@@ -1,0 +1,64 @@
+# GitHub action aimed at creating a Docker image of a Java project. 
+# The Docker image is pushed on DockerHub when created.
+#
+# Requirements:
+# - Secrets. In order to execute the GitHub action the following secrets must be set in the project
+# (Settings / Secrets / Actions):
+#   - ULLSOFTWARE_USERNAME. Username of account ullsoftware.
+#   - ULLSOFTWARE_PASSWORD. Password of account ullsoftware.
+#   - DOCKERHUB_USERNAME. Username of the user in DockerHub.
+#   - DOCKERHUB_PASSWORD. Password of the user in DockerHub.
+#
+# Author: Universidad de La Laguna
+name: Back-end. Publish Docker image
+# Events that trigger the workflow
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - back-end/**
+      - '!**.md'
+  workflow_dispatch:
+# Working directory
+defaults:
+  run:
+    working-directory: back-end
+# Environment variables
+env:
+  JAVA_VERSION: 17
+  WORKING_DIRECTORY: back-end
+  DOCKER_IMAGE_NAME: ull/sensor-app_back-end
+jobs:
+  path-context:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout of the repositoryeso
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Setting Java Development Kit
+      - name: Set up Java Development Kit
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          server-id: github
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+      # Build artifact with Maven
+      - name: Build with Maven
+        run: mvn -B -Pgithub clean package
+        env:
+          MAVEN_USERNAME: ${{ secrets.ULLSOFTWARE_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.ULLSOFTWARE_PASSWORD }}
+      # Build and publish Docker image in DockerHub
+      - name: Build and push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: ${{ env.DOCKER_IMAGE_NAME }}
+          tags: latest
+          registry: docker.io
+          directory: ${{ env.WORKING_DIRECTORY }}
+          dockerfile: ${{ env.WORKING_DIRECTORY }}/Dockerfile
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}

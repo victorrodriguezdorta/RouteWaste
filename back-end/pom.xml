@@ -57,4 +57,26 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+		<id>github</id>
+		<activation>
+			<activeByDefault>true</activeByDefault>
+		</activation>
+		<repositories>
+			<repository>
+			<id>central</id>
+			<url>https://repo1.maven.org/maven2</url>
+			</repository>
+			<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.es.ull/*</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			</repository>
+		</repositories>
+		</profile>
+	</profiles>
+
 </project>
