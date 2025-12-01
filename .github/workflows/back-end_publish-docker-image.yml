@@ -9,8 +9,9 @@
 #   - DOCKERHUB_USERNAME. Username of the user in DockerHub.
 #   - DOCKERHUB_PASSWORD. Password of the user in DockerHub.
 #
-# Author: Universidad de La Laguna
+
 name: Back-end. Publish Docker image
+
 # Events that trigger the workflow
 on:
   push:
@@ -20,20 +21,23 @@ on:
       - back-end/**
       - '!**.md'
   workflow_dispatch:
-# Working directory
-defaults:
-  run:
-    working-directory: back-end
+
+# # Working directory
+# defaults:
+#   run:
+#     working-directory: back-end
+
 # Environment variables
 env:
   JAVA_VERSION: 17
-  WORKING_DIRECTORY: back-end
-  DOCKER_IMAGE_NAME: ull/sensor-app_back-end
+  # WORKING_DIRECTORY: back-end
+  DOCKER_IMAGE_NAME: ullsoftware/sensor-app_back-end
+
 jobs:
   path-context:
     runs-on: ubuntu-latest
     steps:
-      # Checkout of the repositoryeso
+      # Checkout of the repository
       - name: Checkout
         uses: actions/checkout@v4
       # Setting Java Development Kit
@@ -58,7 +62,7 @@ jobs:
           image: ${{ env.DOCKER_IMAGE_NAME }}
           tags: latest
           registry: docker.io
-          directory: ${{ env.WORKING_DIRECTORY }}
-          dockerfile: ${{ env.WORKING_DIRECTORY }}/Dockerfile
+          directory: back-end
+          dockerfile: back-end/Dockerfile
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
