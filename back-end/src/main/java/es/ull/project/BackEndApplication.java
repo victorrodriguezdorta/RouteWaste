@@ -1,5 +1,5 @@
 package es.ull.project;
-// Spring Boot main application class
+// Spring Boot main application classs 
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
