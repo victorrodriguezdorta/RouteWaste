@@ -22,10 +22,10 @@ on:
       - '!**.md'
   workflow_dispatch:
 
-# # Working directory
-# defaults:
-#   run:
-#     working-directory: back-end
+# Working directory
+defaults:
+  run:
+    working-directory: back-end
 
 # Environment variables
 env:
