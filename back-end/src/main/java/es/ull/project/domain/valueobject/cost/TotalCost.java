@@ -111,8 +111,11 @@ public final class TotalCost {
         return this.amount.compareTo(other.amount) > 0;
     }
 
-    public boolean greaterThan( MaximumBudget other) {
-        return greaterThan(other.getAmount());
+    public boolean greaterThan(MaximumBudget other) {
+        if (!this.currency.equals(other.getCurrency())) {
+            throw new IllegalArgumentException("Cannot operate on costs with different currencies");
+        }
+        return this.amount.compareTo(BigDecimal.valueOf(other.getAmount())) > 0;
     }
 
 
@@ -130,6 +133,12 @@ public final class TotalCost {
 
     private void checkCurrencyCompatibility(TotalCost other) {
         if (!this.currency.equals(other.currency)) {
+            throw new IllegalArgumentException("Cannot operate on costs with different currencies");
+        }
+    }
+
+    private void checkCurrencyCompatibility(MaximumBudget other) {
+        if (!this.currency.equals(other.getCurrency())) {
             throw new IllegalArgumentException("Cannot operate on costs with different currencies");
         }
     }
