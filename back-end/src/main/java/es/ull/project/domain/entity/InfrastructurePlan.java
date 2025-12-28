@@ -1,145 +1,199 @@
 package es.ull.project.domain.entity;
-// TODO: Change the types of some attributes as needed
+// TODO: this file needs to be checked for the logic
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
+import es.ull.project.domain.valueobject.identifiers.PlanId;
+import es.ull.project.domain.valueobject.time.PlanningPeriod;
+import es.ull.project.domain.valueobject.policy.ServicePolicies;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
+import es.ull.project.domain.valueobject.cost.TotalCost;
+import es.ull.project.domain.valueobject.demand.WasteDemand;
+
+/**
+ * InfrastructurePlan
+ * 
+ * Represents a complete infrastructure planning decision for a given planning horizon.
+ */
 public class InfrastructurePlan {
 
-    /**
-     * Identifier of the infrastructure plan. It is a computed attribute.
-     */
-    private final UUID planId;
+    public static final String PLAN_ID_NOT_DEFINED = "Plan id is not defined";
+    public static final String PERIOD_NOT_DEFINED = "Planning period is not defined";
+    public static final String MAX_BUDGET_NOT_DEFINED = "Maximum budget is not defined";
+    public static final String TOTAL_COST_EXCEEDED = "Total cost exceeds maximum budget";
+    public static final String INVALID_ASSIGNMENT = "Container assignment is invalid";
+
+    private final PlanId id;
+    private PlanningPeriod period;
+    private List<Facility> selectedFacilities;
+    private Map<Container, Facility> serviceAssignments; // One per container
+    private ServicePolicies servicePolicies;
+    private MaximumBudget maxBudget;
+    private TotalCost estimatedTotalCost;
 
     /**
-     * Planning period (e.g. year, quarter).
+     * Creates a new InfrastructurePlan.
+     *
+     * @param id                Plan identifier
+     * @param period            Planning period
+     * @param maxBudget         Maximum budget allowed
+     * @param servicePolicies   Service policies to comply with
      */
-    private String periodoPlanificacion;
+    public InfrastructurePlan(PlanId id,
+                              PlanningPeriod period,
+                              MaximumBudget maxBudget,
+                              ServicePolicies servicePolicies) {
+        validateId(id);
+        validatePeriod(period);
+        validateMaxBudget(maxBudget);
+
+        this.id = id;
+        this.period = period;
+        this.maxBudget = maxBudget;
+        this.servicePolicies = servicePolicies;
+        this.selectedFacilities = new ArrayList<>();
+        this.serviceAssignments = new HashMap<>();
+        this.estimatedTotalCost = new TotalCost(0.0);
+    }
+
+    private void validateId(PlanId id) {
+        if (id == null) {
+            throw new IllegalArgumentException(PLAN_ID_NOT_DEFINED);
+        }
+    }
+
+    private void validatePeriod(PlanningPeriod period) {
+        if (period == null) {
+            throw new IllegalArgumentException(PERIOD_NOT_DEFINED);
+        }
+    }
+
+    private void validateMaxBudget(MaximumBudget maxBudget) {
+        if (maxBudget == null) {
+            throw new IllegalArgumentException(MAX_BUDGET_NOT_DEFINED);
+        }
+    }
 
     /**
-     * Selected infrastructures for the plan.
+     * Assigns a container to a facility.
+     *
+     * @param container Container to assign
+     * @param facility Facility to assign to
      */
-    private int infraestructuras;
+    public void assignContainerToFacility(Container container, Facility facility) {
+        if (container == null || facility == null) {
+            throw new IllegalArgumentException(INVALID_ASSIGNMENT);
+        }
+
+        // Check facility capacity and status
+        facility.assignWasteDemand(container.getWasteDemand());
+
+        serviceAssignments.put(container, facility);
+
+        // Recalculate total cost
+        recalculateTotalCost();
+    }
 
     /**
-     * Service assignments (one per container).
+     * Adds a facility to the plan.
+     *
+     * @param facility Facility to add
      */
-    private int asignacionesServicio;
+    public void addFacility(Facility facility) {
+        if (facility != null && !selectedFacilities.contains(facility)) {
+            selectedFacilities.add(facility);
+        }
+    }
 
     /**
-     * Service policies applied to the plan.
+     * Recalculates the total estimated cost of the plan.
      */
-    private String politicasServicio;
+    public void recalculateTotalCost() {
+        double total = 0.0;
+        for (Facility facility : selectedFacilities) {
+            total += facility.getOpeningFixedCost().getAmount();
+        }
+        for (Map.Entry<Container, Facility> entry : serviceAssignments.entrySet()) {
+            total += entry.getValue().getOpeningFixedCost().getAmount(); // Optional: add transportation cost here
+        }
+
+        TotalCost newCost = new TotalCost(total);
+        if (newCost.greaterThan(this.maxBudget)) {
+            throw new IllegalStateException(TOTAL_COST_EXCEEDED);
+        }
+        this.estimatedTotalCost = newCost;
+    }
 
     /**
-     * Maximum available budget.
+     * Checks if the plan is valid.
+     *
+     * @return true if the plan is valid, false otherwise
      */
-    private double presupuestoMaximo;
-
-    /**
-     * Estimated total cost of the plan.
-     */
-    private double costeTotalEstimado;
-
-    public InfrastructurePlan(String periodoPlanificacion,
-                              int infraestructuras,
-                              int asignacionesServicio,
-                              String politicasServicio,
-                              double presupuestoMaximo,
-                              double costeTotalEstimado) {
-
-        this.planId = UUID.randomUUID();
-        this.periodoPlanificacion = periodoPlanificacion;
-        this.infraestructuras = infraestructuras;
-        this.asignacionesServicio = asignacionesServicio;
-        this.politicasServicio = politicasServicio;
-        this.presupuestoMaximo = presupuestoMaximo;
-        this.costeTotalEstimado = costeTotalEstimado;
+    public boolean isPlanValid() {
+        // TODO: chek this logic, buceause idk if it's correct
+        for (Map.Entry<Container, Facility> entry : serviceAssignments.entrySet()) {
+            Facility facility = entry.getValue();
+            if (facility.getStatus().isDiscarded()) {
+                return false;
+            }
+            WasteDemand totalDemand = facility.getAssignedWasteDemand();
+            if (totalDemand.greaterThan(facility.getCapacity())) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    public UUID getPlanId() {
-        return this.planId;
+    public PlanId getId() {
+        return id;
     }
 
-    public String getPeriodoPlanificacion() {
-        return this.periodoPlanificacion;
+    public PlanningPeriod getPeriod() {
+        return period;
     }
 
-    public void setPeriodoPlanificacion(String periodoPlanificacion) {
-        this.periodoPlanificacion = periodoPlanificacion;
+    public List<Facility> getSelectedFacilities() {
+        return Collections.unmodifiableList(selectedFacilities);
     }
 
-    public int getInfraestructuras() {
-        return this.infraestructuras;
+    public Map<Container, Facility> getServiceAssignments() {
+        return Collections.unmodifiableMap(serviceAssignments);
     }
 
-    public void setInfraestructuras(int infraestructuras) {
-        this.infraestructuras = infraestructuras;
+    public MaximumBudget getMaxBudget() {
+        return maxBudget;
     }
 
-    public int getAsignacionesServicio() {
-        return this.asignacionesServicio;
+    public TotalCost getEstimatedTotalCost() {
+        return estimatedTotalCost;
     }
 
-    public void setAsignacionesServicio(int asignacionesServicio) {
-    this.asignacionesServicio = asignacionesServicio;
-    }
-
-    public String getPoliticasServicio() {
-        return this.politicasServicio;
-    }
-
-    public void setPoliticasServicio(String politicasServicio) {
-        this.politicasServicio = politicasServicio;
-    }
-
-    public double getPresupuestoMaximo() {
-        return this.presupuestoMaximo;
-    }
-
-    public void setPresupuestoMaximo(double presupuestoMaximo) {
-        this.presupuestoMaximo = presupuestoMaximo;
-    }
-
-    public double getCosteTotalEstimado() {
-        return this.costeTotalEstimado;
-    }
-
-    public void setCosteTotalEstimado(double costeTotalEstimado) {
-        this.costeTotalEstimado = costeTotalEstimado;
+    public ServicePolicies getServicePolicies() {
+        return servicePolicies;
     }
 
     @Override
     public boolean equals(Object otherObject) {
-        if (this == otherObject) {
-            return true;
-        }
-        if (otherObject == null) {
-            return false;
-        }
-        if (getClass() != otherObject.getClass()) {
-            return false;
-        }
-        final InfrastructurePlan otherPlan = (InfrastructurePlan) otherObject;
-        return Objects.equals(this.planId, otherPlan.planId);
+        if (this == otherObject) return true;
+        if (otherObject == null || getClass() != otherObject.getClass()) return false;
+        InfrastructurePlan other = (InfrastructurePlan) otherObject;
+        return Objects.equals(this.id, other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.planId);
+        return Objects.hash(this.id);
     }
 
     @Override
     public String toString() {
         return String.format(
-            "InfrastructurePlan={id=%s, periodo=%s, infraestructuras=%s, asignaciones=%s, politicas=%s, presupuestoMaximo=%s, costeTotalEstimado=%s}",
-            this.planId,
-            this.periodoPlanificacion,
-            this.infraestructuras,
-            this.asignacionesServicio,
-            this.politicasServicio,
-            this.presupuestoMaximo,
-            this.costeTotalEstimado
+                "InfrastructurePlan={id=%s, period=%s, facilities=%s, assignments=%s, totalCost=%s}",
+                id,
+                period,
+                selectedFacilities,
+                serviceAssignments.keySet(),
+                estimatedTotalCost
         );
     }
 }

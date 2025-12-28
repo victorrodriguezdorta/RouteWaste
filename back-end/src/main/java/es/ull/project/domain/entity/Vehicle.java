@@ -1,66 +1,122 @@
 package es.ull.project.domain.entity;
 
 import java.util.Objects;
-import java.util.UUID;
 
+import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.identifiers.VehicleId;
+import es.ull.project.domain.valueobject.demand.Capacity;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+
+/**
+ * Vehicle
+ *
+ * Represents a truck or transport unit participating in the service system.
+ * It is an aggregate root.
+ */
 public class Vehicle {
 
-    /**
-     * Identifier of the vehicle. It is a computed attribute.
-     */
-    private final UUID vehiculoId;
+    public static final String ID_NOT_DEFINED = "Vehicle id is not defined";
+    public static final String TYPE_NOT_DEFINED = "Vehicle type is not defined";
+    public static final String CAPACITY_NOT_DEFINED = "Vehicle capacity is not defined";
+    public static final String COST_NOT_DEFINED = "Transportation variable cost is not defined";
 
     /**
-     * Type of vehicle.
+     * Identifier of the vehicle.
+     * It is required and immutable.
      */
-    private String tipoVehiculo;
+    private final VehicleId id;
 
     /**
-     * Vehicle capacity.
+     * Enumeration of vehicle type (e.g., LIGHT_TRUCK, HEAVY_TRUCK...)
+     * It is required.
      */
-    private double capacidadVehiculo;
+    private VehicleType vehicleType;
 
     /**
-     * Operating cost per kilometer.
+     * Transport capacity of the vehicle.
+     * It is required.
      */
-    private double costeOperacionPorKm;
+    private Capacity transportCapacity;
 
-    public Vehicle(String tipoVehiculo,
-                   double capacidadVehiculo,
-                   double costeOperacionPorKm) {
+    /**
+     * Cost per kilometer of operation.
+     * It is required.
+     */
+    private TransportationVariableCost costPerKilometer;
 
-        this.vehiculoId = UUID.randomUUID();
-        this.tipoVehiculo = tipoVehiculo;
-        this.capacidadVehiculo = capacidadVehiculo;
-        this.costeOperacionPorKm = costeOperacionPorKm;
+    /**
+     * Creates a new Vehicle.
+     */
+    public Vehicle(
+            VehicleId id,
+            VehicleType vehicleType,
+            Capacity transportCapacity,
+            TransportationVariableCost costPerKilometer) {
+
+        validateId(id);
+        validateVehicleType(vehicleType);
+        validateCapacity(transportCapacity);
+        validateCost(costPerKilometer);
+
+        this.id = id;
+        this.vehicleType = vehicleType;
+        this.transportCapacity = transportCapacity;
+        this.costPerKilometer = costPerKilometer;
     }
 
-    public UUID getVehiculoId() {
-        return this.vehiculoId;
+    private void validateId(VehicleId id) {
+        if (id == null) {
+            throw new IllegalArgumentException(ID_NOT_DEFINED);
+        }
     }
 
-    public String getTipoVehiculo() {
-        return this.tipoVehiculo;
+    private void validateVehicleType(VehicleType type) {
+        if (type == null) {
+            throw new IllegalArgumentException(TYPE_NOT_DEFINED);
+        }
     }
 
-    public void setTipoVehiculo(String tipoVehiculo) {
-        this.tipoVehiculo = tipoVehiculo;
+    private void validateCapacity(Capacity capacity) {
+        if (capacity == null) {
+            throw new IllegalArgumentException(CAPACITY_NOT_DEFINED);
+        }
     }
 
-    public double getCapacidadVehiculo() {
-        return this.capacidadVehiculo;
+    private void validateCost(TransportationVariableCost cost) {
+        if (cost == null) {
+            throw new IllegalArgumentException(COST_NOT_DEFINED);
+        }
     }
 
-    public void setCapacidadVehiculo(double capacidadVehiculo) {
-        this.capacidadVehiculo = capacidadVehiculo;
+    public VehicleId getId() {
+        return this.id;
     }
 
-    public double getCosteOperacionPorKm() {
-        return this.costeOperacionPorKm;
+    public VehicleType getVehicleType() {
+        return this.vehicleType;
     }
 
-    public void setCosteOperacionPorKm(double costeOperacionPorKm) {
-        this.costeOperacionPorKm = costeOperacionPorKm;
+    public void updateVehicleType(VehicleType vehicleType) {
+        validateVehicleType(vehicleType);
+        this.vehicleType = vehicleType;
+    }
+
+    public Capacity getTransportCapacity() {
+        return this.transportCapacity;
+    }
+
+    public void updateTransportCapacity(Capacity capacity) {
+        validateCapacity(capacity);
+        this.transportCapacity = capacity;
+    }
+
+    public TransportationVariableCost getCostPerKilometer() {
+        return this.costPerKilometer;
+    }
+
+    public void updateCostPerKilometer(TransportationVariableCost cost) {
+        validateCost(cost);
+        this.costPerKilometer = cost;
     }
 
     @Override
@@ -68,29 +124,26 @@ public class Vehicle {
         if (this == otherObject) {
             return true;
         }
-        if (otherObject == null) {
+        if (otherObject == null || getClass() != otherObject.getClass()) {
             return false;
         }
-        if (getClass() != otherObject.getClass()) {
-            return false;
-        }
-        final Vehicle otherVehicle = (Vehicle) otherObject;
-        return Objects.equals(this.vehiculoId, otherVehicle.vehiculoId);
+        Vehicle otherVehicle = (Vehicle) otherObject;
+        return Objects.equals(this.id, otherVehicle.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.vehiculoId);
+        return Objects.hash(this.id);
     }
 
     @Override
     public String toString() {
         return String.format(
-            "Vehicle={id=%s, tipoVehiculo=%s, capacidad=%s, costePorKm=%s}",
-            this.vehiculoId,
-            this.tipoVehiculo,
-            this.capacidadVehiculo,
-            this.costeOperacionPorKm
+                "Vehicle={id=%s, type=%s, capacity=%s, costPerKm=%s}",
+                this.id,
+                this.vehicleType,
+                this.transportCapacity,
+                this.costPerKilometer
         );
     }
 }

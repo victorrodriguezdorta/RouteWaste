@@ -3,142 +3,153 @@ package es.ull.project.domain.entity;
 import java.util.Objects;
 import java.util.UUID;
 
+import es.ull.project.domain.valueobject.identifiers.ContainerId;
+import es.ull.project.domain.valueobject.identifiers.FacilityId;
+import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.location.Distance;
+import es.ull.project.domain.valueobject.location.ServiceTime;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.policy.ServicePolicies;
+
+/**
+ * ServiceAssignment
+ *
+ * Represents an assignment between a container and a facility,
+ * including calculated values such as distance, service time and transportation cost.
+ *
+ * It is an immutable entity except for recalculations triggered by policy validation.
+ */
 public class ServiceAssignment {
 
-    /**
-     * Identifier of the service assignment. It is a computed attribute.
-     */
+    public static final String CONTAINER_ID_NOT_DEFINED = "Container id is not defined";
+    public static final String FACILITY_ID_NOT_DEFINED = "Facility id is not defined";
+    public static final String DEMAND_NOT_DEFINED = "Waste demand is not defined";
+    public static final String DISTANCE_NOT_DEFINED = "Distance is not defined";
+    public static final String SERVICE_TIME_NOT_DEFINED = "Service time is not defined";
+    public static final String TRANSPORT_COST_NOT_DEFINED = "Transportation cost is not defined";
+    public static final String POLICY_VIOLATION = "Service assignment violates service policies";
+
     private final UUID serviceAssignmentId;
+    private final ContainerId containerId;
+    private final FacilityId facilityId;
+
+    private final WasteDemand wasteDemand;
+    private final Distance distance;
+    private final ServiceTime serviceTime;
+    private final TransportationVariableCost transportCost;
 
     /**
-     * Identifier of the container involved in the assignment.
+     * Creates a new service assignment.
+     *
+     * @param containerId      container identifier
+     * @param facilityId       facility identifier
+     * @param wasteDemand      waste demand of the container
+     * @param distance         distance between container and facility
+     * @param serviceTime      service time required
+     * @param transportCost    transportation cost applied
      */
-    private UUID contenedorId;
+    public ServiceAssignment(ContainerId containerId,
+                             FacilityId facilityId,
+                             WasteDemand wasteDemand,
+                             Distance distance,
+                             ServiceTime serviceTime,
+                             TransportationVariableCost transportCost) {
 
-    /**
-     * Identifier of the infrastructure involved in the assignment.
-     */
-    private UUID infraestructuraId;
-
-    /**
-     * Waste demand associated with this assignment.
-     */
-    private double demandaResiduos;
-
-    /**
-     * Distance between container and infrastructure.
-     */
-    private double distancia;
-
-    /**
-     * Service time required for this assignment.
-     */
-    private double tiempoServicio;
-
-    /**
-     * Transport cost associated with this assignment.
-     */
-    private double costeTransporte;
-
-    public ServiceAssignment(UUID contenedorId,
-                             UUID infraestructuraId,
-                             double demandaResiduos,
-                             double distancia,
-                             double tiempoServicio,
-                             double costeTransporte) {
+        validate(containerId, facilityId, wasteDemand, distance, serviceTime, transportCost);
 
         this.serviceAssignmentId = UUID.randomUUID();
-        this.contenedorId = contenedorId;
-        this.infraestructuraId = infraestructuraId;
-        this.demandaResiduos = demandaResiduos;
-        this.distancia = distancia;
-        this.tiempoServicio = tiempoServicio;
-        this.costeTransporte = costeTransporte;
+        this.containerId = containerId;
+        this.facilityId = facilityId;
+        this.wasteDemand = wasteDemand;
+        this.distance = distance;
+        this.serviceTime = serviceTime;
+        this.transportCost = transportCost;
+    }
+
+    private void validate(ContainerId containerId,
+                          FacilityId facilityId,
+                          WasteDemand wasteDemand,
+                          Distance distance,
+                          ServiceTime serviceTime,
+                          TransportationVariableCost transportCost) {
+
+        if (containerId == null) throw new IllegalArgumentException(CONTAINER_ID_NOT_DEFINED);
+        if (facilityId == null) throw new IllegalArgumentException(FACILITY_ID_NOT_DEFINED);
+        if (wasteDemand == null) throw new IllegalArgumentException(DEMAND_NOT_DEFINED);
+        if (distance == null) throw new IllegalArgumentException(DISTANCE_NOT_DEFINED);
+        if (serviceTime == null) throw new IllegalArgumentException(SERVICE_TIME_NOT_DEFINED);
+        if (transportCost == null) throw new IllegalArgumentException(TRANSPORT_COST_NOT_DEFINED);
+    }
+
+    /**
+     * Validates whether this assignment complies with service policies.
+     *
+     * This method is intended to be called from the InfrastructurePlan aggregate.
+     *
+     * @param policies service policies to validate
+     * @throws IllegalStateException if assignment violates policies
+     */
+    public void validatePolicies(ServicePolicies policies) {
+        if (policies == null) {
+            return; // No policies to validate
+        }
+        
+        // Delegate validation logic to ServicePolicies
+        policies.validateServiceAssignment(
+                this.distance.toMeters(),
+                (int) this.serviceTime.getValue()
+        ).ifPresent(errorMessage -> {
+            throw new IllegalStateException(POLICY_VIOLATION + ": " + errorMessage);
+        });
     }
 
     public UUID getServiceAssignmentId() {
-        return this.serviceAssignmentId;
+        return serviceAssignmentId;
     }
 
-    public UUID getContenedorId() {
-        return this.contenedorId;
+    public ContainerId getContainerId() {
+        return containerId;
     }
 
-    public void setContenedorId(UUID contenedorId) {
-        this.contenedorId = contenedorId;
+    public FacilityId getFacilityId() {
+        return facilityId;
     }
 
-    public UUID getInfraestructuraId() {
-        return this.infraestructuraId;
+    public WasteDemand getWasteDemand() {
+        return wasteDemand;
     }
 
-    public void setInfraestructuraId(UUID infraestructuraId) {
-        this.infraestructuraId = infraestructuraId;
+    public Distance getDistance() {
+        return distance;
     }
 
-    public double getDemandaResiduos() {
-        return this.demandaResiduos;
+    public ServiceTime getServiceTime() {
+        return serviceTime;
     }
 
-    public void setDemandaResiduos(double demandaResiduos) {
-        this.demandaResiduos = demandaResiduos;
-    }
-
-    public double getDistancia() {
-        return this.distancia;
-    }
-
-    public void setDistancia(double distancia) {
-        this.distancia = distancia;
-    }
-
-    public double getTiempoServicio() {
-        return this.tiempoServicio;
-    }
-
-    public void setTiempoServicio(double tiempoServicio) {
-        this.tiempoServicio = tiempoServicio;
-    }
-
-    public double getCosteTransporte() {
-        return this.costeTransporte;
-    }
-
-    public void setCosteTransporte(double costeTransporte) {
-        this.costeTransporte = costeTransporte;
+    public TransportationVariableCost getTransportCost() {
+        return transportCost;
     }
 
     @Override
     public boolean equals(Object otherObject) {
-        if (this == otherObject) {
-            return true;
-        }
-        if (otherObject == null) {
-            return false;
-        }
-        if (getClass() != otherObject.getClass()) {
-            return false;
-        }
-        final ServiceAssignment otherAssignment = (ServiceAssignment) otherObject;
-        return Objects.equals(this.serviceAssignmentId, otherAssignment.serviceAssignmentId);
+        if (this == otherObject) return true;
+        if (otherObject == null || getClass() != otherObject.getClass()) return false;
+        ServiceAssignment other = (ServiceAssignment) otherObject;
+        return Objects.equals(this.serviceAssignmentId, other.serviceAssignmentId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.serviceAssignmentId);
+        return Objects.hash(serviceAssignmentId);
     }
 
     @Override
     public String toString() {
         return String.format(
-            "ServiceAssignment={id=%s, contenedorId=%s, infraestructuraId=%s, demanda=%s, distancia=%s, tiempoServicio=%s, costeTransporte=%s}",
-            this.serviceAssignmentId,
-            this.contenedorId,
-            this.infraestructuraId,
-            this.demandaResiduos,
-            this.distancia,
-            this.tiempoServicio,
-            this.costeTransporte
+                "ServiceAssignment={id=%s, containerId=%s, facilityId=%s, demand=%s, distance=%s, serviceTime=%s, transportCost=%s}",
+                serviceAssignmentId, containerId, facilityId, wasteDemand,
+                distance, serviceTime, transportCost
         );
     }
 }
