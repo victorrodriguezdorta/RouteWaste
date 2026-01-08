@@ -3,7 +3,6 @@ package es.ull.project.domain.entity;
 
 import java.util.*;
 
-import es.ull.project.domain.valueobject.identifiers.PlanId;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;

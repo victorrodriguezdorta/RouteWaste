@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import es.ull.project.domain.enumerate.VehicleType;
-import es.ull.project.domain.valueobject.identifiers.VehicleId;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 
