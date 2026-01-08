@@ -1,6 +1,7 @@
 package es.ull.project.domain.entity;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.identifiers.VehicleId;
@@ -24,7 +25,7 @@ public class Vehicle {
      * Identifier of the vehicle.
      * It is required and immutable.
      */
-    private final VehicleId id;
+    private final UUID id;
 
     /**
      * Enumeration of vehicle type (e.g., LIGHT_TRUCK, HEAVY_TRUCK...)
@@ -48,27 +49,20 @@ public class Vehicle {
      * Creates a new Vehicle.
      */
     public Vehicle(
-            VehicleId id,
             VehicleType vehicleType,
             Capacity transportCapacity,
             TransportationVariableCost costPerKilometer) {
 
-        validateId(id);
         validateVehicleType(vehicleType);
         validateCapacity(transportCapacity);
         validateCost(costPerKilometer);
 
-        this.id = id;
+        this.id = UUID.randomUUID();
         this.vehicleType = vehicleType;
         this.transportCapacity = transportCapacity;
         this.costPerKilometer = costPerKilometer;
     }
 
-    private void validateId(VehicleId id) {
-        if (id == null) {
-            throw new IllegalArgumentException(ID_NOT_DEFINED);
-        }
-    }
 
     private void validateVehicleType(VehicleType type) {
         if (type == null) {
@@ -88,7 +82,7 @@ public class Vehicle {
         }
     }
 
-    public VehicleId getId() {
+    public UUID getId() {
         return this.id;
     }
 

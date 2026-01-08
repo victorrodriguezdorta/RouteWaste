@@ -2,10 +2,10 @@ package es.ull.project.domain.entity;
 
 
 import java.util.Objects;
+import java.util.UUID;
 
 import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.valueobject.identifiers.FacilityId;
-import es.ull.project.domain.valueobject.clasification.FacilityType;
+import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.valueobject.location.Location;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
@@ -36,7 +36,7 @@ public class Facility {
      * Identifier of the facility.
      * It is a required and immutable attribute.
      */
-    private final FacilityId id;
+    private final UUID id;
 
     /**
      * Type of the facility.
@@ -84,21 +84,20 @@ public class Facility {
      * @param openingFixedCost  Fixed opening cost.
      * @param status            Facility status.
      */
-    public Facility(FacilityId id,
+    public Facility(
                     FacilityType facilityType,
                     Location location,
                     Capacity capacity,
                     OpeningFixedCost openingFixedCost,
                     FacilityStatus status) {
 
-        this.validateId(id);
         this.validateFacilityType(facilityType);
         this.validateLocation(location);
         this.validateCapacity(capacity);
         this.validateOpeningFixedCost(openingFixedCost);
         this.validateStatus(status);
 
-        this.id = id;
+        this.id = UUID.randomUUID();
         this.facilityType = facilityType;
         this.location = location;
         this.capacity = capacity;
@@ -106,12 +105,15 @@ public class Facility {
         this.status = status;
         this.assignedWasteDemand = new WasteDemand(0.0);
     }
-
-    private void validateId(FacilityId id) {
-        if (id == null) {
-            throw new IllegalArgumentException(ID_NOT_DEFINED);
-        }
+    /**
+     * Returns the unique identifier of the facility.
+     *
+     * @return Facility UUID.
+     */
+    public UUID getId() {
+        return this.id;
     }
+
 
     private void validateFacilityType(FacilityType facilityType) {
         if (facilityType == null) {
@@ -160,10 +162,6 @@ public class Facility {
         }
 
         this.assignedWasteDemand = newTotal;
-    }
-
-    public FacilityId getId() {
-        return this.id;
     }
 
     public FacilityType getFacilityType() {

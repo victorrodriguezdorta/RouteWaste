@@ -17,7 +17,7 @@ public final class ServicePolicies {
 
     /**
      * Maximum service distance allowed.
-     * Optional attribute. Measured in kilometers.
+     * Optional attribute. Measured in meters.
      */
     private final Double maxServiceDistance;
 
@@ -42,7 +42,7 @@ public final class ServicePolicies {
     /**
      * Creates a new ServicePolicies value object.
      *
-     * @param maxServiceDistance     Maximum service distance (km).
+     * @param maxServiceDistance     Maximum service distance (meters).
      * @param maxServiceTime         Maximum service time (minutes).
      * @param maxInfrastructureCount Maximum number of infrastructures.
      * @param maxEmissions           Maximum emissions allowed (kg CO2).

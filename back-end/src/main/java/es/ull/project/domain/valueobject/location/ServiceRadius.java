@@ -14,7 +14,7 @@ public final class ServiceRadius {
     private static final String ERROR_RADIUS_NEGATIVE = "Service radius cannot be negative";
 
     /**
-     * Service radius value (e.g., in kilometers).
+     * Service radius value ( in meters).
      */
     private final double value;
 

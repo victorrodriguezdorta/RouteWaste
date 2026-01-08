@@ -23,7 +23,7 @@ public class InfrastructurePlan {
     public static final String TOTAL_COST_EXCEEDED = "Total cost exceeds maximum budget";
     public static final String INVALID_ASSIGNMENT = "Container assignment is invalid";
 
-    private final PlanId id;
+    private final UUID id;
     private PlanningPeriod period;
     private List<Facility> selectedFacilities;
     private Map<Container, Facility> serviceAssignments; // One per container
@@ -39,15 +39,14 @@ public class InfrastructurePlan {
      * @param maxBudget         Maximum budget allowed
      * @param servicePolicies   Service policies to comply with
      */
-    public InfrastructurePlan(PlanId id,
+    public InfrastructurePlan(
                               PlanningPeriod period,
                               MaximumBudget maxBudget,
                               ServicePolicies servicePolicies) {
-        validateId(id);
         validatePeriod(period);
         validateMaxBudget(maxBudget);
 
-        this.id = id;
+        this.id = UUID.randomUUID();
         this.period = period;
         this.maxBudget = maxBudget;
         this.servicePolicies = servicePolicies;
@@ -56,11 +55,7 @@ public class InfrastructurePlan {
         this.estimatedTotalCost = new TotalCost(0.0);
     }
 
-    private void validateId(PlanId id) {
-        if (id == null) {
-            throw new IllegalArgumentException(PLAN_ID_NOT_DEFINED);
-        }
-    }
+
 
     private void validatePeriod(PlanningPeriod period) {
         if (period == null) {
@@ -144,7 +139,7 @@ public class InfrastructurePlan {
         return true;
     }
 
-    public PlanId getId() {
+    public UUID getId() {
         return id;
     }
 

@@ -2,12 +2,12 @@ package es.ull.project.domain.entity;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
-import es.ull.project.domain.valueobject.identifiers.ContainerId;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.enumerate.ServiceZone;
+import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
-import es.ull.project.domain.valueobject.clasification.WasteType;
-import es.ull.project.domain.valueobject.clasification.ServiceZone;
 
 /**
  * Container
@@ -26,7 +26,7 @@ public class Container {
      * Identifier of the container.
      * It is a required and immutable attribute.
      */
-    private final ContainerId id;
+    private final UUID  id;
 
     /**
      * Physical location of the container.
@@ -61,18 +61,17 @@ public class Container {
      * @param wasteDemand  Waste demand.
      * @param serviceZone  Service zone (optional).
      */
-    public Container(ContainerId id,
+    public Container(
                      Location location,
                      WasteType wasteType,
                      WasteDemand wasteDemand,
                      ServiceZone serviceZone) {
 
-        this.validateId(id);
         this.validateLocation(location);
         this.validateWasteType(wasteType);
         this.validateWasteDemand(wasteDemand);
 
-        this.id = id;
+        this.id = UUID.randomUUID();
         this.location = location;
         this.wasteType = wasteType;
         this.wasteDemand = wasteDemand;
@@ -87,18 +86,12 @@ public class Container {
      * @param wasteType    Type of waste collected.
      * @param wasteDemand  Waste demand.
      */
-    public Container(ContainerId id,
+    public Container(
                      Location location,
                      WasteType wasteType,
                      WasteDemand wasteDemand) {
 
-        this(id, location, wasteType, wasteDemand, null);
-    }
-
-    private void validateId(ContainerId id) {
-        if (id == null) {
-            throw new IllegalArgumentException(ID_NOT_DEFINED);
-        }
+        this(location, wasteType, wasteDemand, null);
     }
 
     private void validateLocation(Location location) {
@@ -124,7 +117,7 @@ public class Container {
      *
      * @return ContainerId.
      */
-    public ContainerId getId() {
+    public UUID getId() {
         return this.id;
     }
 

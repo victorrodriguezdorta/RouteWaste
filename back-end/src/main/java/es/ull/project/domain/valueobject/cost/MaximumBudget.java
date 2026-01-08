@@ -26,7 +26,7 @@ public final class MaximumBudget {
     /**
      * Optional currency of the budget. Default: "EUR".
      */
-    private final String currency;
+    private final Currency currency;
 
     /**
      * Creates a new MaximumBudget with default currency (EUR).
@@ -34,20 +34,34 @@ public final class MaximumBudget {
      * @param amount Amount of the maximum budget. Must be ≥ 0.
      */
     public MaximumBudget(double amount) {
-        this(amount, "EUR");
+        this(amount, new Currency());
+    }
+
+    /**
+     * Creates a new MaximumBudget with specific Currency object. (BETTER)
+     *
+     * @param amount   Amount of the maximum budget. Must be ≥ 0.
+     * @param currency Currency object. Cannot be null.
+     */
+    public MaximumBudget(double amount, Currency currency) {
+        validateAmount(amount);
+        validateCurrency(currency);
+        Objects.requireNonNull(currency, ERROR_CURRENCY_INVALID);
+        this.amount = BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP);
+        this.currency = currency;
     }
 
     /**
      * Creates a new MaximumBudget with specific currency.
      *
      * @param amount   Amount of the maximum budget. Must be ≥ 0.
-     * @param currency Currency code (e.g., "EUR", "USD"). Cannot be null/empty.
+     * @param currency Currency but as String. Cannot be null or empty. it creates a Currency object internally.
      */
     public MaximumBudget(double amount, String currency) {
         validateAmount(amount);
-        validateCurrency(currency);
+        validateCurrencyString(currency);
         this.amount = BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP);
-        this.currency = currency;
+        this.currency = new Currency(currency);
     }
 
     /**
@@ -67,8 +81,18 @@ public final class MaximumBudget {
      * Validates the currency is not null or empty.
      * @param currency Currency to validate.
      */
-    private void validateCurrency(String currency) {
-        if (currency == null || currency.isEmpty()) {
+    private void validateCurrency(Currency currency) {
+        if (currency == null) {
+            throw new IllegalArgumentException(ERROR_CURRENCY_INVALID);
+        }
+    }
+
+    /**
+     * Validates the currency string is not null or empty.
+     * @param currency Currency string to validate.
+     */
+    private void validateCurrencyString(String currency) {
+        if (currency == null || currency.trim().isEmpty()) {
             throw new IllegalArgumentException(ERROR_CURRENCY_INVALID);
         }
     }
@@ -83,9 +107,9 @@ public final class MaximumBudget {
 
     /**
      * Returns the currency of the maximum budget.
-     * @return Currency as String.
+     * @return Currency object.
      */
-    public String getCurrency() {
+    public Currency getCurrency() {
         return this.currency;
     }
 

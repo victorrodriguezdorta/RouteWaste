@@ -30,8 +30,8 @@ public class ServiceAssignment {
     public static final String POLICY_VIOLATION = "Service assignment violates service policies";
 
     private final UUID serviceAssignmentId;
-    private final ContainerId containerId;
-    private final FacilityId facilityId;
+    private final UUID containerId;
+    private final UUID facilityId;
 
     private final WasteDemand wasteDemand;
     private final Distance distance;
@@ -48,8 +48,8 @@ public class ServiceAssignment {
      * @param serviceTime      service time required
      * @param transportCost    transportation cost applied
      */
-    public ServiceAssignment(ContainerId containerId,
-                             FacilityId facilityId,
+    public ServiceAssignment(UUID containerId,
+                             UUID facilityId,
                              WasteDemand wasteDemand,
                              Distance distance,
                              ServiceTime serviceTime,
@@ -59,15 +59,15 @@ public class ServiceAssignment {
 
         this.serviceAssignmentId = UUID.randomUUID();
         this.containerId = containerId;
-        this.facilityId = facilityId;
+        this.facilityId =   facilityId;
         this.wasteDemand = wasteDemand;
-        this.distance = distance;
+        this.distance =   distance;
         this.serviceTime = serviceTime;
         this.transportCost = transportCost;
     }
 
-    private void validate(ContainerId containerId,
-                          FacilityId facilityId,
+    private void validate(UUID containerId,
+                          UUID facilityId,
                           WasteDemand wasteDemand,
                           Distance distance,
                           ServiceTime serviceTime,
@@ -107,11 +107,11 @@ public class ServiceAssignment {
         return serviceAssignmentId;
     }
 
-    public ContainerId getContainerId() {
+    public UUID getContainerId() {
         return containerId;
     }
 
-    public FacilityId getFacilityId() {
+    public UUID getFacilityId() {
         return facilityId;
     }
 
