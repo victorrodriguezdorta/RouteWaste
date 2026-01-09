@@ -98,7 +98,6 @@ public final class Distance {
      * Returns the distance value in meters (base unit).
      * 
      * @return Distance in meters.
-     * @deprecated Use {@link #toMeters()} for clarity.
      */
     public double getValue() {
         return this.meters;
@@ -109,7 +108,6 @@ public final class Distance {
      * 
      * @param newMeters New distance in meters.
      * @return New Distance object.
-     * @deprecated Use {@link #fromMeters(double)} for clarity.
      */
     public Distance setValue(double newMeters) {
         return Distance.fromMeters(newMeters);
