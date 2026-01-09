@@ -8,23 +8,24 @@ import java.util.Random;
  *
  * Represents the different types of geographical service zones for waste collection.
  * Each zone defines the scope and boundaries of service areas.
+ * NEIGHBORHOOD, DISTRICT, or GEOGRAPHICAL_AREA.
  */
 public enum ServiceZone {
 
     /**
      * Neighborhood-level service zone.
      */
-    BARRIO,
+    NEIGHBORHOOD,
 
     /**
      * District-level service zone.
      */
-    DISTRITO,
+    DISTRICT,
 
     /**
      * Geographical area service zone.
      */
-    AREA_GEOGRAFICA;
+    GEOGRAPHICAL_AREA;
 
     /**
      * Returns the ServiceZone that matches the given string.

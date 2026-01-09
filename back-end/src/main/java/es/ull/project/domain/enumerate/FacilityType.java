@@ -7,23 +7,24 @@ import java.util.Random;
  *
  * Represents the different types of waste management facilities.
  * Each type defines the specific function and purpose of the facility.
+ * OPERATIONAL_BASE, TRANSFER_STATION, or TREATMENT_PLANT.
  */
 public enum FacilityType {
 
     /**
      * Operational base for waste collection vehicles and operations.
      */
-    BASE_OPERATIVA,
+    OPERATIONAL_BASE,
 
     /**
      * Transfer station for temporary waste storage and distribution.
      */
-    ESTACION_TRANSFERENCIA,
+    TRANSFER_STATION,
 
     /**
      * Treatment plant for waste processing and final disposal.
      */
-    PLANTA_TRATAMIENTO;
+    TREATMENT_PLANT;
 
     /**
      * Returns the FacilityType that matches the given string.

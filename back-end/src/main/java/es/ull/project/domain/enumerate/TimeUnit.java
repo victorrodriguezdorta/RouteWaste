@@ -8,6 +8,7 @@ import java.util.Random;
  *
  * Represents the different time units used for temporal measurements.
  * Each unit defines a specific time period granularity.
+ * DAY, WEEK, MONTH, or YEAR.
  */
 public enum TimeUnit {
 

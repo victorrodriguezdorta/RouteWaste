@@ -8,6 +8,7 @@ import java.util.Random;
  *
  * Represents the functional type of a vehicle within the system.
  * Each vehicle type defines how the vehicle is intended to be used.
+ * COLLECTION_TRUCK, TRANSFER_TRUCK, or SUPPORT_VEHICLE.
  */
 public enum VehicleType {
 

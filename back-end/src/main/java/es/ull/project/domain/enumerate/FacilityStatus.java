@@ -8,6 +8,7 @@ import java.util.Random;
  *
  * Represents the current lifecycle state of a facility.
  * It defines whether a facility can be used to assign containers.
+ * CANDIDATE, PLANNED, OPEN, or DISCARDED.
  */
 public enum FacilityStatus {
 

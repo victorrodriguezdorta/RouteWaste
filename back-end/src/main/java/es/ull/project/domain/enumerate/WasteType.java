@@ -8,33 +8,34 @@ import java.util.Random;
  *
  * Represents the different types of waste for collection and recycling.
  * Each type defines a specific category of waste material.
+ * ORGANIC, PACKAGING, PAPER_CARDBOARD, GLASS, or RESIDUAL.
  */
 public enum WasteType {
 
     /**
      * Organic waste.
      */
-    ORGANICO,
+    ORGANIC,
 
     /**
      * Packaging and containers.
      */
-    ENVASES,
+    PACKAGING,
 
     /**
      * Paper and cardboard.
      */
-    PAPEL_CARTON,
+    PAPER_CARDBOARD,
 
     /**
      * Glass waste.
      */
-    VIDRIO,
+    GLASS,
 
     /**
      * Remaining general waste.
      */
-    RESTO;
+    RESIDUAL;
 
     /**
      * Returns the WasteType that matches the given string.
