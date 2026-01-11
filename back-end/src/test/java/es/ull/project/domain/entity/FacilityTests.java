@@ -264,7 +264,7 @@ class FacilityTests {
             randomLocation(),
             capacity,
             randomOpeningFixedCost(),
-            FacilityStatus.random()
+            FacilityStatus.PLANNED
         );
         
         WasteDemand demand = new WasteDemand(60.0);
