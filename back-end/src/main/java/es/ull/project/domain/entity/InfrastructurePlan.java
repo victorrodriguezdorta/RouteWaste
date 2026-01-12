@@ -166,6 +166,33 @@ public class InfrastructurePlan {
         return servicePolicies;
     }
 
+    /**
+     * Updates the planning period.
+     */
+    public void updatePeriod(PlanningPeriod newPeriod) {
+        validatePeriod(newPeriod);
+        this.period = newPeriod;
+    }
+
+    /**
+     * Updates the maximum budget.
+     */
+    public void updateMaxBudget(MaximumBudget newMaxBudget) {
+        validateMaxBudget(newMaxBudget);
+        this.maxBudget = newMaxBudget;
+        // Re-validate total cost against new budget
+        if (this.estimatedTotalCost.greaterThan(this.maxBudget)) {
+            throw new IllegalStateException(TOTAL_COST_EXCEEDED);
+        }
+    }
+
+    /**
+     * Updates the service policies.
+     */
+    public void updateServicePolicies(ServicePolicies newServicePolicies) {
+        this.servicePolicies = newServicePolicies;
+    }
+
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) return true;

@@ -193,6 +193,38 @@ public class Facility {
         this.status = status;
     }
 
+    /**
+     * Updates the facility type.
+     */
+    public void updateFacilityType(FacilityType facilityType) {
+        this.validateFacilityType(facilityType);
+        this.facilityType = facilityType;
+    }
+
+    /**
+     * Updates the facility location.
+     */
+    public void updateLocation(Location location) {
+        this.validateLocation(location);
+        this.location = location;
+    }
+
+    /**
+     * Updates the facility capacity.
+     */
+    public void updateCapacity(Capacity capacity) {
+        this.validateCapacity(capacity);
+        this.capacity = capacity;
+    }
+
+    /**
+     * Updates the facility opening fixed cost.
+     */
+    public void updateOpeningFixedCost(OpeningFixedCost openingFixedCost) {
+        this.validateOpeningFixedCost(openingFixedCost);
+        this.openingFixedCost = openingFixedCost;
+    }
+
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
