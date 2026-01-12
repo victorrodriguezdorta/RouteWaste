@@ -28,8 +28,8 @@ public class ServiceAssignment {
     public static final String POLICY_VIOLATION = "Service assignment violates service policies";
 
     private final UUID serviceAssignmentId;
-    private final UUID containerId;
-    private final UUID facilityId;
+    private final Container container;
+    private final Facility facility;
 
     private final WasteDemand wasteDemand;
     private final Distance distance;
@@ -39,40 +39,40 @@ public class ServiceAssignment {
     /**
      * Creates a new service assignment.
      *
-     * @param containerId      container identifier
-     * @param facilityId       facility identifier
+    * @param container        container entity
+    * @param facility         facility entity
      * @param wasteDemand      waste demand of the container
      * @param distance         distance between container and facility
      * @param serviceTime      service time required
      * @param transportCost    transportation cost applied
      */
-    public ServiceAssignment(UUID containerId,
-                             UUID facilityId,
+    public ServiceAssignment(Container container,
+                             Facility facility,
                              WasteDemand wasteDemand,
                              Distance distance,
                              ServiceTime serviceTime,
                              TransportationVariableCost transportCost) {
 
-        validate(containerId, facilityId, wasteDemand, distance, serviceTime, transportCost);
+        validate(container, facility, wasteDemand, distance, serviceTime, transportCost);
 
         this.serviceAssignmentId = UUID.randomUUID();
-        this.containerId = containerId;
-        this.facilityId =   facilityId;
+        this.container = container;
+        this.facility = facility;
         this.wasteDemand = wasteDemand;
-        this.distance =   distance;
+        this.distance = distance;
         this.serviceTime = serviceTime;
         this.transportCost = transportCost;
     }
 
-    private void validate(UUID containerId,
-                          UUID facilityId,
+    private void validate(Container container,
+                          Facility facility,
                           WasteDemand wasteDemand,
                           Distance distance,
                           ServiceTime serviceTime,
                           TransportationVariableCost transportCost) {
 
-        if (containerId == null) throw new IllegalArgumentException(CONTAINER_ID_NOT_DEFINED);
-        if (facilityId == null) throw new IllegalArgumentException(FACILITY_ID_NOT_DEFINED);
+        if (container == null) throw new IllegalArgumentException(CONTAINER_ID_NOT_DEFINED);
+        if (facility == null) throw new IllegalArgumentException(FACILITY_ID_NOT_DEFINED);
         if (wasteDemand == null) throw new IllegalArgumentException(DEMAND_NOT_DEFINED);
         if (distance == null) throw new IllegalArgumentException(DISTANCE_NOT_DEFINED);
         if (serviceTime == null) throw new IllegalArgumentException(SERVICE_TIME_NOT_DEFINED);
@@ -105,12 +105,12 @@ public class ServiceAssignment {
         return serviceAssignmentId;
     }
 
-    public UUID getContainerId() {
-        return containerId;
+    public Container getContainer() {
+        return container;
     }
 
-    public UUID getFacilityId() {
-        return facilityId;
+    public Facility getFacility() {
+        return facility;
     }
 
     public WasteDemand getWasteDemand() {
@@ -146,7 +146,7 @@ public class ServiceAssignment {
     public String toString() {
         return String.format(
                 "ServiceAssignment={id=%s, containerId=%s, facilityId=%s, demand=%s, distance=%s, serviceTime=%s, transportCost=%s}",
-                serviceAssignmentId, containerId, facilityId, wasteDemand,
+                serviceAssignmentId, container.getId(), facility.getId(), wasteDemand,
                 distance, serviceTime, transportCost
         );
     }
