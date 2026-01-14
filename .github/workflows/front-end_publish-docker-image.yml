@@ -1,0 +1,37 @@
+name: Front-end. Publish Docker image
+# Events that trigger the workflow
+on:
+  push:
+    branches: 
+      - main
+    paths: 
+      - front-end/**
+      - '!**.md'
+  workflow_dispatch:
+# Working directory
+defaults:
+  run:
+    working-directory: front-end
+# Environment variables
+env:
+  WORKING_DIRECTORY: front-end
+  DOCKER_IMAGE_NAME: ull/sensor-app_front-end
+jobs:
+  publish-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout of the repository
+      - uses: actions/checkout@v4
+        name: Check out code
+      # Build and publish Docker image in DockerHub
+      - name: Build and push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: ${{ env.DOCKER_IMAGE_NAME }}
+          tags: latest
+          registry: docker.io
+          directory: ${{ env.WORKING_DIRECTORY }}
+          dockerfile: ${{ env.WORKING_DIRECTORY }}/Dockerfile
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          buildArgs: GITHUB_TOKEN=${{ secrets.ULLSOFTWARE_PASSWORD }}
