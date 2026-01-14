@@ -1,28 +1,41 @@
+# GitHub action aimed at creating a Docker image of the Front-end (Vue).
+# The Docker image is pushed on DockerHub when created.
+#
+# Requirements:
+# - Secrets (Settings / Secrets / Actions):
+#   - DOCKERHUB_USERNAME
+#   - DOCKERHUB_PASSWORD
+#   - ULLSOFTWARE_PASSWORD (used as GITHUB_TOKEN for npm registry)
+
 name: Front-end. Publish Docker image
+
 # Events that trigger the workflow
 on:
   push:
-    branches: 
+    branches:
       - main
-    paths: 
+    paths:
       - front-end/**
       - '!**.md'
   workflow_dispatch:
+
 # Working directory
 defaults:
   run:
     working-directory: front-end
+
 # Environment variables
 env:
-  WORKING_DIRECTORY: front-end
   DOCKER_IMAGE_NAME: ullsoftware/sensor-app_front-end
+
 jobs:
   publish-docker-image:
     runs-on: ubuntu-latest
     steps:
       # Checkout of the repository
-      - uses: actions/checkout@v4
-        name: Check out code
+      - name: Checkout
+        uses: actions/checkout@v4
+
       # Build and publish Docker image in DockerHub
       - name: Build and push Docker image
         uses: mr-smithers-excellent/docker-build-push@v6
@@ -30,8 +43,9 @@ jobs:
           image: ${{ env.DOCKER_IMAGE_NAME }}
           tags: latest
           registry: docker.io
-          directory: ${{ env.WORKING_DIRECTORY }}
-          dockerfile: ${{ env.WORKING_DIRECTORY }}/Dockerfile
+          directory: front-end
+          dockerfile: front-end/Dockerfile
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          buildArgs: GITHUB_TOKEN=${{ secrets.ULLSOFTWARE_PASSWORD }}
+          buildArgs: |
+            GITHUB_TOKEN=${{ secrets.ULLSOFTWARE_PASSWORD }}
