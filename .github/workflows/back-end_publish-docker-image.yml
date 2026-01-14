@@ -31,7 +31,7 @@ defaults:
 env:
   JAVA_VERSION: 17
   # WORKING_DIRECTORY: back-end
-  DOCKER_IMAGE_NAME: ullsoftware/sensor-app_back-end
+  DOCKER_IMAGE_NAME: alu0101540153/sensor-app_back-end
 
 jobs:
   path-context:

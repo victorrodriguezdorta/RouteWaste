@@ -26,7 +26,7 @@ defaults:
 
 # Environment variables
 env:
-  DOCKER_IMAGE_NAME: ullsoftware/sensor-app_front-end
+  DOCKER_IMAGE_NAME: alu0101540153/sensor-app_front-end
 
 jobs:
   publish-docker-image:
