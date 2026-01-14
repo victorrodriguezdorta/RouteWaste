@@ -9,7 +9,7 @@ import es.ull.project.domain.entity.Container;
 /**
  * Repository interface for the Container aggregate.
  *
- * The repository defines an abstraction for storing and retrieving
+ * The repository defines an abstraction for storing and retrieving 
  * Container entities. Use this interface from application services
  * (use cases) to decouple business logic from persistence details.
  */
