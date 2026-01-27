@@ -3,6 +3,7 @@
 
 # Sheriff
 sheriff_errors.json
+sheriff_tracked_files.json
 sheriff_summary.json
 sheriff_log.json
 yarn-error.log
