@@ -2,11 +2,35 @@
 
 IMAGE_NAME="kaizten/sheriff"
 
-# Check if the image exists
-if docker images --format "{{.Repository}}" | grep -q "^${IMAGE_NAME}$"; then
-  echo "Image '${IMAGE_NAME}' found. Deleting..."
-  docker rmi "${IMAGE_NAME}" --force
-  echo "Image '${IMAGE_NAME}' has been deleted."
+if ! docker image inspect "$IMAGE_NAME" &>/dev/null; then
+  echo -e "\xE2\x9D\x8C Image '${IMAGE_NAME}' not found locally."
+  echo -e "\xF0\x9F\x9A\x80 Pulling image '${IMAGE_NAME}' from Docker Hub..."
+  if ! docker pull "$IMAGE_NAME"; then
+    echo -e "\xF0\x9F\x9A\x80 Failed to pull image '${IMAGE_NAME}'. Exiting."
+    exit 1
+  fi
+fi
+
+LOCAL_DIGEST=$(docker image inspect "$IMAGE_NAME" --format '{{index .RepoDigests 0}}' 2>/dev/null | cut -d@ -f2)
+if [ -z "$LOCAL_DIGEST" ]; then
+  LOCAL_DIGEST=$(docker image inspect "$IMAGE_NAME" --format '{{.Id}}')
+fi
+
+REMOTE_DIGEST=$(docker manifest inspect --verbose "$IMAGE_NAME" \
+  | sed -n 's/.*"digest"[[:space:]]*:[[:space:]]*"\(sha256:[^"]*\)".*/\1/p' \
+  | head -n1)
+
+if [ -n "$REMOTE_DIGEST" ]; then
+  if [ "$LOCAL_DIGEST" != "$REMOTE_DIGEST" ]; then
+    echo -e "\xE2\x9C\x85 Remote changed! (different digest)"
+    docker rmi "${IMAGE_NAME}" --force
+    echo -e "\xE2\x9D\x8C Image '${IMAGE_NAME}' has been deleted."
+    echo -e "\xF0\x9F\x9A\x80 Pulling image '${IMAGE_NAME}' from Docker Hub..."
+    if ! docker pull "$IMAGE_NAME"; then
+      echo -e "\xF0\x9F\x9A\x80 Failed to pull image '${IMAGE_NAME}'. Exiting."
+      exit 1
+    fi
+  fi
 fi
 
 # Back-end
