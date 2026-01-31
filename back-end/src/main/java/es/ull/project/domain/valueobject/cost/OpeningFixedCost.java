@@ -1,9 +1,8 @@
 package es.ull.project.domain.valueobject.cost;
 
-
-import java.util.Objects;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 /**
  * OpeningFixedCost
@@ -16,15 +15,18 @@ public final class OpeningFixedCost {
     private static final String ERROR_AMOUNT_NOT_DEFINED = "Opening fixed cost is not defined";
     private static final String ERROR_AMOUNT_NEGATIVE = "Opening fixed cost cannot be negative";
     private static final String ERROR_CURRENCY_INVALID = "Currency cannot be null or empty";
+    private static final String ERROR_CURRENCY_MISMATCH = "Incompatible currencies: ";
+    private static final int ZERO = 0;
 
     /**
-     * Amount of the fixed cost.
-     * Required attribute. Always stored with 2 decimal precision.
+     * Required.
+     * Amount of the fixed cost. Always stored with 2 decimal precision.
      */
     private final BigDecimal amount;
 
     /**
-     * Optional currency of the cost. Default: "EUR".
+     * Optional.
+     * Currency of the cost. Default: "EUR".
      */
     private final Currency currency;
 
@@ -63,8 +65,6 @@ public final class OpeningFixedCost {
         this.currency = new Currency(currency);
     }
 
-
-
     /**
      * Validates that the amount is defined and non-negative.
      *
@@ -75,7 +75,7 @@ public final class OpeningFixedCost {
         if (Double.isNaN(amount)) {
             throw new IllegalArgumentException(ERROR_AMOUNT_NOT_DEFINED);
         }
-        if (amount < 0) {
+        if (amount < ZERO) {
             throw new IllegalArgumentException(ERROR_AMOUNT_NEGATIVE);
         }
     }
@@ -143,8 +143,8 @@ public final class OpeningFixedCost {
     public OpeningFixedCost subtract(OpeningFixedCost other) {
         checkCurrencyCompatibility(other);
         double result = this.amount.subtract(other.amount).doubleValue();
-        if (result < 0) {
-            result = 0;
+        if (result < ZERO) {
+            result = ZERO;
         }
         return new OpeningFixedCost(result, this.currency);
     }
@@ -157,7 +157,7 @@ public final class OpeningFixedCost {
      */
     public boolean greaterThan(OpeningFixedCost other) {
         checkCurrencyCompatibility(other);
-        return this.amount.compareTo(other.amount) > 0;
+        return this.amount.compareTo(other.amount) > ZERO;
     }
 
     /**
@@ -168,7 +168,7 @@ public final class OpeningFixedCost {
      */
     public boolean lessThan(OpeningFixedCost other) {
         checkCurrencyCompatibility(other);
-        return this.amount.compareTo(other.amount) < 0;
+        return this.amount.compareTo(other.amount) < ZERO;
     }
 
     /**
@@ -179,7 +179,7 @@ public final class OpeningFixedCost {
      */
     private void checkCurrencyCompatibility(OpeningFixedCost other) {
         if (!this.currency.equals(other.currency)) {
-            throw new IllegalArgumentException("Incompatible currencies: " + this.currency + " vs " + other.currency);
+            throw new IllegalArgumentException(ERROR_CURRENCY_MISMATCH + this.currency + " vs " + other.currency);
         }
     }
 
@@ -191,8 +191,12 @@ public final class OpeningFixedCost {
      */
     @Override
     public boolean equals(Object otherObject) {
-        if (this == otherObject) return true;
-        if (otherObject == null || getClass() != otherObject.getClass()) return false;
+        if (this == otherObject) {
+            return true;
+        }
+        if (otherObject == null || getClass() != otherObject.getClass()) {
+            return false;
+        }
         OpeningFixedCost other = (OpeningFixedCost) otherObject;
         return this.amount.equals(other.amount) && this.currency.equals(other.currency);
     }

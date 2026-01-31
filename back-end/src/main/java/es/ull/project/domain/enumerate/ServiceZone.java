@@ -1,6 +1,5 @@
 package es.ull.project.domain.enumerate;
 
-
 import java.util.Random;
 
 /**
@@ -27,6 +26,9 @@ public enum ServiceZone {
      */
     GEOGRAPHICAL_AREA;
 
+    private static final String ERROR_SERVICE_ZONE_NOT_DEFINED = "Service zone is not defined";
+    private static final String ERROR_SERVICE_ZONE_INVALID = "Service zone is invalid. Allowed zones: ";
+
     /**
      * Returns the ServiceZone that matches the given string.
      *
@@ -36,7 +38,7 @@ public enum ServiceZone {
      */
     public static ServiceZone fromString(String stringToCheck) {
         if (stringToCheck == null) {
-            throw new IllegalArgumentException("Service zone is not defined");
+            throw new IllegalArgumentException(ERROR_SERVICE_ZONE_NOT_DEFINED);
         }
 
         stringToCheck = stringToCheck.trim().toUpperCase();
@@ -48,7 +50,7 @@ public enum ServiceZone {
         }
 
         throw new IllegalArgumentException(
-                "Service zone is invalid. Allowed zones: " + allowedValues()
+                ERROR_SERVICE_ZONE_INVALID + allowedValues()
         );
     }
 

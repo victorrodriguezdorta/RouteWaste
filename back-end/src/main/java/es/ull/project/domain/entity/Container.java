@@ -4,10 +4,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import es.ull.project.domain.valueobject.location.Location;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.location.Location;
 
 /**
  * Container
@@ -66,11 +66,9 @@ public class Container {
                      WasteType wasteType,
                      WasteDemand wasteDemand,
                      ServiceZone serviceZone) {
-
         this.validateLocation(location);
         this.validateWasteType(wasteType);
         this.validateWasteDemand(wasteDemand);
-
         this.id = UUID.randomUUID();
         this.location = location;
         this.wasteType = wasteType;
@@ -90,22 +88,78 @@ public class Container {
                      Location location,
                      WasteType wasteType,
                      WasteDemand wasteDemand) {
-
         this(location, wasteType, wasteDemand, null);
     }
 
+    /**
+     * Copy constructor.
+     * Creates a new Container as a copy of another Container.
+     *
+     * @param otherObject the Container to copy
+     */
+    public Container(Container otherObject) {
+        this.id = otherObject.id;
+        this.location = otherObject.location;
+        this.wasteType = otherObject.wasteType;
+        this.wasteDemand = otherObject.wasteDemand;
+        this.serviceZone = otherObject.serviceZone;
+    }
+
+    /**
+     * Restore constructor.
+     * Restores a Container from persistence with all its attributes.
+     *
+     * @param id           the container identifier
+     * @param location     the location of the container
+     * @param wasteType    the type of waste collected
+     * @param wasteDemand  the waste demand
+     * @param serviceZone  the service zone (optional)
+     */
+    public Container(UUID id,
+                     Location location,
+                     WasteType wasteType,
+                     WasteDemand wasteDemand,
+                     ServiceZone serviceZone) {
+        this.validateLocation(location);
+        this.validateWasteType(wasteType);
+        this.validateWasteDemand(wasteDemand);
+        this.id = id;
+        this.location = location;
+        this.wasteType = wasteType;
+        this.wasteDemand = wasteDemand;
+        this.serviceZone = serviceZone;
+    }
+
+    /**
+     * Validates that the location is not null.
+     *
+     * @param location the location to validate
+     * @throws IllegalArgumentException if the location is null
+     */
     private void validateLocation(Location location) {
         if (location == null) {
             throw new IllegalArgumentException(LOCATION_NOT_DEFINED);
         }
     }
 
+    /**
+     * Validates that the waste type is not null.
+     *
+     * @param wasteType the waste type to validate
+     * @throws IllegalArgumentException if the waste type is null
+     */
     private void validateWasteType(WasteType wasteType) {
         if (wasteType == null) {
             throw new IllegalArgumentException(WASTE_TYPE_NOT_DEFINED);
         }
     }
 
+    /**
+     * Validates that the waste demand is not null.
+     *
+     * @param wasteDemand the waste demand to validate
+     * @throws IllegalArgumentException if the waste demand is null
+     */
     private void validateWasteDemand(WasteDemand wasteDemand) {
         if (wasteDemand == null) {
             throw new IllegalArgumentException(WASTE_DEMAND_NOT_DEFINED);
@@ -196,6 +250,12 @@ public class Container {
         this.serviceZone = serviceZone;
     }
 
+    /**
+     * Compares this container to another object for equality.
+     *
+     * @param otherObject the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
@@ -211,11 +271,21 @@ public class Container {
         return Objects.equals(this.id, other.id);
     }
 
+    /**
+     * Returns a hash code value for this container.
+     *
+     * @return a hash code value based on the container identifier
+     */
     @Override
     public int hashCode() {
         return Objects.hash(this.id);
     }
 
+    /**
+     * Returns a string representation of this container.
+     *
+     * @return a formatted string containing all container attributes
+     */
     @Override
     public String toString() {
         return String.format(

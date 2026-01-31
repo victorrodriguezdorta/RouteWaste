@@ -1,11 +1,17 @@
 package es.ull.project.domain.valueobject.cost;
 
-
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+/**
+ * Currency
+ *
+ * Represents a currency value object using ISO 4217 currency codes.
+ * This is a value object in the domain.
+ */
 public final class Currency {
 
+    private static final int ZERO = 0;
     private static final Pattern CURRENCY_CODE_PATTERN = Pattern.compile("^[A-Z]{3}$");
 
     private static final String ERROR_CURRENCY_NOT_DEFINED = "Currency is not defined";
@@ -14,12 +20,13 @@ public final class Currency {
 
     /**
      * ISO 4217 currency code (e.g. EUR, USD).
+     * Defaults to EUR if not specified.
+     * It is a required attribute.
      */
     private final String code;
 
     /**
-     * default constructor
-     * @param code
+     * Default constructor that creates a Currency with EUR code.
      */
     public Currency() {
         this.code = "EUR";
@@ -35,11 +42,17 @@ public final class Currency {
         this.code = code;
     }
 
+    /**
+     * Validates the currency code format.
+     *
+     * @param code the currency code to validate
+     * @throws IllegalArgumentException if the code is null, empty, or invalid format
+     */
     private void validateCode(String code) {
         if (code == null) {
             throw new IllegalArgumentException(ERROR_CURRENCY_NOT_DEFINED);
         }
-        if (code.length() == 0) {
+        if (code.length() == ZERO) {
             throw new IllegalArgumentException(ERROR_CURRENCY_EMPTY);
         }
         if (!CURRENCY_CODE_PATTERN.matcher(code).matches()) {
@@ -66,6 +79,12 @@ public final class Currency {
         return new Currency(newCode);
     }
 
+    /**
+     * Compares this Currency to another object for equality.
+     *
+     * @param otherObject the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
@@ -78,11 +97,21 @@ public final class Currency {
         return this.code.equals(other.code);
     }
 
+    /**
+     * Returns the hash code for this Currency.
+     *
+     * @return the hash code value
+     */
     @Override
     public int hashCode() {
         return Objects.hash(code);
     }
 
+    /**
+     * Returns a string representation of this Currency.
+     *
+     * @return a formatted string containing the currency code
+     */
     @Override
     public String toString() {
         return String.format("Currency={code='%s'}", this.code);

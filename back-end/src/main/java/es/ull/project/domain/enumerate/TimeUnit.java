@@ -1,6 +1,5 @@
 package es.ull.project.domain.enumerate;
 
-
 import java.util.Random;
 
 /**
@@ -32,6 +31,9 @@ public enum TimeUnit {
      */
     YEAR;
 
+    private static final String ERROR_TIME_UNIT_NOT_DEFINED = "Time unit is not defined";
+    private static final String ERROR_TIME_UNIT_INVALID = "Invalid time unit";
+
     /**
      * Returns the TimeUnit that matches the given string.
      *
@@ -41,18 +43,27 @@ public enum TimeUnit {
      */
     public static TimeUnit fromString(String stringToCheck) {
         if (stringToCheck == null) {
-            throw new IllegalArgumentException("Time unit is not defined");
+            throw new IllegalArgumentException(ERROR_TIME_UNIT_NOT_DEFINED);
         }
-
         stringToCheck = stringToCheck.trim().toUpperCase();
-
         for (TimeUnit timeUnit : values()) {
             if (timeUnit.name().equals(stringToCheck)) {
                 return timeUnit;
             }
         }
+        throw new IllegalArgumentException(ERROR_TIME_UNIT_INVALID);
+    }
 
-        throw new IllegalArgumentException("Invalid time unit");
+    /**
+     * Returns the ordinal index of the given time unit string.
+     *
+     * @param stringToCheck String representation of the time unit.
+     * @return Ordinal index of the time unit.
+     */
+    public static int indexOf(String stringToCheck) {
+        return TimeUnit
+                .fromString(stringToCheck)
+                .ordinal();
     }
 
     /**
@@ -65,9 +76,7 @@ public enum TimeUnit {
         if (stringToCheck == null) {
             return false;
         }
-
         stringToCheck = stringToCheck.trim().toUpperCase();
-
         for (TimeUnit timeUnit : values()) {
             if (timeUnit.name().equals(stringToCheck)) {
                 return true;
@@ -85,6 +94,4 @@ public enum TimeUnit {
     public static TimeUnit random() {
         return values()[new Random().nextInt(values().length)];
     }
-
-
 }

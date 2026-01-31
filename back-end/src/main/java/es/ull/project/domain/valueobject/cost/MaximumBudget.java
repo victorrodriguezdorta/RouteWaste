@@ -1,9 +1,8 @@
 package es.ull.project.domain.valueobject.cost;
 
-
-import java.util.Objects;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 /**
  * MaximumBudget
@@ -16,15 +15,17 @@ public final class MaximumBudget {
     private static final String ERROR_AMOUNT_NOT_DEFINED = "Maximum budget is not defined";
     private static final String ERROR_AMOUNT_NEGATIVE = "Maximum budget cannot be negative";
     private static final String ERROR_CURRENCY_INVALID = "Currency cannot be null or empty";
+    private static final String ERROR_CURRENCY_MISMATCH = "Cannot operate on budgets with different currencies";
+    private static final int ZERO = 0;
 
     /**
-     * Amount of the maximum budget.
-     * Required attribute. Always stored with 2 decimal precision.
+     * Required. Amount of the maximum budget.
+     * Always stored with 2 decimal precision.
      */
     private final BigDecimal amount;
 
     /**
-     * Optional currency of the budget. Default: "EUR".
+     * Optional. Currency of the budget. Default: "EUR" when not provided.
      */
     private final Currency currency;
 
@@ -72,7 +73,7 @@ public final class MaximumBudget {
         if (Double.isNaN(amount)) {
             throw new IllegalArgumentException(ERROR_AMOUNT_NOT_DEFINED);
         }
-        if (amount < 0) {
+        if (amount < ZERO) {
             throw new IllegalArgumentException(ERROR_AMOUNT_NEGATIVE);
         }
     }
@@ -126,6 +127,7 @@ public final class MaximumBudget {
 
     /**
      * Returns a new MaximumBudget with the difference of this and another budget.
+     * Prevents negative budget by returning 0 if the result would be negative.
      *
      * @param other Other MaximumBudget to subtract.
      * @return New MaximumBudget representing the difference.
@@ -133,8 +135,8 @@ public final class MaximumBudget {
     public MaximumBudget subtract(MaximumBudget other) {
         checkCurrencyCompatibility(other);
         double result = this.amount.subtract(other.amount).doubleValue();
-        if (result < 0) {
-            result = 0; // Prevent negative budget
+        if (result < ZERO) {
+            result = ZERO;
         }
         return new MaximumBudget(result, this.currency);
     }
@@ -147,7 +149,7 @@ public final class MaximumBudget {
      */
     public boolean greaterThan(MaximumBudget other) {
         checkCurrencyCompatibility(other);
-        return this.amount.compareTo(other.amount) > 0;
+        return this.amount.compareTo(other.amount) > ZERO;
     }
 
     /**
@@ -158,7 +160,7 @@ public final class MaximumBudget {
      */
     public boolean lessThan(MaximumBudget other) {
         checkCurrencyCompatibility(other);
-        return this.amount.compareTo(other.amount) < 0;
+        return this.amount.compareTo(other.amount) < ZERO;
     }
 
     /**
@@ -168,7 +170,7 @@ public final class MaximumBudget {
      */
     private void checkCurrencyCompatibility(MaximumBudget other) {
         if (!this.currency.equals(other.currency)) {
-            throw new IllegalArgumentException("Cannot operate on budgets with different currencies");
+            throw new IllegalArgumentException(ERROR_CURRENCY_MISMATCH);
         }
     }
 
@@ -179,8 +181,12 @@ public final class MaximumBudget {
      */
     @Override
     public boolean equals(Object otherObject) {
-        if (this == otherObject) return true;
-        if (otherObject == null || getClass() != otherObject.getClass()) return false;
+        if (this == otherObject) {
+            return true;
+        }
+        if (otherObject == null || getClass() != otherObject.getClass()) {
+            return false;
+        }
         MaximumBudget other = (MaximumBudget) otherObject;
         return this.amount.equals(other.amount) && this.currency.equals(other.currency);
     }

@@ -15,9 +15,12 @@ import java.util.Objects;
 public final class Distance {
 
     private static final String ERROR_DISTANCE_NEGATIVE = "Distance cannot be negative";
+    private static final int ZERO = 0;
 
     /**
      * Distance value in meters (base unit).
+     * Always stored with meter precision.
+     * It is a required attribute.
      */
     private final double meters;
 
@@ -31,8 +34,14 @@ public final class Distance {
         this.meters = meters;
     }
 
+    /**
+     * Validates that the provided distance is not negative.
+     *
+     * @param value Distance value to validate (meters)
+     * @throws IllegalArgumentException if the value is negative
+     */
     private void validateDistance(double value) {
-        if (value < 0) {
+        if (value < ZERO) {
             throw new IllegalArgumentException(ERROR_DISTANCE_NEGATIVE);
         }
     }
@@ -113,19 +122,39 @@ public final class Distance {
         return Distance.fromMeters(newMeters);
     }
 
+    /**
+     * Compares this Distance with another object for equality.
+     *
+     * @param otherObject the object to compare with
+     * @return true if both objects represent the same distance (in meters), false otherwise
+     */
     @Override
     public boolean equals(Object otherObject) {
-        if (this == otherObject) return true;
-        if (otherObject == null || getClass() != otherObject.getClass()) return false;
+        if (this == otherObject) {
+            return true;
+        }
+        if (otherObject == null || getClass() != otherObject.getClass()) {
+            return false;
+        }
         Distance other = (Distance) otherObject;
-        return Double.compare(other.meters, meters) == 0;
+        return Double.compare(other.meters, meters) == ZERO;
     }
 
+    /**
+     * Returns the hash code for this Distance.
+     *
+     * @return hash code based on the meters value
+     */
     @Override
     public int hashCode() {
         return Objects.hash(meters);
     }
 
+    /**
+     * Returns a string representation of the Distance.
+     *
+     * @return formatted string with meters and kilometers
+     */
     @Override
     public String toString() {
         return String.format("Distance={meters=%.2f m, kilometers=%.2f km}", meters, toKilometers());

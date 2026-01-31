@@ -19,14 +19,14 @@ public final class ValidityPeriod {
             "End date of validity period cannot be before start date";
 
     /**
+     * Required.
      * Start date of the validity period.
-     * Required attribute.
      */
     private final LocalDate startDate;
 
     /**
-     * End date of the validity period.
-     * Optional attribute. If not present, the validity is open-ended. (CCan be null)
+     * Optional.
+     * End date of the validity period. If not present, the validity is open-ended.
      */
     private final LocalDate endDate;
 
@@ -120,6 +120,12 @@ public final class ValidityPeriod {
         return !date.isBefore(this.startDate) && !date.isAfter(this.endDate);
     }
 
+    /**
+     * Compares this validity period to another object for equality.
+     *
+     * @param otherObject the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
@@ -133,11 +139,21 @@ public final class ValidityPeriod {
                 && Objects.equals(this.endDate, other.endDate);
     }
 
+    /**
+     * Returns a hash code value for this validity period.
+     *
+     * @return a hash code value based on the start and end dates
+     */
     @Override
     public int hashCode() {
         return Objects.hash(startDate, endDate);
     }
 
+    /**
+     * Returns a string representation of this validity period.
+     *
+     * @return a formatted string containing the start and end dates
+     */
     @Override
     public String toString() {
         return String.format(

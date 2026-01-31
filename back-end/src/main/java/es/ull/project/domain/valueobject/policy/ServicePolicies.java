@@ -1,6 +1,5 @@
 package es.ull.project.domain.valueobject.policy;
 
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -14,28 +13,29 @@ public final class ServicePolicies {
 
     private static final String ERROR_NEGATIVE_VALUE =
             "Policy values cannot be negative";
+    private static final int ZERO = 0;
 
     /**
-     * Maximum service distance allowed.
-     * Optional attribute. Measured in meters.
+     * Optional.
+     * Maximum service distance allowed. Measured in meters.
      */
     private final Double maxServiceDistance;
 
     /**
-     * Maximum service time allowed.
-     * Optional attribute. Measured in minutes.
+     * Optional.
+     * Maximum service time allowed. Measured in minutes.
      */
     private final Integer maxServiceTime;
 
     /**
+     * Optional.
      * Maximum number of infrastructures allowed.
-     * Optional attribute.
      */
     private final Integer maxInfrastructureCount;
 
     /**
-     * Maximum emission limit.
-     * Optional attribute. Measured in kilograms of CO2.
+     * Optional.
+     * Maximum emission limit. Measured in kilograms of CO2.
      */
     private final Double maxEmissions;
 
@@ -57,7 +57,6 @@ public final class ServicePolicies {
         validateNonNegative(maxServiceTime);
         validateNonNegative(maxInfrastructureCount);
         validateNonNegative(maxEmissions);
-
         this.maxServiceDistance = maxServiceDistance;
         this.maxServiceTime = maxServiceTime;
         this.maxInfrastructureCount = maxInfrastructureCount;
@@ -70,7 +69,7 @@ public final class ServicePolicies {
      * @param value Value to validate.
      */
     private void validateNonNegative(Number value) {
-        if (value != null && value.doubleValue() < 0) {
+        if (value != null && value.doubleValue() < ZERO) {
             throw new IllegalArgumentException(ERROR_NEGATIVE_VALUE);
         }
     }
@@ -137,18 +136,24 @@ public final class ServicePolicies {
                     serviceDistance, maxServiceDistance
             ));
         }
-        
         if (maxServiceTime != null && serviceTime > maxServiceTime) {
             return Optional.of(String.format(
                     "Service time %d minutes exceeds maximum allowed %d minutes",
                     serviceTime, maxServiceTime
             ));
         }
-        
         return Optional.empty();
     }
 
-    //iscompliantvalue
+    /**
+     * Checks if all policy constraints are satisfied.
+     *
+     * @param serviceDistance Distance of the service.
+     * @param serviceTime Service time.
+     * @param infrastructureCount Number of infrastructures.
+     * @param emissions Emissions value.
+     * @return True if compliant with all policies, false otherwise.
+     */
     public boolean isCompliant(
             double serviceDistance,
             int serviceTime,
@@ -170,6 +175,12 @@ public final class ServicePolicies {
         return true;
     }
 
+    /**
+     * Compares this service policies with another object for equality.
+     *
+     * @param otherObject the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
@@ -185,6 +196,11 @@ public final class ServicePolicies {
                 && Objects.equals(this.maxEmissions, other.maxEmissions);
     }
 
+    /**
+     * Returns the hash code of this service policies.
+     *
+     * @return the hash code
+     */
     @Override
     public int hashCode() {
         return Objects.hash(
@@ -195,6 +211,11 @@ public final class ServicePolicies {
         );
     }
 
+    /**
+     * Returns a string representation of this service policies.
+     *
+     * @return a formatted string with policy details
+     */
     @Override
     public String toString() {
         return String.format(

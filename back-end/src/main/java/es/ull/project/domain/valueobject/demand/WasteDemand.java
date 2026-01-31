@@ -1,17 +1,21 @@
 package es.ull.project.domain.valueobject.demand;
 
-import java.util.concurrent.TimeUnit;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * WasteDemand
  *
- * Representa la demanda esperada de residuos por unidad de tiempo (por ejemplo, toneladas por día).
- * Es un value object inmutable que encapsula el valor, la unidad de cantidad y la unidad de tiempo.
+ * Represents the expected waste demand per time unit (for example, tons per day).
+ * Immutable value object that encapsulates the value, the quantity unit, and the time unit.
  */
 public final class WasteDemand {
 
-    // Mensajes de error
+    private static final int ZERO = 0;
+
+    /**
+     * Error messages for validation.
+     */
     private static final String ERROR_DEMAND_NEGATIVE = "Waste demand cannot be negative";
     private static final String ERROR_UNITS_NULL = "Units cannot be null";
     private static final String ERROR_OTHER_DEMAND_NULL = "Other WasteDemand cannot be null";
@@ -20,29 +24,32 @@ public final class WasteDemand {
     private static final String ERROR_UNITS_MUST_MATCH_CAPACITY = "Units must be the same to compare WasteDemand and Capacity";
 
     /**
-     * Valor de la demanda de residuos por unidad de tiempo.
+     * Required.
+     * Value of the waste demand per time unit.
      */
     private final double value;
 
     /**
-     * Unidad de cantidad (por ejemplo, toneladas).
+     * Required.
+     * Quantity unit (for example, tons).
      */
     private final QuantityUnit quantityUnit;
 
     /**
-     * Unidad de tiempo (por ejemplo, día).
+     * Required.
+     * Time unit (for example, DAYS).
      */
     private final TimeUnit timeUnit;
 
     /**
-     * Crea una nueva WasteDemand (demanda de residuos por tiempo).
+     * Creates a new WasteDemand (waste demand per time).
      *
-     * @param value        Valor de demanda (debe ser ≥ 0)
-     * @param quantityUnit Unidad de cantidad
-     * @param timeUnit     Unidad de tiempo
+     * @param value        Demand value (must be ≥ 0)
+     * @param quantityUnit Quantity unit
+     * @param timeUnit     Time unit
      */
     public WasteDemand(double value, QuantityUnit quantityUnit, TimeUnit timeUnit) {
-        if (value < 0) {
+        if (value < ZERO) {
             throw new IllegalArgumentException(ERROR_DEMAND_NEGATIVE);
         }
         if (quantityUnit == null || timeUnit == null) {
@@ -54,25 +61,25 @@ public final class WasteDemand {
     }
 
     /**
-     * Crea una nueva WasteDemand con valores por defecto (toneladas/día).
+     * Creates a new WasteDemand with default values (tons/day).
      *
-     * @param value Valor de demanda
+     * @param value Demand value
      */
     public WasteDemand(double value) {
-        this(value, new QuantityUnit("tons"), TimeUnit.DAYS); 
+        this(value, new QuantityUnit("tons"), TimeUnit.DAYS);
     }
 
     /**
-     * Devuelve el valor de la demanda.
+     * Returns the demand value.
      *
-     * @return Valor de demanda
+     * @return Demand value
      */
     public double getValue() {
         return value;
     }
 
     /**
-     * Devuelve la unidad de cantidad.
+     * Returns the quantity unit.
      *
      * @return QuantityUnit
      */
@@ -81,7 +88,7 @@ public final class WasteDemand {
     }
 
     /**
-     * Devuelve la unidad de tiempo.
+     * Returns the time unit.
      *
      * @return TimeUnit
      */
@@ -90,41 +97,41 @@ public final class WasteDemand {
     }
 
     /**
-     * Devuelve una nueva WasteDemand con el valor actualizado.
+     * Returns a new WasteDemand with the updated value.
      *
-     * @param newValue Nuevo valor
-     * @return Nueva WasteDemand
+     * @param newValue New value
+     * @return New WasteDemand
      */
     public WasteDemand setValue(double newValue) {
         return new WasteDemand(newValue, this.quantityUnit, this.timeUnit);
     }
 
     /**
-     * Devuelve una nueva WasteDemand con la unidad de cantidad actualizada.
+     * Returns a new WasteDemand with the updated quantity unit.
      *
-     * @param newQuantityUnit Nueva unidad de cantidad
-     * @return Nueva WasteDemand
+     * @param newQuantityUnit New quantity unit
+     * @return New WasteDemand
      */
     public WasteDemand setQuantityUnit(QuantityUnit newQuantityUnit) {
         return new WasteDemand(this.value, newQuantityUnit, this.timeUnit);
     }
 
     /**
-     * Devuelve una nueva WasteDemand con la unidad de tiempo actualizada.
+     * Returns a new WasteDemand with the updated time unit.
      *
-     * @param newTimeUnit Nueva unidad de tiempo
-     * @return Nueva WasteDemand
+     * @param newTimeUnit New time unit
+     * @return New WasteDemand
      */
     public WasteDemand setTimeUnit(TimeUnit newTimeUnit) {
         return new WasteDemand(this.value, this.quantityUnit, newTimeUnit);
     }
 
     /**
-     * Suma dos WasteDemand si tienen las mismas unidades.
+     * Adds two WasteDemand instances if they have the same units.
      *
-     * @param other Otra WasteDemand
-     * @return Nueva WasteDemand con la suma
-     * @throws IllegalArgumentException si las unidades no coinciden o el otro objeto es nulo
+     * @param other Other WasteDemand
+     * @return New WasteDemand with the sum
+     * @throws IllegalArgumentException if units do not match or the other object is null
      */
     public WasteDemand add(WasteDemand other) {
         validateSameUnit(other);
@@ -132,11 +139,11 @@ public final class WasteDemand {
     }
 
     /**
-     * Compara si esta demanda es mayor que otra.
+     * Compares if this demand is greater than another.
      *
-     * @param other Otra WasteDemand
-     * @return true si es mayor, false en caso contrario
-     * @throws IllegalArgumentException si las unidades no coinciden o el otro objeto es nulo
+     * @param other Other WasteDemand
+     * @return true if greater, false otherwise
+     * @throws IllegalArgumentException if units do not match or the other object is null
      */
     public boolean greaterThan(WasteDemand other) {
         validateSameUnit(other);
@@ -144,11 +151,11 @@ public final class WasteDemand {
     }
 
     /**
-     * Compara si esta demanda es mayor que una capacidad.
+     * Compares if this demand is greater than a capacity.
      *
-     * @param capacity Capacity a comparar
-     * @return true si es mayor, false en caso contrario
-     * @throws IllegalArgumentException si las unidades no coinciden o el objeto es nulo
+     * @param capacity Capacity to compare
+     * @return true if greater, false otherwise
+     * @throws IllegalArgumentException if units do not match or the object is null
      */
     public boolean greaterThan(Capacity capacity) {
         if (capacity == null) {
@@ -162,10 +169,10 @@ public final class WasteDemand {
     }
 
     /**
-     * Valida que las unidades sean iguales entre dos WasteDemand.
+     * Validates that the units are the same between two WasteDemand instances.
      *
-     * @param other Otra WasteDemand
-     * @throws IllegalArgumentException si las unidades no coinciden o el otro objeto es nulo
+     * @param other Other WasteDemand
+     * @throws IllegalArgumentException if units do not match or the other object is null
      */
     private void validateSameUnit(WasteDemand other) {
         if (other == null) {
@@ -178,23 +185,27 @@ public final class WasteDemand {
     }
 
     /**
-     * Compara la igualdad de dos WasteDemand.
+     * Compares equality of two WasteDemand instances.
      *
-     * @param o Otro objeto
-     * @return true si son iguales, false en caso contrario
+     * @param otherObject Other object to compare
+     * @return true if equal, false otherwise
      */
     @Override
-    public boolean equals(Object other) {
-        if (this == other) return true;
-        if (other == null || getClass() != other.getClass()) return false;
-        WasteDemand that = (WasteDemand) other;
-        return Double.compare(that.value, value) == 0 &&
+    public boolean equals(Object otherObject) {
+        if (this == otherObject) {
+            return true;
+        }
+        if (otherObject == null || getClass() != otherObject.getClass()) {
+            return false;
+        }
+        WasteDemand that = (WasteDemand) otherObject;
+        return Double.compare(that.value, value) == ZERO &&
                 quantityUnit.equals(that.quantityUnit) &&
                 timeUnit.equals(that.timeUnit);
     }
 
     /**
-     * Devuelve el hashCode de la WasteDemand.
+     * Returns the hash code of the WasteDemand.
      *
      * @return hashCode
      */
@@ -204,7 +215,7 @@ public final class WasteDemand {
     }
 
     /**
-     * Devuelve la representación en String de la WasteDemand.
+     * Returns the string representation of the WasteDemand.
      *
      * @return String
      */

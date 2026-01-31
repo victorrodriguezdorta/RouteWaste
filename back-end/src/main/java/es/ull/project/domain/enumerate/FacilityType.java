@@ -26,6 +26,9 @@ public enum FacilityType {
      */
     TREATMENT_PLANT;
 
+    private static final String ERROR_FACILITY_TYPE_NOT_DEFINED = "Facility type is not defined";
+    private static final String ERROR_FACILITY_TYPE_INVALID = "Facility type is invalid. Allowed types: ";
+
     /**
      * Returns the FacilityType that matches the given string.
      *
@@ -35,19 +38,16 @@ public enum FacilityType {
      */
     public static FacilityType fromString(String stringToCheck) {
         if (stringToCheck == null) {
-            throw new IllegalArgumentException("Facility type is not defined");
+            throw new IllegalArgumentException(ERROR_FACILITY_TYPE_NOT_DEFINED);
         }
-
         stringToCheck = stringToCheck.trim().toUpperCase();
-
         for (FacilityType facilityType : values()) {
             if (facilityType.name().equals(stringToCheck)) {
                 return facilityType;
             }
         }
-
         throw new IllegalArgumentException(
-                "Facility type is invalid. Allowed types: " + allowedValues()
+                ERROR_FACILITY_TYPE_INVALID + allowedValues()
         );
     }
 
@@ -73,9 +73,7 @@ public enum FacilityType {
         if (stringToCheck == null) {
             return false;
         }
-
         stringToCheck = stringToCheck.trim().toUpperCase();
-
         for (FacilityType facilityType : values()) {
             if (facilityType.name().equals(stringToCheck)) {
                 return true;

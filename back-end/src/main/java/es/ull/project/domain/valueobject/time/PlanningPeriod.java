@@ -1,6 +1,5 @@
 package es.ull.project.domain.valueobject.time;
 
-
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -20,8 +19,8 @@ public final class PlanningPeriod {
             "Planning period format is invalid. Expected formats: YYYY or YYYY-Q[1-4]";
 
     /**
-     * Value of the planning period.
-     * Required attribute.
+     * Required.
+     * Value of the planning period (e.g., "2026", "2026-Q1").
      */
     private final String value;
 

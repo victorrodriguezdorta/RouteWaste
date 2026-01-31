@@ -7,18 +7,36 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Location;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@Service
+/**
+ * Service implementation for updating containers.
+ * This service handles the business logic for container update operations.
+ */
 public class UpdateContainerService implements UpdateContainerUseCase {
 
-    @Autowired
-    private ContainerRepository repository;
+    private final ContainerRepository repository;
 
+    /**
+     * Constructs a new UpdateContainerService with the specified repository.
+     * @param repository the container repository for persistence operations
+     */
+    public UpdateContainerService(ContainerRepository repository) {
+        this.repository = repository;
+    }
+
+    /**
+     * Updates an existing container with new values.
+     * @param id the unique identifier of the container to update
+     * @param newLocation the new location, or null to keep the existing value
+     * @param newWasteType the new waste type, or null to keep the existing value
+     * @param newWasteDemand the new waste demand, or null to keep the existing value
+     * @param newServiceZone the new service zone
+     * @return the updated container
+     * @throws NoSuchElementException if no container is found with the given id
+     */
     @Override
     public Container update(UUID id, Location newLocation, WasteType newWasteType, WasteDemand newWasteDemand, ServiceZone newServiceZone) {
         Container existing = this.repository.findById(id).orElseThrow(() -> new NoSuchElementException("Container not found"));

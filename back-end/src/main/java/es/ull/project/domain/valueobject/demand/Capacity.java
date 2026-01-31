@@ -6,77 +6,81 @@ import java.util.concurrent.TimeUnit;
 /**
  * Capacity
  *
- * Representa una cantidad por unidad de tiempo (por ejemplo, toneladas por día).
- * Es un value object inmutable que encapsula el valor, la unidad de cantidad y la unidad de tiempo.
+ * Represents an amount per time unit (for example, tons per day).
+ * Immutable value object that encapsulates the value, the quantity unit, and the time unit.
  */
 public final class Capacity {
 
-    // Mensajes de error
+    /**
+     * Error messages.
+     */
     private static final String ERROR_VALUE_NEGATIVE = "Capacity value must be greater than or equal to 0";
     private static final String ERROR_QUANTITY_UNIT_NOT_DEFINED = "Quantity unit is not defined";
     private static final String ERROR_TIME_UNIT_NOT_DEFINED = "Time unit is not defined";
     private static final String ERROR_OTHER_CAPACITY_NULL = "Other Capacity cannot be null";
     private static final String ERROR_UNITS_MUST_MATCH = "Units must be the same";
+    private static final int ZERO = 0;
 
     /**
-     * Valor de cantidad por unidad de tiempo.
+     * Required.
+     * Amount value per time unit (e.g., 10.5).
      */
     private final double value;
 
     /**
-     * Unidad de cantidad (por ejemplo, toneladas).
+     * Required.
+     * Quantity unit (e.g., tons, liters).
      */
     private final QuantityUnit quantityUnit;
 
     /**
-     * Unidad de tiempo (por ejemplo, día).
+     * Required.
+     * Time unit (e.g., DAYS, HOURS).
      */
     private final TimeUnit timeUnit;
 
     /**
-     * Crea una nueva Capacity (cantidad por tiempo).
+     * Creates a new Capacity (amount per time).
      *
-     * @param value        Valor de cantidad (debe ser ≥ 0)
-     * @param quantityUnit Unidad de cantidad
-     * @param timeUnit     Unidad de tiempo
+     * @param value        Amount value (must be ≥ 0)
+     * @param quantityUnit Quantity unit
+     * @param timeUnit     Time unit
      */
     public Capacity(double value, QuantityUnit quantityUnit, TimeUnit timeUnit) {
         this.validateValue(value);
-
         if (quantityUnit == null) {
             throw new IllegalArgumentException(ERROR_QUANTITY_UNIT_NOT_DEFINED);
         }
         if (timeUnit == null) {
             throw new IllegalArgumentException(ERROR_TIME_UNIT_NOT_DEFINED);
         }
-
         this.value = value;
         this.quantityUnit = quantityUnit;
         this.timeUnit = timeUnit;
     }
 
     /**
-     * Valida que el valor sea mayor o igual que cero.
+     * Validates that the value is greater than or equal to zero.
      *
-     * @param value Valor a validar
+     * @param value Value to validate
      */
     private void validateValue(double value) {
-        if (value < 0) {
+        if (value < ZERO) {
             throw new IllegalArgumentException(ERROR_VALUE_NEGATIVE);
         }
     }
 
     /**
-     * Devuelve el valor de cantidad.
+     * Returns the amount value.
      *
-     * @return Valor de cantidad
+     * @return Amount value
      */
     public double getValue() {
         return this.value;
     }
 
     /**
-     * Devuelve la unidad de cantidad.
+     * Returns the quantity unit.
      *
      * @return QuantityUnit
      */
@@ -85,7 +89,7 @@ public final class Capacity {
     }
 
     /**
-     * Devuelve la unidad de tiempo.
+     * Returns the time unit.
      *
      * @return TimeUnit
      */
@@ -94,41 +98,41 @@ public final class Capacity {
     }
 
     /**
-     * Devuelve una nueva Capacity con el valor actualizado.
+     * Returns a new Capacity with the updated value.
      *
-     * @param newValue Nuevo valor
-     * @return Nueva Capacity
+     * @param newValue New value
+     * @return New Capacity
      */
     public Capacity setValue(double newValue) {
         return new Capacity(newValue, this.quantityUnit, this.timeUnit);
     }
 
     /**
-     * Devuelve una nueva Capacity con la unidad de cantidad actualizada.
+     * Returns a new Capacity with the updated quantity unit.
      *
-     * @param newQuantityUnit Nueva unidad de cantidad
-     * @return Nueva Capacity
+     * @param newQuantityUnit New quantity unit
+     * @return New Capacity
      */
     public Capacity setQuantityUnit(QuantityUnit newQuantityUnit) {
         return new Capacity(this.value, newQuantityUnit, this.timeUnit);
     }
 
     /**
-     * Devuelve una nueva Capacity con la unidad de tiempo actualizada.
+     * Returns a new Capacity with the updated time unit.
      *
-     * @param newTimeUnit Nueva unidad de tiempo
-     * @return Nueva Capacity
+     * @param newTimeUnit New time unit
+     * @return New Capacity
      */
     public Capacity setTimeUnit(TimeUnit newTimeUnit) {
         return new Capacity(this.value, this.quantityUnit, newTimeUnit);
     }
 
     /**
-     * Compara si esta capacidad es mayor que otra.
+     * Compares if this capacity is greater than another.
      *
-     * @param other Otra Capacity
-     * @return true si es mayor, false en caso contrario
-     * @throws IllegalArgumentException si las unidades no coinciden o el otro objeto es nulo
+     * @param other Other Capacity
+     * @return true if greater, false otherwise
+     * @throws IllegalArgumentException if units do not match or the other object is null
      */
     public boolean greaterThan(Capacity other) {
         if (other == null) {
@@ -142,10 +146,10 @@ public final class Capacity {
     }
 
     /**
-     * Compara la igualdad de dos Capacity.
+     * Compares equality of two Capacity instances.
      *
-     * @param otherObject Otro objeto
-     * @return true si son iguales, false en caso contrario
+     * @param otherObject Other object
+     * @return true if equal, false otherwise
      */
     @Override
     public boolean equals(Object otherObject) {
@@ -156,13 +160,13 @@ public final class Capacity {
             return false;
         }
         Capacity other = (Capacity) otherObject;
-        return Double.compare(this.value, other.value) == 0 &&
+        return Double.compare(this.value, other.value) == ZERO &&
                 this.quantityUnit.equals(other.quantityUnit) &&
                 this.timeUnit.equals(other.timeUnit);
     }
 
     /**
-     * Devuelve el hashCode de la Capacity.
+     * Returns the hash code of the Capacity.
      *
      * @return hashCode
      */
@@ -172,7 +176,7 @@ public final class Capacity {
     }
 
     /**
-     * Devuelve la representación en String de la Capacity.
+     * Returns the string representation of the Capacity.
      *
      * @return String
      */

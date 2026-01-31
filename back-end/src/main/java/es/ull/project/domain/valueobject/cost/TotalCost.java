@@ -1,9 +1,9 @@
 package es.ull.project.domain.valueobject.cost;
 
-
-import java.util.Objects;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
+ 
 
 /**
  * TotalCost
@@ -14,18 +14,22 @@ import java.math.RoundingMode;
  */
 public final class TotalCost {
 
+    private static final int ZERO = 0;
     private static final String ERROR_AMOUNT_NOT_DEFINED = "Total cost is not defined";
     private static final String ERROR_AMOUNT_NEGATIVE = "Total cost cannot be negative";
     private static final String ERROR_CURRENCY_INVALID = "Currency cannot be null or empty";
+    private static final String ERROR_CURRENCY_MISMATCH = "Cannot operate on costs with different currencies";
 
     /**
      * Amount of the total cost.
-     * Required attribute. Always stored with 2 decimal precision.
+     * Always stored with 2 decimal precision.
+     * It is a required attribute.
      */
     private final BigDecimal amount;
 
     /**
-     * Optional currency of the cost. Default: "EUR".
+     * Currency of the cost. Default: "EUR".
+     * It is an optional attribute.
      */
     private final Currency currency;
 
@@ -74,7 +78,7 @@ public final class TotalCost {
         if (Double.isNaN(amount)) {
             throw new IllegalArgumentException(ERROR_AMOUNT_NOT_DEFINED);
         }
-        if (amount < 0) {
+        if (amount < ZERO) {
             throw new IllegalArgumentException(ERROR_AMOUNT_NEGATIVE);
         }
     }
@@ -115,7 +119,7 @@ public final class TotalCost {
     /**
      * Returns the currency of the total cost.
      *
-     * @return Currency object.
+     * @return Currency object (never null)
      */
     public Currency getCurrency() {
         return this.currency;
@@ -141,8 +145,8 @@ public final class TotalCost {
     public TotalCost subtract(TotalCost other) {
         checkCurrencyCompatibility(other);
         double result = this.amount.subtract(other.amount).doubleValue();
-        if (result < 0) {
-            result = 0; // Prevent negative cost
+        if (result < ZERO) {
+            result = ZERO;
         }
         return new TotalCost(result, this.currency);
     }
@@ -155,7 +159,7 @@ public final class TotalCost {
      */
     public boolean greaterThan(TotalCost other) {
         checkCurrencyCompatibility(other);
-        return this.amount.compareTo(other.amount) > 0;
+        return this.amount.compareTo(other.amount) > ZERO;
     }
 
     /**
@@ -167,7 +171,7 @@ public final class TotalCost {
      */
     public boolean greaterThan(MaximumBudget other) {
         checkCurrencyCompatibility(other);
-        return this.amount.compareTo(BigDecimal.valueOf(other.getAmount())) > 0;
+        return this.amount.compareTo(BigDecimal.valueOf(other.getAmount())) > ZERO;
     }
 
     /**
@@ -178,10 +182,10 @@ public final class TotalCost {
      */
     public boolean lessThan(TotalCost other) {
         checkCurrencyCompatibility(other);
-        return this.amount.compareTo(other.amount) < 0;
+        return this.amount.compareTo(other.amount) < ZERO;
     }
 
-        /**
+    /**
      * Compares this cost to another to check if less.
      *
      * @param other Other TotalCost.
@@ -189,10 +193,8 @@ public final class TotalCost {
      */
     public boolean lessThan(MaximumBudget other) {
         checkCurrencyCompatibility(other);
-        return this.amount.compareTo(BigDecimal.valueOf(other.getAmount())) < 0;
+        return this.amount.compareTo(BigDecimal.valueOf(other.getAmount())) < ZERO;
     }
-
-
 
     /**
      * Checks if the currency of this cost matches another cost's currency.
@@ -202,7 +204,7 @@ public final class TotalCost {
      */
     private void checkCurrencyCompatibility(TotalCost other) {
         if (!this.currency.equals(other.currency)) {
-            throw new IllegalArgumentException("Cannot operate on costs with different currencies");
+            throw new IllegalArgumentException(ERROR_CURRENCY_MISMATCH);
         }
     }
 
@@ -214,7 +216,7 @@ public final class TotalCost {
      */
     private void checkCurrencyCompatibility(MaximumBudget other) {
         if (!this.currency.equals(other.getCurrency())) {
-            throw new IllegalArgumentException("Cannot operate on costs with different currencies");
+            throw new IllegalArgumentException(ERROR_CURRENCY_MISMATCH);
         }
     }
 
@@ -226,8 +228,12 @@ public final class TotalCost {
      */
     @Override
     public boolean equals(Object otherObject) {
-        if (this == otherObject) return true;
-        if (otherObject == null || getClass() != otherObject.getClass()) return false;
+        if (this == otherObject) {
+            return true;
+        }
+        if (otherObject == null || getClass() != otherObject.getClass()) {
+            return false;
+        }
         TotalCost other = (TotalCost) otherObject;
         return this.amount.equals(other.amount) && this.currency.equals(other.currency);
     }

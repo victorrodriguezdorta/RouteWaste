@@ -6,15 +6,33 @@ import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
+/**
+ * Service responsible for creating new vehicles in the system.
+ * This service implements the {@link CreateVehicleUseCase} interface and provides
+ * the business logic for vehicle creation operations.
+ */
 public class CreateVehicleService implements CreateVehicleUseCase {
 
-    @Autowired
-    private VehicleRepository repository;
+    private final VehicleRepository repository;
 
+    /**
+     * Constructs a new CreateVehicleService with the specified repository.
+     *
+     * @param repository the vehicle repository used for persistence operations
+     */
+    public CreateVehicleService(VehicleRepository repository) {
+        this.repository = repository;
+    }
+
+    /**
+     * Creates a new vehicle with the specified parameters.
+     *
+     * @param vehicleType the type of vehicle to create
+     * @param transportCapacity the transport capacity of the vehicle
+     * @param costPerKilometer the transportation cost per kilometer
+     * @return the newly created and persisted vehicle
+     */
     @Override
     public Vehicle create(VehicleType vehicleType, Capacity transportCapacity, TransportationVariableCost costPerKilometer) {
         Vehicle newVehicle = new Vehicle(vehicleType, transportCapacity, costPerKilometer);

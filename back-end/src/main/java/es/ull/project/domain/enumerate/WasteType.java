@@ -1,6 +1,5 @@
 package es.ull.project.domain.enumerate;
 
-
 import java.util.Random;
 
 /**
@@ -37,6 +36,9 @@ public enum WasteType {
      */
     RESIDUAL;
 
+    private static final String ERROR_WASTE_TYPE_NOT_DEFINED = "Waste type is not defined";
+    private static final String ERROR_WASTE_TYPE_INVALID = "Waste type is invalid. Allowed types: ";
+
     /**
      * Returns the WasteType that matches the given string.
      *
@@ -46,20 +48,15 @@ public enum WasteType {
      */
     public static WasteType fromString(String stringToCheck) {
         if (stringToCheck == null) {
-            throw new IllegalArgumentException("Waste type is not defined");
+            throw new IllegalArgumentException(ERROR_WASTE_TYPE_NOT_DEFINED);
         }
-
         stringToCheck = stringToCheck.trim().toUpperCase();
-
         for (WasteType wasteType : values()) {
             if (wasteType.name().equals(stringToCheck)) {
                 return wasteType;
             }
         }
-
-        throw new IllegalArgumentException(
-                "Waste type is invalid. Allowed types: " + allowedValues()
-        );
+        throw new IllegalArgumentException(ERROR_WASTE_TYPE_INVALID + allowedValues());
     }
 
     /**
@@ -84,9 +81,7 @@ public enum WasteType {
         if (stringToCheck == null) {
             return false;
         }
-
         stringToCheck = stringToCheck.trim().toUpperCase();
-
         for (WasteType wasteType : values()) {
             if (wasteType.name().equals(stringToCheck)) {
                 return true;

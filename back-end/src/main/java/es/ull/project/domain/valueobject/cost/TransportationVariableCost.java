@@ -1,8 +1,8 @@
 package es.ull.project.domain.valueobject.cost;
 
-import java.util.Objects;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 /**
  * TransportationVariableCost
@@ -15,15 +15,17 @@ public final class TransportationVariableCost {
     private static final String ERROR_AMOUNT_NOT_DEFINED = "Transportation variable cost is not defined";
     private static final String ERROR_AMOUNT_NEGATIVE = "Transportation variable cost cannot be negative";
     private static final String ERROR_CURRENCY_INVALID = "Currency cannot be null or empty";
+    private static final String ERROR_CURRENCY_MISMATCH = "Cannot operate on costs with different currencies";
+    private static final int ZERO = 0;
 
     /**
      * Amount of the transportation cost.
-     * Required attribute. Always stored with 2 decimal precision.
+     * Required. Always stored with 2 decimal precision.
      */
     private final BigDecimal amount;
 
     /**
-     * Optional currency of the cost. Default: "EUR".
+     * Optional. Currency of the cost. Default: "EUR".
      */
     private final Currency currency;
 
@@ -72,7 +74,7 @@ public final class TransportationVariableCost {
         if (Double.isNaN(amount)) {
             throw new IllegalArgumentException(ERROR_AMOUNT_NOT_DEFINED);
         }
-        if (amount < 0) {
+        if (amount < ZERO) {
             throw new IllegalArgumentException(ERROR_AMOUNT_NEGATIVE);
         }
     }
@@ -143,8 +145,8 @@ public final class TransportationVariableCost {
     public TransportationVariableCost subtract(TransportationVariableCost other) {
         checkCurrencyCompatibility(other);
         double result = this.amount.subtract(other.amount).doubleValue();
-        if (result < 0) {
-            result = 0;
+        if (result < ZERO) {
+            result = ZERO;
         }
         return new TransportationVariableCost(result, this.currency);
     }
@@ -159,7 +161,7 @@ public final class TransportationVariableCost {
      */
     public boolean greaterThan(TransportationVariableCost other) {
         checkCurrencyCompatibility(other);
-        return this.amount.compareTo(other.amount) > 0;
+        return this.amount.compareTo(other.amount) > ZERO;
     }
 
     /**
@@ -172,7 +174,7 @@ public final class TransportationVariableCost {
      */
     public boolean lessThan(TransportationVariableCost other) {
         checkCurrencyCompatibility(other);
-        return this.amount.compareTo(other.amount) < 0;
+        return this.amount.compareTo(other.amount) < ZERO;
     }
 
     /**
@@ -183,7 +185,7 @@ public final class TransportationVariableCost {
      */
     private void checkCurrencyCompatibility(TransportationVariableCost other) {
         if (!this.currency.equals(other.currency)) {
-            throw new IllegalArgumentException("Cannot operate on costs with different currencies");
+            throw new IllegalArgumentException(ERROR_CURRENCY_MISMATCH);
         }
     }
 
@@ -195,8 +197,12 @@ public final class TransportationVariableCost {
      */
     @Override
     public boolean equals(Object otherObject) {
-        if (this == otherObject) return true;
-        if (otherObject == null || getClass() != otherObject.getClass()) return false;
+        if (this == otherObject) {
+            return true;
+        }
+        if (otherObject == null || getClass() != otherObject.getClass()) {
+            return false;
+        }
         TransportationVariableCost other = (TransportationVariableCost) otherObject;
         return this.amount.equals(other.amount) && this.currency.equals(other.currency);
     }

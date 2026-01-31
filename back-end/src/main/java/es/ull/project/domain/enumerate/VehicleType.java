@@ -1,6 +1,5 @@
 package es.ull.project.domain.enumerate;
 
-
 import java.util.Random;
 
 /**

@@ -3,20 +3,37 @@ package es.ull.project.application.service.facility;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
 import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.location.Location;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
+/**
+ * Service implementation for creating facilities.
+ * This service handles the business logic for facility creation operations.
+ */
 public class CreateFacilityService implements CreateFacilityUseCase {
 
-    @Autowired
-    private FacilityRepository repository;
+    private final FacilityRepository repository;
 
+    /**
+     * Constructs a new CreateFacilityService with the specified repository.
+     * @param repository the facility repository for persistence operations
+     */
+    public CreateFacilityService(FacilityRepository repository) {
+        this.repository = repository;
+    }
+
+    /**
+     * Creates a new facility with the specified attributes.
+     * @param facilityType the type of facility
+     * @param location the geographic location of the facility
+     * @param capacity the capacity configuration of the facility
+     * @param openingFixedCost the fixed cost for opening the facility
+     * @param status the initial status of the facility
+     * @return the created and persisted facility
+     */
     @Override
     public Facility create(FacilityType facilityType, Location location, Capacity capacity, OpeningFixedCost openingFixedCost, FacilityStatus status) {
         Facility newFacility = new Facility(facilityType, location, capacity, openingFixedCost, status);
