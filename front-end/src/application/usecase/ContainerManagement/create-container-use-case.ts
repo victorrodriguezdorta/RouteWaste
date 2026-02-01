@@ -6,6 +6,7 @@ import { Container } from '../../../domain/entity/container';
 import { Location } from '../../../domain/valueobject/location/location';
 import { WasteType } from '../../../domain/enumerate/waste-type';
 import { WasteDemand } from '../../../domain/valueobject/demand/waste-demand';
+import { ServiceZone } from '../../../domain/enumerate/service-zone';
 
 /**
  * Use case for registering a new container in the system.
@@ -18,7 +19,7 @@ export interface CreateContainerCommand {
     location: Location;
     wasteType: WasteType;
     wasteDemand: WasteDemand;
-    serviceZone?: string | null;
+    serviceZone?: ServiceZone | null;
 }
 
 // Result type for the use case
