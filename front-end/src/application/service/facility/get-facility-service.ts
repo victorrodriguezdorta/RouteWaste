@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { GetFacilityUseCase, GetFacilityCommand, GetFacilityResult } from '../../usecase/FacilityManagement/get-facility-use-case';
-import { FacilityRepository } from '../../repository/facility/facility-repository';
+import type { FacilityRepository } from '../../repository/facility-repository';
 
 /**
  * @brief Service implementing the GetFacility use case.
@@ -25,6 +25,6 @@ export class GetFacilityService implements GetFacilityUseCase {
      * @return Either a `DataError` or the `Facility` entity.
      */
     async execute(command: GetFacilityCommand): Promise<Either<DataError, GetFacilityResult>> {
-        return this.facilityRepository.getById(command.facilityId);
+        return this.facilityRepository.getById(command);
     }
 }

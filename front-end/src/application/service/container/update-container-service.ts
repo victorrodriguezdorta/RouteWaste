@@ -1,7 +1,7 @@
 
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { UpdateContainerUseCase, UpdateContainerCommand, UpdateContainerResult } from '../../usecase/ContainerManagement/update-container-use-case';
-import { ContainerRepository } from '../../repository/container/container-repository';
+import type { ContainerRepository } from '../../repository/container-repository';
 
 /**
  * @brief Service implementing the UpdateContainer use case.
@@ -26,6 +26,6 @@ export class UpdateContainerService implements UpdateContainerUseCase {
      * @return Either a `DataError` or the updated `Container` entity.
      */
     async execute(command: UpdateContainerCommand): Promise<Either<DataError, UpdateContainerResult>> {
-        return this.containerRepository.update(command.containerId, command.updatedFields);
+        return this.containerRepository.update(command);
     }
 }

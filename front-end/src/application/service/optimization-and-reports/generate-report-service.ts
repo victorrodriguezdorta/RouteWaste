@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { GenerateReportUseCase, GenerateReportCommand, GenerateReportResult } from '../../usecase/OptimizationAndReports/generate-report-use-case';
-import { ReportRepository } from '../../repository/report/report-repository';
+import type { OptimizationAndReportsRepository } from '../../repository/optimization-and-reports-repository';
 
 /**
  * @brief Service implementing the GenerateReport use case.
@@ -9,13 +9,13 @@ import { ReportRepository } from '../../repository/report/report-repository';
  * produce a `GeneratedReport` wrapped in an `Either<DataError, GeneratedReport>`.
  */
 export class GenerateReportService implements GenerateReportUseCase {
-    private readonly reportRepository: ReportRepository;
+    private readonly reportRepository: OptimizationAndReportsRepository;
 
     /**
      * @brief Construct the service with a repository implementation.
      * @param reportRepository Repository used to generate reports.
      */
-    constructor(reportRepository: ReportRepository) {
+    constructor(reportRepository: OptimizationAndReportsRepository) {
         this.reportRepository = reportRepository;
     }
 
@@ -25,6 +25,6 @@ export class GenerateReportService implements GenerateReportUseCase {
      * @return Either a `DataError` or the generated report.
      */
     async execute(command: GenerateReportCommand): Promise<Either<DataError, GenerateReportResult>> {
-        return this.reportRepository.generate(command);
+        return this.reportRepository.generateReport(command);
     }
 }

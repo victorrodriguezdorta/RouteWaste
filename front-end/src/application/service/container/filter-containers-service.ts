@@ -1,7 +1,7 @@
 
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { FilterContainersUseCase, FilterContainersCommand, FilterContainersResult } from '../../usecase/ContainerManagement/filter-containers-use-case';
-import { ContainerRepository } from '../../repository/container/container-repository';
+import type { ContainerRepository } from '../../repository/container-repository';
 
 /**
  * @brief Service implementing the FilterContainers use case.

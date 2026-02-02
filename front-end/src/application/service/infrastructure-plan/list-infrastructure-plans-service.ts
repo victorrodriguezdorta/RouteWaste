@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { ListInfrastructurePlansUseCase, ListInfrastructurePlansCommand, ListInfrastructurePlansResult } from '../../usecase/InfrastructurePlanManagement/list-infrastructure-plans-use-case';
-import { InfrastructurePlanRepository } from '../../repository/infrastructure-plan/infrastructure-plan-repository';
+import type { InfrastructurePlanRepository } from '../../repository/infrastructure-plan-repository';
 
 /**
  * @brief Service implementing the ListInfrastructurePlans use case.

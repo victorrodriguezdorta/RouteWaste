@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { GetVehicleUseCase, GetVehicleCommand, GetVehicleResult } from '../../usecase/VehicleManagement/get-vehicle-use-case';
-import { VehicleRepository } from '../../repository/vehicle/vehicle-repository';
+import type { VehicleRepository } from '../../repository/vehicle-repository';
 
 /**
  * @brief Service implementing the GetVehicle use case.
@@ -25,6 +25,6 @@ export class GetVehicleService implements GetVehicleUseCase {
      * @return Either a `DataError` or the `Vehicle` entity.
      */
     async execute(command: GetVehicleCommand): Promise<Either<DataError, GetVehicleResult>> {
-        return this.vehicleRepository.getById(command.vehicleId);
+        return this.vehicleRepository.getById(command);
     }
 }

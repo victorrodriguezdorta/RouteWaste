@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { OptimizeRoutesUseCase, OptimizeRoutesCommand, OptimizeRoutesResult } from '../../usecase/OptimizationAndReports/optimize-routes-use-case';
-import { OptimizationRepository } from '../../repository/optimization/optimization-repository';
+import type { OptimizationAndReportsRepository } from '../../repository/optimization-and-reports-repository';
 
 /**
  * @brief Service implementing the OptimizeRoutes use case.
@@ -9,13 +9,13 @@ import { OptimizationRepository } from '../../repository/optimization/optimizati
  * implement optimization algorithms and return optimized routes wrapped in `Either`.
  */
 export class OptimizeRoutesService implements OptimizeRoutesUseCase {
-    private readonly optimizationRepository: OptimizationRepository;
+    private readonly optimizationRepository: OptimizationAndReportsRepository;
 
     /**
      * @brief Construct the service with a repository implementation.
      * @param optimizationRepository Repository used to perform route optimization.
      */
-    constructor(optimizationRepository: OptimizationRepository) {
+    constructor(optimizationRepository: OptimizationAndReportsRepository) {
         this.optimizationRepository = optimizationRepository;
     }
 

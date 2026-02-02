@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { GetInfrastructurePlanUseCase, GetInfrastructurePlanCommand, GetInfrastructurePlanResult } from '../../usecase/InfrastructurePlanManagement/get-infrastructure-plan-use-case';
-import { InfrastructurePlanRepository } from '../../repository/infrastructure-plan/infrastructure-plan-repository';
+import type { InfrastructurePlanRepository } from '../../repository/infrastructure-plan-repository';
 
 /**
  * @brief Service implementing the GetInfrastructurePlan use case.
@@ -25,6 +25,6 @@ export class GetInfrastructurePlanService implements GetInfrastructurePlanUseCas
      * @return Either a `DataError` or the `InfrastructurePlan` entity.
      */
     async execute(command: GetInfrastructurePlanCommand): Promise<Either<DataError, GetInfrastructurePlanResult>> {
-        return this.infrastructurePlanRepository.getById(command.planId);
+        return this.infrastructurePlanRepository.getById(command);
     }
 }

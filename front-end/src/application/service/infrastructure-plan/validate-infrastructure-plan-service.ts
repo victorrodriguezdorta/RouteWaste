@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { ValidateInfrastructurePlanUseCase, ValidateInfrastructurePlanCommand, ValidateInfrastructurePlanResult } from '../../usecase/InfrastructurePlanManagement/validate-infrastructure-plan-use-case';
-import { InfrastructurePlanRepository } from '../../repository/infrastructure-plan/infrastructure-plan-repository';
+import type { InfrastructurePlanRepository } from '../../repository/infrastructure-plan-repository';
 
 /**
  * @brief Service implementing the ValidateInfrastructurePlan use case.
@@ -25,6 +25,6 @@ export class ValidateInfrastructurePlanService implements ValidateInfrastructure
      * @return Either a `DataError` or a boolean indicating if the plan is valid.
      */
     async execute(command: ValidateInfrastructurePlanCommand): Promise<Either<DataError, ValidateInfrastructurePlanResult>> {
-        return this.infrastructurePlanRepository.validate(command.planId);
+        return this.infrastructurePlanRepository.validate(command);
     }
 }

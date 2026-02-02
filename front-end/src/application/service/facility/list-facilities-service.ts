@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { ListFacilitiesUseCase, ListFacilitiesCommand, ListFacilitiesResult } from '../../usecase/FacilityManagement/list-facilities-use-case';
-import { FacilityRepository } from '../../repository/facility/facility-repository';
+import type { FacilityRepository } from '../../repository/facility-repository';
 
 /**
  * @brief Service implementing the ListFacilities use case.

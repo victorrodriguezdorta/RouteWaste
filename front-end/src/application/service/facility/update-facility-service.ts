@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { UpdateFacilityUseCase, UpdateFacilityCommand, UpdateFacilityResult } from '../../usecase/FacilityManagement/update-facility-use-case';
-import { FacilityRepository } from '../../repository/facility/facility-repository';
+import type { FacilityRepository } from '../../repository/facility-repository';
 
 /**
  * @brief Service implementing the UpdateFacility use case.
@@ -25,6 +25,6 @@ export class UpdateFacilityService implements UpdateFacilityUseCase {
      * @return Either a `DataError` or the updated `Facility` entity.
      */
     async execute(command: UpdateFacilityCommand): Promise<Either<DataError, UpdateFacilityResult>> {
-        return this.facilityRepository.update(command.facilityId, command.updatedFields);
+        return this.facilityRepository.update(command);
     }
 }

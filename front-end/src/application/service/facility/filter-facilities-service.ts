@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { FilterFacilitiesUseCase, FilterFacilitiesCommand, FilterFacilitiesResult } from '../../usecase/FacilityManagement/filter-facilities-use-case';
-import { FacilityRepository } from '../../repository/facility/facility-repository';
+import type { FacilityRepository } from '../../repository/facility-repository';
 
 /**
  * @brief Service implementing the FilterFacilities use case.

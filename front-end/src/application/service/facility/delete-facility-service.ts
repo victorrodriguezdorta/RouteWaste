@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { DeleteFacilityUseCase, DeleteFacilityCommand, DeleteFacilityResult } from '../../usecase/FacilityManagement/delete-facility-use-case';
-import { FacilityRepository } from '../../repository/facility/facility-repository';
+import type { FacilityRepository } from '../../repository/facility-repository';
 
 /**
  * @brief Service implementing the DeleteFacility use case.
@@ -25,6 +25,6 @@ export class DeleteFacilityService implements DeleteFacilityUseCase {
      * @return Either a `DataError` or a boolean indicating success.
      */
     async execute(command: DeleteFacilityCommand): Promise<Either<DataError, DeleteFacilityResult>> {
-        return this.facilityRepository.delete(command.facilityId);
+        return this.facilityRepository.delete(command);
     }
 }

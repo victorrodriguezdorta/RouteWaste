@@ -1,7 +1,7 @@
 
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { GetContainerUseCase, GetContainerCommand, GetContainerResult } from '../../usecase/ContainerManagement/get-container-use-case';
-import { ContainerRepository } from '../../repository/container/container-repository';
+import type { ContainerRepository } from '../../repository/container-repository';
 
 /**
  * @brief Service implementing the GetContainer use case.
@@ -26,6 +26,6 @@ export class GetContainerService implements GetContainerUseCase {
      * @return Either a `DataError` or the `Container` entity.
      */
     async execute(command: GetContainerCommand): Promise<Either<DataError, GetContainerResult>> {
-        return this.containerRepository.getById(command.containerId);
+        return this.containerRepository.getById(command);
     }
 }

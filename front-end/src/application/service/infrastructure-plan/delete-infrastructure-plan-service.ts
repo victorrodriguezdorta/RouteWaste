@@ -1,6 +1,6 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { DeleteInfrastructurePlanUseCase, DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '../../usecase/InfrastructurePlanManagement/delete-infrastructure-plan-use-case';
-import { InfrastructurePlanRepository } from '../../repository/infrastructure-plan/infrastructure-plan-repository';
+import type { InfrastructurePlanRepository } from '../../repository/infrastructure-plan-repository';
 
 /**
  * @brief Service implementing the DeleteInfrastructurePlan use case.
@@ -25,6 +25,6 @@ export class DeleteInfrastructurePlanService implements DeleteInfrastructurePlan
      * @return Either a `DataError` or a boolean indicating success.
      */
     async execute(command: DeleteInfrastructurePlanCommand): Promise<Either<DataError, DeleteInfrastructurePlanResult>> {
-        return this.infrastructurePlanRepository.delete(command.planId);
+        return this.infrastructurePlanRepository.delete(command);
     }
 }

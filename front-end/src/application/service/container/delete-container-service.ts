@@ -1,7 +1,7 @@
 
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { DeleteContainerUseCase, DeleteContainerCommand, DeleteContainerResult } from '../../usecase/ContainerManagement/delete-container-use-case';
-import { ContainerRepository } from '../../repository/container/container-repository';
+import type { ContainerRepository } from '../../repository/container-repository';
 
 /**
  * @brief Service implementing the DeleteContainer use case.
@@ -26,6 +26,6 @@ export class DeleteContainerService implements DeleteContainerUseCase {
      * @return Either a `DataError` or a boolean indicating success.
      */
     async execute(command: DeleteContainerCommand): Promise<Either<DataError, DeleteContainerResult>> {
-        return this.containerRepository.delete(command.containerId);
+        return this.containerRepository.delete(command);
     }
 }

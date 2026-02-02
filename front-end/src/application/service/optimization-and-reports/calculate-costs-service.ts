@@ -1,6 +1,7 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { CalculateCostsUseCase, CalculateCostsCommand, CalculateCostsResult } from '../../usecase/OptimizationAndReports/calculate-costs-use-case';
-import { OptimizationRepository } from '../../repository/optimization/optimization-repository';
+import type { OptimizationAndReportsRepository } from '../../repository/optimization-and-reports-repository';
+
 
 /**
  * @brief Service implementing the CalculateCosts use case.
@@ -9,13 +10,13 @@ import { OptimizationRepository } from '../../repository/optimization/optimizati
  * to provide a `calculateCosts` method returning an `Either<DataError, number>`.
  */
 export class CalculateCostsService implements CalculateCostsUseCase {
-    private readonly optimizationRepository: OptimizationRepository;
+    private readonly optimizationRepository: OptimizationAndReportsRepository;
 
     /**
      * @brief Construct the service with a repository implementation.
      * @param optimizationRepository Repository used to perform cost calculations.
      */
-    constructor(optimizationRepository: OptimizationRepository) {
+    constructor(optimizationRepository: OptimizationAndReportsRepository) {
         this.optimizationRepository = optimizationRepository;
     }
 
