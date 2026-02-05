@@ -1,6 +1,6 @@
 
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { UpdateContainerUseCase, UpdateContainerCommand, UpdateContainerResult } from '../../usecase/ContainerManagement/update-container-use-case';
+import type { UpdateContainerUseCase, UpdateContainerCommand, UpdateContainerResult } from '../../usecase/ContainerManagement/UpdateContainer/update-container-use-case';
 import type { ContainerRepository } from '../../repository/container-repository';
 
 /**

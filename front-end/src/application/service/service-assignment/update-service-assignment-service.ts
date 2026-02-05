@@ -1,5 +1,5 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { UpdateServiceAssignmentUseCase, UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '../../usecase/ServiceAssignmentManagement/update-service-assignment-use-case';
+import type { UpdateServiceAssignmentUseCase, UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '../../usecase/ServiceAssignmentManagement/UpdateServiceAssignment/update-service-assignment-use-case';
 import type{ ServiceAssignmentRepository } from '../../repository/service-assignment-repository';
 
 /**

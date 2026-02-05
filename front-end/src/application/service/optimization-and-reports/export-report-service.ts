@@ -1,5 +1,5 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { ExportReportUseCase, ExportReportCommand, ExportReportResult } from '../../usecase/OptimizationAndReports/export-report-use-case';
+import type { ExportReportUseCase, ExportReportCommand, ExportReportResult } from '../../usecase/OptimizationAndReports/ExportReport/export-report-use-case';
 import type { OptimizationAndReportsRepository } from '../../repository/optimization-and-reports-repository';
 
 /**

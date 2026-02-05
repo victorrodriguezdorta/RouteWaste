@@ -1,4 +1,4 @@
-import { generateUniqueId } from './utils';
+import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { Container } from './container';
 import { Facility } from './facility';
 import { WasteDemand } from '../valueobject/demand/waste-demand';
@@ -17,7 +17,7 @@ import { ServicePolicies } from '../valueobject/policy/service-policies';
  * by application logic.
  */
 export class ServiceAssignment {
-  readonly id: string;
+  readonly id: UllUUID;
   readonly container: Container;
   readonly facility: Facility;
   readonly wasteDemand: WasteDemand;
@@ -36,14 +36,14 @@ export class ServiceAssignment {
    * @param id optional explicit id (generated when omitted)
    * @throws Error when a required argument is missing
    */
-  constructor(container: Container, facility: Facility, wasteDemand: WasteDemand, distance: Distance, serviceTime: ServiceTime, transportCost: TransportationVariableCost, id?: string) {
+  constructor(container: Container, facility: Facility, wasteDemand: WasteDemand, distance: Distance, serviceTime: ServiceTime, transportCost: TransportationVariableCost, id?: UllUUID) {
     if (!container) throw new Error('Container is not defined');
     if (!facility) throw new Error('Facility is not defined');
     if (!wasteDemand) throw new Error('Waste demand is not defined');
     if (!distance) throw new Error('Distance is not defined');
     if (!serviceTime) throw new Error('Service time is not defined');
     if (!transportCost) throw new Error('Transportation cost is not defined');
-    this.id = id ?? generateUniqueId();
+    this.id = id ?? UllUUID.random();
     this.container = container;
     this.facility = facility;
     this.wasteDemand = wasteDemand;
@@ -64,10 +64,10 @@ export class ServiceAssignment {
   }
 
   /** Return the identifier for this service assignment. */
-  getServiceAssignmentId(): string { return this.id; }
+  getServiceAssignmentId(): UllUUID { return this.id; }
 
   /** Compare by identity. */
-  equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof ServiceAssignment)) return false; return this.id === other.id; }
+  equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof ServiceAssignment)) return false; return this.id.equals(other.id); }
 
   /** Human-readable representation useful for debugging. */
   toString(): string { return `ServiceAssignment={id=${this.id}, containerId=${this.container.getId()}, facilityId=${this.facility.getId()}, demand=${this.wasteDemand}, distance=${this.distance}, serviceTime=${this.serviceTime}, transportCost=${this.transportCost}}`; }

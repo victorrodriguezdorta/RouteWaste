@@ -1,5 +1,5 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { CreateContainerUseCase, CreateContainerCommand, CreateContainerResult } from '../../usecase/ContainerManagement/create-container-use-case';
+import type { CreateContainerUseCase, CreateContainerCommand, CreateContainerResult } from '../../usecase/ContainerManagement/CreateContainer/create-container-use-case';
 import type { ContainerRepository } from '../../repository/container-repository';
 
 /**

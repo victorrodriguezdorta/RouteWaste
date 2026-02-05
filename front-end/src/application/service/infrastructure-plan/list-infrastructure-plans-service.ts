@@ -1,5 +1,5 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { ListInfrastructurePlansUseCase, ListInfrastructurePlansCommand, ListInfrastructurePlansResult } from '../../usecase/InfrastructurePlanManagement/list-infrastructure-plans-use-case';
+import type { ListInfrastructurePlansUseCase, ListInfrastructurePlansCommand, ListInfrastructurePlansResult } from '../../usecase/InfrastructurePlanManagement/ListInfrastructurePlans/list-infrastructure-plans-use-case';
 import type { InfrastructurePlanRepository } from '../../repository/infrastructure-plan-repository';
 
 /**

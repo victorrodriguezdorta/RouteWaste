@@ -1,5 +1,5 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { ListFacilitiesUseCase, ListFacilitiesCommand, ListFacilitiesResult } from '../../usecase/FacilityManagement/list-facilities-use-case';
+import type { ListFacilitiesUseCase, ListFacilitiesCommand, ListFacilitiesResult } from '../../usecase/FacilityManagement/ListFacilities/list-facilities-use-case';
 import type { FacilityRepository } from '../../repository/facility-repository';
 
 /**

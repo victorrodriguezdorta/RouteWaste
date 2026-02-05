@@ -1,5 +1,5 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { DeleteVehicleUseCase, DeleteVehicleCommand, DeleteVehicleResult } from '../../usecase/VehicleManagement/delete-vehicle-use-case';
+import type { DeleteVehicleUseCase, DeleteVehicleCommand, DeleteVehicleResult } from '../../usecase/VehicleManagement/DeleteVehicle/delete-vehicle-use-case';
 import type { VehicleRepository } from '../../repository/vehicle-repository';
 
 /**

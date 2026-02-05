@@ -1,6 +1,6 @@
 
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { DeleteContainerUseCase, DeleteContainerCommand, DeleteContainerResult } from '../../usecase/ContainerManagement/delete-container-use-case';
+import type { DeleteContainerUseCase, DeleteContainerCommand, DeleteContainerResult } from '../../usecase/ContainerManagement/DeleteContainer/delete-container-use-case';
 import type { ContainerRepository } from '../../repository/container-repository';
 
 /**

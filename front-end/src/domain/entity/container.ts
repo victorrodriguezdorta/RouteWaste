@@ -1,4 +1,4 @@
-import { generateUniqueId } from './utils';
+import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { Location } from '../valueobject/location/location';
 import { WasteDemand } from '../valueobject/demand/waste-demand';
 import { WasteType } from '../enumerate/waste-type';
@@ -14,7 +14,7 @@ import { ServiceZone } from '../enumerate/service-zone';
  * domain logic.
  */
 export class Container {
-  readonly id: string;
+  readonly id: UllUUID;
   private location: Location;
   private wasteType: WasteType;
   private wasteDemand: WasteDemand;
@@ -29,11 +29,11 @@ export class Container {
    * @param id optional explicit id (generated when omitted)
    * @throws Error when required parameters are missing
    */
-  constructor(location: Location, wasteType: WasteType, wasteDemand: WasteDemand, serviceZone?: ServiceZone | null, id?: string) {
+  constructor(location: Location, wasteType: WasteType, wasteDemand: WasteDemand, serviceZone?: ServiceZone | null, id?: UllUUID) {
     if (!location) throw new Error('Container location is not defined');
     if (!wasteType) throw new Error('Waste type is not defined');
     if (!wasteDemand) throw new Error('Waste demand is not defined');
-    this.id = id ?? generateUniqueId();
+    this.id = id ?? UllUUID.random();
     this.location = location;
     this.wasteType = wasteType;
     this.wasteDemand = wasteDemand;
@@ -41,7 +41,7 @@ export class Container {
   }
 
   /** Return the container identifier. */
-  getId(): string { return this.id; }
+  getId(): UllUUID { return this.id; }
 
   /** Return the container location value object. */
   getLocation(): Location { return this.location; }
@@ -71,7 +71,7 @@ export class Container {
    * Equality by identity (id field).
    * @param other candidate object to compare
    */
-  equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof Container)) return false; return this.id === other.id; }
+  equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof Container)) return false; return this.id.equals(other.id); }
 
   /** Human-readable representation for debugging. */
   toString(): string { return `Container={id=${this.id}, location=${this.location}, wasteType=${this.wasteType}, wasteDemand=${this.wasteDemand}, serviceZone=${this.serviceZone}}`; }

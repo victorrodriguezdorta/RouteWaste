@@ -1,5 +1,5 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { DeleteFacilityUseCase, DeleteFacilityCommand, DeleteFacilityResult } from '../../usecase/FacilityManagement/delete-facility-use-case';
+import type { DeleteFacilityUseCase, DeleteFacilityCommand, DeleteFacilityResult } from '../../usecase/FacilityManagement/DeleteFacility/delete-facility-use-case';
 import type { FacilityRepository } from '../../repository/facility-repository';
 
 /**

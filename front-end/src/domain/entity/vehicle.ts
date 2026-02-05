@@ -1,4 +1,4 @@
-import { generateUniqueId } from './utils';
+import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { VehicleType } from '../enumerate/vehicle-type';
 import { Capacity } from '../valueobject/demand/capacity';
 import { TransportationVariableCost } from '../valueobject/cost/transportation-variable-cost';
@@ -12,7 +12,7 @@ import { TransportationVariableCost } from '../valueobject/cost/transportation-v
  * cost information used for routing and costing calculations.
  */
 export class Vehicle {
-  readonly id: string;
+  readonly id: UllUUID;
   private vehicleType: VehicleType;
   private transportCapacity: Capacity;
   private costPerKilometer: TransportationVariableCost;
@@ -24,18 +24,18 @@ export class Vehicle {
    * @param costPerKilometer transportation variable cost value object
    * @param id optional explicit id (generated when omitted)
    */
-  constructor(vehicleType: VehicleType, transportCapacity: Capacity, costPerKilometer: TransportationVariableCost, id?: string) {
+  constructor(vehicleType: VehicleType, transportCapacity: Capacity, costPerKilometer: TransportationVariableCost, id?: UllUUID) {
     if (!vehicleType) throw new Error('Vehicle type is not defined');
     if (!transportCapacity) throw new Error('Vehicle capacity is not defined');
     if (!costPerKilometer) throw new Error('Transportation variable cost is not defined');
-    this.id = id ?? generateUniqueId();
+    this.id = id ?? UllUUID.random();
     this.vehicleType = vehicleType;
     this.transportCapacity = transportCapacity;
     this.costPerKilometer = costPerKilometer;
   }
 
   /** Return the vehicle identifier. */
-  getId(): string { return this.id; }
+  getId(): UllUUID { return this.id; }
 
   /** Return the vehicle type. */
   getVehicleType(): VehicleType { return this.vehicleType; }
@@ -56,7 +56,7 @@ export class Vehicle {
   updateCostPerKilometer(c: TransportationVariableCost): void { if (!c) throw new Error('Transportation variable cost is not defined'); this.costPerKilometer = c; }
 
   /** Equality by id. */
-  equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof Vehicle)) return false; return this.id === other.id; }
+  equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof Vehicle)) return false; return this.id.equals(other.id); }
 
   /** Human-readable representation for debugging. */
   toString(): string { return `Vehicle={id=${this.id}, type=${this.vehicleType}, capacity=${this.transportCapacity}, costPerKm=${this.costPerKilometer}}`; }

@@ -1,5 +1,5 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { GetVehicleUseCase, GetVehicleCommand, GetVehicleResult } from '../../usecase/VehicleManagement/get-vehicle-use-case';
+import type { GetVehicleUseCase, GetVehicleCommand, GetVehicleResult } from '../../usecase/VehicleManagement/GetVehicle/get-vehicle-use-case';
 import type { VehicleRepository } from '../../repository/vehicle-repository';
 
 /**

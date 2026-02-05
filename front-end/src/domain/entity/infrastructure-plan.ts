@@ -1,4 +1,4 @@
-import { generateUniqueId } from './utils';
+import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { PlanningPeriod } from '../valueobject/time/planning-period';
 import { MaximumBudget } from '../valueobject/cost/maximum-budget';
 import { ServicePolicies } from '../valueobject/policy/service-policies';
@@ -16,7 +16,7 @@ import { TotalCost } from '../valueobject/cost/total-cost';
  * re-evaluate estimated costs and validity.
  */
 export class InfrastructurePlan {
-  readonly id: string;
+  readonly id: UllUUID;
   private period: PlanningPeriod;
   private selectedFacilities: Facility[];
   private serviceAssignments: Map<Container, Facility>;
@@ -32,10 +32,10 @@ export class InfrastructurePlan {
    * @param id optional explicit id (generated when omitted)
    * @throws Error when required parameters are missing
    */
-  constructor(period: PlanningPeriod, maxBudget: MaximumBudget, servicePolicies?: ServicePolicies | null, id?: string) {
+  constructor(period: PlanningPeriod, maxBudget: MaximumBudget, servicePolicies?: ServicePolicies | null, id?: UllUUID) {
     if (!period) throw new Error('Planning period is not defined');
     if (!maxBudget) throw new Error('Maximum budget is not defined');
-    this.id = id ?? generateUniqueId();
+    this.id = id ?? UllUUID.random();
     this.period = period;
     this.maxBudget = maxBudget;
     this.servicePolicies = servicePolicies ?? null;
@@ -45,7 +45,7 @@ export class InfrastructurePlan {
   }
 
   /** Return the plan identifier. */
-  getId(): string { return this.id; }
+  getId(): UllUUID { return this.id; }
 
   /** Return the planning period. */
   getPeriod(): PlanningPeriod { return this.period; }
@@ -125,7 +125,7 @@ export class InfrastructurePlan {
   updateServicePolicies(newServicePolicies?: ServicePolicies | null): void { this.servicePolicies = newServicePolicies ?? null; }
 
   /** Equality by id. */
-  equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof InfrastructurePlan)) return false; return this.id === other.id; }
+  equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof InfrastructurePlan)) return false; return this.id.equals(other.id); }
 
   /** Human-readable representation for debugging. */
   toString(): string { return `InfrastructurePlan={id=${this.id}, period=${this.period}, facilities=${this.selectedFacilities}, assignments=${Array.from(this.serviceAssignments.keys())}, totalCost=${this.estimatedTotalCost}}`; }

@@ -1,8 +1,8 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { ExportReportCommand, ExportReportResult } from '../usecase/OptimizationAndReports/export-report-use-case';
-import type { GenerateReportCommand, GenerateReportResult } from '../usecase/OptimizationAndReports/generate-report-use-case';
-import type { CalculateCostsCommand, CalculateCostsResult } from '../usecase/OptimizationAndReports/calculate-costs-use-case';
-import type { OptimizeRoutesCommand, OptimizeRoutesResult } from '../usecase/OptimizationAndReports/optimize-routes-use-case';
+import type { ExportReportCommand, ExportReportResult } from '../usecase/OptimizationAndReports/ExportReport/export-report-use-case';
+import type { GenerateReportCommand, GenerateReportResult } from '../usecase/OptimizationAndReports/GenerateReport/generate-report-use-case';
+import type { CalculateCostsCommand, CostCalculationResult } from '../usecase/OptimizationAndReports/CalculateCosts/calculate-costs-use-case';
+import type { OptimizeRoutesCommand, OptimizeRoutesResult } from '../usecase/OptimizationAndReports/OptimizeRoutes/optimize-routes-use-case';
 
 /**
  * @brief Repository interface for optimization and reports.
@@ -28,7 +28,7 @@ export interface OptimizationAndReportsRepository {
    * @param command Input data required to compute costs.
    * @return Either a DataError or the computed cost value.
    */
-  calculateCosts(command: CalculateCostsCommand): Promise<Either<DataError, CalculateCostsResult>>;
+  calculateCosts(command: CalculateCostsCommand): Promise<Either<DataError, CostCalculationResult>>;
 
   /**
    * @brief Optimize routes for containers, facilities, vehicles, etc.

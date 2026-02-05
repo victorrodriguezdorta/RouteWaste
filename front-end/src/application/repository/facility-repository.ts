@@ -1,11 +1,11 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 
-import type { CreateFacilityCommand, CreateFacilityResult } from '../usecase/FacilityManagement/create-facility-use-case';
-import type { GetFacilityCommand, GetFacilityResult } from '../usecase/FacilityManagement/get-facility-use-case';
-import type { UpdateFacilityCommand, UpdateFacilityResult } from '../usecase/FacilityManagement/update-facility-use-case';
-import type { ListFacilitiesCommand, ListFacilitiesResult } from '../usecase/FacilityManagement/list-facilities-use-case';
-import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '../usecase/FacilityManagement/filter-facilities-use-case';
-import type { DeleteFacilityCommand, DeleteFacilityResult } from '../usecase/FacilityManagement/delete-facility-use-case';
+import type { CreateFacilityCommand, CreateFacilityResult } from '../usecase/FacilityManagement/CreateFacility/create-facility-use-case';
+import type { GetFacilityCommand, GetFacilityResult } from '../usecase/FacilityManagement/GetFacility/get-facility-use-case';
+import type { UpdateFacilityCommand, UpdateFacilityResult } from '../usecase/FacilityManagement/UpdateFacility/update-facility-use-case';
+import type { ListFacilitiesCommand, ListFacilitiesResult } from '../usecase/FacilityManagement/ListFacilities/list-facilities-use-case';
+import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '../usecase/FacilityManagement/FilterFacilities/filter-facilities-use-case';
+import type { DeleteFacilityCommand, DeleteFacilityResult } from '../usecase/FacilityManagement/DeleteFacility/delete-facility-use-case';
 
 /**
  * @brief Repository interface for Facility entity.

@@ -1,5 +1,5 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { CalculateCostsUseCase, CalculateCostsCommand, CalculateCostsResult } from '../../usecase/OptimizationAndReports/calculate-costs-use-case';
+import type { CalculateCostsUseCase, CalculateCostsCommand, CostCalculationResult } from '../../usecase/OptimizationAndReports/CalculateCosts/calculate-costs-use-case';
 import type { OptimizationAndReportsRepository } from '../../repository/optimization-and-reports-repository';
 
 
@@ -25,7 +25,7 @@ export class CalculateCostsService implements CalculateCostsUseCase {
      * @param command Input data required to compute costs.
      * @return Either a `DataError` or the computed cost value.
      */
-    async execute(command: CalculateCostsCommand): Promise<Either<DataError, CalculateCostsResult>> {
+    async execute(command: CalculateCostsCommand): Promise<Either<DataError, CostCalculationResult>> {
         return this.optimizationRepository.calculateCosts(command);
     }
 }

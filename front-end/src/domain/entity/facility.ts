@@ -1,4 +1,4 @@
-import { generateUniqueId } from './utils';
+import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { FacilityType } from '../enumerate/facility-type';
 import { FacilityStatus, facilityStatusIsDiscarded } from '../enumerate/facility-status';
 import { Location } from '../valueobject/location/location';
@@ -16,7 +16,7 @@ import { OpeningFixedCost } from '../valueobject/cost/opening-fixed-cost';
  * to update facility attributes used by the application layer.
  */
 export class Facility {
-  readonly id: string;
+  readonly id: UllUUID;
   private facilityType: FacilityType;
   private location: Location;
   private capacity: Capacity;
@@ -34,14 +34,14 @@ export class Facility {
    * @param id optional explicit id (generated if omitted)
    * @throws Error when required parameters are missing
    */
-  constructor(facilityType: FacilityType, location: Location, capacity: Capacity, openingFixedCost: OpeningFixedCost, status: FacilityStatus, id?: string) {
+  constructor(facilityType: FacilityType, location: Location, capacity: Capacity, openingFixedCost: OpeningFixedCost, status: FacilityStatus, id?: UllUUID) {
     if (!facilityType) throw new Error('Facility type is not defined');
     if (!location) throw new Error('Facility location is not defined');
     if (!capacity) throw new Error('Facility capacity is not defined');
     if (!openingFixedCost) throw new Error('Opening fixed cost is not defined');
     if (!status) throw new Error('Facility status is not defined');
 
-    this.id = id ?? generateUniqueId();
+    this.id = id ?? UllUUID.random();
     this.facilityType = facilityType;
     this.location = location;
     this.capacity = capacity;
@@ -51,7 +51,7 @@ export class Facility {
   }
 
   /** Return the facility identifier. */
-  getId(): string { return this.id; }
+  getId(): UllUUID { return this.id; }
 
   /**
    * Assign additional waste demand to the facility.
@@ -106,7 +106,7 @@ export class Facility {
   equals(other: unknown): boolean {
     if (this === other) return true;
     if (!(other instanceof Facility)) return false;
-    return this.id === other.id;
+    return this.id.equals(other.id);
   }
 
   /** Human-readable representation for debugging. */

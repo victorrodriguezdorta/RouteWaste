@@ -1,5 +1,5 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { OptimizeRoutesUseCase, OptimizeRoutesCommand, OptimizeRoutesResult } from '../../usecase/OptimizationAndReports/optimize-routes-use-case';
+import type { OptimizeRoutesUseCase, OptimizeRoutesCommand, OptimizeRoutesResult } from '../../usecase/OptimizationAndReports/OptimizeRoutes/optimize-routes-use-case';
 import type { OptimizationAndReportsRepository } from '../../repository/optimization-and-reports-repository';
 
 /**

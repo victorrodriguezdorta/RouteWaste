@@ -1,8 +1,8 @@
 import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { AssignContainerToFacilityCommand, AssignContainerToFacilityResult } from '../usecase/ServiceAssignmentManagement/assign-container-to-facility-use-case';
-import type { UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '../usecase/ServiceAssignmentManagement/update-service-assignment-use-case';
-import type { RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult } from '../usecase/ServiceAssignmentManagement/remove-service-assignment-use-case';
-import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult } from '../usecase/ServiceAssignmentManagement/list-service-assignments-use-case';
+import type { AssignContainerToFacilityCommand, AssignContainerToFacilityResult } from '../usecase/ServiceAssignmentManagement/AssignContainerToFacility/assign-container-to-facility-use-case';
+import type { UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '../usecase/ServiceAssignmentManagement/UpdateServiceAssignment/update-service-assignment-use-case';
+import type { RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult } from '../usecase/ServiceAssignmentManagement/RemoveServiceAssignment/remove-service-assignment-use-case';
+import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult } from '../usecase/ServiceAssignmentManagement/ListServiceAssignments/list-service-assignments-use-case';
 
 /**
  * @brief Repository interface for ServiceAssignment entity.
