@@ -14,7 +14,7 @@ public class TotalCostTests {
         TotalCost cost = new TotalCost(10.5);
 
         assertEquals(10.50, cost.getAmount());
-        assertEquals(new Currency("EUR"), cost.getCurrency());
+        assertEquals(new Currency("EUR"), cost.getCurrency().get());
     }
 
     /**
@@ -26,7 +26,7 @@ public class TotalCostTests {
         TotalCost cost = new TotalCost(20.0, currency);
 
         assertEquals(20.00, cost.getAmount());
-        assertEquals(currency, cost.getCurrency());
+        assertEquals(currency, cost.getCurrency().get());
     }
 
     /**
@@ -37,7 +37,7 @@ public class TotalCostTests {
         TotalCost cost = new TotalCost(15.25, "EUR");
 
         assertEquals(15.25, cost.getAmount());
-        assertEquals(new Currency("EUR"), cost.getCurrency());
+        assertEquals(new Currency("EUR"), cost.getCurrency().get());
     }
 
     /**
@@ -128,7 +128,7 @@ public class TotalCostTests {
         TotalCost cost = new TotalCost(30.75, "USD");
 
         assertEquals(30.75, cost.getAmount());
-        assertEquals(new Currency("USD"), cost.getCurrency());
+        assertEquals(new Currency("USD"), cost.getCurrency().get());
     }
 
     /**
@@ -142,7 +142,7 @@ public class TotalCostTests {
         TotalCost result = cost1.add(cost2);
 
         assertEquals(15.50, result.getAmount());
-        assertEquals(new Currency("EUR"), result.getCurrency());
+        assertEquals(new Currency("EUR"), result.getCurrency().get());
     }
 
     /**
