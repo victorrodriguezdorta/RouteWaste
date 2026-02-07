@@ -13,11 +13,12 @@ public final class ServiceRadius {
     private static final int ZERO = 0;
     private static final String ERROR_RADIUS_NEGATIVE = "Service radius cannot be negative";
 
-        /**
-         * Required.
-         * Service radius value in meters.
-         */
-        private final double value;
+    /**
+     * Required.
+     * Service radius value in meters.
+     * @required
+     */
+    private final double value;
 
     /**
      * Creates a new ServiceRadius.

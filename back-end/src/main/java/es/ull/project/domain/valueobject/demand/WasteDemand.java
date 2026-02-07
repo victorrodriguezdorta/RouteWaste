@@ -26,18 +26,21 @@ public final class WasteDemand {
     /**
      * Required.
      * Value of the waste demand per time unit.
+     * @required
      */
     private final double value;
 
     /**
      * Required.
      * Quantity unit (for example, tons).
+     * @required
      */
     private final QuantityUnit quantityUnit;
 
     /**
      * Required.
      * Time unit (for example, DAYS).
+     * @required
      */
     private final TimeUnit timeUnit;
 

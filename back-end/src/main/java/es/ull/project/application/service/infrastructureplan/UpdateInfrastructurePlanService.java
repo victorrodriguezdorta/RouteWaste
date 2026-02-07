@@ -54,7 +54,6 @@ public class UpdateInfrastructurePlanService implements UpdateInfrastructurePlan
         if (newServicePolicies != null) {
             existing.updateServicePolicies(newServicePolicies);
         }
-
         InfrastructurePlan saved = this.repository.save(existing);
         return saved;
     }

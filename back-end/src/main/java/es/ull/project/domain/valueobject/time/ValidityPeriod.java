@@ -1,6 +1,5 @@
 package es.ull.project.domain.valueobject.time;
 
-
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,14 +18,14 @@ public final class ValidityPeriod {
             "End date of validity period cannot be before start date";
 
     /**
-     * Required.
      * Start date of the validity period.
+     * @required
      */
     private final LocalDate startDate;
 
     /**
-     * Optional.
      * End date of the validity period. If not present, the validity is open-ended.
+     * @optional
      */
     private final LocalDate endDate;
 

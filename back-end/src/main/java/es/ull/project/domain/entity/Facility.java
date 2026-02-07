@@ -94,7 +94,6 @@ public class Facility {
         this.validateCapacity(capacity);
         this.validateOpeningFixedCost(openingFixedCost);
         this.validateStatus(status);
-
         this.id = UUID.randomUUID();
         this.facilityType = facilityType;
         this.location = location;

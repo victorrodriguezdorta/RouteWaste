@@ -2,7 +2,6 @@ package es.ull.project.domain.entity;
 
 import java.util.Objects;
 import java.util.UUID;
-
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
@@ -27,7 +26,7 @@ public class ServiceAssignment {
     public static final String TRANSPORT_COST_NOT_DEFINED = "Transportation cost is not defined";
     public static final String POLICY_VIOLATION = "Service assignment violates service policies";
 
-    private final UUID serviceAssignmentId;
+    private final UUID id;
     private final Container container;
     private final Facility facility;
 
@@ -53,7 +52,7 @@ public class ServiceAssignment {
                              ServiceTime serviceTime,
                              TransportationVariableCost transportCost) {
         validate(container, facility, wasteDemand, distance, serviceTime, transportCost);
-        this.serviceAssignmentId = UUID.randomUUID();
+        this.id = UUID.randomUUID();
         this.container = container;
         this.facility = facility;
         this.wasteDemand = wasteDemand;
@@ -69,7 +68,7 @@ public class ServiceAssignment {
      * @param otherObject the ServiceAssignment to copy
      */
     public ServiceAssignment(ServiceAssignment otherObject) {
-        this.serviceAssignmentId = otherObject.serviceAssignmentId;
+        this.id = otherObject.id;
         this.container = otherObject.container;
         this.facility = otherObject.facility;
         this.wasteDemand = otherObject.wasteDemand;
@@ -82,7 +81,7 @@ public class ServiceAssignment {
      * Restore constructor.
      * Restores a ServiceAssignment from persistence with all its attributes.
      *
-     * @param serviceAssignmentId the assignment identifier
+     * @param id the assignment identifier
      * @param container           the container entity
      * @param facility            the facility entity
      * @param wasteDemand         the waste demand
@@ -90,7 +89,7 @@ public class ServiceAssignment {
      * @param serviceTime         the service time required
      * @param transportCost       the transportation cost
      */
-    public ServiceAssignment(UUID serviceAssignmentId,
+    public ServiceAssignment(UUID id,
                              Container container,
                              Facility facility,
                              WasteDemand wasteDemand,
@@ -98,7 +97,7 @@ public class ServiceAssignment {
                              ServiceTime serviceTime,
                              TransportationVariableCost transportCost) {
         validate(container, facility, wasteDemand, distance, serviceTime, transportCost);
-        this.serviceAssignmentId = serviceAssignmentId;
+        this.id = id;
         this.container = container;
         this.facility = facility;
         this.wasteDemand = wasteDemand;
@@ -169,8 +168,8 @@ public class ServiceAssignment {
      *
      * @return the service assignment UUID
      */
-    public UUID getServiceAssignmentId() {
-        return serviceAssignmentId;
+    public UUID getId() {
+        return id;
     }
 
     /**
@@ -242,7 +241,7 @@ public class ServiceAssignment {
             return false;
         }
         ServiceAssignment other = (ServiceAssignment) otherObject;
-        return Objects.equals(this.serviceAssignmentId, other.serviceAssignmentId);
+        return Objects.equals(this.id, other.id);
     }
 
     /**
@@ -252,7 +251,7 @@ public class ServiceAssignment {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(serviceAssignmentId);
+        return Objects.hash(id);
     }
 
     /**
@@ -264,7 +263,7 @@ public class ServiceAssignment {
     public String toString() {
         return String.format(
                 "ServiceAssignment={id=%s, containerId=%s, facilityId=%s, demand=%s, distance=%s, serviceTime=%s, transportCost=%s}",
-                serviceAssignmentId, container.getId(), facility.getId(), wasteDemand,
+                id, container.getId(), facility.getId(), wasteDemand,
                 distance, serviceTime, transportCost
         );
     }

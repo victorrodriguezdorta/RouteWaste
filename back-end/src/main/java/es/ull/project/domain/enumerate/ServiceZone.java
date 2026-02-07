@@ -40,15 +40,12 @@ public enum ServiceZone {
         if (stringToCheck == null) {
             throw new IllegalArgumentException(ERROR_SERVICE_ZONE_NOT_DEFINED);
         }
-
         stringToCheck = stringToCheck.trim().toUpperCase();
-
         for (ServiceZone serviceZone : values()) {
             if (serviceZone.name().equals(stringToCheck)) {
                 return serviceZone;
             }
         }
-
         throw new IllegalArgumentException(
                 ERROR_SERVICE_ZONE_INVALID + allowedValues()
         );
@@ -76,9 +73,7 @@ public enum ServiceZone {
         if (stringToCheck == null) {
             return false;
         }
-
         stringToCheck = stringToCheck.trim().toUpperCase();
-
         for (ServiceZone serviceZone : values()) {
             if (serviceZone.name().equals(stringToCheck)) {
                 return true;

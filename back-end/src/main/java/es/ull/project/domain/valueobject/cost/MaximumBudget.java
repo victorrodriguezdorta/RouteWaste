@@ -21,11 +21,13 @@ public final class MaximumBudget {
     /**
      * Required. Amount of the maximum budget.
      * Always stored with 2 decimal precision.
+     * @required
      */
     private final BigDecimal amount;
 
     /**
      * Optional. Currency of the budget. Default: "EUR" when not provided.
+     * @optional
      */
     private final Currency currency;
 

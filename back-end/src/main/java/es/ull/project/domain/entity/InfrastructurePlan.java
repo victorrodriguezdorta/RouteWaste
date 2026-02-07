@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.TotalCost;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
@@ -104,29 +103,6 @@ public class InfrastructurePlan {
         this.serviceAssignments = serviceAssignments != null ? new HashMap<>(serviceAssignments) : new HashMap<>();
         this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
     }
-
-    /**
-     * Static factory method to restore an InfrastructurePlan from persistence.
-     *
-     * @param id                  the plan identifier
-     * @param period              the planning period
-     * @param maxBudget           the maximum budget allowed
-     * @param servicePolicies     the service policies
-     * @param selectedFacilities  the list of selected facilities
-     * @param serviceAssignments  the map of container to facility assignments
-     * @param estimatedTotalCost  the estimated total cost
-     * @return the restored InfrastructurePlan instance
-     */
-    public static InfrastructurePlan restore(UUID id,
-                                             PlanningPeriod period,
-                                             MaximumBudget maxBudget,
-                                             ServicePolicies servicePolicies,
-                                             List<Facility> selectedFacilities,
-                                             Map<Container, Facility> serviceAssignments,
-                                             TotalCost estimatedTotalCost) {
-        return new InfrastructurePlan(id, period, maxBudget, servicePolicies, selectedFacilities, serviceAssignments, estimatedTotalCost);
-    }
-
     /**
      * Validates that the plan identifier is not null.
      *

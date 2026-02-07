@@ -16,7 +16,8 @@ public final class ServiceTime {
     private static final String ERROR_TIME_NEGATIVE = "Service time cannot be negative";
 
     /**
-     * Required. Service time value in minutes.
+     * Service time value in minutes.
+     * @required
      */
     private final double value;
 

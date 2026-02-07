@@ -19,8 +19,8 @@ public final class PlanningPeriod {
             "Planning period format is invalid. Expected formats: YYYY or YYYY-Q[1-4]";
 
     /**
-     * Required.
      * Value of the planning period (e.g., "2026", "2026-Q1").
+     * @required
      */
     private final String value;
 

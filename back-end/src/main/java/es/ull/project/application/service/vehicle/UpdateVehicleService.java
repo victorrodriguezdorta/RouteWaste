@@ -45,7 +45,6 @@ public class UpdateVehicleService implements UpdateVehicleUseCase {
     @Override
     public Vehicle update(UUID id, VehicleType newVehicleType, Capacity newTransportCapacity, TransportationVariableCost newCostPerKilometer) {
         Vehicle existing = this.repository.findById(id).orElseThrow(() -> new NoSuchElementException("Vehicle not found"));
-
         if (newVehicleType != null) {
             existing.updateVehicleType(newVehicleType);
         }
@@ -55,7 +54,6 @@ public class UpdateVehicleService implements UpdateVehicleUseCase {
         if (newCostPerKilometer != null) {
             existing.updateCostPerKilometer(newCostPerKilometer);
         }
-
         Vehicle saved = this.repository.save(existing);
         return saved;
     }

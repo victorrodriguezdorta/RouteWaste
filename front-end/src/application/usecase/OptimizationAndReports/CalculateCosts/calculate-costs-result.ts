@@ -12,6 +12,6 @@ export interface CostCalculationResult {
     transportationCosts: TransportationVariableCost;
     breakdown: {
         facilityId: UllUUID;
-        cost: number;
+        cost: TotalCost;
     }[];
 }

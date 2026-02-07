@@ -4,8 +4,8 @@ import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
-import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.demand.Capacity;
 
 /**
  * Service responsible for creating new vehicles in the system.

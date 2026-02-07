@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
-
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.domain.entity.InfrastructurePlan;
 

@@ -46,26 +46,26 @@ public final class Location {
     private static final int ZERO = 0;
 
         /**
-         * Required.
          * Latitude in decimal degrees.
+         * @required
          */
         private final double latitude;
 
         /**
-         * Required.
          * Longitude in decimal degrees.
+         * @required
          */
         private final double longitude;
 
         /**
-         * Required.
          * Postal address.
+         * @optional
          */
         private final String postalAddress;
 
         /**
-         * Required.
          * GIS reference. (Geographic Information System)
+         * @optional
          * TODO: maybe change String to a more complex type if needed in the future.
          */
         private final String gisReference;

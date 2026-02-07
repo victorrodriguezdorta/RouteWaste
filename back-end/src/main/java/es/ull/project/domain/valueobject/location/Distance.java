@@ -1,6 +1,5 @@
 package es.ull.project.domain.valueobject.location;
 
-
 import java.util.Objects;
 
 /**

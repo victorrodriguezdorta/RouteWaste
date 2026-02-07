@@ -85,7 +85,7 @@ class ServiceAssignmentTests {
         assertEquals(distance, sa.getDistance());
         assertEquals(serviceTime, sa.getServiceTime());
         assertEquals(cost, sa.getTransportCost());
-        assertNotNull(sa.getServiceAssignmentId());
+        assertNotNull(sa.getId());
     }
 
     @Test
@@ -200,7 +200,7 @@ class ServiceAssignmentTests {
         ServiceAssignment sa = new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), randomDistance(), randomServiceTime(), randomTransportCost());
         String expected = String.format(
             "ServiceAssignment={id=%s, containerId=%s, facilityId=%s, demand=%s, distance=%s, serviceTime=%s, transportCost=%s}",
-            sa.getServiceAssignmentId(), sa.getContainer().getId(), sa.getFacility().getId(), sa.getWasteDemand(), sa.getDistance(), sa.getServiceTime(), sa.getTransportCost()
+            sa.getId(), sa.getContainer().getId(), sa.getFacility().getId(), sa.getWasteDemand(), sa.getDistance(), sa.getServiceTime(), sa.getTransportCost()
         );
 
         assertEquals(expected, sa.toString());

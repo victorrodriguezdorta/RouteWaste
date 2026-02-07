@@ -21,12 +21,14 @@ public final class OpeningFixedCost {
     /**
      * Required.
      * Amount of the fixed cost. Always stored with 2 decimal precision.
+     * @required
      */
     private final BigDecimal amount;
 
     /**
      * Optional.
      * Currency of the cost. Default: "EUR".
+     * @optional
      */
     private final Currency currency;
 

@@ -18,24 +18,28 @@ public final class ServicePolicies {
     /**
      * Optional.
      * Maximum service distance allowed. Measured in meters.
+     * @optional
      */
     private final Double maxServiceDistance;
 
     /**
      * Optional.
      * Maximum service time allowed. Measured in minutes.
+     * @optional
      */
     private final Integer maxServiceTime;
 
     /**
      * Optional.
      * Maximum number of infrastructures allowed.
+     * @optional
      */
     private final Integer maxInfrastructureCount;
 
     /**
      * Optional.
      * Maximum emission limit. Measured in kilograms of CO2.
+     * @optional
      */
     private final Double maxEmissions;
 

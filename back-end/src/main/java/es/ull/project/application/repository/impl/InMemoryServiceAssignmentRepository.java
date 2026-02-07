@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.stereotype.Repository;
-
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.domain.entity.ServiceAssignment;
 
@@ -30,7 +28,7 @@ public class InMemoryServiceAssignmentRepository implements ServiceAssignmentRep
         if (entity == null) {
             return;
         }
-        store.remove(entity.getServiceAssignmentId());
+        store.remove(entity.getId());
     }
 
     /**
@@ -64,7 +62,7 @@ public class InMemoryServiceAssignmentRepository implements ServiceAssignmentRep
         if (entity == null) {
             return null;
         }
-        store.put(entity.getServiceAssignmentId(), entity);
+        store.put(entity.getId(), entity);
         return entity;
     }
 
