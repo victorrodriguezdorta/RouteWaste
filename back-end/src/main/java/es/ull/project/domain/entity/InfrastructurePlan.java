@@ -80,27 +80,27 @@ public class InfrastructurePlan {
      *
      * @param id                 the plan identifier
      * @param period             the planning period
-     * @param maxBudget          the maximum budget allowed
-     * @param servicePolicies    the service policies
      * @param selectedFacilities the list of selected facilities
      * @param serviceAssignments the map of container to facility assignments
+     * @param servicePolicies    the service policies
+     * @param maxBudget          the maximum budget allowed
      * @param estimatedTotalCost the estimated total cost
      */
     public InfrastructurePlan(UUID id,
             PlanningPeriod period,
-            MaximumBudget maxBudget,
-            ServicePolicies servicePolicies,
             List<Facility> selectedFacilities,
             Map<Container, Facility> serviceAssignments,
+            ServicePolicies servicePolicies,
+            MaximumBudget maxBudget,
             TotalCost estimatedTotalCost) {
         validatePeriod(period);
         validateMaxBudget(maxBudget);
         this.id = id;
         this.period = period;
-        this.maxBudget = maxBudget;
-        this.servicePolicies = servicePolicies;
         this.selectedFacilities = selectedFacilities != null ? new ArrayList<>(selectedFacilities) : new ArrayList<>();
         this.serviceAssignments = serviceAssignments != null ? new HashMap<>(serviceAssignments) : new HashMap<>();
+        this.servicePolicies = servicePolicies;
+        this.maxBudget = maxBudget;
         this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
     }
 
