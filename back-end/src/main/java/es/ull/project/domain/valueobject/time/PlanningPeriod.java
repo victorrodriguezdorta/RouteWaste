@@ -20,7 +20,7 @@ public final class PlanningPeriod {
 
     /**
      * Value of the planning period (e.g., "2026", "2026-Q1").
-     * @required
+     * It is a required attribute.
      */
     private final String value;
 

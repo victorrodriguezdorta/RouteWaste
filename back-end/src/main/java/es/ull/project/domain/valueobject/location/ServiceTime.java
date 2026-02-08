@@ -17,7 +17,7 @@ public final class ServiceTime {
 
     /**
      * Service time value in minutes.
-     * @required
+     * It is a required attribute.
      */
     private final double value;
 

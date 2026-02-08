@@ -3,6 +3,7 @@ package es.ull.project.domain.valueobject.cost;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * OpeningFixedCost
@@ -19,18 +20,14 @@ public final class OpeningFixedCost {
     private static final int ZERO = 0;
 
     /**
-     * Required.
      * Amount of the fixed cost. Always stored with 2 decimal precision.
-     * 
-     * @required
+     * It is a required attribute.
      */
     private final BigDecimal amount;
 
     /**
-     * Optional.
      * Currency of the cost. Default: "EUR".
-     * 
-     * @optional
+     * It is an optional attribute.
      */
     private final Currency currency;
 
@@ -121,10 +118,10 @@ public final class OpeningFixedCost {
     /**
      * Returns the currency of the opening fixed cost.
      *
-     * @return Currency object.
+     * @return Optional containing the Currency object.
      */
-    public Currency getCurrency() {
-        return this.currency;
+    public Optional<Currency> getCurrency() {
+        return Optional.ofNullable(this.currency);
     }
 
     /**

@@ -1,5 +1,8 @@
 package es.ull.project.application.repository.impl;
 
+import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.domain.entity.Vehicle;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -8,8 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
-import es.ull.project.application.repository.VehicleRepository;
-import es.ull.project.domain.entity.Vehicle;
 
 /**
  * In-memory VehicleRepository for tests and local runs.

@@ -26,21 +26,21 @@ public final class WasteDemand {
     /**
      * Required.
      * Value of the waste demand per time unit.
-     * @required
+     * It is a required attribute.
      */
     private final double value;
 
     /**
      * Required.
      * Quantity unit (for example, tons).
-     * @required
+     * It is a required attribute.
      */
     private final QuantityUnit quantityUnit;
 
     /**
      * Required.
      * Time unit (for example, DAYS).
-     * @required
+     * It is a required attribute.
      */
     private final TimeUnit timeUnit;
 

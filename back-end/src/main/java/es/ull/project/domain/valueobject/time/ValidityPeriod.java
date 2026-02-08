@@ -19,13 +19,13 @@ public final class ValidityPeriod {
 
     /**
      * Start date of the validity period.
-     * @required
+     * It is a required attribute.
      */
     private final LocalDate startDate;
 
     /**
      * End date of the validity period. If not present, the validity is open-ended.
-     * @optional
+     * It is an optional attribute.
      */
     private final LocalDate endDate;
 

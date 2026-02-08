@@ -24,7 +24,7 @@ public final class QuantityUnit {
 
     /**
      * Required. The unit value. Must be non-empty and contain only letters. E.g., "kg", "liters", "units"
-     * @required
+     * It is a required attribute.
      */
     private final String value;
 

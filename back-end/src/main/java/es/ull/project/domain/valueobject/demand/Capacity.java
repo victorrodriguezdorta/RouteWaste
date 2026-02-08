@@ -24,21 +24,21 @@ public final class Capacity {
     /**
      * Required.
      * Amount value per time unit (e.g., 10.5).
-     * @required
+     * It is a required attribute.
      */
     private final double value;
 
     /**
      * Required.
      * Quantity unit (e.g., tons, liters).
-     * @required
+     * It is a required attribute.
      */
     private final QuantityUnit quantityUnit;
 
     /**
      * Required.
      * Time unit (e.g., DAYS, HOURS).
-     * @required
+     * It is a required attribute.
      */
     private final TimeUnit timeUnit;
 

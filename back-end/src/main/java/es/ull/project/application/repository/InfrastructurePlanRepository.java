@@ -1,9 +1,10 @@
 package es.ull.project.application.repository;
 
+import es.ull.project.domain.entity.InfrastructurePlan;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import es.ull.project.domain.entity.InfrastructurePlan;
 
 /**
  * Repository interface for InfrastructurePlan aggregates.

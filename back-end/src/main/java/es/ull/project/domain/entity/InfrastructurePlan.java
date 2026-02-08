@@ -1,5 +1,11 @@
 package es.ull.project.domain.entity;
 
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
+import es.ull.project.domain.valueobject.cost.TotalCost;
+import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.policy.ServicePolicies;
+import es.ull.project.domain.valueobject.time.PlanningPeriod;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,11 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import es.ull.project.domain.valueobject.cost.MaximumBudget;
-import es.ull.project.domain.valueobject.cost.TotalCost;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
-import es.ull.project.domain.valueobject.policy.ServicePolicies;
-import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
 /**
  * InfrastructurePlan
@@ -21,7 +22,6 @@ import es.ull.project.domain.valueobject.time.PlanningPeriod;
  */
 public class InfrastructurePlan {
 
-    public static final String PLAN_ID_NOT_DEFINED = "Plan id is not defined";
     public static final String PERIOD_NOT_DEFINED = "Planning period is not defined";
     public static final String MAX_BUDGET_NOT_DEFINED = "Maximum budget is not defined";
     public static final String TOTAL_COST_EXCEEDED = "Total cost exceeds maximum budget";
@@ -93,7 +93,6 @@ public class InfrastructurePlan {
             List<Facility> selectedFacilities,
             Map<Container, Facility> serviceAssignments,
             TotalCost estimatedTotalCost) {
-        validateId(id);
         validatePeriod(period);
         validateMaxBudget(maxBudget);
         this.id = id;
@@ -103,18 +102,6 @@ public class InfrastructurePlan {
         this.selectedFacilities = selectedFacilities != null ? new ArrayList<>(selectedFacilities) : new ArrayList<>();
         this.serviceAssignments = serviceAssignments != null ? new HashMap<>(serviceAssignments) : new HashMap<>();
         this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
-    }
-
-    /**
-     * Validates that the plan identifier is not null.
-     *
-     * @param id the plan identifier to validate
-     * @throws IllegalArgumentException if the id is null
-     */
-    private static void validateId(UUID id) {
-        if (id == null) {
-            throw new IllegalArgumentException(PLAN_ID_NOT_DEFINED);
-        }
     }
 
     /**

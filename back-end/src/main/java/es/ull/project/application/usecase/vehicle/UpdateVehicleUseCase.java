@@ -1,10 +1,11 @@
 package es.ull.project.application.usecase.vehicle;
 
-import java.util.UUID;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
+
+import java.util.UUID;
 
 /**
  * Use case for updating a vehicle.

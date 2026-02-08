@@ -42,33 +42,34 @@ public final class Location {
 
     /**
      * Zero constant for comparisons.
+     * Used to avoid magic numbers in the code and improve readability.
      */
     private static final int ZERO = 0;
 
-        /**
-         * Latitude in decimal degrees.
-         * @required
-         */
-        private final double latitude;
+    /**
+     * Latitude in decimal degrees.
+     * It is a required attribute.
+     */
+    private final double latitude;
 
-        /**
-         * Longitude in decimal degrees.
-         * @required
-         */
-        private final double longitude;
+    /**
+     * Longitude in decimal degrees.
+     * It is a required attribute.
+     */
+    private final double longitude;
 
-        /**
-         * Postal address.
-         * @optional
-         */
-        private final String postalAddress;
+    /**
+     * Postal address.
+     * It is a required attribute.
+     */
+    private final String postalAddress;
 
-        /**
-         * GIS reference. (Geographic Information System)
-         * @optional
-         * TODO: maybe change String to a more complex type if needed in the future.
-         */
-        private final String gisReference;
+    /**
+     * GIS reference. (Geographic Information System)
+     * TODO: maybe change String to a more complex type if needed in the future.
+     * It is a required attribute.
+     */
+    private final String gisReference;
 
     /**
      * Creates a new Location with coordinates, postal address, and GIS reference.

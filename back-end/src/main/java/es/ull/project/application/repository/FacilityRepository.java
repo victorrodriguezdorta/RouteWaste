@@ -1,9 +1,10 @@
 package es.ull.project.application.repository;
 
+import es.ull.project.domain.entity.Facility;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import es.ull.project.domain.entity.Facility;
 
 /**
  * Repository interface for the Facility aggregate.

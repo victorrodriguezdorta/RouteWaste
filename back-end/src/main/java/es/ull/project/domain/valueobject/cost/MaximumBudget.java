@@ -3,6 +3,7 @@ package es.ull.project.domain.valueobject.cost;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * MaximumBudget
@@ -21,15 +22,13 @@ public final class MaximumBudget {
     /**
      * Required. Amount of the maximum budget.
      * Always stored with 2 decimal precision.
-     * 
-     * @required
+     * It is a required attribute.
      */
     private final BigDecimal amount;
 
     /**
      * Optional. Currency of the budget. Default: "EUR" when not provided.
-     * 
-     * @optional
+     * It is an optional attribute.
      */
     private final Currency currency;
 
@@ -118,10 +117,10 @@ public final class MaximumBudget {
     /**
      * Returns the currency of the maximum budget.
      * 
-     * @return Currency object.
+     * @return Optional containing the Currency object.
      */
-    public Currency getCurrency() {
-        return this.currency;
+    public Optional<Currency> getCurrency() {
+        return Optional.ofNullable(this.currency);
     }
 
     /**

@@ -1,12 +1,13 @@
 package es.ull.project.domain.entity;
 
-import java.util.Objects;
-import java.util.UUID;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.ServiceTime;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
+
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * ServiceAssignment

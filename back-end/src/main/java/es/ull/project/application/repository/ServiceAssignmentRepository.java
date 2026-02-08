@@ -1,9 +1,10 @@
 package es.ull.project.application.repository;
 
+import es.ull.project.domain.entity.ServiceAssignment;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import es.ull.project.domain.entity.ServiceAssignment;
 
 /**
  * Repository interface for ServiceAssignment entities.

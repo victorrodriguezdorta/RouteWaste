@@ -1,11 +1,12 @@
 package es.ull.project.application.usecase.serviceassignment;
 
-import java.util.UUID;
 import es.ull.project.domain.entity.ServiceAssignment;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.ServiceTime;
+
+import java.util.UUID;
 
 /**
  * Use case: update of a {@link ServiceAssignment}.

@@ -3,6 +3,8 @@ package es.ull.project.domain.valueobject.cost;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
+import java.util.Optional;
+
 /**
  * TotalCost
  * 
@@ -118,8 +120,8 @@ public final class TotalCost {
      * Returns the currency of the cost, wrapped in Optional.
      * @return Optional containing the currency if present, otherwise empty.
      */
-    public java.util.Optional<Currency> getCurrency() {
-        return java.util.Optional.ofNullable(this.currency);
+    public Optional<Currency> getCurrency() {
+        return Optional.ofNullable(this.currency);
     }
 
     /**

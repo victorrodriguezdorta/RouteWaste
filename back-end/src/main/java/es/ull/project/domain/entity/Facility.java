@@ -1,14 +1,14 @@
 package es.ull.project.domain.entity;
 
-import java.util.Objects;
-import java.util.UUID;
-
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Location;
+
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Facility

@@ -16,30 +16,26 @@ public final class ServicePolicies {
     private static final int ZERO = 0;
 
     /**
-     * Optional.
      * Maximum service distance allowed. Measured in meters.
-     * @optional
+     * It is an optional attribute.
      */
     private final Double maxServiceDistance;
 
     /**
-     * Optional.
      * Maximum service time allowed. Measured in minutes.
-     * @optional
+     * It is an optional attribute.
      */
     private final Integer maxServiceTime;
 
     /**
-     * Optional.
      * Maximum number of infrastructures allowed.
-     * @optional
+     * It is an optional attribute.
      */
     private final Integer maxInfrastructureCount;
 
     /**
-     * Optional.
      * Maximum emission limit. Measured in kilograms of CO2.
-     * @optional
+     * It is an optional attribute.
      */
     private final Double maxEmissions;
 

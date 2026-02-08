@@ -1,11 +1,11 @@
 package es.ull.project.domain.entity;
 
-import java.util.Objects;
-import java.util.UUID;
-
 import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
+
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Vehicle
