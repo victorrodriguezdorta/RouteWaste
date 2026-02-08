@@ -5,7 +5,8 @@ import java.util.Random;
 /**
  * ServiceZone
  *
- * Represents the different types of geographical service zones for waste collection.
+ * Represents the different types of geographical service zones for waste
+ * collection.
  * Each zone defines the scope and boundaries of service areas.
  * NEIGHBORHOOD, DISTRICT, or GEOGRAPHICAL_AREA.
  */
@@ -47,8 +48,7 @@ public enum ServiceZone {
             }
         }
         throw new IllegalArgumentException(
-                ERROR_SERVICE_ZONE_INVALID + allowedValues()
-        );
+                ERROR_SERVICE_ZONE_INVALID + allowedValues());
     }
 
     /**

@@ -12,9 +12,11 @@ import es.ull.project.domain.valueobject.policy.ServicePolicies;
  * ServiceAssignment
  *
  * Represents an assignment between a container and a facility,
- * including calculated values such as distance, service time and transportation cost.
+ * including calculated values such as distance, service time and transportation
+ * cost.
  *
- * It is an immutable entity except for recalculations triggered by policy validation.
+ * It is an immutable entity except for recalculations triggered by policy
+ * validation.
  */
 public class ServiceAssignment {
 
@@ -38,19 +40,19 @@ public class ServiceAssignment {
     /**
      * Creates a new service assignment.
      *
-    * @param container        container entity
-    * @param facility         facility entity
-     * @param wasteDemand      waste demand of the container
-     * @param distance         distance between container and facility
-     * @param serviceTime      service time required
-     * @param transportCost    transportation cost applied
+     * @param container     container entity
+     * @param facility      facility entity
+     * @param wasteDemand   waste demand of the container
+     * @param distance      distance between container and facility
+     * @param serviceTime   service time required
+     * @param transportCost transportation cost applied
      */
     public ServiceAssignment(Container container,
-                             Facility facility,
-                             WasteDemand wasteDemand,
-                             Distance distance,
-                             ServiceTime serviceTime,
-                             TransportationVariableCost transportCost) {
+            Facility facility,
+            WasteDemand wasteDemand,
+            Distance distance,
+            ServiceTime serviceTime,
+            TransportationVariableCost transportCost) {
         validate(container, facility, wasteDemand, distance, serviceTime, transportCost);
         this.id = UUID.randomUUID();
         this.container = container;
@@ -81,21 +83,22 @@ public class ServiceAssignment {
      * Restore constructor.
      * Restores a ServiceAssignment from persistence with all its attributes.
      *
-     * @param id the assignment identifier
-     * @param container           the container entity
-     * @param facility            the facility entity
-     * @param wasteDemand         the waste demand
-     * @param distance            the distance between container and facility
-     * @param serviceTime         the service time required
-     * @param transportCost       the transportation cost
+     * @param id            the assignment identifier
+     * @param container     the container entity
+     * @param facility      the facility entity
+     * @param wasteDemand   the waste demand
+     * @param distance      the distance between container and facility
+     * @param serviceTime   the service time required
+     * @param transportCost the transportation cost
      */
-    public ServiceAssignment(UUID id,
-                             Container container,
-                             Facility facility,
-                             WasteDemand wasteDemand,
-                             Distance distance,
-                             ServiceTime serviceTime,
-                             TransportationVariableCost transportCost) {
+    public ServiceAssignment(
+            UUID id,
+            Container container,
+            Facility facility,
+            WasteDemand wasteDemand,
+            Distance distance,
+            ServiceTime serviceTime,
+            TransportationVariableCost transportCost) {
         validate(container, facility, wasteDemand, distance, serviceTime, transportCost);
         this.id = id;
         this.container = container;
@@ -118,11 +121,11 @@ public class ServiceAssignment {
      * @throws IllegalArgumentException if any parameter is null
      */
     private void validate(Container container,
-                          Facility facility,
-                          WasteDemand wasteDemand,
-                          Distance distance,
-                          ServiceTime serviceTime,
-                          TransportationVariableCost transportCost) {
+            Facility facility,
+            WasteDemand wasteDemand,
+            Distance distance,
+            ServiceTime serviceTime,
+            TransportationVariableCost transportCost) {
         if (container == null) {
             throw new IllegalArgumentException(CONTAINER_ID_NOT_DEFINED);
         }
@@ -157,10 +160,9 @@ public class ServiceAssignment {
         }
         policies.validateServiceAssignment(
                 this.distance.toMeters(),
-                (int) this.serviceTime.getValue()
-        ).ifPresent(errorMessage -> {
-            throw new IllegalStateException(POLICY_VIOLATION + ": " + errorMessage);
-        });
+                (int) this.serviceTime.getValue()).ifPresent(errorMessage -> {
+                    throw new IllegalStateException(POLICY_VIOLATION + ": " + errorMessage);
+                });
     }
 
     /**
@@ -264,7 +266,6 @@ public class ServiceAssignment {
         return String.format(
                 "ServiceAssignment={id=%s, containerId=%s, facilityId=%s, demand=%s, distance=%s, serviceTime=%s, transportCost=%s}",
                 id, container.getId(), facility.getId(), wasteDemand,
-                distance, serviceTime, transportCost
-        );
+                distance, serviceTime, transportCost);
     }
 }

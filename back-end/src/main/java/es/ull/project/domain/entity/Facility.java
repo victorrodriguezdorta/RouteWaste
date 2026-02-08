@@ -76,19 +76,19 @@ public class Facility {
     /**
      * Creates a new Facility.
      *
-     * @param id                Facility identifier.
-     * @param facilityType      Type of facility.
-     * @param location          Facility location.
-     * @param capacity          Facility capacity.
-     * @param openingFixedCost  Fixed opening cost.
-     * @param status            Facility status.
+     * @param id               Facility identifier.
+     * @param facilityType     Type of facility.
+     * @param location         Facility location.
+     * @param capacity         Facility capacity.
+     * @param openingFixedCost Fixed opening cost.
+     * @param status           Facility status.
      */
     public Facility(
-                    FacilityType facilityType,
-                    Location location,
-                    Capacity capacity,
-                    OpeningFixedCost openingFixedCost,
-                    FacilityStatus status) {
+            FacilityType facilityType,
+            Location location,
+            Capacity capacity,
+            OpeningFixedCost openingFixedCost,
+            FacilityStatus status) {
         this.validateFacilityType(facilityType);
         this.validateLocation(location);
         this.validateCapacity(capacity);
@@ -132,12 +132,12 @@ public class Facility {
      * @param assignedWasteDemand the assigned waste demand
      */
     public Facility(UUID id,
-                    FacilityType facilityType,
-                    Location location,
-                    Capacity capacity,
-                    OpeningFixedCost openingFixedCost,
-                    FacilityStatus status,
-                    WasteDemand assignedWasteDemand) {
+            FacilityType facilityType,
+            Location location,
+            Capacity capacity,
+            OpeningFixedCost openingFixedCost,
+            FacilityStatus status,
+            WasteDemand assignedWasteDemand) {
         this.validateFacilityType(facilityType);
         this.validateLocation(location);
         this.validateCapacity(capacity);
@@ -388,7 +388,6 @@ public class Facility {
                 this.capacity,
                 this.assignedWasteDemand,
                 this.openingFixedCost,
-                this.status
-        );
+                this.status);
     }
 }

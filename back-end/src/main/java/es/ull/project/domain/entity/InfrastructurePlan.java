@@ -16,7 +16,8 @@ import es.ull.project.domain.valueobject.time.PlanningPeriod;
 /**
  * InfrastructurePlan
  * 
- * Represents a complete infrastructure planning decision for a given planning horizon.
+ * Represents a complete infrastructure planning decision for a given planning
+ * horizon.
  */
 public class InfrastructurePlan {
 
@@ -37,15 +38,15 @@ public class InfrastructurePlan {
     /**
      * Creates a new InfrastructurePlan.
      *
-     * @param id                Plan identifier
-     * @param period            Planning period
-     * @param maxBudget         Maximum budget allowed
-     * @param servicePolicies   Service policies to comply with
+     * @param id              Plan identifier
+     * @param period          Planning period
+     * @param maxBudget       Maximum budget allowed
+     * @param servicePolicies Service policies to comply with
      */
     public InfrastructurePlan(
-                              PlanningPeriod period,
-                              MaximumBudget maxBudget,
-                              ServicePolicies servicePolicies) {
+            PlanningPeriod period,
+            MaximumBudget maxBudget,
+            ServicePolicies servicePolicies) {
         validatePeriod(period);
         validateMaxBudget(maxBudget);
         this.id = UUID.randomUUID();
@@ -77,21 +78,21 @@ public class InfrastructurePlan {
      * Restore constructor.
      * Restores an InfrastructurePlan from persistence with all its attributes.
      *
-     * @param id                  the plan identifier
-     * @param period              the planning period
-     * @param maxBudget           the maximum budget allowed
-     * @param servicePolicies     the service policies
-     * @param selectedFacilities  the list of selected facilities
-     * @param serviceAssignments  the map of container to facility assignments
-     * @param estimatedTotalCost  the estimated total cost
+     * @param id                 the plan identifier
+     * @param period             the planning period
+     * @param maxBudget          the maximum budget allowed
+     * @param servicePolicies    the service policies
+     * @param selectedFacilities the list of selected facilities
+     * @param serviceAssignments the map of container to facility assignments
+     * @param estimatedTotalCost the estimated total cost
      */
     public InfrastructurePlan(UUID id,
-                               PlanningPeriod period,
-                               MaximumBudget maxBudget,
-                               ServicePolicies servicePolicies,
-                               List<Facility> selectedFacilities,
-                               Map<Container, Facility> serviceAssignments,
-                               TotalCost estimatedTotalCost) {
+            PlanningPeriod period,
+            MaximumBudget maxBudget,
+            ServicePolicies servicePolicies,
+            List<Facility> selectedFacilities,
+            Map<Container, Facility> serviceAssignments,
+            TotalCost estimatedTotalCost) {
         validateId(id);
         validatePeriod(period);
         validateMaxBudget(maxBudget);
@@ -103,6 +104,7 @@ public class InfrastructurePlan {
         this.serviceAssignments = serviceAssignments != null ? new HashMap<>(serviceAssignments) : new HashMap<>();
         this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
     }
+
     /**
      * Validates that the plan identifier is not null.
      *
@@ -143,7 +145,7 @@ public class InfrastructurePlan {
      * Assigns a container to a facility.
      *
      * @param container Container to assign
-     * @param facility Facility to assign to
+     * @param facility  Facility to assign to
      */
     public void assignContainerToFacility(Container container, Facility facility) {
         if (container == null || facility == null) {
@@ -279,7 +281,8 @@ public class InfrastructurePlan {
      * Updates the maximum budget.
      *
      * @param newMaxBudget the new maximum budget
-     * @throws IllegalStateException if the estimated total cost exceeds the new budget
+     * @throws IllegalStateException if the estimated total cost exceeds the new
+     *                               budget
      */
     public void updateMaxBudget(MaximumBudget newMaxBudget) {
         validateMaxBudget(newMaxBudget);
@@ -339,7 +342,6 @@ public class InfrastructurePlan {
                 period,
                 selectedFacilities,
                 serviceAssignments.keySet(),
-                estimatedTotalCost
-        );
+                estimatedTotalCost);
     }
 }

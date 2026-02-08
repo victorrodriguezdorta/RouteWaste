@@ -25,7 +25,7 @@ public class Container {
      * Identifier of the container.
      * It is a required and immutable attribute.
      */
-    private final UUID  id;
+    private final UUID id;
 
     /**
      * Physical location of the container.
@@ -54,17 +54,17 @@ public class Container {
     /**
      * Creates a new Container.
      *
-     * @param id           Container identifier.
-     * @param location     Location of the container.
-     * @param wasteType    Type of waste collected.
-     * @param wasteDemand  Waste demand.
-     * @param serviceZone  Service zone (optional).
+     * @param id          Container identifier.
+     * @param location    Location of the container.
+     * @param wasteType   Type of waste collected.
+     * @param wasteDemand Waste demand.
+     * @param serviceZone Service zone (optional).
      */
     public Container(
-                     Location location,
-                     WasteType wasteType,
-                     WasteDemand wasteDemand,
-                     ServiceZone serviceZone) {
+            Location location,
+            WasteType wasteType,
+            WasteDemand wasteDemand,
+            ServiceZone serviceZone) {
         this.validateLocation(location);
         this.validateWasteType(wasteType);
         this.validateWasteDemand(wasteDemand);
@@ -78,15 +78,15 @@ public class Container {
     /**
      * Creates a new Container without a service zone.
      *
-     * @param id           Container identifier.
-     * @param location     Location of the container.
-     * @param wasteType    Type of waste collected.
-     * @param wasteDemand  Waste demand.
+     * @param id          Container identifier.
+     * @param location    Location of the container.
+     * @param wasteType   Type of waste collected.
+     * @param wasteDemand Waste demand.
      */
     public Container(
-                     Location location,
-                     WasteType wasteType,
-                     WasteDemand wasteDemand) {
+            Location location,
+            WasteType wasteType,
+            WasteDemand wasteDemand) {
         this(location, wasteType, wasteDemand, null);
     }
 
@@ -108,17 +108,17 @@ public class Container {
      * Restore constructor.
      * Restores a Container from persistence with all its attributes.
      *
-     * @param id           the container identifier
-     * @param location     the location of the container
-     * @param wasteType    the type of waste collected
-     * @param wasteDemand  the waste demand
-     * @param serviceZone  the service zone (optional)
+     * @param id          the container identifier
+     * @param location    the location of the container
+     * @param wasteType   the type of waste collected
+     * @param wasteDemand the waste demand
+     * @param serviceZone the service zone (optional)
      */
     public Container(UUID id,
-                     Location location,
-                     WasteType wasteType,
-                     WasteDemand wasteDemand,
-                     ServiceZone serviceZone) {
+            Location location,
+            WasteType wasteType,
+            WasteDemand wasteDemand,
+            ServiceZone serviceZone) {
         this.validateLocation(location);
         this.validateWasteType(wasteType);
         this.validateWasteDemand(wasteDemand);
@@ -293,7 +293,6 @@ public class Container {
                 this.location,
                 this.wasteType,
                 this.wasteDemand,
-                this.serviceZone
-        );
+                this.serviceZone);
     }
 }

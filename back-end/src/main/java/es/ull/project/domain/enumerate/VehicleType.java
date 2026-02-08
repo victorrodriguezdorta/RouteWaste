@@ -80,7 +80,7 @@ public enum VehicleType {
 
     /**
      * Returns a random VehicleType.
-    `
+     * 
      * Useful for testing purposes.
      *
      * @return Random VehicleType.

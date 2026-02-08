@@ -21,12 +21,14 @@ public final class MaximumBudget {
     /**
      * Required. Amount of the maximum budget.
      * Always stored with 2 decimal precision.
+     * 
      * @required
      */
     private final BigDecimal amount;
 
     /**
      * Optional. Currency of the budget. Default: "EUR" when not provided.
+     * 
      * @optional
      */
     private final Currency currency;
@@ -58,7 +60,8 @@ public final class MaximumBudget {
      * Creates a new MaximumBudget with specific currency.
      *
      * @param amount   Amount of the maximum budget. Must be ≥ 0.
-     * @param currency Currency but as String. Cannot be null or empty. it creates a Currency object internally.
+     * @param currency Currency but as String. Cannot be null or empty. it creates a
+     *                 Currency object internally.
      */
     public MaximumBudget(double amount, String currency) {
         validateAmount(amount);
@@ -69,6 +72,7 @@ public final class MaximumBudget {
 
     /**
      * Validates the amount is defined and non-negative.
+     * 
      * @param amount Amount to validate.
      */
     private void validateAmount(double amount) {
@@ -82,6 +86,7 @@ public final class MaximumBudget {
 
     /**
      * Validates the currency is not null or empty.
+     * 
      * @param currency Currency to validate.
      */
     private void validateCurrency(Currency currency) {
@@ -92,6 +97,7 @@ public final class MaximumBudget {
 
     /**
      * Validates the currency string is not null or empty.
+     * 
      * @param currency Currency string to validate.
      */
     private void validateCurrencyString(String currency) {
@@ -102,6 +108,7 @@ public final class MaximumBudget {
 
     /**
      * Returns the amount of the maximum budget.
+     * 
      * @return Amount as double.
      */
     public double getAmount() {
@@ -110,6 +117,7 @@ public final class MaximumBudget {
 
     /**
      * Returns the currency of the maximum budget.
+     * 
      * @return Currency object.
      */
     public Currency getCurrency() {
@@ -178,6 +186,7 @@ public final class MaximumBudget {
 
     /**
      * Checks equality between this and another object.
+     * 
      * @param otherObject Other object to compare.
      * @return True if equal, false otherwise.
      */
@@ -195,6 +204,7 @@ public final class MaximumBudget {
 
     /**
      * Returns the hash code of this MaximumBudget.
+     * 
      * @return Hash code as int.
      */
     @Override
@@ -204,6 +214,7 @@ public final class MaximumBudget {
 
     /**
      * Returns the string representation of the MaximumBudget.
+     * 
      * @return String representation.
      */
     @Override

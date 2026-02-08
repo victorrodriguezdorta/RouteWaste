@@ -47,8 +47,7 @@ public enum FacilityType {
             }
         }
         throw new IllegalArgumentException(
-                ERROR_FACILITY_TYPE_INVALID + allowedValues()
-        );
+                ERROR_FACILITY_TYPE_INVALID + allowedValues());
     }
 
     /**

@@ -46,7 +46,8 @@ public final class Currency {
      * Validates the currency code format.
      *
      * @param code the currency code to validate
-     * @throws IllegalArgumentException if the code is null, empty, or invalid format
+     * @throws IllegalArgumentException if the code is null, empty, or invalid
+     *                                  format
      */
     private void validateCode(String code) {
         if (code == null) {

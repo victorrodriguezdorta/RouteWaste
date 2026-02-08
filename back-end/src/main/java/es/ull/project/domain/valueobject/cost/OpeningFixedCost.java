@@ -21,6 +21,7 @@ public final class OpeningFixedCost {
     /**
      * Required.
      * Amount of the fixed cost. Always stored with 2 decimal precision.
+     * 
      * @required
      */
     private final BigDecimal amount;
@@ -28,6 +29,7 @@ public final class OpeningFixedCost {
     /**
      * Optional.
      * Currency of the cost. Default: "EUR".
+     * 
      * @optional
      */
     private final Currency currency;
@@ -58,7 +60,8 @@ public final class OpeningFixedCost {
      * Creates a new OpeningFixedCost with a specific currency.
      *
      * @param amount   Amount of the fixed cost. Must be ≥ 0.
-     * @param currency Currency code (e.g., "EUR", "USD"). Cannot be null/empty. Is a string. and it creates a Currency object internally.
+     * @param currency Currency code (e.g., "EUR", "USD"). Cannot be null/empty. Is
+     *                 a string. and it creates a Currency object internally.
      */
     public OpeningFixedCost(double amount, String currency) {
         validateAmount(amount);
@@ -136,7 +139,8 @@ public final class OpeningFixedCost {
     }
 
     /**
-     * Subtracts another OpeningFixedCost from this one, ensuring currency compatibility.
+     * Subtracts another OpeningFixedCost from this one, ensuring currency
+     * compatibility.
      * If the result is negative, it returns zero.
      *
      * @param other The other OpeningFixedCost to subtract.
@@ -152,7 +156,8 @@ public final class OpeningFixedCost {
     }
 
     /**
-     * Compares if this OpeningFixedCost is greater than another, ensuring currency compatibility.
+     * Compares if this OpeningFixedCost is greater than another, ensuring currency
+     * compatibility.
      *
      * @param other The other OpeningFixedCost to compare.
      * @return True if this cost is greater, false otherwise.
@@ -163,7 +168,8 @@ public final class OpeningFixedCost {
     }
 
     /**
-     * Compares if this OpeningFixedCost is less than another, ensuring currency compatibility.
+     * Compares if this OpeningFixedCost is less than another, ensuring currency
+     * compatibility.
      *
      * @param other The other OpeningFixedCost to compare.
      * @return True if this cost is less, false otherwise.

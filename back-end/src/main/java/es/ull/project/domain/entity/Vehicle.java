@@ -47,9 +47,9 @@ public class Vehicle {
     /**
      * Creates a new Vehicle with the specified parameters.
      *
-     * @param vehicleType the type of vehicle
+     * @param vehicleType       the type of vehicle
      * @param transportCapacity the transport capacity of the vehicle
-     * @param costPerKilometer the cost per kilometer of operation
+     * @param costPerKilometer  the cost per kilometer of operation
      */
     public Vehicle(
             VehicleType vehicleType,
@@ -87,9 +87,9 @@ public class Vehicle {
      * @param costPerKilometer  the cost per kilometer
      */
     public Vehicle(UUID id,
-                   VehicleType vehicleType,
-                   Capacity transportCapacity,
-                   TransportationVariableCost costPerKilometer) {
+            VehicleType vehicleType,
+            Capacity transportCapacity,
+            TransportationVariableCost costPerKilometer) {
         validateVehicleType(vehicleType);
         validateCapacity(transportCapacity);
         validateCost(costPerKilometer);
@@ -241,7 +241,6 @@ public class Vehicle {
                 this.id,
                 this.vehicleType,
                 this.transportCapacity,
-                this.costPerKilometer
-        );
+                this.costPerKilometer);
     }
 }
