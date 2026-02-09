@@ -214,7 +214,7 @@ public final class TotalCost {
      * @throws IllegalArgumentException if currencies don't match.
      */
     private void checkCurrencyCompatibility(MaximumBudget other) {
-        if (!this.currency.equals(other.getCurrency())) {
+        if (!this.currency.equals(other.getCurrency().orElse(null))) {
             throw new IllegalArgumentException(ERROR_CURRENCY_MISMATCH);
         }
     }

@@ -1,8 +1,12 @@
 package es.ull.project.domain.valueobject.cost;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class OpeningFixedCostTests {
 
@@ -14,7 +18,7 @@ public class OpeningFixedCostTests {
         OpeningFixedCost cost = new OpeningFixedCost(120.5);
 
         assertEquals(120.50, cost.getAmount());
-        assertEquals(new Currency(), cost.getCurrency());
+        assertEquals(new Currency(), cost.getCurrency().get());
     }
 
     /**
@@ -26,7 +30,7 @@ public class OpeningFixedCostTests {
         OpeningFixedCost cost = new OpeningFixedCost(300, currency);
 
         assertEquals(300.00, cost.getAmount());
-        assertEquals(currency, cost.getCurrency());
+        assertEquals(currency, cost.getCurrency().get());
     }
 
     /**
@@ -37,7 +41,7 @@ public class OpeningFixedCostTests {
         OpeningFixedCost cost = new OpeningFixedCost(75, "EUR");
 
         assertEquals(75.00, cost.getAmount());
-        assertEquals(new Currency("EUR"), cost.getCurrency());
+        assertEquals(new Currency("EUR"), cost.getCurrency().get());
     }
 
     /**
@@ -148,7 +152,7 @@ public class OpeningFixedCostTests {
         );
 
         assertEquals(
-                "Incompatible currencies: " + c1.getCurrency() + " vs " + c2.getCurrency(),
+                "Incompatible currencies: " + c1.getCurrency().get() + " vs " + c2.getCurrency().get(),
                 exception.getMessage()
         );
     }

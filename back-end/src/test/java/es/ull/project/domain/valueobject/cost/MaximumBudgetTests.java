@@ -1,8 +1,12 @@
 package es.ull.project.domain.valueobject.cost;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class MaximumBudgetTests {
 
@@ -14,7 +18,7 @@ public class MaximumBudgetTests {
         MaximumBudget budget = new MaximumBudget(100.5);
 
         assertEquals(100.50, budget.getAmount());
-        assertEquals(new Currency(), budget.getCurrency());
+        assertEquals(new Currency(), budget.getCurrency().get());
     }
 
     /**
@@ -26,7 +30,7 @@ public class MaximumBudgetTests {
         MaximumBudget budget = new MaximumBudget(200, currency);
 
         assertEquals(200.00, budget.getAmount());
-        assertEquals(currency, budget.getCurrency());
+        assertEquals(currency, budget.getCurrency().get());
     }
 
     /**
@@ -37,7 +41,7 @@ public class MaximumBudgetTests {
         MaximumBudget budget = new MaximumBudget(50, "EUR");
 
         assertEquals(50.00, budget.getAmount());
-        assertEquals(new Currency("EUR"), budget.getCurrency());
+        assertEquals(new Currency("EUR"), budget.getCurrency().get());
     }
 
     /**

@@ -1,8 +1,12 @@
 package es.ull.project.domain.valueobject.cost;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class TransportationVariableCostTests {
 
@@ -14,7 +18,7 @@ public class TransportationVariableCostTests {
         TransportationVariableCost cost = new TransportationVariableCost(10.5);
 
         assertEquals(10.50, cost.getAmount());
-        assertEquals(new Currency("EUR"), cost.getCurrency());
+        assertEquals(new Currency("EUR"), cost.getCurrency().get());
     }
 
     /**
@@ -26,7 +30,7 @@ public class TransportationVariableCostTests {
         TransportationVariableCost cost = new TransportationVariableCost(20.0, currency);
 
         assertEquals(20.00, cost.getAmount());
-        assertEquals(currency, cost.getCurrency());
+        assertEquals(currency, cost.getCurrency().get());
     }
 
     /**
@@ -37,7 +41,7 @@ public class TransportationVariableCostTests {
         TransportationVariableCost cost = new TransportationVariableCost(15.25, "EUR");
 
         assertEquals(15.25, cost.getAmount());
-        assertEquals(new Currency("EUR"), cost.getCurrency());
+        assertEquals(new Currency("EUR"), cost.getCurrency().get());
     }
 
     /**
@@ -128,7 +132,7 @@ public class TransportationVariableCostTests {
         TransportationVariableCost cost = new TransportationVariableCost(30.75, "USD");
 
         assertEquals(30.75, cost.getAmount());
-        assertEquals(new Currency("USD"), cost.getCurrency());
+        assertEquals(new Currency("USD"), cost.getCurrency().get());
     }
 
     /**
@@ -142,7 +146,7 @@ public class TransportationVariableCostTests {
         TransportationVariableCost result = cost1.add(cost2);
 
         assertEquals(15.50, result.getAmount());
-        assertEquals(new Currency("EUR"), result.getCurrency());
+        assertEquals(new Currency("EUR"), result.getCurrency().get());
     }
 
     /**

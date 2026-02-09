@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Unit tests for the ServiceZone enumeration.
  */
 @DisplayName("ServiceZone Tests")
-class ServiceZoneTest {
+class ServiceZoneTests {
 
     @Nested
     @DisplayName("fromString method tests")
