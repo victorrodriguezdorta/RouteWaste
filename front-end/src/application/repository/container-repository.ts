@@ -1,10 +1,10 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { CreateContainerCommand, CreateContainerResult } from '../usecase/ContainerManagement/CreateContainer/create-container-use-case';
-import type { GetContainerCommand, GetContainerResult } from '../usecase/ContainerManagement/GetContainer/get-container-use-case';
-import type { UpdateContainerCommand, UpdateContainerResult } from '../usecase/ContainerManagement/UpdateContainer/update-container-use-case';
-import type { ListContainersCommand, ListContainersResult } from '../usecase/ContainerManagement/ListContainers/list-containers-use-case';
-import type { FilterContainersCommand, FilterContainersResult } from '../usecase/ContainerManagement/FilterContainers/filter-containers-use-case';
-import type { DeleteContainerCommand, DeleteContainerResult } from '../usecase/ContainerManagement/DeleteContainer/delete-container-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+import type { CreateContainerCommand, CreateContainerResult } from '../usecase/container-management/create-container/create-container-use-case';
+import type { DeleteContainerCommand, DeleteContainerResult } from '../usecase/container-management/delete-container/delete-container-use-case';
+import type { FilterContainersCommand, FilterContainersResult } from '../usecase/container-management/filter-containers/filter-containers-use-case';
+import type { GetContainerCommand, GetContainerResult } from '../usecase/container-management/get-container/get-container-use-case';
+import type { ListContainersCommand, ListContainersResult } from '../usecase/container-management/list-containers/list-containers-use-case';
+import type { UpdateContainerCommand, UpdateContainerResult } from '../usecase/container-management/update-container/update-container-use-case';
 
 /**
  * @brief Repository interface for Container entity.

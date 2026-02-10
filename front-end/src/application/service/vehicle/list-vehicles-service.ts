@@ -1,6 +1,6 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { ListVehiclesUseCase, ListVehiclesCommand, ListVehiclesResult } from '../../usecase/VehicleManagement/ListVehicles/list-vehicles-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { VehicleRepository } from '../../repository/vehicle-repository';
+import type { ListVehiclesCommand, ListVehiclesResult, ListVehiclesUseCase } from '../../usecase/vehicle-management/list-vehicles/list-vehicles-use-case';
 
 /**
  * @brief Service implementing the ListVehicles use case.

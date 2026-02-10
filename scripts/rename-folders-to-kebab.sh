@@ -93,11 +93,23 @@ for i in "${!RENAMES_OLD[@]}"; do
   else
     # Reemplazar rutas en importaciones y require
     # Maneja comillas simples y dobles
-    grep -rl --exclude-dir=node_modules --exclude-dir=.git "/$old/" . --include='*.ts' --include='*.vue' --include='*.js' 2>/dev/null | while IFS= read -r file; do
+    # Buscar archivos que probablemente contengan la ruta (varias variantes)
+    grep -rl --exclude-dir=node_modules --exclude-dir=.git "/$old\|./$old\|$old/" . --include='*.ts' --include='*.vue' --include='*.js' 2>/dev/null | sort -u | while IFS= read -r file; do
+      # Reemplazos seguros cubriendo varias variantes:
+      #  /old/   -> /new/
+      #  ./old/  -> ./new/
+      #  '.../old' -> '.../new'
+      #  ".../old" -> ".../new"
+      #  .../old/filename (sin barra final) -> .../new/filename
+      sed -i -E "s|/($old)/|/\1/|g; s|/($old)(')|/\1\2|g" "$file" || true
       sed -i "s|/$old/|/$new/|g" "$file" || true
-      sed -i "s|./$old/|./$new/|g" "$file" || true
-      sed -i "s|'./$old/|'./$new/|g" "$file" || true
-      sed -i "s|\"./$old/|\"./$new/|g" "$file" || true
+      sed -i "s|\./$old/|./$new/|g" "$file" || true
+      sed -i "s|'/$old/|'/$new/|g" "$file" || true
+      sed -i "s|\"/$old/|\"/$new/|g" "$file" || true
+      # Reemplazar casos donde aparece el segmento al final antes de comilla o parentesis
+      sed -i -E "s|/($old)(['\")])|/$new\2|g" "$file" || true
+      # Reemplazar referencias relativas o alias sin barra final (ej: /application/usecase/.../CreateContainer)
+      sed -i -E "s|(/|\.)$old/|\1$new/|g" "$file" || true
       echo "  ✓ Actualizado: $file"
     done
   fi

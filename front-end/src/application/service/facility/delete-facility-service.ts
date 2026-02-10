@@ -1,6 +1,6 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { DeleteFacilityUseCase, DeleteFacilityCommand, DeleteFacilityResult } from '../../usecase/FacilityManagement/DeleteFacility/delete-facility-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { FacilityRepository } from '../../repository/facility-repository';
+import type { DeleteFacilityCommand, DeleteFacilityResult, DeleteFacilityUseCase } from '../../usecase/facility-management/delete-facility/delete-facility-use-case';
 
 /**
  * @brief Service implementing the DeleteFacility use case.

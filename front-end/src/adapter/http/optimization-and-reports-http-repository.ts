@@ -5,10 +5,10 @@ import {
   type ApiError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { OptimizationAndReportsRepository } from '../../application/repository/optimization-and-reports-repository';
-import type { GenerateReportCommand, GenerateReportResult } from '../../application/usecase/OptimizationAndReports/GenerateReport/generate-report-use-case';
-import type { ExportReportCommand, ExportReportResult } from '../../application/usecase/OptimizationAndReports/ExportReport/export-report-use-case';
-import type { CalculateCostsCommand, CostCalculationResult } from '../../application/usecase/OptimizationAndReports/CalculateCosts/calculate-costs-use-case';
-import type { OptimizeRoutesCommand, OptimizeRoutesResult } from '../../application/usecase/OptimizationAndReports/OptimizeRoutes/optimize-routes-use-case';
+import type { GenerateReportCommand, GenerateReportResult } from '../../application/usecase/optimization-and-reports/generate-report/generate-report-use-case';
+import type { ExportReportCommand, ExportReportResult } from '../../application/usecase/optimization-and-reports/export-report/export-report-use-case';
+import type { CalculateCostsCommand, CostCalculationResult } from '../../application/usecase/optimization-and-reports/calculate-costs/calculate-costs-use-case';
+import type { OptimizeRoutesCommand, OptimizeRoutesResult } from '../../application/usecase/optimization-and-reports/optimize-routes/optimize-routes-use-case';
 // Import DTOs (assuming they exist)
 import { GenerateReportJsonRequest } from './dto/generate-report-json-request';
 import { ExportReportJsonRequest } from './dto/export-report-json-request';

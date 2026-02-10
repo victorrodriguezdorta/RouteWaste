@@ -1,6 +1,6 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { CreateFacilityUseCase, CreateFacilityCommand, CreateFacilityResult } from '../../usecase/FacilityManagement/CreateFacility/create-facility-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { FacilityRepository } from '../../repository/facility-repository';
+import type { CreateFacilityCommand, CreateFacilityResult, CreateFacilityUseCase } from '../../usecase/facility-management/create-facility/create-facility-use-case';
 
 /**
  * @brief Service implementing the CreateFacility use case.

@@ -1,11 +1,11 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 
-import type { CreateFacilityCommand, CreateFacilityResult } from '../usecase/FacilityManagement/CreateFacility/create-facility-use-case';
-import type { GetFacilityCommand, GetFacilityResult } from '../usecase/FacilityManagement/GetFacility/get-facility-use-case';
-import type { UpdateFacilityCommand, UpdateFacilityResult } from '../usecase/FacilityManagement/UpdateFacility/update-facility-use-case';
-import type { ListFacilitiesCommand, ListFacilitiesResult } from '../usecase/FacilityManagement/ListFacilities/list-facilities-use-case';
-import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '../usecase/FacilityManagement/FilterFacilities/filter-facilities-use-case';
-import type { DeleteFacilityCommand, DeleteFacilityResult } from '../usecase/FacilityManagement/DeleteFacility/delete-facility-use-case';
+import type { CreateFacilityCommand, CreateFacilityResult } from '../usecase/facility-management/create-facility/create-facility-use-case';
+import type { DeleteFacilityCommand, DeleteFacilityResult } from '../usecase/facility-management/delete-facility/delete-facility-use-case';
+import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '../usecase/facility-management/filter-facilities/filter-facilities-use-case';
+import type { GetFacilityCommand, GetFacilityResult } from '../usecase/facility-management/get-facility/get-facility-use-case';
+import type { ListFacilitiesCommand, ListFacilitiesResult } from '../usecase/facility-management/list-facilities/list-facilities-use-case';
+import type { UpdateFacilityCommand, UpdateFacilityResult } from '../usecase/facility-management/update-facility/update-facility-use-case';
 
 /**
  * @brief Repository interface for Facility entity.

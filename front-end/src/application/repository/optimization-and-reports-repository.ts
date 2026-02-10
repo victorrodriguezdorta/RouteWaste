@@ -1,8 +1,8 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { ExportReportCommand, ExportReportResult } from '../usecase/OptimizationAndReports/ExportReport/export-report-use-case';
-import type { GenerateReportCommand, GenerateReportResult } from '../usecase/OptimizationAndReports/GenerateReport/generate-report-use-case';
-import type { CalculateCostsCommand, CostCalculationResult } from '../usecase/OptimizationAndReports/CalculateCosts/calculate-costs-use-case';
-import type { OptimizeRoutesCommand, OptimizeRoutesResult } from '../usecase/OptimizationAndReports/OptimizeRoutes/optimize-routes-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+import type { CalculateCostsCommand, CostCalculationResult } from '../usecase/optimization-and-reports/calculate-costs/calculate-costs-use-case';
+import type { ExportReportCommand, ExportReportResult } from '../usecase/optimization-and-reports/export-report/export-report-use-case';
+import type { GenerateReportCommand, GenerateReportResult } from '../usecase/optimization-and-reports/generate-report/generate-report-use-case';
+import type { OptimizeRoutesCommand, OptimizeRoutesResult } from '../usecase/optimization-and-reports/optimize-routes/optimize-routes-use-case';
 
 /**
  * @brief Repository interface for optimization and reports.

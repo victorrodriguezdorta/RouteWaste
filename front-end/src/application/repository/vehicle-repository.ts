@@ -1,9 +1,9 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { CreateVehicleCommand, CreateVehicleResult } from '../usecase/VehicleManagement/CreateVehicle/create-vehicle-use-case';
-import type { GetVehicleCommand, GetVehicleResult } from '../usecase/VehicleManagement/GetVehicle/get-vehicle-use-case';
-import type { UpdateVehicleCommand, UpdateVehicleResult } from '../usecase/VehicleManagement/UpdateVehicle/update-vehicle-use-case';
-import type { ListVehiclesCommand, ListVehiclesResult } from '../usecase/VehicleManagement/ListVehicles/list-vehicles-use-case';
-import type { DeleteVehicleCommand, DeleteVehicleResult } from '../usecase/VehicleManagement/DeleteVehicle/delete-vehicle-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+import type { CreateVehicleCommand, CreateVehicleResult } from '../usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
+import type { DeleteVehicleCommand, DeleteVehicleResult } from '../usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';
+import type { GetVehicleCommand, GetVehicleResult } from '../usecase/vehicle-management/get-vehicle/get-vehicle-use-case';
+import type { ListVehiclesCommand, ListVehiclesResult } from '../usecase/vehicle-management/list-vehicles/list-vehicles-use-case';
+import type { UpdateVehicleCommand, UpdateVehicleResult } from '../usecase/vehicle-management/update-vehicle/update-vehicle-use-case';
 
 /**
  * @brief Repository interface for Vehicle entity.

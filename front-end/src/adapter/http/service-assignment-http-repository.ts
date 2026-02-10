@@ -5,10 +5,10 @@ import {
   type ApiError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { ServiceAssignmentRepository } from '../../application/repository/service-assignment-repository';
-import type { AssignContainerToFacilityCommand, AssignContainerToFacilityResult } from '../../application/usecase/ServiceAssignmentManagement/AssignContainerToFacility/assign-container-to-facility-use-case';
-import type { UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '../../application/usecase/ServiceAssignmentManagement/UpdateServiceAssignment/update-service-assignment-use-case';
-import type { RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult } from '../../application/usecase/ServiceAssignmentManagement/RemoveServiceAssignment/remove-service-assignment-use-case';
-import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult } from '../../application/usecase/ServiceAssignmentManagement/ListServiceAssignments/list-service-assignments-use-case';
+import type { AssignContainerToFacilityCommand, AssignContainerToFacilityResult } from '../../application/usecase/service-assignment-management/assign-container-to-facility/assign-container-to-facility-use-case';
+import type { UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '../../application/usecase/service-assignment-management/update-service-assignment/update-service-assignment-use-case';
+import type { RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult } from '../../application/usecase/service-assignment-management/remove-service-assignment/remove-service-assignment-use-case';
+import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult } from '../../application/usecase/service-assignment-management/list-service-assignments/list-service-assignments-use-case';
 // Import DTOs (assuming they exist)
 import { ServiceAssignmentJsonResponse } from './dto/service-assignment-json-response';
 import { ServiceAssignmentPostJsonRequest } from './dto/service-assignment-post-json-request';

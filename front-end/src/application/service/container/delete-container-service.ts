@@ -1,7 +1,7 @@
 
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { DeleteContainerUseCase, DeleteContainerCommand, DeleteContainerResult } from '../../usecase/ContainerManagement/DeleteContainer/delete-container-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { ContainerRepository } from '../../repository/container-repository';
+import type { DeleteContainerCommand, DeleteContainerResult, DeleteContainerUseCase } from '../../usecase/container-management/delete-container/delete-container-use-case';
 
 /**
  * @brief Service implementing the DeleteContainer use case.

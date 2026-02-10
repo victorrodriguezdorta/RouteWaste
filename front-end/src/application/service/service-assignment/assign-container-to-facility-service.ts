@@ -1,6 +1,6 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { AssignContainerToFacilityUseCase, AssignContainerToFacilityCommand, AssignContainerToFacilityResult } from '../../usecase/ServiceAssignmentManagement/AssignContainerToFacility/assign-container-to-facility-use-case';
-import type{ ServiceAssignmentRepository } from '../../repository/service-assignment-repository';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+import type { ServiceAssignmentRepository } from '../../repository/service-assignment-repository';
+import type { AssignContainerToFacilityCommand, AssignContainerToFacilityResult, AssignContainerToFacilityUseCase } from '../../usecase/service-assignment-management/assign-container-to-facility/assign-container-to-facility-use-case';
 
 /**
  * @brief Service implementing the AssignContainerToFacility use case.

@@ -1,6 +1,6 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { RemoveServiceAssignmentUseCase, RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult } from '../../usecase/ServiceAssignmentManagement/RemoveServiceAssignment/remove-service-assignment-use-case';
-import type{ ServiceAssignmentRepository } from '../../repository/service-assignment-repository';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+import type { ServiceAssignmentRepository } from '../../repository/service-assignment-repository';
+import type { RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult, RemoveServiceAssignmentUseCase } from '../../usecase/service-assignment-management/remove-service-assignment/remove-service-assignment-use-case';
 
 /**
  * @brief Service implementing the RemoveServiceAssignment use case.

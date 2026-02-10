@@ -1,6 +1,6 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { ExportReportUseCase, ExportReportCommand, ExportReportResult } from '../../usecase/OptimizationAndReports/ExportReport/export-report-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { OptimizationAndReportsRepository } from '../../repository/optimization-and-reports-repository';
+import type { ExportReportCommand, ExportReportResult, ExportReportUseCase } from '../../usecase/optimization-and-reports/export-report/export-report-use-case';
 
 /**
  * @brief Service implementing the ExportReport use case.

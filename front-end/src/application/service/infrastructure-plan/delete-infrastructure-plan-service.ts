@@ -1,6 +1,6 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { DeleteInfrastructurePlanUseCase, DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '../../usecase/InfrastructurePlanManagement/DeleteInfrastructurePlan/delete-infrastructure-plan-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { InfrastructurePlanRepository } from '../../repository/infrastructure-plan-repository';
+import type { DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult, DeleteInfrastructurePlanUseCase } from '../../usecase/infrastructure-plan-management/delete-infrastructure-plan/delete-infrastructure-plan-use-case';
 
 /**
  * @brief Service implementing the DeleteInfrastructurePlan use case.

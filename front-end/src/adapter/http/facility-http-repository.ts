@@ -5,12 +5,12 @@ import {
   type ApiError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { FacilityRepository } from '../../application/repository/facility-repository';
-import type { CreateFacilityCommand, CreateFacilityResult } from '../../application/usecase/FacilityManagement/CreateFacility/create-facility-use-case';
-import type { GetFacilityCommand, GetFacilityResult } from '../../application/usecase/FacilityManagement/GetFacility/get-facility-use-case';
-import type { UpdateFacilityCommand, UpdateFacilityResult } from '../../application/usecase/FacilityManagement/UpdateFacility/update-facility-use-case';
-import type { ListFacilitiesCommand, ListFacilitiesResult } from '../../application/usecase/FacilityManagement/ListFacilities/list-facilities-use-case';
-import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '../../application/usecase/FacilityManagement/FilterFacilities/filter-facilities-use-case';
-import type { DeleteFacilityCommand, DeleteFacilityResult } from '../../application/usecase/FacilityManagement/DeleteFacility/delete-facility-use-case';
+import type { CreateFacilityCommand, CreateFacilityResult } from '../../application/usecase/facility-management/create-facility/create-facility-use-case';
+import type { GetFacilityCommand, GetFacilityResult } from '../../application/usecase/facility-management/get-facility/get-facility-use-case';
+import type { UpdateFacilityCommand, UpdateFacilityResult } from '../../application/usecase/facility-management/update-facility/update-facility-use-case';
+import type { ListFacilitiesCommand, ListFacilitiesResult } from '../../application/usecase/facility-management/list-facilities/list-facilities-use-case';
+import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '../../application/usecase/facility-management/filter-facilities/filter-facilities-use-case';
+import type { DeleteFacilityCommand, DeleteFacilityResult } from '../../application/usecase/facility-management/delete-facility/delete-facility-use-case';
 // Import DTOs (assuming they exist)
 import { FacilityJsonResponse } from './dto/facility-json-response';
 import { FacilityPostJsonRequest } from './dto/facility-post-json-request';

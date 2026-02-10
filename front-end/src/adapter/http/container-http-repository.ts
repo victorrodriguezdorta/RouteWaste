@@ -5,12 +5,12 @@ import {
   type ApiError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { ContainerRepository } from '../../application/repository/container-repository';
-import type { CreateContainerCommand, CreateContainerResult } from '../../application/usecase/ContainerManagement/CreateContainer/create-container-use-case';
-import type { GetContainerCommand, GetContainerResult } from '../../application/usecase/ContainerManagement/GetContainer/get-container-use-case';
-import type { UpdateContainerCommand, UpdateContainerResult } from '../../application/usecase/ContainerManagement/UpdateContainer/update-container-use-case';
-import type { ListContainersCommand, ListContainersResult } from '../../application/usecase/ContainerManagement/ListContainers/list-containers-use-case';
-import type { FilterContainersCommand, FilterContainersResult } from '../../application/usecase/ContainerManagement/FilterContainers/filter-containers-use-case';
-import type { DeleteContainerCommand, DeleteContainerResult } from '../../application/usecase/ContainerManagement/DeleteContainer/delete-container-use-case';
+import type { CreateContainerCommand, CreateContainerResult } from '../../application/usecase/container-management/create-container/create-container-use-case';
+import type { GetContainerCommand, GetContainerResult } from '../../application/usecase/container-management/get-container/get-container-use-case';
+import type { UpdateContainerCommand, UpdateContainerResult } from '../../application/usecase/container-management/update-container/update-container-use-case';
+import type { ListContainersCommand, ListContainersResult } from '../../application/usecase/container-management/list-containers/list-containers-use-case';
+import type { FilterContainersCommand, FilterContainersResult } from '../../application/usecase/container-management/filter-containers/filter-containers-use-case';
+import type { DeleteContainerCommand, DeleteContainerResult } from '../../application/usecase/container-management/delete-container/delete-container-use-case';
 // Import DTOs (assuming they exist)
 import { ContainerJsonResponse } from './dto/container-json-response';
 import { ContainerPostJsonRequest } from './dto/container-post-json-request';

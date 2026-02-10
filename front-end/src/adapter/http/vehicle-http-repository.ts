@@ -5,11 +5,11 @@ import {
   type ApiError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { VehicleRepository } from '../../application/repository/vehicle-repository';
-import type { CreateVehicleCommand, CreateVehicleResult } from '../../application/usecase/VehicleManagement/CreateVehicle/create-vehicle-use-case';
-import type { GetVehicleCommand, GetVehicleResult } from '../../application/usecase/VehicleManagement/GetVehicle/get-vehicle-use-case';
-import type { UpdateVehicleCommand, UpdateVehicleResult } from '../../application/usecase/VehicleManagement/UpdateVehicle/update-vehicle-use-case';
-import type { ListVehiclesCommand, ListVehiclesResult } from '../../application/usecase/VehicleManagement/ListVehicles/list-vehicles-use-case';
-import type { DeleteVehicleCommand, DeleteVehicleResult } from '../../application/usecase/VehicleManagement/DeleteVehicle/delete-vehicle-use-case';
+import type { CreateVehicleCommand, CreateVehicleResult } from '../../application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
+import type { GetVehicleCommand, GetVehicleResult } from '../../application/usecase/vehicle-management/get-vehicle/get-vehicle-use-case';
+import type { UpdateVehicleCommand, UpdateVehicleResult } from '../../application/usecase/vehicle-management/update-vehicle/update-vehicle-use-case';
+import type { ListVehiclesCommand, ListVehiclesResult } from '../../application/usecase/vehicle-management/list-vehicles/list-vehicles-use-case';
+import type { DeleteVehicleCommand, DeleteVehicleResult } from '../../application/usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';
 // Import DTOs (assuming they exist)
 import { VehicleJsonResponse } from './dto/vehicle-json-response';
 import { VehiclePostJsonRequest } from './dto/vehicle-post-json-request';

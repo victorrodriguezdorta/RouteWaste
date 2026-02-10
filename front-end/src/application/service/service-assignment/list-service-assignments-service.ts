@@ -1,6 +1,6 @@
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { ListServiceAssignmentsUseCase, ListServiceAssignmentsCommand, ListServiceAssignmentsResult } from '../../usecase/ServiceAssignmentManagement/ListServiceAssignments/list-service-assignments-use-case';
-import type{ ServiceAssignmentRepository } from '../../repository/service-assignment-repository';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+import type { ServiceAssignmentRepository } from '../../repository/service-assignment-repository';
+import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult, ListServiceAssignmentsUseCase } from '../../usecase/service-assignment-management/list-service-assignments/list-service-assignments-use-case';
 
 /**
  * @brief Service implementing the ListServiceAssignments use case.

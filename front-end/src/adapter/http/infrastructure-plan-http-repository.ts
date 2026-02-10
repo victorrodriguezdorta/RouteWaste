@@ -5,12 +5,12 @@ import {
   type ApiError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { InfrastructurePlanRepository } from '../../application/repository/infrastructure-plan-repository';
-import type { CreateInfrastructurePlanCommand, CreateInfrastructurePlanResult } from '../../application/usecase/InfrastructurePlanManagement/CreateInfrastructurePlan/create-infrastructure-plan-use-case';
-import type { GetInfrastructurePlanCommand, GetInfrastructurePlanResult } from '../../application/usecase/InfrastructurePlanManagement/GetInfrastructurePlan/get-infrastructure-plan-use-case';
-import type { UpdateInfrastructurePlanCommand, UpdateInfrastructurePlanResult } from '../../application/usecase/InfrastructurePlanManagement/UpdateInfrastructurePlan/update-infrastructure-plan-use-case';
-import type { ListInfrastructurePlansCommand, ListInfrastructurePlansResult } from '../../application/usecase/InfrastructurePlanManagement/ListInfrastructurePlans/list-infrastructure-plans-use-case';
-import type { DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '../../application/usecase/InfrastructurePlanManagement/DeleteInfrastructurePlan/delete-infrastructure-plan-use-case';
-import type { ValidateInfrastructurePlanCommand, ValidateInfrastructurePlanResult } from '../../application/usecase/InfrastructurePlanManagement/ValidateInfrastructurePlan/validate-infrastructure-plan-use-case';
+import type { CreateInfrastructurePlanCommand, CreateInfrastructurePlanResult } from '../../application/usecase/infrastructure-plan-management/create-infrastructure-plan/create-infrastructure-plan-use-case';
+import type { GetInfrastructurePlanCommand, GetInfrastructurePlanResult } from '../../application/usecase/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-use-case';
+import type { UpdateInfrastructurePlanCommand, UpdateInfrastructurePlanResult } from '../../application/usecase/infrastructure-plan-management/update-infrastructure-plan/update-infrastructure-plan-use-case';
+import type { ListInfrastructurePlansCommand, ListInfrastructurePlansResult } from '../../application/usecase/infrastructure-plan-management/list-infrastructure-plans/list-infrastructure-plans-use-case';
+import type { DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '../../application/usecase/infrastructure-plan-management/delete-infrastructure-plan/delete-infrastructure-plan-use-case';
+import type { ValidateInfrastructurePlanCommand, ValidateInfrastructurePlanResult } from '../../application/usecase/infrastructure-plan-management/validate-infrastructure-plan/validate-infrastructure-plan-use-case';
 // Import DTOs (assuming they exist)
 import { InfrastructurePlanJsonResponse } from './dto/infrastructure-plan-json-response';
 import { InfrastructurePlanPostJsonRequest } from './dto/infrastructure-plan-post-json-request';

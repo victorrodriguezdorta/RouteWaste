@@ -1,7 +1,7 @@
 
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { GetContainerUseCase, GetContainerCommand, GetContainerResult } from '../../usecase/ContainerManagement/GetContainer/get-container-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { ContainerRepository } from '../../repository/container-repository';
+import type { GetContainerCommand, GetContainerResult, GetContainerUseCase } from '../../usecase/container-management/get-container/get-container-use-case';
 
 /**
  * @brief Service implementing the GetContainer use case.

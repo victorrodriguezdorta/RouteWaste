@@ -1,7 +1,7 @@
 
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
-import type { UpdateContainerUseCase, UpdateContainerCommand, UpdateContainerResult } from '../../usecase/ContainerManagement/UpdateContainer/update-container-use-case';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { ContainerRepository } from '../../repository/container-repository';
+import type { UpdateContainerCommand, UpdateContainerResult, UpdateContainerUseCase } from '../../usecase/container-management/update-container/update-container-use-case';
 
 /**
  * @brief Service implementing the UpdateContainer use case.
