@@ -1,19 +1,18 @@
 import {
   Either,
-  type DataError,
   http,
   type ApiError,
+  type DataError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { ServiceAssignmentRepository } from '../../application/repository/service-assignment-repository';
 import type { AssignContainerToFacilityCommand, AssignContainerToFacilityResult } from '../../application/usecase/service-assignment-management/assign-container-to-facility/assign-container-to-facility-use-case';
-import type { UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '../../application/usecase/service-assignment-management/update-service-assignment/update-service-assignment-use-case';
-import type { RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult } from '../../application/usecase/service-assignment-management/remove-service-assignment/remove-service-assignment-use-case';
 import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult } from '../../application/usecase/service-assignment-management/list-service-assignments/list-service-assignments-use-case';
-// Import DTOs (assuming they exist)
-import { ServiceAssignmentJsonResponse } from './dto/service-assignment-json-response';
-import { ServiceAssignmentPostJsonRequest } from './dto/service-assignment-post-json-request';
-import { ServiceAssignmentPutJsonRequest } from './dto/service-assignment-put-json-request';
-import type { ServiceAssignmentsResponse } from './dto/service-assignments-response';
+import type { RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult } from '../../application/usecase/service-assignment-management/remove-service-assignment/remove-service-assignment-use-case';
+import type { UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '../../application/usecase/service-assignment-management/update-service-assignment/update-service-assignment-use-case';
+// Import DTOs
+import { ServiceAssignmentJsonResponse } from './dto/service-assignment/service-assignment-json-response';
+import { ServiceAssignmentPostJsonRequest } from './dto/service-assignment/service-assignment-post-json-request';
+import { ServiceAssignmentPutJsonRequest } from './dto/service-assignment/service-assignment-put-json-request';
 
 /**
  * HTTP repository implementation for ServiceAssignment entity.
@@ -124,7 +123,7 @@ export class ServiceAssignmentHttpRepository implements ServiceAssignmentReposit
     const url = `${this.API_URL}/${command.assignmentId.toString()}`;
     const body = ServiceAssignmentPutJsonRequest.toRequest(command);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       http
         .put(url, body, this.headers)
         .then(response => {
@@ -149,21 +148,19 @@ export class ServiceAssignmentHttpRepository implements ServiceAssignmentReposit
    * Remove a service assignment by its identifier.
    * 
    * @param command Data containing the id of the assignment to remove.
-   * @return Either a DataError or the removed ServiceAssignment entity.
+   * @return Either a DataError or true on successful removal.
    */
   public async delete(
     command: RemoveServiceAssignmentCommand
   ): Promise<Either<DataError, RemoveServiceAssignmentResult>> {
     const url = `${this.API_URL}/${command.assignmentId.toString()}`;
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       http
         .delete(url, this.headers)
         .then(response => {
           if (response.ok) {
-            response.json().then((data: ServiceAssignmentJsonResponse) => {
-              resolve(Either.right(ServiceAssignmentJsonResponse.toServiceAssignment(data)));
-            });
+            resolve(Either.right(true));
           } else {
             response.json().then((data: ApiError) => {
               data.kind = 'ApiError';

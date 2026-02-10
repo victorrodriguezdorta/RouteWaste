@@ -1,20 +1,19 @@
 import {
   Either,
-  type DataError,
   http,
   type ApiError,
+  type DataError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { VehicleRepository } from '../../application/repository/vehicle-repository';
 import type { CreateVehicleCommand, CreateVehicleResult } from '../../application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
-import type { GetVehicleCommand, GetVehicleResult } from '../../application/usecase/vehicle-management/get-vehicle/get-vehicle-use-case';
-import type { UpdateVehicleCommand, UpdateVehicleResult } from '../../application/usecase/vehicle-management/update-vehicle/update-vehicle-use-case';
-import type { ListVehiclesCommand, ListVehiclesResult } from '../../application/usecase/vehicle-management/list-vehicles/list-vehicles-use-case';
 import type { DeleteVehicleCommand, DeleteVehicleResult } from '../../application/usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';
+import type { GetVehicleCommand, GetVehicleResult } from '../../application/usecase/vehicle-management/get-vehicle/get-vehicle-use-case';
+import type { ListVehiclesCommand, ListVehiclesResult } from '../../application/usecase/vehicle-management/list-vehicles/list-vehicles-use-case';
+import type { UpdateVehicleCommand, UpdateVehicleResult } from '../../application/usecase/vehicle-management/update-vehicle/update-vehicle-use-case';
 // Import DTOs (assuming they exist)
-import { VehicleJsonResponse } from './dto/vehicle-json-response';
-import { VehiclePostJsonRequest } from './dto/vehicle-post-json-request';
-import { VehiclePutJsonRequest } from './dto/vehicle-put-json-request';
-import type { VehiclesResponse } from './dto/vehicles-response';
+import { VehicleJsonResponse } from './dto/vehicle/vehicle-json-response';
+import { VehiclePostJsonRequest } from './dto/vehicle/vehicle-post-json-request';
+import { VehiclePutJsonRequest } from './dto/vehicle/vehicle-put-json-request';
 
 /**
  * HTTP repository implementation for Vehicle entity.
@@ -156,7 +155,7 @@ export class VehicleHttpRepository implements VehicleRepository {
     const url = `${this.API_URL}/${command.vehicleId.toString()}`;
     const body = VehiclePutJsonRequest.toRequest(command);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       http
         .put(url, body, this.headers)
         .then(response => {
@@ -181,21 +180,19 @@ export class VehicleHttpRepository implements VehicleRepository {
    * Delete a vehicle by its identifier.
    * 
    * @param command Data containing the id of the vehicle to delete.
-   * @return Either a DataError or the deleted Vehicle entity.
+   * @return Either a DataError or true on successful deletion.
    */
   public async delete(
     command: DeleteVehicleCommand
   ): Promise<Either<DataError, DeleteVehicleResult>> {
     const url = `${this.API_URL}/${command.vehicleId.toString()}`;
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       http
         .delete(url, this.headers)
         .then(response => {
           if (response.ok) {
-            response.json().then((data: VehicleJsonResponse) => {
-              resolve(Either.right(VehicleJsonResponse.toVehicle(data)));
-            });
+            resolve(Either.right(true));
           } else {
             response.json().then((data: ApiError) => {
               data.kind = 'ApiError';

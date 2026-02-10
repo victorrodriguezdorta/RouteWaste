@@ -1,21 +1,20 @@
 import {
   Either,
-  type DataError,
   http,
   type ApiError,
+  type DataError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { FacilityRepository } from '../../application/repository/facility-repository';
 import type { CreateFacilityCommand, CreateFacilityResult } from '../../application/usecase/facility-management/create-facility/create-facility-use-case';
-import type { GetFacilityCommand, GetFacilityResult } from '../../application/usecase/facility-management/get-facility/get-facility-use-case';
-import type { UpdateFacilityCommand, UpdateFacilityResult } from '../../application/usecase/facility-management/update-facility/update-facility-use-case';
-import type { ListFacilitiesCommand, ListFacilitiesResult } from '../../application/usecase/facility-management/list-facilities/list-facilities-use-case';
-import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '../../application/usecase/facility-management/filter-facilities/filter-facilities-use-case';
 import type { DeleteFacilityCommand, DeleteFacilityResult } from '../../application/usecase/facility-management/delete-facility/delete-facility-use-case';
-// Import DTOs (assuming they exist)
-import { FacilityJsonResponse } from './dto/facility-json-response';
-import { FacilityPostJsonRequest } from './dto/facility-post-json-request';
-import { FacilityPutJsonRequest } from './dto/facility-put-json-request';
-import type { FacilitiesResponse } from './dto/facilities-response';
+import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '../../application/usecase/facility-management/filter-facilities/filter-facilities-use-case';
+import type { GetFacilityCommand, GetFacilityResult } from '../../application/usecase/facility-management/get-facility/get-facility-use-case';
+import type { ListFacilitiesCommand, ListFacilitiesResult } from '../../application/usecase/facility-management/list-facilities/list-facilities-use-case';
+import type { UpdateFacilityCommand, UpdateFacilityResult } from '../../application/usecase/facility-management/update-facility/update-facility-use-case';
+// Import DTOs
+import { FacilityJsonResponse } from './dto/facility/facility-json-response';
+import { FacilityPostJsonRequest } from './dto/facility/facility-post-json-request';
+import { FacilityPutJsonRequest } from './dto/facility/facility-put-json-request';
 
 /**
  * HTTP repository implementation for Facility entity.
@@ -157,7 +156,7 @@ export class FacilityHttpRepository implements FacilityRepository {
     const url = `${this.API_URL}/${command.facilityId.toString()}`;
     const body = FacilityPutJsonRequest.toRequest(command);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       http
         .put(url, body, this.headers)
         .then(response => {
@@ -182,21 +181,19 @@ export class FacilityHttpRepository implements FacilityRepository {
    * Delete a facility by its identifier.
    * 
    * @param command Data containing the id of the facility to delete.
-   * @return Either a DataError or the deleted Facility entity.
+   * @return Either a DataError or true on successful deletion.
    */
   public async delete(
     command: DeleteFacilityCommand
   ): Promise<Either<DataError, DeleteFacilityResult>> {
     const url = `${this.API_URL}/${command.facilityId.toString()}`;
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       http
         .delete(url, this.headers)
         .then(response => {
           if (response.ok) {
-            response.json().then((data: FacilityJsonResponse) => {
-              resolve(Either.right(FacilityJsonResponse.toFacility(data)));
-            });
+            resolve(Either.right(true));
           } else {
             response.json().then((data: ApiError) => {
               data.kind = 'ApiError';

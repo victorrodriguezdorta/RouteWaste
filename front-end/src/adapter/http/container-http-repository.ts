@@ -1,21 +1,20 @@
 import {
   Either,
-  type DataError,
   http,
   type ApiError,
+  type DataError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { ContainerRepository } from '../../application/repository/container-repository';
 import type { CreateContainerCommand, CreateContainerResult } from '../../application/usecase/container-management/create-container/create-container-use-case';
-import type { GetContainerCommand, GetContainerResult } from '../../application/usecase/container-management/get-container/get-container-use-case';
-import type { UpdateContainerCommand, UpdateContainerResult } from '../../application/usecase/container-management/update-container/update-container-use-case';
-import type { ListContainersCommand, ListContainersResult } from '../../application/usecase/container-management/list-containers/list-containers-use-case';
-import type { FilterContainersCommand, FilterContainersResult } from '../../application/usecase/container-management/filter-containers/filter-containers-use-case';
 import type { DeleteContainerCommand, DeleteContainerResult } from '../../application/usecase/container-management/delete-container/delete-container-use-case';
-// Import DTOs (assuming they exist)
-import { ContainerJsonResponse } from './dto/container-json-response';
-import { ContainerPostJsonRequest } from './dto/container-post-json-request';
-import { ContainerPutJsonRequest } from './dto/container-put-json-request';
-import type { ContainersResponse } from './dto/containers-response';
+import type { FilterContainersCommand, FilterContainersResult } from '../../application/usecase/container-management/filter-containers/filter-containers-use-case';
+import type { GetContainerCommand, GetContainerResult } from '../../application/usecase/container-management/get-container/get-container-use-case';
+import type { ListContainersCommand, ListContainersResult } from '../../application/usecase/container-management/list-containers/list-containers-use-case';
+import type { UpdateContainerCommand, UpdateContainerResult } from '../../application/usecase/container-management/update-container/update-container-use-case';
+// Import DTOs
+import { ContainerJsonResponse } from './dto/container/container-json-response';
+import { ContainerPostJsonRequest } from './dto/container/container-post-json-request';
+import { ContainerPutJsonRequest } from './dto/container/container-put-json-request';
 
 /**
  * HTTP repository implementation for Container entity.
@@ -157,7 +156,7 @@ export class ContainerHttpRepository implements ContainerRepository {
     const url = `${this.API_URL}/${command.containerId.toString()}`;
     const body = ContainerPutJsonRequest.toRequest(command);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       http
         .put(url, body, this.headers)
         .then(response => {
@@ -182,21 +181,19 @@ export class ContainerHttpRepository implements ContainerRepository {
    * Delete a container by its identifier.
    * 
    * @param command Data containing the id of the container to delete.
-   * @return Either a DataError or the deleted Container entity.
+   * @return Either a DataError or true on successful deletion.
    */
   public async delete(
     command: DeleteContainerCommand
   ): Promise<Either<DataError, DeleteContainerResult>> {
     const url = `${this.API_URL}/${command.containerId.toString()}`;
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       http
         .delete(url, this.headers)
         .then(response => {
           if (response.ok) {
-            response.json().then((data: ContainerJsonResponse) => {
-              resolve(Either.right(ContainerJsonResponse.toContainer(data)));
-            });
+            resolve(Either.right(true));
           } else {
             response.json().then((data: ApiError) => {
               data.kind = 'ApiError';
