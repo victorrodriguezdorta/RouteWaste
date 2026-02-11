@@ -15,13 +15,13 @@ LOCAL_DIGEST=$(docker image inspect "$IMAGE_NAME" --format '{{index .RepoDigests
 if [ -z "$LOCAL_DIGEST" ]; then
   LOCAL_DIGEST=$(docker image inspect "$IMAGE_NAME" --format '{{.Id}}')
 fi
-
+PLATFORM_DIGESTS=$(docker buildx imagetools inspect "$IMAGE_NAME:latest" --raw | jq -r '.manifests[].digest')
 REMOTE_DIGEST=$(docker manifest inspect --verbose "$IMAGE_NAME" \
   | sed -n 's/.*"digest"[[:space:]]*:[[:space:]]*"\(sha256:[^"]*\)".*/\1/p' \
   | head -n1)
 
 if [ -n "$REMOTE_DIGEST" ]; then
-  if [ "$LOCAL_DIGEST" != "$REMOTE_DIGEST" ]; then
+  if [ "$LOCAL_DIGEST" != "$REMOTE_DIGEST" ] && ! echo "$PLATFORM_DIGESTS" | grep -q "$REMOTE_DIGEST"; then
     echo -e "\xE2\x9C\x85 Remote changed! (different digest)"
     docker rmi "${IMAGE_NAME}" --force
     echo -e "\xE2\x9D\x8C Image '${IMAGE_NAME}' has been deleted."
