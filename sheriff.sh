@@ -1,35 +1,32 @@
 #!/bin/bash
 
-IMAGE_NAME="kaizten/sheriff"
+IMAGE_NAME="kaizten/sheriff:latest"
 
 if ! docker image inspect "$IMAGE_NAME" &>/dev/null; then
-  echo -e "\xE2\x9D\x8C Image '${IMAGE_NAME}' not found locally."
-  echo -e "\xF0\x9F\x9A\x80 Pulling image '${IMAGE_NAME}' from Docker Hub..."
+  echo -e "🔄 Local Docker image '${IMAGE_NAME}' not found. Pulling from Docker Hub..."
   if ! docker pull "$IMAGE_NAME"; then
-    echo -e "\xF0\x9F\x9A\x80 Failed to pull image '${IMAGE_NAME}'. Exiting."
+    echo -e "🛑 Failed to pull image '${IMAGE_NAME}'. Exiting."
     exit 1
   fi
-fi
-
-LOCAL_DIGEST=$(docker image inspect "$IMAGE_NAME" --format '{{index .RepoDigests 0}}' 2>/dev/null | cut -d@ -f2)
-if [ -z "$LOCAL_DIGEST" ]; then
-  LOCAL_DIGEST=$(docker image inspect "$IMAGE_NAME" --format '{{.Id}}')
-fi
-PLATFORM_DIGESTS=$(docker buildx imagetools inspect "$IMAGE_NAME:latest" --raw | jq -r '.manifests[].digest')
-REMOTE_DIGEST=$(docker manifest inspect --verbose "$IMAGE_NAME" \
-  | sed -n 's/.*"digest"[[:space:]]*:[[:space:]]*"\(sha256:[^"]*\)".*/\1/p' \
-  | head -n1)
-
-if [ -n "$REMOTE_DIGEST" ]; then
-  if [ "$LOCAL_DIGEST" != "$REMOTE_DIGEST" ] && ! echo "$PLATFORM_DIGESTS" | grep -q "$REMOTE_DIGEST"; then
-    echo -e "\xE2\x9C\x85 Remote changed! (different digest)"
+  echo -e "✅ Docker image '${IMAGE_NAME}' has been downloaded."
+  docker run -v $(pwd):/data ${IMAGE_NAME} --reset
+else
+  echo -e "🔍 Checking for updates to Docker image '${IMAGE_NAME}'..."
+  LOCAL_DIGEST=$(docker image inspect "$IMAGE_NAME" --format '{{index .RepoDigests 0}}' 2>/dev/null | cut -d@ -f2)
+  REMOTE_DIGEST=$(docker buildx imagetools inspect "$IMAGE_NAME" | grep -oP 'Digest:\s+\Ksha256:[a-f0-9]{64}')
+  echo "Local Docker digest:  $LOCAL_DIGEST"
+  echo "Remote Docker digest: $REMOTE_DIGEST"
+  if [[ "$LOCAL_DIGEST" != "$REMOTE_DIGEST" ]]; then
+    echo -e "⚠️  Local Docker image is outdated. It must be updated to ensure you have the latest features and fixes."
     docker rmi "${IMAGE_NAME}" --force
-    echo -e "\xE2\x9D\x8C Image '${IMAGE_NAME}' has been deleted."
-    echo -e "\xF0\x9F\x9A\x80 Pulling image '${IMAGE_NAME}' from Docker Hub..."
+    echo -e "✅ Local Docker image '${IMAGE_NAME}' has been deleted."
+    echo -e "🔄 Pulling Docker image '${IMAGE_NAME}' from Docker Hub..."
     if ! docker pull "$IMAGE_NAME"; then
-      echo -e "\xF0\x9F\x9A\x80 Failed to pull image '${IMAGE_NAME}'. Exiting."
+      echo -e "🛑 Failed to pull image '${IMAGE_NAME}'. Exiting."
       exit 1
     fi
+    echo -e "✅ Docker image '${IMAGE_NAME}' has been updated."
+    docker run -v $(pwd):/data ${IMAGE_NAME} --reset
   fi
 fi
 
