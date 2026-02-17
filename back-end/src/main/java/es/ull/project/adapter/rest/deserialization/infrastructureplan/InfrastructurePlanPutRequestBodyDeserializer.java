@@ -1,0 +1,186 @@
+package es.ull.project.adapter.rest.deserialization.infrastructureplan;
+
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import es.ull.project.adapter.rest.deserialization.JsonFields;
+import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPutRequestBody;
+import es.ull.project.domain.valueobject.cost.Currency;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
+import es.ull.project.domain.valueobject.policy.ServicePolicies;
+import es.ull.project.domain.valueobject.time.PlanningPeriod;
+
+/**
+ * InfrastructurePlanPutRequestBodyDeserializer
+ * 
+ * Custom JSON deserializer for InfrastructurePlanPutRequestBody.
+ * This class converts incoming JSON from PUT requests into InfrastructurePlanPutRequestBody
+ * objects, performing validation and constructing required value objects from
+ * primitive JSON fields.
+ * 
+ * The deserializer validates each attribute and provides meaningful error messages
+ * when validation fails. It handles nested value objects (PlanningPeriod, MaximumBudget, ServicePolicies)
+ * by extracting their constituent parts from the JSON structure.
+ */
+public class InfrastructurePlanPutRequestBodyDeserializer extends JsonDeserializer<InfrastructurePlanPutRequestBody> {
+
+    /**
+     * Deserializes JSON content into an InfrastructurePlanPutRequestBody object.
+     * 
+     * @param parser the JSON parser
+     * @param context the deserialization context
+     * @return the deserialized InfrastructurePlanPutRequestBody
+     * @throws IOException if parsing or validation fails
+     */
+    @Override
+    public InfrastructurePlanPutRequestBody deserialize(JsonParser parser, DeserializationContext context) 
+            throws IOException {
+        
+        JsonNode rootNode = parser.getCodec().readTree(parser);
+        
+        try {
+            // Parse period
+            PlanningPeriod period = parsePeriod(rootNode);
+            
+            // Parse maxBudget
+            MaximumBudget maxBudget = parseMaxBudget(rootNode);
+            
+            // Parse servicePolicies
+            ServicePolicies servicePolicies = parseServicePolicies(rootNode);
+            
+            // Create and populate request body
+            InfrastructurePlanPutRequestBody requestBody = new InfrastructurePlanPutRequestBody();
+            requestBody.period = period;
+            requestBody.maxBudget = maxBudget;
+            requestBody.servicePolicies = servicePolicies;
+            
+            return requestBody;
+            
+        } catch (Exception e) {
+            throw new IOException("Failed to deserialize InfrastructurePlanPutRequestBody: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Parses the period field from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @return the parsed PlanningPeriod value object
+     * @throws IllegalArgumentException if the field is missing or invalid
+     */
+    private PlanningPeriod parsePeriod(JsonNode rootNode) {
+        if (!rootNode.has(JsonFields.PERIOD)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.PERIOD + "' is missing");
+        }
+        
+        JsonNode node = rootNode.get(JsonFields.PERIOD);
+        if (node.isNull() || !node.isTextual()) {
+            throw new IllegalArgumentException("Field '" + JsonFields.PERIOD + "' must be a non-null string");
+        }
+        
+        String value = node.asText();
+        try {
+            return new PlanningPeriod(value);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                "Invalid value '" + value + "' for field '" + JsonFields.PERIOD + "': " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Parses the maxBudget nested object from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @return the parsed MaximumBudget value object
+     * @throws IllegalArgumentException if the field is missing or invalid
+     */
+    private MaximumBudget parseMaxBudget(JsonNode rootNode) {
+        if (!rootNode.has(JsonFields.MAX_BUDGET)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.MAX_BUDGET + "' is missing");
+        }
+        
+        JsonNode budgetNode = rootNode.get(JsonFields.MAX_BUDGET);
+        if (budgetNode.isNull() || !budgetNode.isObject()) {
+            throw new IllegalArgumentException("Field '" + JsonFields.MAX_BUDGET + "' must be a non-null object");
+        }
+        
+        try {
+            // Extract amount
+            if (!budgetNode.has(JsonFields.AMOUNT)) {
+                throw new IllegalArgumentException("Required field '" + JsonFields.AMOUNT + "' is missing");
+            }
+            double amount = budgetNode.get(JsonFields.AMOUNT).asDouble();
+            
+            // Extract currency (optional)
+            String currencyCode = null;
+            if (budgetNode.has(JsonFields.CURRENCY) && !budgetNode.get(JsonFields.CURRENCY).isNull()) {
+                currencyCode = budgetNode.get(JsonFields.CURRENCY).asText();
+            }
+            
+            if (currencyCode == null || currencyCode.trim().isEmpty()) {
+                return new MaximumBudget(amount);
+            } else {
+                Currency currency = new Currency(currencyCode);
+                return new MaximumBudget(amount, currency);
+            }
+            
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                "Invalid value for field '" + JsonFields.MAX_BUDGET + "': " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Parses the servicePolicies nested object from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @return the parsed ServicePolicies value object
+     * @throws IllegalArgumentException if the field is missing or invalid
+     */
+    private ServicePolicies parseServicePolicies(JsonNode rootNode) {
+        if (!rootNode.has(JsonFields.SERVICE_POLICIES)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.SERVICE_POLICIES + "' is missing");
+        }
+        
+        JsonNode policiesNode = rootNode.get(JsonFields.SERVICE_POLICIES);
+        if (policiesNode.isNull() || !policiesNode.isObject()) {
+            throw new IllegalArgumentException("Field '" + JsonFields.SERVICE_POLICIES + "' must be a non-null object");
+        }
+        
+        try {
+            // Extract maxServiceDistance (optional)
+            Double maxServiceDistance = null;
+            if (policiesNode.has(JsonFields.MAX_SERVICE_DISTANCE) && !policiesNode.get(JsonFields.MAX_SERVICE_DISTANCE).isNull()) {
+                maxServiceDistance = policiesNode.get(JsonFields.MAX_SERVICE_DISTANCE).asDouble();
+            }
+            
+            // Extract maxServiceTime (optional)
+            Integer maxServiceTime = null;
+            if (policiesNode.has(JsonFields.MAX_SERVICE_TIME) && !policiesNode.get(JsonFields.MAX_SERVICE_TIME).isNull()) {
+                maxServiceTime = policiesNode.get(JsonFields.MAX_SERVICE_TIME).asInt();
+            }
+            
+            // Extract maxInfrastructureCount (optional)
+            Integer maxInfrastructureCount = null;
+            if (policiesNode.has(JsonFields.MAX_INFRASTRUCTURE_COUNT) && !policiesNode.get(JsonFields.MAX_INFRASTRUCTURE_COUNT).isNull()) {
+                maxInfrastructureCount = policiesNode.get(JsonFields.MAX_INFRASTRUCTURE_COUNT).asInt();
+            }
+            
+            // Extract maxEmissions (optional)
+            Double maxEmissions = null;
+            if (policiesNode.has(JsonFields.MAX_EMISSIONS) && !policiesNode.get(JsonFields.MAX_EMISSIONS).isNull()) {
+                maxEmissions = policiesNode.get(JsonFields.MAX_EMISSIONS).asDouble();
+            }
+            
+            return new ServicePolicies(maxServiceDistance, maxServiceTime, maxInfrastructureCount, maxEmissions);
+            
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                "Invalid value for field '" + JsonFields.SERVICE_POLICIES + "': " + e.getMessage(), e);
+        }
+    }
+}

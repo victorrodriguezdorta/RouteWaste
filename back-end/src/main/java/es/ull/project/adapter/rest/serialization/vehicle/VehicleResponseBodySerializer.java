@@ -1,0 +1,66 @@
+package es.ull.project.adapter.rest.serialization.vehicle;
+
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
+import es.ull.project.adapter.rest.deserialization.JsonFields;
+import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
+
+/**
+ * Custom JSON serializer for VehicleResponseBody
+ * This serializer manually controls how Vehicle response data is converted to JSON format
+ * It follows the Jackson serialization pattern using JsonGenerator
+ */
+public class VehicleResponseBodySerializer extends StdSerializer<VehicleResponseBody> {
+
+    /**
+     * Default constructor for the serializer
+     * Calls the parent constructor with the class type
+     */
+    public VehicleResponseBodySerializer() {
+        super(VehicleResponseBody.class);
+    }
+
+    /**
+     * Serializes a VehicleResponseBody object into JSON format
+     * This method writes each field of the vehicle to the JSON output stream
+     *
+     * @param value    The VehicleResponseBody object to serialize
+     * @param gen      JsonGenerator to write JSON content
+     * @param provider SerializerProvider for accessing serializers
+     * @throws IOException if an I/O error occurs during serialization
+     */
+    @Override
+    public void serialize(VehicleResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+        gen.writeStartObject();
+
+        // Write vehicle ID as string (UUID)
+        gen.writeStringField(JsonFields.ID, value.id.toString());
+
+        // Write vehicle type as string
+        gen.writeStringField(JsonFields.VEHICLE_TYPE, value.vehicleType);
+
+        // Write transport capacity as nested object
+        gen.writeObjectFieldStart(JsonFields.TRANSPORT_CAPACITY);
+        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.transportCapacity.value);
+        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.transportCapacity.quantityUnit);
+        gen.writeStringField(JsonFields.TIME_UNIT, value.transportCapacity.timeUnit);
+        gen.writeEndObject();
+
+        // Write cost per kilometer as nested object
+        gen.writeObjectFieldStart(JsonFields.COST_PER_KILOMETER);
+        gen.writeNumberField(JsonFields.AMOUNT, value.costPerKilometer.amount);
+        
+        // Write currency only if it is not null (optional field)
+        if (value.costPerKilometer.currency != null) {
+            gen.writeStringField(JsonFields.CURRENCY, value.costPerKilometer.currency);
+        }
+        
+        gen.writeEndObject();
+
+        gen.writeEndObject();
+    }
+}

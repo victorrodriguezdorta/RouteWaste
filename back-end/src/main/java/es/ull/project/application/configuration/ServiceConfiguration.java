@@ -1,5 +1,8 @@
 package es.ull.project.application.configuration;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
@@ -25,8 +28,6 @@ import es.ull.project.application.service.vehicle.CreateVehicleService;
 import es.ull.project.application.service.vehicle.DeleteVehicleService;
 import es.ull.project.application.service.vehicle.ReadVehicleService;
 import es.ull.project.application.service.vehicle.UpdateVehicleService;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration class for application services.
@@ -197,12 +198,17 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the CreateServiceAssignmentService.
-     * @param repository the service assignment repository
+     * @param serviceAssignmentRepository the service assignment repository
+     * @param containerRepository the container repository
+     * @param facilityRepository the facility repository
      * @return a new CreateServiceAssignmentService instance
      */
     @Bean
-    public CreateServiceAssignmentService createServiceAssignmentService(ServiceAssignmentRepository repository) {
-        return new CreateServiceAssignmentService(repository);
+    public CreateServiceAssignmentService createServiceAssignmentService(
+            ServiceAssignmentRepository serviceAssignmentRepository,
+            ContainerRepository containerRepository,
+            FacilityRepository facilityRepository) {
+        return new CreateServiceAssignmentService(serviceAssignmentRepository, containerRepository, facilityRepository);
     }
 
     /**
