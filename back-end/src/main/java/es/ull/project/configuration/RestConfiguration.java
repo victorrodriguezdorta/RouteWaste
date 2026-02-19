@@ -1,4 +1,4 @@
-package es.ull.project.adapter.rest.configuration;
+package es.ull.project.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +43,8 @@ import es.ull.project.adapter.rest.serialization.vehicle.VehicleResponseBodySeri
  * 
  * Configuration class for the REST adapter layer.
  * This class registers all custom Jackson serializers and deserializers
- * used for converting between JSON and Java objects in HTTP requests and responses.
+ * used for converting between JSON and Java objects in HTTP requests and
+ * responses.
  * 
  * Each deserializer handles the conversion of JSON request bodies into DTOs,
  * while serializers handle the conversion of DTOs into JSON responses.
@@ -67,7 +68,7 @@ public class RestConfiguration {
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
         ObjectMapper objectMapper = builder.build();
         SimpleModule module = new SimpleModule();
-        
+
         // Register Vehicle deserializers
         module.addDeserializer(
                 VehiclePostRequestBody.class,
@@ -75,7 +76,7 @@ public class RestConfiguration {
         module.addDeserializer(
                 VehiclePutRequestBody.class,
                 new VehiclePutRequestBodyDeserializer());
-        
+
         // Register Container deserializers
         module.addDeserializer(
                 ContainerPostRequestBody.class,
@@ -83,7 +84,7 @@ public class RestConfiguration {
         module.addDeserializer(
                 ContainerPutRequestBody.class,
                 new ContainerPutRequestBodyDeserializer());
-        
+
         // Register Facility deserializers
         module.addDeserializer(
                 FacilityPostRequestBody.class,
@@ -91,7 +92,7 @@ public class RestConfiguration {
         module.addDeserializer(
                 FacilityPutRequestBody.class,
                 new FacilityPutRequestBodyDeserializer());
-        
+
         // Register InfrastructurePlan deserializers
         module.addDeserializer(
                 InfrastructurePlanPostRequestBody.class,
@@ -99,7 +100,7 @@ public class RestConfiguration {
         module.addDeserializer(
                 InfrastructurePlanPutRequestBody.class,
                 new InfrastructurePlanPutRequestBodyDeserializer());
-        
+
         // Register ServiceAssignment deserializers
         module.addDeserializer(
                 ServiceAssignmentPostRequestBody.class,
@@ -107,34 +108,34 @@ public class RestConfiguration {
         module.addDeserializer(
                 ServiceAssignmentPutRequestBody.class,
                 new ServiceAssignmentPutRequestBodyDeserializer());
-        
+
         // Register Vehicle serializer
         module.addSerializer(
                 VehicleResponseBody.class,
                 new VehicleResponseBodySerializer());
-        
+
         // Register Container serializer
         module.addSerializer(
                 ContainerResponseBody.class,
                 new ContainerResponseBodySerializer());
-        
+
         // Register Facility serializer
         module.addSerializer(
                 FacilityResponseBody.class,
                 new FacilityResponseBodySerializer());
-        
+
         // Register InfrastructurePlan serializer
         module.addSerializer(
                 InfrastructurePlanResponseBody.class,
                 new InfrastructurePlanResponseBodySerializer());
-        
+
         // Register ServiceAssignment serializer
         module.addSerializer(
                 ServiceAssignmentResponseBody.class,
                 new ServiceAssignmentResponseBodySerializer());
-        
+
         // Remaining serializers will be added here as they are implemented
-        
+
         objectMapper.registerModule(module);
         return objectMapper;
     }
@@ -148,7 +149,7 @@ public class RestConfiguration {
      */
     // @Bean
     // public ResponseEntityExceptionHandler responseEntityExceptionHandler() {
-    //     return new KaiztenExceptionHandler();
+    // return new KaiztenExceptionHandler();
     // }
 
     /**
@@ -159,17 +160,18 @@ public class RestConfiguration {
      */
     // @Bean
     // public FilterConditionBuilder filterConditionBuilder() {
-    //     return new FilterConditionBuilder();
+    // return new FilterConditionBuilder();
     // }
 
     /**
      * TODO: Create and register JWT authentication converter
-     * This bean will handle JWT token conversion and validation for securing endpoints.
+     * This bean will handle JWT token conversion and validation for securing
+     * endpoints.
      * 
      * @return JwtAuthConverter for JWT authentication
      */
     // @Bean
     // public JwtAuthConverter jwtAuthConverter() {
-    //     return new JwtAuthConverter();
+    // return new JwtAuthConverter();
     // }
 }
