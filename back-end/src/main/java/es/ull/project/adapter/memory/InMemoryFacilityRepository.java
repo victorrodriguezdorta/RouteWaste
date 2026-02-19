@@ -1,4 +1,4 @@
-package es.ull.project.application.repository.impl;
+package es.ull.project.adapter.memory;
 
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.domain.entity.Facility;
