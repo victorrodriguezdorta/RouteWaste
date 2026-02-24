@@ -1,4 +1,4 @@
-package es.ull.project.adapter.rest.configuration;
+package es.ull.project.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +43,8 @@ import es.ull.project.adapter.rest.serialization.vehicle.VehicleResponseBodySeri
  * 
  * Configuration class for the REST adapter layer.
  * This class registers all custom Jackson serializers and deserializers
- * used for converting between JSON and Java objects in HTTP requests and responses.
+ * used for converting between JSON and Java objects in HTTP requests and
+ * responses.
  * 
  * Each deserializer handles the conversion of JSON request bodies into DTOs,
  * while serializers handle the conversion of DTOs into JSON responses.

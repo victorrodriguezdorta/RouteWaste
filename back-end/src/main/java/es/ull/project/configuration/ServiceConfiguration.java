@@ -1,4 +1,4 @@
-package es.ull.project.application.configuration;
+package es.ull.project.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,13 +31,15 @@ import es.ull.project.application.service.vehicle.UpdateVehicleService;
 
 /**
  * Configuration class for application services.
- * This class defines all service beans following the hexagonal architecture pattern.
+ * This class defines all service beans following the hexagonal architecture
+ * pattern.
  */
 @Configuration
 public class ServiceConfiguration {
 
     /**
      * Creates a bean for the CreateContainerService.
+     * 
      * @param repository the container repository
      * @return a new CreateContainerService instance
      */
@@ -48,6 +50,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the ReadContainerService.
+     * 
      * @param repository the container repository
      * @return a new ReadContainerService instance
      */
@@ -58,6 +61,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the UpdateContainerService.
+     * 
      * @param repository the container repository
      * @return a new UpdateContainerService instance
      */
@@ -68,6 +72,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the DeleteContainerService.
+     * 
      * @param repository the container repository
      * @return a new DeleteContainerService instance
      */
@@ -78,6 +83,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the CreateFacilityService.
+     * 
      * @param repository the facility repository
      * @return a new CreateFacilityService instance
      */
@@ -88,6 +94,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the ReadFacilityService.
+     * 
      * @param repository the facility repository
      * @return a new ReadFacilityService instance
      */
@@ -98,6 +105,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the UpdateFacilityService.
+     * 
      * @param repository the facility repository
      * @return a new UpdateFacilityService instance
      */
@@ -108,6 +116,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the DeleteFacilityService.
+     * 
      * @param repository the facility repository
      * @return a new DeleteFacilityService instance
      */
@@ -118,6 +127,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the CreateVehicleService.
+     * 
      * @param repository the vehicle repository
      * @return a new CreateVehicleService instance
      */
@@ -128,6 +138,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the ReadVehicleService.
+     * 
      * @param repository the vehicle repository
      * @return a new ReadVehicleService instance
      */
@@ -138,6 +149,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the UpdateVehicleService.
+     * 
      * @param repository the vehicle repository
      * @return a new UpdateVehicleService instance
      */
@@ -148,6 +160,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the DeleteVehicleService.
+     * 
      * @param repository the vehicle repository
      * @return a new DeleteVehicleService instance
      */
@@ -158,6 +171,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the CreateInfrastructurePlanService.
+     * 
      * @param repository the infrastructure plan repository
      * @return a new CreateInfrastructurePlanService instance
      */
@@ -168,6 +182,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the ReadInfrastructurePlanService.
+     * 
      * @param repository the infrastructure plan repository
      * @return a new ReadInfrastructurePlanService instance
      */
@@ -178,6 +193,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the UpdateInfrastructurePlanService.
+     * 
      * @param repository the infrastructure plan repository
      * @return a new UpdateInfrastructurePlanService instance
      */
@@ -188,6 +204,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the DeleteInfrastructurePlanService.
+     * 
      * @param repository the infrastructure plan repository
      * @return a new DeleteInfrastructurePlanService instance
      */
@@ -198,9 +215,10 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the CreateServiceAssignmentService.
+     * 
      * @param serviceAssignmentRepository the service assignment repository
-     * @param containerRepository the container repository
-     * @param facilityRepository the facility repository
+     * @param containerRepository         the container repository
+     * @param facilityRepository          the facility repository
      * @return a new CreateServiceAssignmentService instance
      */
     @Bean
@@ -213,6 +231,7 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the ReadServiceAssignmentService.
+     * 
      * @param repository the service assignment repository
      * @return a new ReadServiceAssignmentService instance
      */
@@ -223,20 +242,22 @@ public class ServiceConfiguration {
 
     /**
      * Creates a bean for the UpdateServiceAssignmentService.
-     * @param repository the service assignment repository
+     * 
+     * @param repository          the service assignment repository
      * @param containerRepository the container repository
-     * @param facilityRepository the facility repository
+     * @param facilityRepository  the facility repository
      * @return a new UpdateServiceAssignmentService instance
      */
     @Bean
     public UpdateServiceAssignmentService updateServiceAssignmentService(ServiceAssignmentRepository repository,
-                                                                         ContainerRepository containerRepository,
-                                                                         FacilityRepository facilityRepository) {
+            ContainerRepository containerRepository,
+            FacilityRepository facilityRepository) {
         return new UpdateServiceAssignmentService(repository, containerRepository, facilityRepository);
     }
 
     /**
      * Creates a bean for the DeleteServiceAssignmentService.
+     * 
      * @param repository the service assignment repository
      * @return a new DeleteServiceAssignmentService instance
      */
