@@ -10,6 +10,13 @@ import es.ull.project.domain.entity.Container;
 public class ContainerResponseMapper {
 
     /**
+     * Private constructor to prevent instantiation of utility class.
+     */
+    private ContainerResponseMapper() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    }
+
+    /**
      * Converts a Container domain entity to a ContainerResponseBody DTO
      * Maps all the container properties including nested objects (location and waste demand)
      *
@@ -18,31 +25,20 @@ public class ContainerResponseMapper {
      */
     public static ContainerResponseBody toResponseBody(Container container) {
         ContainerResponseBody responseBody = new ContainerResponseBody();
-        
-        // Map container ID
         responseBody.id = container.getId();
-        
-        // Map location
         responseBody.location = new ContainerResponseBody.LocationData();
         responseBody.location.latitude = container.getLocation().getLatitude();
         responseBody.location.longitude = container.getLocation().getLongitude();
         responseBody.location.postalAddress = container.getLocation().getPostalAddress();
         responseBody.location.gisReference = container.getLocation().getGISReference();
-        
-        // Map waste type (convert enum to string)
         responseBody.wasteType = container.getWasteType().name();
-        
-        // Map waste demand
         responseBody.wasteDemand = new ContainerResponseBody.WasteDemandData();
         responseBody.wasteDemand.value = container.getWasteDemand().getValue();
         responseBody.wasteDemand.quantityUnit = container.getWasteDemand().getQuantityUnit().getValue();
         responseBody.wasteDemand.timeUnit = container.getWasteDemand().getTimeUnit().name();
-        
-        // Map service zone (optional field)
         if (container.getServiceZone().isPresent()) {
             responseBody.serviceZone = container.getServiceZone().get().name();
         }
-        
         return responseBody;
     }
 }

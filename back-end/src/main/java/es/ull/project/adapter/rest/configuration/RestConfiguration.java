@@ -67,109 +67,52 @@ public class RestConfiguration {
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
         ObjectMapper objectMapper = builder.build();
         SimpleModule module = new SimpleModule();
-        
-        // Register Vehicle deserializers
         module.addDeserializer(
                 VehiclePostRequestBody.class,
                 new VehiclePostRequestBodyDeserializer());
         module.addDeserializer(
                 VehiclePutRequestBody.class,
                 new VehiclePutRequestBodyDeserializer());
-        
-        // Register Container deserializers
         module.addDeserializer(
                 ContainerPostRequestBody.class,
                 new ContainerPostRequestBodyDeserializer());
         module.addDeserializer(
                 ContainerPutRequestBody.class,
                 new ContainerPutRequestBodyDeserializer());
-        
-        // Register Facility deserializers
         module.addDeserializer(
                 FacilityPostRequestBody.class,
                 new FacilityPostRequestBodyDeserializer());
         module.addDeserializer(
                 FacilityPutRequestBody.class,
                 new FacilityPutRequestBodyDeserializer());
-        
-        // Register InfrastructurePlan deserializers
         module.addDeserializer(
                 InfrastructurePlanPostRequestBody.class,
                 new InfrastructurePlanPostRequestBodyDeserializer());
         module.addDeserializer(
                 InfrastructurePlanPutRequestBody.class,
                 new InfrastructurePlanPutRequestBodyDeserializer());
-        
-        // Register ServiceAssignment deserializers
         module.addDeserializer(
                 ServiceAssignmentPostRequestBody.class,
                 new ServiceAssignmentPostRequestBodyDeserializer());
         module.addDeserializer(
                 ServiceAssignmentPutRequestBody.class,
                 new ServiceAssignmentPutRequestBodyDeserializer());
-        
-        // Register Vehicle serializer
         module.addSerializer(
                 VehicleResponseBody.class,
                 new VehicleResponseBodySerializer());
-        
-        // Register Container serializer
         module.addSerializer(
                 ContainerResponseBody.class,
                 new ContainerResponseBodySerializer());
-        
-        // Register Facility serializer
         module.addSerializer(
                 FacilityResponseBody.class,
                 new FacilityResponseBodySerializer());
-        
-        // Register InfrastructurePlan serializer
         module.addSerializer(
                 InfrastructurePlanResponseBody.class,
                 new InfrastructurePlanResponseBodySerializer());
-        
-        // Register ServiceAssignment serializer
         module.addSerializer(
                 ServiceAssignmentResponseBody.class,
                 new ServiceAssignmentResponseBodySerializer());
-        
-        // Remaining serializers will be added here as they are implemented
-        
         objectMapper.registerModule(module);
         return objectMapper;
     }
-
-    /**
-     * TODO: Create and register exception handler
-     * This bean will handle exceptions thrown by the REST controllers
-     * and convert them into appropriate HTTP error responses.
-     * 
-     * @return ResponseEntityExceptionHandler for handling REST exceptions
-     */
-    // @Bean
-    // public ResponseEntityExceptionHandler responseEntityExceptionHandler() {
-    //     return new KaiztenExceptionHandler();
-    // }
-
-    /**
-     * TODO: Create and register filter condition builder
-     * This bean will help build filter conditions for querying entities.
-     * 
-     * @return FilterConditionBuilder for creating filter conditions
-     */
-    // @Bean
-    // public FilterConditionBuilder filterConditionBuilder() {
-    //     return new FilterConditionBuilder();
-    // }
-
-    /**
-     * TODO: Create and register JWT authentication converter
-     * This bean will handle JWT token conversion and validation for securing endpoints.
-     * 
-     * @return JwtAuthConverter for JWT authentication
-     */
-    // @Bean
-    // public JwtAuthConverter jwtAuthConverter() {
-    //     return new JwtAuthConverter();
-    // }
 }

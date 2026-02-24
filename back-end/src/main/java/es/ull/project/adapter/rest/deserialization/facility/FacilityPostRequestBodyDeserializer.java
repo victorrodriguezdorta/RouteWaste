@@ -47,23 +47,16 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
     @Override
     public FacilityPostRequestBody deserialize(JsonParser parser, DeserializationContext context) 
             throws IOException {
-        
         JsonNode rootNode = parser.getCodec().readTree(parser);
         List<FieldError> errors = new ArrayList<>();
-        
-        // Parse all fields, accumulating errors instead of throwing immediately
         FacilityType facilityType = parseFacilityType(rootNode, errors);
         Location location = parseLocation(rootNode, errors);
         Capacity capacity = parseCapacity(rootNode, errors);
         OpeningFixedCost openingFixedCost = parseOpeningFixedCost(rootNode, errors);
         FacilityStatus status = parseStatus(rootNode, errors);
-        
-        // If there are any validation errors, throw ValidationException with all of them
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-        
-        // Create and populate request body
         FacilityPostRequestBody requestBody = new FacilityPostRequestBody();
         requestBody.facilityType = facilityType;
         requestBody.location = location;
@@ -86,13 +79,11 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
             errors.add(new FieldError(JsonFields.FACILITY_TYPE, "Field is required"));
             return null;
         }
-        
         JsonNode node = rootNode.get(JsonFields.FACILITY_TYPE);
         if (node.isNull() || !node.isTextual()) {
             errors.add(new FieldError(JsonFields.FACILITY_TYPE, "Must be a non-null string"));
             return null;
         }
-        
         String value = node.asText();
         try {
             return FacilityType.fromString(value);
@@ -114,18 +105,13 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
             errors.add(new FieldError(JsonFields.LOCATION, "Field is required"));
             return null;
         }
-        
         JsonNode locationNode = rootNode.get(JsonFields.LOCATION);
         if (locationNode.isNull() || !locationNode.isObject()) {
             errors.add(new FieldError(JsonFields.LOCATION, "Must be a non-null object"));
             return null;
         }
-        
-        // Track required nested fields
         Double latitude = null;
         Double longitude = null;
-        
-        // Extract latitude
         if (!locationNode.has(JsonFields.LATITUDE)) {
             errors.add(new FieldError(
                 JsonFields.LOCATION + "." + JsonFields.LATITUDE,
@@ -141,8 +127,6 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
                 ));
             }
         }
-        
-        // Extract longitude
         if (!locationNode.has(JsonFields.LONGITUDE)) {
             errors.add(new FieldError(
                 JsonFields.LOCATION + "." + JsonFields.LONGITUDE,
@@ -158,20 +142,14 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
                 ));
             }
         }
-        
-        // Extract postal address (optional)
         String postalAddress = null;
         if (locationNode.has(JsonFields.POSTAL_ADDRESS) && !locationNode.get(JsonFields.POSTAL_ADDRESS).isNull()) {
             postalAddress = locationNode.get(JsonFields.POSTAL_ADDRESS).asText();
         }
-        
-        // Extract GIS reference (optional)
         String gisReference = null;
         if (locationNode.has(JsonFields.GIS_REFERENCE) && !locationNode.get(JsonFields.GIS_REFERENCE).isNull()) {
             gisReference = locationNode.get(JsonFields.GIS_REFERENCE).asText();
         }
-        
-        // Only create Location if required fields are valid
         if (latitude != null && longitude != null) {
             try {
                 return new Location(latitude, longitude, postalAddress, gisReference);
@@ -196,19 +174,14 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
             errors.add(new FieldError(JsonFields.CAPACITY, "Field is required"));
             return null;
         }
-        
         JsonNode capacityNode = rootNode.get(JsonFields.CAPACITY);
         if (capacityNode.isNull() || !capacityNode.isObject()) {
             errors.add(new FieldError(JsonFields.CAPACITY, "Must be a non-null object"));
             return null;
         }
-        
-        // Track required nested fields
         Double value = null;
         QuantityUnit quantityUnit = null;
         TimeUnit timeUnit = null;
-        
-        // Extract capacity value
         if (!capacityNode.has(JsonFields.CAPACITY_VALUE)) {
             errors.add(new FieldError(
                 JsonFields.CAPACITY + "." + JsonFields.CAPACITY_VALUE,
@@ -224,8 +197,6 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
                 ));
             }
         }
-        
-        // Extract quantity unit
         if (!capacityNode.has(JsonFields.QUANTITY_UNIT)) {
             errors.add(new FieldError(
                 JsonFields.CAPACITY + "." + JsonFields.QUANTITY_UNIT,
@@ -242,8 +213,6 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
                 ));
             }
         }
-        
-        // Extract time unit
         if (!capacityNode.has(JsonFields.TIME_UNIT)) {
             errors.add(new FieldError(
                 JsonFields.CAPACITY + "." + JsonFields.TIME_UNIT,
@@ -260,8 +229,6 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
                 ));
             }
         }
-        
-        // Only create Capacity if all required fields are valid
         if (value != null && quantityUnit != null && timeUnit != null) {
             try {
                 return new Capacity(value, quantityUnit, timeUnit);
@@ -270,7 +237,6 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
                 return null;
             }
         }
-        
         return null;
     }
 
@@ -286,14 +252,11 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
             errors.add(new FieldError(JsonFields.OPENING_FIXED_COST, "Field is required"));
             return null;
         }
-        
         JsonNode costNode = rootNode.get(JsonFields.OPENING_FIXED_COST);
         if (costNode.isNull() || !costNode.isObject()) {
             errors.add(new FieldError(JsonFields.OPENING_FIXED_COST, "Must be a non-null object"));
             return null;
         }
-        
-        // Extract amount (required)
         Double amount = null;
         if (!costNode.has(JsonFields.AMOUNT)) {
             errors.add(new FieldError(
@@ -310,8 +273,6 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
                 ));
             }
         }
-        
-        // Extract currency (optional)
         Currency currency = null;
         if (costNode.has(JsonFields.CURRENCY) && !costNode.get(JsonFields.CURRENCY).isNull()) {
             try {
@@ -326,8 +287,6 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
                 ));
             }
         }
-        
-        // Only create OpeningFixedCost if amount is valid
         if (amount != null) {
             try {
                 if (currency == null) {
@@ -343,7 +302,6 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
                 return null;
             }
         }
-        
         return null;
     }
 
@@ -359,13 +317,11 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
             errors.add(new FieldError(JsonFields.STATUS, "Field is required"));
             return null;
         }
-        
         JsonNode node = rootNode.get(JsonFields.STATUS);
         if (node.isNull() || !node.isTextual()) {
             errors.add(new FieldError(JsonFields.STATUS, "Must be a non-null string"));
             return null;
         }
-        
         String value = node.asText();
         try {
             return FacilityStatus.fromString(value);

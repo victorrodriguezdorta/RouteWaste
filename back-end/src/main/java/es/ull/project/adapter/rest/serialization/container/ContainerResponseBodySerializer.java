@@ -36,42 +36,26 @@ public class ContainerResponseBodySerializer extends StdSerializer<ContainerResp
     @Override
     public void serialize(ContainerResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
-
-        // Write container ID as string (UUID)
         gen.writeStringField(JsonFields.ID, value.id.toString());
-
-        // Write location as nested object
         gen.writeObjectFieldStart(JsonFields.LOCATION);
         gen.writeNumberField(JsonFields.LATITUDE, value.location.latitude);
         gen.writeNumberField(JsonFields.LONGITUDE, value.location.longitude);
-        
-        // Write postal address only if it is not null (optional field)
         if (value.location.postalAddress != null) {
             gen.writeStringField(JsonFields.POSTAL_ADDRESS, value.location.postalAddress);
         }
-        
-        // Write GIS reference only if it is not null (optional field)
         if (value.location.gisReference != null) {
             gen.writeStringField(JsonFields.GIS_REFERENCE, value.location.gisReference);
         }
-        
         gen.writeEndObject();
-
-        // Write waste type as string
         gen.writeStringField(JsonFields.WASTE_TYPE, value.wasteType);
-
-        // Write waste demand as nested object
         gen.writeObjectFieldStart(JsonFields.WASTE_DEMAND);
         gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.wasteDemand.value);
         gen.writeStringField(JsonFields.QUANTITY_UNIT, value.wasteDemand.quantityUnit);
         gen.writeStringField(JsonFields.TIME_UNIT, value.wasteDemand.timeUnit);
         gen.writeEndObject();
-
-        // Write service zone only if it is not null (optional field)
         if (value.serviceZone != null) {
             gen.writeStringField(JsonFields.SERVICE_ZONE, value.serviceZone);
         }
-
         gen.writeEndObject();
     }
 }

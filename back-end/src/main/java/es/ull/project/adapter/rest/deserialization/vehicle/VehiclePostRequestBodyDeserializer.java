@@ -45,26 +45,18 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
     @Override
     public VehiclePostRequestBody deserialize(JsonParser parser, DeserializationContext context) 
             throws IOException {
-        
         JsonNode rootNode = parser.getCodec().readTree(parser);
         List<FieldError> errors = new ArrayList<>();
-        
-        // Parse all fields, accumulating errors instead of throwing immediately
         VehicleType vehicleType = parseVehicleType(rootNode, errors);
         Capacity transportCapacity = parseCapacity(rootNode, errors);
         TransportationVariableCost costPerKilometer = parseCost(rootNode, errors);
-        
-        // If there are any validation errors, throw ValidationException with all of them
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-        
-        // Create and populate request body
         VehiclePostRequestBody requestBody = new VehiclePostRequestBody();
         requestBody.vehicleType = vehicleType;
         requestBody.transportCapacity = transportCapacity;
         requestBody.costPerKilometer = costPerKilometer;
-        
         return requestBody;
     }
 
@@ -80,13 +72,11 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
             errors.add(new FieldError(JsonFields.VEHICLE_TYPE, "Field is required"));
             return null;
         }
-        
         JsonNode node = rootNode.get(JsonFields.VEHICLE_TYPE);
         if (node.isNull() || !node.isTextual()) {
             errors.add(new FieldError(JsonFields.VEHICLE_TYPE, "Must be a non-null string"));
             return null;
         }
-        
         String value = node.asText();
         try {
             return VehicleType.fromString(value);
@@ -108,19 +98,14 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
             errors.add(new FieldError(JsonFields.TRANSPORT_CAPACITY, "Field is required"));
             return null;
         }
-        
         JsonNode capacityNode = rootNode.get(JsonFields.TRANSPORT_CAPACITY);
         if (capacityNode.isNull() || !capacityNode.isObject()) {
             errors.add(new FieldError(JsonFields.TRANSPORT_CAPACITY, "Must be a non-null object"));
             return null;
         }
-        
-        // Track if we have all required nested fields
         Double value = null;
         QuantityUnit quantityUnit = null;
         TimeUnit timeUnit = null;
-        
-        // Extract capacity value
         if (!capacityNode.has(JsonFields.CAPACITY_VALUE)) {
             errors.add(new FieldError(
                 JsonFields.TRANSPORT_CAPACITY + "." + JsonFields.CAPACITY_VALUE, 
@@ -136,8 +121,6 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
                 ));
             }
         }
-        
-        // Extract quantity unit
         if (!capacityNode.has(JsonFields.QUANTITY_UNIT)) {
             errors.add(new FieldError(
                 JsonFields.TRANSPORT_CAPACITY + "." + JsonFields.QUANTITY_UNIT,
@@ -154,8 +137,6 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
                 ));
             }
         }
-        
-        // Extract time unit
         if (!capacityNode.has(JsonFields.TIME_UNIT)) {
             errors.add(new FieldError(
                 JsonFields.TRANSPORT_CAPACITY + "." + JsonFields.TIME_UNIT,
@@ -172,8 +153,6 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
                 ));
             }
         }
-        
-        // Only create Capacity if all fields are valid
         if (value != null && quantityUnit != null && timeUnit != null) {
             try {
                 return new Capacity(value, quantityUnit, timeUnit);
@@ -182,7 +161,6 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
                 return null;
             }
         }
-        
         return null;
     }
 
@@ -198,14 +176,11 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
             errors.add(new FieldError(JsonFields.COST_PER_KILOMETER, "Field is required"));
             return null;
         }
-        
         JsonNode costNode = rootNode.get(JsonFields.COST_PER_KILOMETER);
         if (costNode.isNull() || !costNode.isObject()) {
             errors.add(new FieldError(JsonFields.COST_PER_KILOMETER, "Must be a non-null object"));
             return null;
         }
-        
-        // Extract amount (required)
         Double amount = null;
         if (!costNode.has(JsonFields.AMOUNT)) {
             errors.add(new FieldError(
@@ -222,8 +197,6 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
                 ));
             }
         }
-        
-        // Extract currency (optional)
         Currency currency = null;
         if (costNode.has(JsonFields.CURRENCY) && !costNode.get(JsonFields.CURRENCY).isNull()) {
             try {
@@ -238,8 +211,6 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
                 ));
             }
         }
-        
-        // Only create TransportationVariableCost if amount is valid
         if (amount != null) {
             try {
                 if (currency == null) {
@@ -255,7 +226,6 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
                 return null;
             }
         }
-        
         return null;
     }
 }

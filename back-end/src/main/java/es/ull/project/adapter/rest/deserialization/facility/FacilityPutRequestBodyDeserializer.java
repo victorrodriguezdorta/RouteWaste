@@ -43,35 +43,20 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
     @Override
     public FacilityPutRequestBody deserialize(JsonParser parser, DeserializationContext context) 
             throws IOException {
-        
         JsonNode rootNode = parser.getCodec().readTree(parser);
-        
         try {
-            // Parse facilityType
             FacilityType facilityType = parseFacilityType(rootNode);
-            
-            // Parse location
             Location location = parseLocation(rootNode);
-            
-            // Parse capacity
             Capacity capacity = parseCapacity(rootNode);
-            
-            // Parse openingFixedCost
             OpeningFixedCost openingFixedCost = parseOpeningFixedCost(rootNode);
-            
-            // Parse status
             FacilityStatus status = parseStatus(rootNode);
-            
-            // Create and populate request body
             FacilityPutRequestBody requestBody = new FacilityPutRequestBody();
             requestBody.facilityType = facilityType;
             requestBody.location = location;
             requestBody.capacity = capacity;
             requestBody.openingFixedCost = openingFixedCost;
             requestBody.status = status;
-            
             return requestBody;
-            
         } catch (Exception e) {
             throw new IOException("Failed to deserialize FacilityPutRequestBody: " + e.getMessage(), e);
         }
@@ -88,12 +73,10 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
         if (!rootNode.has(JsonFields.FACILITY_TYPE)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.FACILITY_TYPE + "' is missing");
         }
-        
         JsonNode node = rootNode.get(JsonFields.FACILITY_TYPE);
         if (node.isNull() || !node.isTextual()) {
             throw new IllegalArgumentException("Field '" + JsonFields.FACILITY_TYPE + "' must be a non-null string");
         }
-        
         String value = node.asText();
         try {
             return FacilityType.fromString(value);
@@ -114,39 +97,28 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
         if (!rootNode.has(JsonFields.LOCATION)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.LOCATION + "' is missing");
         }
-        
         JsonNode locationNode = rootNode.get(JsonFields.LOCATION);
         if (locationNode.isNull() || !locationNode.isObject()) {
             throw new IllegalArgumentException("Field '" + JsonFields.LOCATION + "' must be a non-null object");
         }
-        
         try {
-            // Extract latitude
             if (!locationNode.has(JsonFields.LATITUDE)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.LATITUDE + "' is missing");
             }
             double latitude = locationNode.get(JsonFields.LATITUDE).asDouble();
-            
-            // Extract longitude
             if (!locationNode.has(JsonFields.LONGITUDE)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.LONGITUDE + "' is missing");
             }
             double longitude = locationNode.get(JsonFields.LONGITUDE).asDouble();
-            
-            // Extract postal address (optional)
             String postalAddress = null;
             if (locationNode.has(JsonFields.POSTAL_ADDRESS) && !locationNode.get(JsonFields.POSTAL_ADDRESS).isNull()) {
                 postalAddress = locationNode.get(JsonFields.POSTAL_ADDRESS).asText();
             }
-            
-            // Extract GIS reference (optional)
             String gisReference = null;
             if (locationNode.has(JsonFields.GIS_REFERENCE) && !locationNode.get(JsonFields.GIS_REFERENCE).isNull()) {
                 gisReference = locationNode.get(JsonFields.GIS_REFERENCE).asText();
             }
-            
             return new Location(latitude, longitude, postalAddress, gisReference);
-            
         } catch (Exception e) {
             throw new IllegalArgumentException(
                 "Invalid value for field '" + JsonFields.LOCATION + "': " + e.getMessage(), e);
@@ -164,35 +136,26 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
         if (!rootNode.has(JsonFields.CAPACITY)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.CAPACITY + "' is missing");
         }
-        
         JsonNode capacityNode = rootNode.get(JsonFields.CAPACITY);
         if (capacityNode.isNull() || !capacityNode.isObject()) {
             throw new IllegalArgumentException("Field '" + JsonFields.CAPACITY + "' must be a non-null object");
         }
-        
         try {
-            // Extract capacity value
             if (!capacityNode.has(JsonFields.CAPACITY_VALUE)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.CAPACITY_VALUE + "' is missing");
             }
             double value = capacityNode.get(JsonFields.CAPACITY_VALUE).asDouble();
-            
-            // Extract quantity unit
             if (!capacityNode.has(JsonFields.QUANTITY_UNIT)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.QUANTITY_UNIT + "' is missing");
             }
             String quantityUnitStr = capacityNode.get(JsonFields.QUANTITY_UNIT).asText();
             QuantityUnit quantityUnit = new QuantityUnit(quantityUnitStr);
-            
-            // Extract time unit
             if (!capacityNode.has(JsonFields.TIME_UNIT)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.TIME_UNIT + "' is missing");
             }
             String timeUnitStr = capacityNode.get(JsonFields.TIME_UNIT).asText();
             TimeUnit timeUnit = TimeUnit.valueOf(timeUnitStr.toUpperCase());
-            
             return new Capacity(value, quantityUnit, timeUnit);
-            
         } catch (Exception e) {
             throw new IllegalArgumentException(
                 "Invalid value for field '" + JsonFields.CAPACITY + "': " + e.getMessage(), e);
@@ -210,32 +173,25 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
         if (!rootNode.has(JsonFields.OPENING_FIXED_COST)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.OPENING_FIXED_COST + "' is missing");
         }
-        
         JsonNode costNode = rootNode.get(JsonFields.OPENING_FIXED_COST);
         if (costNode.isNull() || !costNode.isObject()) {
             throw new IllegalArgumentException("Field '" + JsonFields.OPENING_FIXED_COST + "' must be a non-null object");
         }
-        
         try {
-            // Extract amount
             if (!costNode.has(JsonFields.AMOUNT)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.AMOUNT + "' is missing");
             }
             double amount = costNode.get(JsonFields.AMOUNT).asDouble();
-            
-            // Extract currency (optional)
             String currencyCode = null;
             if (costNode.has(JsonFields.CURRENCY) && !costNode.get(JsonFields.CURRENCY).isNull()) {
                 currencyCode = costNode.get(JsonFields.CURRENCY).asText();
             }
-            
             if (currencyCode == null || currencyCode.trim().isEmpty()) {
                 return new OpeningFixedCost(amount);
             } else {
                 Currency currency = new Currency(currencyCode);
                 return new OpeningFixedCost(amount, currency);
             }
-            
         } catch (Exception e) {
             throw new IllegalArgumentException(
                 "Invalid value for field '" + JsonFields.OPENING_FIXED_COST + "': " + e.getMessage(), e);
@@ -253,12 +209,10 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
         if (!rootNode.has(JsonFields.STATUS)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.STATUS + "' is missing");
         }
-        
         JsonNode node = rootNode.get(JsonFields.STATUS);
         if (node.isNull() || !node.isTextual()) {
             throw new IllegalArgumentException("Field '" + JsonFields.STATUS + "' must be a non-null string");
         }
-        
         String value = node.asText();
         try {
             return FacilityStatus.fromString(value);

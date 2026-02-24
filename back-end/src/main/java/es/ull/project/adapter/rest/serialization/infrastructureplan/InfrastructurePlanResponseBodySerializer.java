@@ -36,57 +36,34 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
     @Override
     public void serialize(InfrastructurePlanResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
-
-        // Write infrastructure plan ID as string (UUID)
         gen.writeStringField(JsonFields.ID, value.id.toString());
-
-        // Write planning period as string
         gen.writeStringField(JsonFields.PERIOD, value.period);
-
-        // Write maximum budget as nested object
         gen.writeObjectFieldStart(JsonFields.MAX_BUDGET);
         gen.writeNumberField(JsonFields.AMOUNT, value.maxBudget.amount);
-        
-        // Write currency only if it is not null (optional field)
         if (value.maxBudget.currency != null) {
             gen.writeStringField(JsonFields.CURRENCY, value.maxBudget.currency);
         }
-        
         gen.writeEndObject();
-
-        // Write estimated total cost as nested object
         gen.writeObjectFieldStart("estimatedTotalCost");
         gen.writeNumberField(JsonFields.AMOUNT, value.estimatedTotalCost.amount);
-        
-        // Write currency only if it is not null (optional field)
         if (value.estimatedTotalCost.currency != null) {
             gen.writeStringField(JsonFields.CURRENCY, value.estimatedTotalCost.currency);
         }
-        
         gen.writeEndObject();
-
-        // Write service policies as nested object
         gen.writeObjectFieldStart(JsonFields.SERVICE_POLICIES);
-        
-        // Write each policy field only if it is not null (all are optional)
         if (value.servicePolicies.maxServiceDistance != null) {
             gen.writeNumberField(JsonFields.MAX_SERVICE_DISTANCE, value.servicePolicies.maxServiceDistance);
         }
-        
         if (value.servicePolicies.maxServiceTime != null) {
             gen.writeNumberField(JsonFields.MAX_SERVICE_TIME, value.servicePolicies.maxServiceTime);
         }
-        
         if (value.servicePolicies.maxInfrastructureCount != null) {
             gen.writeNumberField(JsonFields.MAX_INFRASTRUCTURE_COUNT, value.servicePolicies.maxInfrastructureCount);
         }
-        
         if (value.servicePolicies.maxEmissions != null) {
             gen.writeNumberField(JsonFields.MAX_EMISSIONS, value.servicePolicies.maxEmissions);
         }
-        
         gen.writeEndObject();
-
         gen.writeEndObject();
     }
 }

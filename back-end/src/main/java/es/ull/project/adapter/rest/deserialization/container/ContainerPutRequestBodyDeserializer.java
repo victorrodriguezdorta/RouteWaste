@@ -41,31 +41,18 @@ public class ContainerPutRequestBodyDeserializer extends JsonDeserializer<Contai
     @Override
     public ContainerPutRequestBody deserialize(JsonParser parser, DeserializationContext context) 
             throws IOException {
-        
         JsonNode rootNode = parser.getCodec().readTree(parser);
-        
         try {
-            // Parse location
             Location location = parseLocation(rootNode);
-            
-            // Parse wasteType
             WasteType wasteType = parseWasteType(rootNode);
-            
-            // Parse wasteDemand
             WasteDemand wasteDemand = parseWasteDemand(rootNode);
-            
-            // Parse serviceZone (optional)
             ServiceZone serviceZone = parseServiceZone(rootNode);
-            
-            // Create and populate request body
             ContainerPutRequestBody requestBody = new ContainerPutRequestBody();
             requestBody.location = location;
             requestBody.wasteType = wasteType;
             requestBody.wasteDemand = wasteDemand;
             requestBody.serviceZone = serviceZone;
-            
             return requestBody;
-            
         } catch (Exception e) {
             throw new IOException("Failed to deserialize ContainerPutRequestBody: " + e.getMessage(), e);
         }
@@ -82,39 +69,28 @@ public class ContainerPutRequestBodyDeserializer extends JsonDeserializer<Contai
         if (!rootNode.has(JsonFields.LOCATION)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.LOCATION + "' is missing");
         }
-        
         JsonNode locationNode = rootNode.get(JsonFields.LOCATION);
         if (locationNode.isNull() || !locationNode.isObject()) {
             throw new IllegalArgumentException("Field '" + JsonFields.LOCATION + "' must be a non-null object");
         }
-        
         try {
-            // Extract latitude
             if (!locationNode.has(JsonFields.LATITUDE)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.LATITUDE + "' is missing");
             }
             double latitude = locationNode.get(JsonFields.LATITUDE).asDouble();
-            
-            // Extract longitude
             if (!locationNode.has(JsonFields.LONGITUDE)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.LONGITUDE + "' is missing");
             }
             double longitude = locationNode.get(JsonFields.LONGITUDE).asDouble();
-            
-            // Extract postal address (optional)
             String postalAddress = null;
             if (locationNode.has(JsonFields.POSTAL_ADDRESS) && !locationNode.get(JsonFields.POSTAL_ADDRESS).isNull()) {
                 postalAddress = locationNode.get(JsonFields.POSTAL_ADDRESS).asText();
             }
-            
-            // Extract GIS reference (optional)
             String gisReference = null;
             if (locationNode.has(JsonFields.GIS_REFERENCE) && !locationNode.get(JsonFields.GIS_REFERENCE).isNull()) {
                 gisReference = locationNode.get(JsonFields.GIS_REFERENCE).asText();
             }
-            
             return new Location(latitude, longitude, postalAddress, gisReference);
-            
         } catch (Exception e) {
             throw new IllegalArgumentException(
                 "Invalid value for field '" + JsonFields.LOCATION + "': " + e.getMessage(), e);
@@ -132,12 +108,10 @@ public class ContainerPutRequestBodyDeserializer extends JsonDeserializer<Contai
         if (!rootNode.has(JsonFields.WASTE_TYPE)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.WASTE_TYPE + "' is missing");
         }
-        
         JsonNode node = rootNode.get(JsonFields.WASTE_TYPE);
         if (node.isNull() || !node.isTextual()) {
             throw new IllegalArgumentException("Field '" + JsonFields.WASTE_TYPE + "' must be a non-null string");
         }
-        
         String value = node.asText();
         try {
             return WasteType.fromString(value);
@@ -158,35 +132,26 @@ public class ContainerPutRequestBodyDeserializer extends JsonDeserializer<Contai
         if (!rootNode.has(JsonFields.WASTE_DEMAND)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.WASTE_DEMAND + "' is missing");
         }
-        
         JsonNode demandNode = rootNode.get(JsonFields.WASTE_DEMAND);
         if (demandNode.isNull() || !demandNode.isObject()) {
             throw new IllegalArgumentException("Field '" + JsonFields.WASTE_DEMAND + "' must be a non-null object");
         }
-        
         try {
-            // Extract demand value
             if (!demandNode.has(JsonFields.CAPACITY_VALUE)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.CAPACITY_VALUE + "' is missing");
             }
             double value = demandNode.get(JsonFields.CAPACITY_VALUE).asDouble();
-            
-            // Extract quantity unit
             if (!demandNode.has(JsonFields.QUANTITY_UNIT)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.QUANTITY_UNIT + "' is missing");
             }
             String quantityUnitStr = demandNode.get(JsonFields.QUANTITY_UNIT).asText();
             QuantityUnit quantityUnit = new QuantityUnit(quantityUnitStr);
-            
-            // Extract time unit
             if (!demandNode.has(JsonFields.TIME_UNIT)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.TIME_UNIT + "' is missing");
             }
             String timeUnitStr = demandNode.get(JsonFields.TIME_UNIT).asText();
             TimeUnit timeUnit = TimeUnit.valueOf(timeUnitStr.toUpperCase());
-            
             return new WasteDemand(value, quantityUnit, timeUnit);
-            
         } catch (Exception e) {
             throw new IllegalArgumentException(
                 "Invalid value for field '" + JsonFields.WASTE_DEMAND + "': " + e.getMessage(), e);
@@ -204,12 +169,10 @@ public class ContainerPutRequestBodyDeserializer extends JsonDeserializer<Contai
         if (!rootNode.has(JsonFields.SERVICE_ZONE) || rootNode.get(JsonFields.SERVICE_ZONE).isNull()) {
             return null;
         }
-        
         JsonNode node = rootNode.get(JsonFields.SERVICE_ZONE);
         if (!node.isTextual()) {
             throw new IllegalArgumentException("Field '" + JsonFields.SERVICE_ZONE + "' must be a string");
         }
-        
         String value = node.asText();
         try {
             return ServiceZone.fromString(value);

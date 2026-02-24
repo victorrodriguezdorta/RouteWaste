@@ -13,11 +13,16 @@ package es.ull.project.adapter.rest.controller;
 public final class ApiRoutes {
 
     /**
+     * Error message for utility class instantiation attempts.
+     */
+    private static final String UTILITY_CLASS_INSTANTIATION_ERROR = "This is a utility class and cannot be instantiated";
+
+    /**
      * Private constructor to prevent instantiation.
      * This is a utility class with only static constants.
      */
     private ApiRoutes() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+        throw new UnsupportedOperationException(UTILITY_CLASS_INSTANTIATION_ERROR);
     }
 
     /**

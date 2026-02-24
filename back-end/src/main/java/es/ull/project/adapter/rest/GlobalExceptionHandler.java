@@ -46,10 +46,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleDeserializationError(HttpMessageNotReadableException ex) {
         String message = extractRootCauseMessage(ex);
-        
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", message);
-        
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -68,7 +66,6 @@ public class GlobalExceptionHandler {
             "Validation failed",
             ex.getErrors()
         );
-        
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -86,7 +83,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleValidationError(IllegalArgumentException ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
-        
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -103,7 +99,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleNotFoundError(NoSuchElementException ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage() != null ? ex.getMessage() : "Resource not found");
-        
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
@@ -119,11 +114,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleGenericError(Exception ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "An internal error occurred. Please try again later.");
-        
-        // Log the full exception for debugging (in a real app, use a logger)
         System.err.println("Unhandled exception: " + ex.getClass().getName() + " - " + ex.getMessage());
         ex.printStackTrace();
-        
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -138,13 +130,9 @@ public class GlobalExceptionHandler {
      */
     private String extractRootCauseMessage(Throwable ex) {
         Throwable cause = ex;
-        
-        // Traverse the exception chain to find the root cause
         while (cause.getCause() != null && cause.getCause() != cause) {
             cause = cause.getCause();
         }
-        
-        // Return the root cause message, or a default if null
         String message = cause.getMessage();
         return message != null ? message : "Invalid request format";
     }

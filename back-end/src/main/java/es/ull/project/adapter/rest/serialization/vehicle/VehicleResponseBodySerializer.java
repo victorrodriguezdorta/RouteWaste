@@ -36,31 +36,19 @@ public class VehicleResponseBodySerializer extends StdSerializer<VehicleResponse
     @Override
     public void serialize(VehicleResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
-
-        // Write vehicle ID as string (UUID)
         gen.writeStringField(JsonFields.ID, value.id.toString());
-
-        // Write vehicle type as string
         gen.writeStringField(JsonFields.VEHICLE_TYPE, value.vehicleType);
-
-        // Write transport capacity as nested object
         gen.writeObjectFieldStart(JsonFields.TRANSPORT_CAPACITY);
         gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.transportCapacity.value);
         gen.writeStringField(JsonFields.QUANTITY_UNIT, value.transportCapacity.quantityUnit);
         gen.writeStringField(JsonFields.TIME_UNIT, value.transportCapacity.timeUnit);
         gen.writeEndObject();
-
-        // Write cost per kilometer as nested object
         gen.writeObjectFieldStart(JsonFields.COST_PER_KILOMETER);
         gen.writeNumberField(JsonFields.AMOUNT, value.costPerKilometer.amount);
-        
-        // Write currency only if it is not null (optional field)
         if (value.costPerKilometer.currency != null) {
             gen.writeStringField(JsonFields.CURRENCY, value.costPerKilometer.currency);
         }
-        
         gen.writeEndObject();
-
         gen.writeEndObject();
     }
 }

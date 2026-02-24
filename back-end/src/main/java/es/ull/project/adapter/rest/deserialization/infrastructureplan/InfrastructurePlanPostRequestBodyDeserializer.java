@@ -78,13 +78,11 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
             errors.add(new FieldError(JsonFields.PERIOD, "Field is required"));
             return null;
         }
-        
         JsonNode node = rootNode.get(JsonFields.PERIOD);
         if (node.isNull() || !node.isTextual()) {
             errors.add(new FieldError(JsonFields.PERIOD, "Must be a non-null string"));
             return null;
         }
-        
         String value = node.asText();
         try {
             return new PlanningPeriod(value);
@@ -106,14 +104,11 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
             errors.add(new FieldError(JsonFields.MAX_BUDGET, "Field is required"));
             return null;
         }
-        
         JsonNode budgetNode = rootNode.get(JsonFields.MAX_BUDGET);
         if (budgetNode.isNull() || !budgetNode.isObject()) {
             errors.add(new FieldError(JsonFields.MAX_BUDGET, "Must be a non-null object"));
             return null;
         }
-        
-        // Extract amount (required)
         Double amount = null;
         if (!budgetNode.has(JsonFields.AMOUNT)) {
             errors.add(new FieldError(
@@ -130,8 +125,6 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
                 ));
             }
         }
-        
-        // Extract currency (optional)
         Currency currency = null;
         if (budgetNode.has(JsonFields.CURRENCY) && !budgetNode.get(JsonFields.CURRENCY).isNull()) {
             try {
@@ -146,8 +139,6 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
                 ));
             }
         }
-        
-        // Only create MaximumBudget if amount is valid
         if (amount != null) {
             try {
                 if (currency == null) {
@@ -163,7 +154,6 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
                 return null;
             }
         }
-        
         return null;
     }
 
@@ -179,15 +169,12 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
             errors.add(new FieldError(JsonFields.SERVICE_POLICIES, "Field is required"));
             return null;
         }
-        
         JsonNode policiesNode = rootNode.get(JsonFields.SERVICE_POLICIES);
         if (policiesNode.isNull() || !policiesNode.isObject()) {
             errors.add(new FieldError(JsonFields.SERVICE_POLICIES, "Must be a non-null object"));
             return null;
         }
-        
         try {
-            // Extract maxServiceDistance (optional)
             Double maxServiceDistance = null;
             if (policiesNode.has(JsonFields.MAX_SERVICE_DISTANCE) && !policiesNode.get(JsonFields.MAX_SERVICE_DISTANCE).isNull()) {
                 try {
@@ -199,8 +186,6 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
                     ));
                 }
             }
-            
-            // Extract maxServiceTime (optional)
             Integer maxServiceTime = null;
             if (policiesNode.has(JsonFields.MAX_SERVICE_TIME) && !policiesNode.get(JsonFields.MAX_SERVICE_TIME).isNull()) {
                 try {
@@ -212,8 +197,6 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
                     ));
                 }
             }
-            
-            // Extract maxInfrastructureCount (optional)
             Integer maxInfrastructureCount = null;
             if (policiesNode.has(JsonFields.MAX_INFRASTRUCTURE_COUNT) && !policiesNode.get(JsonFields.MAX_INFRASTRUCTURE_COUNT).isNull()) {
                 try {
@@ -225,8 +208,6 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
                     ));
                 }
             }
-            
-            // Extract maxEmissions (optional)
             Double maxEmissions = null;
             if (policiesNode.has(JsonFields.MAX_EMISSIONS) && !policiesNode.get(JsonFields.MAX_EMISSIONS).isNull()) {
                 try {
@@ -238,9 +219,7 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
                     ));
                 }
             }
-            
             return new ServicePolicies(maxServiceDistance, maxServiceTime, maxInfrastructureCount, maxEmissions);
-            
         } catch (Exception e) {
             errors.add(new FieldError(
                 JsonFields.SERVICE_POLICIES,

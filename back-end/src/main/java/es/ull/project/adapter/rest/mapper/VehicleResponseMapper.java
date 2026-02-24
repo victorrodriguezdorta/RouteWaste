@@ -10,6 +10,13 @@ import es.ull.project.domain.entity.Vehicle;
 public class VehicleResponseMapper {
 
     /**
+     * Private constructor to prevent instantiation of this utility class
+     */
+    private VehicleResponseMapper() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
+    /**
      * Converts a Vehicle domain entity to a VehicleResponseBody DTO
      * Maps all the vehicle properties including nested objects (capacity and cost)
      *
@@ -18,28 +25,17 @@ public class VehicleResponseMapper {
      */
     public static VehicleResponseBody toResponseBody(Vehicle vehicle) {
         VehicleResponseBody responseBody = new VehicleResponseBody();
-        
-        // Map vehicle ID
         responseBody.id = vehicle.getId();
-        
-        // Map vehicle type (convert enum to string)
         responseBody.vehicleType = vehicle.getVehicleType().name();
-        
-        // Map transport capacity
         responseBody.transportCapacity = new VehicleResponseBody.TransportCapacityData();
         responseBody.transportCapacity.value = vehicle.getTransportCapacity().getValue();
         responseBody.transportCapacity.quantityUnit = vehicle.getTransportCapacity().getQuantityUnit().getValue();
         responseBody.transportCapacity.timeUnit = vehicle.getTransportCapacity().getTimeUnit().name();
-        
-        // Map cost per kilometer
         responseBody.costPerKilometer = new VehicleResponseBody.CostPerKilometerData();
         responseBody.costPerKilometer.amount = vehicle.getCostPerKilometer().getAmount();
-        
-        // Map currency (optional field)
         if (vehicle.getCostPerKilometer().getCurrency().isPresent()) {
             responseBody.costPerKilometer.currency = vehicle.getCostPerKilometer().getCurrency().get().getCode();
         }
-        
         return responseBody;
     }
 }

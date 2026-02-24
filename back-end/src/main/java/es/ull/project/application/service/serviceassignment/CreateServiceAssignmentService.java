@@ -71,34 +71,21 @@ public class CreateServiceAssignmentService implements CreateServiceAssignmentUs
      */
     @Override
     public ServiceAssignment create(UUID containerId, UUID facilityId, WasteDemand wasteDemand, Distance distance, ServiceTime serviceTime, TransportationVariableCost transportCost) {
-        // Validate both IDs and collect all errors
         List<FieldError> errors = new ArrayList<>();
-        
-        // Try to fetch container
         Optional<Container> containerOpt = containerRepository.findById(containerId);
         if (containerOpt.isEmpty()) {
             errors.add(new FieldError("containerId", "Container with id " + containerId + " not found"));
         }
-        
-        // Try to fetch facility
         Optional<Facility> facilityOpt = facilityRepository.findById(facilityId);
         if (facilityOpt.isEmpty()) {
             errors.add(new FieldError("facilityId", "Facility with id " + facilityId + " not found"));
         }
-        
-        // If there are any errors, throw ValidationException with all error details
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-        
-        // Get the entities (we know they exist at this point)
         Container container = containerOpt.get();
         Facility facility = facilityOpt.get();
-        
-        // Create service assignment with complete entities
         ServiceAssignment newAssignment = new ServiceAssignment(container, facility, wasteDemand, distance, serviceTime, transportCost);
-        
-        // Persist and return
         return this.serviceAssignmentRepository.save(newAssignment);
     }
 }

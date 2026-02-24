@@ -41,27 +41,16 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
     @Override
     public VehiclePutRequestBody deserialize(JsonParser parser, DeserializationContext context) 
             throws IOException {
-        
         JsonNode rootNode = parser.getCodec().readTree(parser);
-        
         try {
-            // Parse vehicleType
             VehicleType vehicleType = parseVehicleType(rootNode);
-            
-            // Parse transportCapacity
             Capacity transportCapacity = parseCapacity(rootNode);
-            
-            // Parse costPerKilometer
             TransportationVariableCost costPerKilometer = parseCost(rootNode);
-            
-            // Create and populate request body
             VehiclePutRequestBody requestBody = new VehiclePutRequestBody();
             requestBody.vehicleType = vehicleType;
             requestBody.transportCapacity = transportCapacity;
             requestBody.costPerKilometer = costPerKilometer;
-            
             return requestBody;
-            
         } catch (Exception e) {
             throw new IOException("Failed to deserialize VehiclePutRequestBody: " + e.getMessage(), e);
         }
@@ -78,12 +67,10 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
         if (!rootNode.has(JsonFields.VEHICLE_TYPE)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.VEHICLE_TYPE + "' is missing");
         }
-        
         JsonNode node = rootNode.get(JsonFields.VEHICLE_TYPE);
         if (node.isNull() || !node.isTextual()) {
             throw new IllegalArgumentException("Field '" + JsonFields.VEHICLE_TYPE + "' must be a non-null string");
         }
-        
         String value = node.asText();
         try {
             return VehicleType.fromString(value);
@@ -104,35 +91,26 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
         if (!rootNode.has(JsonFields.TRANSPORT_CAPACITY)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.TRANSPORT_CAPACITY + "' is missing");
         }
-        
         JsonNode capacityNode = rootNode.get(JsonFields.TRANSPORT_CAPACITY);
         if (capacityNode.isNull() || !capacityNode.isObject()) {
             throw new IllegalArgumentException("Field '" + JsonFields.TRANSPORT_CAPACITY + "' must be a non-null object");
         }
-        
         try {
-            // Extract capacity value
             if (!capacityNode.has(JsonFields.CAPACITY_VALUE)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.CAPACITY_VALUE + "' is missing");
             }
             double value = capacityNode.get(JsonFields.CAPACITY_VALUE).asDouble();
-            
-            // Extract quantity unit
             if (!capacityNode.has(JsonFields.QUANTITY_UNIT)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.QUANTITY_UNIT + "' is missing");
             }
             String quantityUnitStr = capacityNode.get(JsonFields.QUANTITY_UNIT).asText();
             QuantityUnit quantityUnit = new QuantityUnit(quantityUnitStr);
-            
-            // Extract time unit
             if (!capacityNode.has(JsonFields.TIME_UNIT)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.TIME_UNIT + "' is missing");
             }
             String timeUnitStr = capacityNode.get(JsonFields.TIME_UNIT).asText();
             TimeUnit timeUnit = TimeUnit.valueOf(timeUnitStr.toUpperCase());
-            
             return new Capacity(value, quantityUnit, timeUnit);
-            
         } catch (Exception e) {
             throw new IllegalArgumentException(
                 "Invalid value for field '" + JsonFields.TRANSPORT_CAPACITY + "': " + e.getMessage(), e);
@@ -150,32 +128,25 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
         if (!rootNode.has(JsonFields.COST_PER_KILOMETER)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.COST_PER_KILOMETER + "' is missing");
         }
-        
         JsonNode costNode = rootNode.get(JsonFields.COST_PER_KILOMETER);
         if (costNode.isNull() || !costNode.isObject()) {
             throw new IllegalArgumentException("Field '" + JsonFields.COST_PER_KILOMETER + "' must be a non-null object");
         }
-        
         try {
-            // Extract amount
             if (!costNode.has(JsonFields.AMOUNT)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.AMOUNT + "' is missing");
             }
             double amount = costNode.get(JsonFields.AMOUNT).asDouble();
-            
-            // Extract currency (optional)
             String currencyCode = null;
             if (costNode.has(JsonFields.CURRENCY) && !costNode.get(JsonFields.CURRENCY).isNull()) {
                 currencyCode = costNode.get(JsonFields.CURRENCY).asText();
             }
-            
             if (currencyCode == null || currencyCode.trim().isEmpty()) {
                 return new TransportationVariableCost(amount);
             } else {
                 Currency currency = new Currency(currencyCode);
                 return new TransportationVariableCost(amount, currency);
             }
-            
         } catch (Exception e) {
             throw new IllegalArgumentException(
                 "Invalid value for field '" + JsonFields.COST_PER_KILOMETER + "': " + e.getMessage(), e);

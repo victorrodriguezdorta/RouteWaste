@@ -50,24 +50,17 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
     @Override
     public ServiceAssignmentPostRequestBody deserialize(JsonParser parser, DeserializationContext context) 
             throws IOException {
-        
         JsonNode rootNode = parser.getCodec().readTree(parser);
         List<FieldError> errors = new ArrayList<>();
-        
-        // Parse all fields, accumulating errors instead of throwing immediately
         UUID containerId = parseContainerId(rootNode, errors);
         UUID facilityId = parseFacilityId(rootNode, errors);
         WasteDemand wasteDemand = parseWasteDemand(rootNode, errors);
         Distance distance = parseDistance(rootNode, errors);
         ServiceTime serviceTime = parseServiceTime(rootNode, errors);
         TransportationVariableCost transportCost = parseTransportCost(rootNode, errors);
-        
-        // If there are any validation errors, throw ValidationException with all of them
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-        
-        // Create and populate request body
         ServiceAssignmentPostRequestBody requestBody = new ServiceAssignmentPostRequestBody();
         requestBody.containerId = containerId;
         requestBody.facilityId = facilityId;
@@ -91,13 +84,11 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
             errors.add(new FieldError(JsonFields.CONTAINER_ID, "Field is required"));
             return null;
         }
-        
         JsonNode containerIdNode = rootNode.get(JsonFields.CONTAINER_ID);
         if (containerIdNode.isNull()) {
             errors.add(new FieldError(JsonFields.CONTAINER_ID, "Cannot be null"));
             return null;
         }
-        
         try {
             String containerIdStr = containerIdNode.asText();
             return UUID.fromString(containerIdStr);
@@ -119,13 +110,11 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
             errors.add(new FieldError(JsonFields.FACILITY_ID, "Field is required"));
             return null;
         }
-        
         JsonNode facilityIdNode = rootNode.get(JsonFields.FACILITY_ID);
         if (facilityIdNode.isNull()) {
             errors.add(new FieldError(JsonFields.FACILITY_ID, "Cannot be null"));
             return null;
         }
-        
         try {
             String facilityIdStr = facilityIdNode.asText();
             return UUID.fromString(facilityIdStr);
@@ -147,19 +136,14 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
             errors.add(new FieldError(JsonFields.WASTE_DEMAND, "Field is required"));
             return null;
         }
-        
         JsonNode demandNode = rootNode.get(JsonFields.WASTE_DEMAND);
         if (demandNode.isNull() || !demandNode.isObject()) {
             errors.add(new FieldError(JsonFields.WASTE_DEMAND, "Must be a non-null object"));
             return null;
         }
-        
-        // Track required nested fields
         Double value = null;
         QuantityUnit quantityUnit = null;
         TimeUnit timeUnit = null;
-        
-        // Extract demand value
         if (!demandNode.has(JsonFields.CAPACITY_VALUE)) {
             errors.add(new FieldError(
                 JsonFields.WASTE_DEMAND + "." + JsonFields.CAPACITY_VALUE,
@@ -175,8 +159,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
                 ));
             }
         }
-        
-        // Extract quantity unit
         if (!demandNode.has(JsonFields.QUANTITY_UNIT)) {
             errors.add(new FieldError(
                 JsonFields.WASTE_DEMAND + "." + JsonFields.QUANTITY_UNIT,
@@ -193,8 +175,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
                 ));
             }
         }
-        
-        // Extract time unit
         if (!demandNode.has(JsonFields.TIME_UNIT)) {
             errors.add(new FieldError(
                 JsonFields.WASTE_DEMAND + "." + JsonFields.TIME_UNIT,
@@ -211,8 +191,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
                 ));
             }
         }
-        
-        // Only create WasteDemand if all required fields are valid
         if (value != null && quantityUnit != null && timeUnit != null) {
             try {
                 return new WasteDemand(value, quantityUnit, timeUnit);
@@ -237,13 +215,11 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
             errors.add(new FieldError(JsonFields.DISTANCE, "Field is required"));
             return null;
         }
-        
         JsonNode distanceNode = rootNode.get(JsonFields.DISTANCE);
         if (distanceNode.isNull() || !distanceNode.isObject()) {
             errors.add(new FieldError(JsonFields.DISTANCE, "Must be a non-null object"));
             return null;
         }
-        
         try {
             // Check which unit is provided (meters, kilometers, or miles)
             if (distanceNode.has(JsonFields.METERS)) {
@@ -305,13 +281,11 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
             errors.add(new FieldError(JsonFields.SERVICE_TIME, "Field is required"));
             return null;
         }
-        
         JsonNode timeNode = rootNode.get(JsonFields.SERVICE_TIME);
         if (timeNode.isNull() || !timeNode.isObject()) {
             errors.add(new FieldError(JsonFields.SERVICE_TIME, "Must be a non-null object"));
             return null;
         }
-        
         try {
             // Check which unit is provided (minutes, hours, or seconds)
             if (timeNode.has(JsonFields.MINUTES)) {
@@ -373,14 +347,11 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
             errors.add(new FieldError(JsonFields.TRANSPORT_COST, "Field is required"));
             return null;
         }
-        
         JsonNode costNode = rootNode.get(JsonFields.TRANSPORT_COST);
         if (costNode.isNull() || !costNode.isObject()) {
             errors.add(new FieldError(JsonFields.TRANSPORT_COST, "Must be a non-null object"));
             return null;
         }
-        
-        // Extract amount (required)
         Double amount = null;
         if (!costNode.has(JsonFields.AMOUNT)) {
             errors.add(new FieldError(
@@ -397,8 +368,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
                 ));
             }
         }
-        
-        // Extract currency (optional)
         Currency currency = null;
         if (costNode.has(JsonFields.CURRENCY) && !costNode.get(JsonFields.CURRENCY).isNull()) {
             try {
@@ -413,8 +382,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
                 ));
             }
         }
-        
-        // Only create TransportationVariableCost if amount is valid
         if (amount != null) {
             try {
                 if (currency == null) {
@@ -430,7 +397,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
                 return null;
             }
         }
-        
         return null;
     }
 }

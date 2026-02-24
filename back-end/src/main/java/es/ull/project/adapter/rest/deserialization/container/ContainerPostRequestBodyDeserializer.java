@@ -45,28 +45,20 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
     @Override
     public ContainerPostRequestBody deserialize(JsonParser parser, DeserializationContext context) 
             throws IOException {
-        
         JsonNode rootNode = parser.getCodec().readTree(parser);
         List<FieldError> errors = new ArrayList<>();
-        
-        // Parse all fields, accumulating errors instead of throwing immediately
         Location location = parseLocation(rootNode, errors);
         WasteType wasteType = parseWasteType(rootNode, errors);
         WasteDemand wasteDemand = parseWasteDemand(rootNode, errors);
         ServiceZone serviceZone = parseServiceZone(rootNode, errors);
-        
-        // If there are any validation errors, throw ValidationException with all of them
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-        
-        // Create and populate request body
         ContainerPostRequestBody requestBody = new ContainerPostRequestBody();
         requestBody.location = location;
         requestBody.wasteType = wasteType;
         requestBody.wasteDemand = wasteDemand;
         requestBody.serviceZone = serviceZone;
-        
         return requestBody;
     }
 
@@ -82,18 +74,13 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
             errors.add(new FieldError(JsonFields.LOCATION, "Field is required"));
             return null;
         }
-        
         JsonNode locationNode = rootNode.get(JsonFields.LOCATION);
         if (locationNode.isNull() || !locationNode.isObject()) {
             errors.add(new FieldError(JsonFields.LOCATION, "Must be a non-null object"));
             return null;
         }
-        
-        // Track required nested fields
         Double latitude = null;
         Double longitude = null;
-        
-        // Extract latitude
         if (!locationNode.has(JsonFields.LATITUDE)) {
             errors.add(new FieldError(
                 JsonFields.LOCATION + "." + JsonFields.LATITUDE,
@@ -109,8 +96,6 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
                 ));
             }
         }
-        
-        // Extract longitude
         if (!locationNode.has(JsonFields.LONGITUDE)) {
             errors.add(new FieldError(
                 JsonFields.LOCATION + "." + JsonFields.LONGITUDE,
@@ -126,20 +111,14 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
                 ));
             }
         }
-        
-        // Extract postal address (optional)
         String postalAddress = null;
         if (locationNode.has(JsonFields.POSTAL_ADDRESS) && !locationNode.get(JsonFields.POSTAL_ADDRESS).isNull()) {
             postalAddress = locationNode.get(JsonFields.POSTAL_ADDRESS).asText();
         }
-        
-        // Extract GIS reference (optional)
         String gisReference = null;
         if (locationNode.has(JsonFields.GIS_REFERENCE) && !locationNode.get(JsonFields.GIS_REFERENCE).isNull()) {
             gisReference = locationNode.get(JsonFields.GIS_REFERENCE).asText();
         }
-        
-        // Only create Location if required fields are valid
         if (latitude != null && longitude != null) {
             try {
                 return new Location(latitude, longitude, postalAddress, gisReference);
@@ -148,7 +127,6 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
                 return null;
             }
         }
-        
         return null;
     }
 
@@ -164,13 +142,11 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
             errors.add(new FieldError(JsonFields.WASTE_TYPE, "Field is required"));
             return null;
         }
-        
         JsonNode node = rootNode.get(JsonFields.WASTE_TYPE);
         if (node.isNull() || !node.isTextual()) {
             errors.add(new FieldError(JsonFields.WASTE_TYPE, "Must be a non-null string"));
             return null;
         }
-        
         String value = node.asText();
         try {
             return WasteType.fromString(value);
@@ -192,19 +168,14 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
             errors.add(new FieldError(JsonFields.WASTE_DEMAND, "Field is required"));
             return null;
         }
-        
         JsonNode demandNode = rootNode.get(JsonFields.WASTE_DEMAND);
         if (demandNode.isNull() || !demandNode.isObject()) {
             errors.add(new FieldError(JsonFields.WASTE_DEMAND, "Must be a non-null object"));
             return null;
         }
-        
-        // Track required nested fields
         Double value = null;
         QuantityUnit quantityUnit = null;
         TimeUnit timeUnit = null;
-        
-        // Extract demand value
         if (!demandNode.has(JsonFields.CAPACITY_VALUE)) {
             errors.add(new FieldError(
                 JsonFields.WASTE_DEMAND + "." + JsonFields.CAPACITY_VALUE,
@@ -220,8 +191,6 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
                 ));
             }
         }
-        
-        // Extract quantity unit
         if (!demandNode.has(JsonFields.QUANTITY_UNIT)) {
             errors.add(new FieldError(
                 JsonFields.WASTE_DEMAND + "." + JsonFields.QUANTITY_UNIT,
@@ -238,8 +207,6 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
                 ));
             }
         }
-        
-        // Extract time unit
         if (!demandNode.has(JsonFields.TIME_UNIT)) {
             errors.add(new FieldError(
                 JsonFields.WASTE_DEMAND + "." + JsonFields.TIME_UNIT,
@@ -256,8 +223,6 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
                 ));
             }
         }
-        
-        // Only create WasteDemand if all required fields are valid
         if (value != null && quantityUnit != null && timeUnit != null) {
             try {
                 return new WasteDemand(value, quantityUnit, timeUnit);
@@ -266,7 +231,6 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
                 return null;
             }
         }
-        
         return null;
     }
 
@@ -281,13 +245,11 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
         if (!rootNode.has(JsonFields.SERVICE_ZONE) || rootNode.get(JsonFields.SERVICE_ZONE).isNull()) {
             return null;
         }
-        
         JsonNode node = rootNode.get(JsonFields.SERVICE_ZONE);
         if (!node.isTextual()) {
             errors.add(new FieldError(JsonFields.SERVICE_ZONE, "Must be a string"));
             return null;
         }
-        
         String value = node.asText();
         try {
             return ServiceZone.fromString(value);
