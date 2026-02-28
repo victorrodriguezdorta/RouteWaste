@@ -1,20 +1,30 @@
 package es.ull.project.domain.entity;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import es.ull.project.domain.valueobject.time.PlanningPeriod;
-import es.ull.project.domain.valueobject.cost.MaximumBudget;
-import es.ull.project.domain.valueobject.policy.ServicePolicies;
-import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.enumerate.FacilityType;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.jupiter.api.Test;
+
 import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.location.Location;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
+import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.demand.QuantityUnit;
-import java.util.concurrent.TimeUnit;
+import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.location.Distance;
+import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.location.ServiceTime;
+import es.ull.project.domain.valueobject.policy.ServicePolicies;
+import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
 class InfrastructurePlanTests {
 
@@ -51,6 +61,10 @@ class InfrastructurePlanTests {
 
     private static Container randomContainer() {
         return new Container(randomLocation(), WasteType.random(), new WasteDemand(10.0));
+    }
+
+    private static ServiceAssignment randomServiceAssignment(Container container, Facility facility) {
+        return new ServiceAssignment(container, facility, container.getWasteDemand(), Distance.fromMeters(1000.0), new ServiceTime(10.0), new TransportationVariableCost(50.0));
     }
 
     // ========== Constructors ==========
@@ -125,35 +139,29 @@ class InfrastructurePlanTests {
     // ========== State modifiers / behaviors ==========
 
     @Test
-    void assignContainerToFacility_valid() {
+    void addServiceAssignment_valid() {
         InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), new MaximumBudget(1_000_000.0), randomServicePolicies());
         Facility facility = randomFacility();
         plan.addFacility(facility);
         Container container = randomContainer();
+        ServiceAssignment assignment = randomServiceAssignment(container, facility);
 
-        plan.assignContainerToFacility(container, facility);
+        plan.addServiceAssignment(assignment);
 
-        assertTrue(plan.getServiceAssignments().containsKey(container));
-        assertEquals(facility, plan.getServiceAssignments().get(container));
+        assertTrue(plan.getServiceAssignments().contains(assignment));
+        assertEquals(1, plan.getServiceAssignments().size());
     }
 
     @Test
-    void assignContainerToFacility_invalid_nulls() {
+    void addServiceAssignment_invalid_null() {
         InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies());
-        Container container = null;
-        Facility facility = randomFacility();
+        ServiceAssignment assignment = null;
 
-        IllegalArgumentException exc1 = assertThrows(
+        IllegalArgumentException exc = assertThrows(
                 IllegalArgumentException.class,
-                () -> plan.assignContainerToFacility(container, facility)
+                () -> plan.addServiceAssignment(assignment)
         );
-        assertEquals(InfrastructurePlan.INVALID_ASSIGNMENT, exc1.getMessage());
-
-        IllegalArgumentException exc2 = assertThrows(
-                IllegalArgumentException.class,
-                () -> plan.assignContainerToFacility(randomContainer(), null)
-        );
-        assertEquals(InfrastructurePlan.INVALID_ASSIGNMENT, exc2.getMessage());
+        assertEquals(InfrastructurePlan.INVALID_ASSIGNMENT, exc.getMessage());
     }
 
     @Test
@@ -177,9 +185,9 @@ class InfrastructurePlanTests {
         Facility facility = randomFacility();
         plan.addFacility(facility);
         Container container = randomContainer();
-        plan.assignContainerToFacility(container, facility);
+        ServiceAssignment assignment = randomServiceAssignment(container, facility);
+        plan.addServiceAssignment(assignment);
 
-        // Mark facility as discarded
         facility.updateStatus(FacilityStatus.DISCARDED);
 
         assertFalse(plan.isPlanValid());
@@ -191,7 +199,7 @@ class InfrastructurePlanTests {
     void toStringMethod() {
         InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies());
         String expected = String.format("InfrastructurePlan={id=%s, period=%s, facilities=%s, assignments=%s, totalCost=%s}",
-                plan.getId(), plan.getPeriod(), plan.getSelectedFacilities(), plan.getServiceAssignments().keySet(), plan.getEstimatedTotalCost());
+                plan.getId(), plan.getPeriod(), plan.getSelectedFacilities(), plan.getServiceAssignments(), plan.getEstimatedTotalCost());
 
         assertEquals(expected, plan.toString());
     }

@@ -1,13 +1,13 @@
 package es.ull.project.adapter.rest.serialization.facility;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
+
+import java.io.IOException;
 
 /**
  * Custom JSON serializer for FacilityResponseBody
@@ -26,7 +26,7 @@ public class FacilityResponseBodySerializer extends StdSerializer<FacilityRespon
 
     /**
      * Serializes a FacilityResponseBody object into JSON format
-     * This method writes each field of the facility to the JSON output stream
+     * Extracts primitives from domain value objects during serialization
      *
      * @param value    The FacilityResponseBody object to serialize
      * @param gen      JsonGenerator to write JSON content
@@ -36,49 +36,31 @@ public class FacilityResponseBodySerializer extends StdSerializer<FacilityRespon
     @Override
     public void serialize(FacilityResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
-
-        // Write facility ID as string (UUID)
         gen.writeStringField(JsonFields.ID, value.id.toString());
-
-        // Write facility type as string
-        gen.writeStringField(JsonFields.FACILITY_TYPE, value.facilityType);
-
-        // Write location as nested object
+        gen.writeStringField(JsonFields.FACILITY_TYPE, value.facilityType.name());
         gen.writeObjectFieldStart(JsonFields.LOCATION);
-        gen.writeNumberField(JsonFields.LATITUDE, value.location.latitude);
-        gen.writeNumberField(JsonFields.LONGITUDE, value.location.longitude);
-        gen.writeStringField(JsonFields.POSTAL_ADDRESS, value.location.postalAddress);
-        gen.writeStringField(JsonFields.GIS_REFERENCE, value.location.gisReference);
+        gen.writeNumberField(JsonFields.LATITUDE, value.location.getLatitude());
+        gen.writeNumberField(JsonFields.LONGITUDE, value.location.getLongitude());
+        gen.writeStringField(JsonFields.POSTAL_ADDRESS, value.location.getPostalAddress());
+        gen.writeStringField(JsonFields.GIS_REFERENCE, value.location.getGISReference());
         gen.writeEndObject();
-
-        // Write capacity as nested object
         gen.writeObjectFieldStart(JsonFields.CAPACITY);
-        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.capacity.value);
-        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.capacity.quantityUnit);
-        gen.writeStringField(JsonFields.TIME_UNIT, value.capacity.timeUnit);
+        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.capacity.getValue());
+        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.capacity.getQuantityUnit().getValue());
+        gen.writeStringField(JsonFields.TIME_UNIT, value.capacity.getTimeUnit().name());
         gen.writeEndObject();
-
-        // Write opening fixed cost as nested object
         gen.writeObjectFieldStart(JsonFields.OPENING_FIXED_COST);
-        gen.writeNumberField(JsonFields.AMOUNT, value.openingFixedCost.amount);
-        
-        // Write currency only if it is not null (optional field)
-        if (value.openingFixedCost.currency != null) {
-            gen.writeStringField(JsonFields.CURRENCY, value.openingFixedCost.currency);
+        gen.writeNumberField(JsonFields.AMOUNT, value.openingFixedCost.getAmount());
+        if (value.openingFixedCost.getCurrency().isPresent()) {
+            gen.writeStringField(JsonFields.CURRENCY, value.openingFixedCost.getCurrency().get().getCode());
         }
-        
         gen.writeEndObject();
-
-        // Write facility status as string
-        gen.writeStringField(JsonFields.STATUS, value.status);
-
-        // Write assigned waste demand as nested object
+        gen.writeStringField(JsonFields.STATUS, value.status.name());
         gen.writeObjectFieldStart(JsonFields.WASTE_DEMAND);
-        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.assignedWasteDemand.value);
-        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.assignedWasteDemand.quantityUnit);
-        gen.writeStringField(JsonFields.TIME_UNIT, value.assignedWasteDemand.timeUnit);
+        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.assignedWasteDemand.getValue());
+        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.assignedWasteDemand.getQuantityUnit().getValue());
+        gen.writeStringField(JsonFields.TIME_UNIT, value.assignedWasteDemand.getTimeUnit().name());
         gen.writeEndObject();
-
         gen.writeEndObject();
     }
 }

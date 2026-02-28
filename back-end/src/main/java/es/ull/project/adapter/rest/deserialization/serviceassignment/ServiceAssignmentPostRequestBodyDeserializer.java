@@ -68,7 +68,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
         requestBody.distance = distance;
         requestBody.serviceTime = serviceTime;
         requestBody.transportCost = transportCost;
-        
         return requestBody;
     }
 
@@ -199,7 +198,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
                 return null;
             }
         }
-        
         return null;
     }
 
@@ -221,7 +219,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
             return null;
         }
         try {
-            // Check which unit is provided (meters, kilometers, or miles)
             if (distanceNode.has(JsonFields.METERS)) {
                 try {
                     double meters = distanceNode.get(JsonFields.METERS).asDouble();
@@ -262,7 +259,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
                 ));
                 return null;
             }
-            
         } catch (Exception e) {
             errors.add(new FieldError(JsonFields.DISTANCE, "Invalid distance: " + e.getMessage()));
             return null;
@@ -287,7 +283,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
             return null;
         }
         try {
-            // Check which unit is provided (minutes, hours, or seconds)
             if (timeNode.has(JsonFields.MINUTES)) {
                 try {
                     double minutes = timeNode.get(JsonFields.MINUTES).asDouble();
@@ -328,7 +323,6 @@ public class ServiceAssignmentPostRequestBodyDeserializer extends JsonDeserializ
                 ));
                 return null;
             }
-            
         } catch (Exception e) {
             errors.add(new FieldError(JsonFields.SERVICE_TIME, "Invalid service time: " + e.getMessage()));
             return null;

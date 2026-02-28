@@ -9,16 +9,18 @@ import es.ull.project.domain.entity.Container;
  */
 public class ContainerResponseMapper {
 
+    private static final String UTILITY_CLASS_ERROR_MESSAGE = "Utility class cannot be instantiated";
+
     /**
      * Private constructor to prevent instantiation of utility class.
      */
     private ContainerResponseMapper() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+        throw new UnsupportedOperationException(UTILITY_CLASS_ERROR_MESSAGE);
     }
 
     /**
      * Converts a Container domain entity to a ContainerResponseBody DTO
-     * Maps all the container properties including nested objects (location and waste demand)
+     * Assigns domain value objects directly without extracting primitives
      *
      * @param container The Container domain entity to convert
      * @return ContainerResponseBody DTO ready to be serialized as JSON
@@ -26,19 +28,10 @@ public class ContainerResponseMapper {
     public static ContainerResponseBody toResponseBody(Container container) {
         ContainerResponseBody responseBody = new ContainerResponseBody();
         responseBody.id = container.getId();
-        responseBody.location = new ContainerResponseBody.LocationData();
-        responseBody.location.latitude = container.getLocation().getLatitude();
-        responseBody.location.longitude = container.getLocation().getLongitude();
-        responseBody.location.postalAddress = container.getLocation().getPostalAddress();
-        responseBody.location.gisReference = container.getLocation().getGISReference();
-        responseBody.wasteType = container.getWasteType().name();
-        responseBody.wasteDemand = new ContainerResponseBody.WasteDemandData();
-        responseBody.wasteDemand.value = container.getWasteDemand().getValue();
-        responseBody.wasteDemand.quantityUnit = container.getWasteDemand().getQuantityUnit().getValue();
-        responseBody.wasteDemand.timeUnit = container.getWasteDemand().getTimeUnit().name();
-        if (container.getServiceZone().isPresent()) {
-            responseBody.serviceZone = container.getServiceZone().get().name();
-        }
+        responseBody.location = container.getLocation();
+        responseBody.wasteType = container.getWasteType();
+        responseBody.wasteDemand = container.getWasteDemand();
+        responseBody.serviceZone = container.getServiceZone().orElse(null);
         return responseBody;
     }
 }

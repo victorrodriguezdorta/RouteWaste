@@ -1,8 +1,15 @@
 package es.ull.project.adapter.rest.request.infrastructureplan;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import es.ull.project.adapter.rest.deserialization.infrastructureplan.InfrastructurePlanPostRequestBodyDeserializer;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * InfrastructurePlanPostRequestBody
@@ -17,6 +24,7 @@ import es.ull.project.domain.valueobject.time.PlanningPeriod;
  * 
  * This class contains no business logic, only data representation.
  */
+@JsonDeserialize(using = InfrastructurePlanPostRequestBodyDeserializer.class)
 public class InfrastructurePlanPostRequestBody {
 
     /**
@@ -38,6 +46,18 @@ public class InfrastructurePlanPostRequestBody {
     public ServicePolicies servicePolicies;
 
     /**
+     * List of facility IDs to be selected for this plan.
+     * Optional field - defaults to empty list.
+     */
+    public List<UUID> selectedFacilityIds;
+
+    /**
+     * List of service assignment IDs to be included in this plan.
+     * Optional field - defaults to empty list.
+     */
+    public List<UUID> serviceAssignmentIds;
+
+    /**
      * Returns a string representation of this request body.
      * 
      * @return formatted string containing all attributes
@@ -45,9 +65,11 @@ public class InfrastructurePlanPostRequestBody {
     @Override
     public String toString() {
         return String.format(
-                "InfrastructurePlanPostRequestBody={period=%s, maxBudget=%s, servicePolicies=%s}",
+                "InfrastructurePlanPostRequestBody={period=%s, maxBudget=%s, servicePolicies=%s, selectedFacilityIds=%s, serviceAssignmentIds=%s}",
                 this.period,
                 this.maxBudget,
-                this.servicePolicies);
+                this.servicePolicies,
+                this.selectedFacilityIds != null ? this.selectedFacilityIds : Collections.emptyList(),
+                this.serviceAssignmentIds != null ? this.serviceAssignmentIds : Collections.emptyList());
     }
 }

@@ -1,11 +1,11 @@
 package es.ull.project.adapter.rest.request.serviceassignment;
 
-import java.util.UUID;
-
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.ServiceTime;
+
+import java.util.UUID;
 
 /**
  * ServiceAssignmentPostRequestBody

@@ -1,7 +1,5 @@
 package es.ull.project.adapter.rest.deserialization.infrastructureplan;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -13,6 +11,11 @@ import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * InfrastructurePlanPutRequestBodyDeserializer
@@ -44,10 +47,14 @@ public class InfrastructurePlanPutRequestBodyDeserializer extends JsonDeserializ
             PlanningPeriod period = parsePeriod(rootNode);
             MaximumBudget maxBudget = parseMaxBudget(rootNode);
             ServicePolicies servicePolicies = parseServicePolicies(rootNode);
+            List<UUID> selectedFacilityIds = parseUuidList(rootNode, JsonFields.SELECTED_FACILITY_IDS);
+            List<UUID> serviceAssignmentIds = parseUuidList(rootNode, JsonFields.SERVICE_ASSIGNMENT_IDS);
             InfrastructurePlanPutRequestBody requestBody = new InfrastructurePlanPutRequestBody();
             requestBody.period = period;
             requestBody.maxBudget = maxBudget;
             requestBody.servicePolicies = servicePolicies;
+            requestBody.selectedFacilityIds = selectedFacilityIds;
+            requestBody.serviceAssignmentIds = serviceAssignmentIds;
             return requestBody;
         } catch (Exception e) {
             throw new IOException("Failed to deserialize InfrastructurePlanPutRequestBody: " + e.getMessage(), e);
@@ -151,5 +158,41 @@ public class InfrastructurePlanPutRequestBodyDeserializer extends JsonDeserializ
             throw new IllegalArgumentException(
                 "Invalid value for field '" + JsonFields.SERVICE_POLICIES + "': " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Parses an optional array of UUID strings from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @param fieldName the name of the field containing the UUID array
+     * @return list of parsed UUIDs, or empty list if field is missing/null
+     * @throws IllegalArgumentException if the array contains invalid UUID values
+     */
+    private List<UUID> parseUuidList(JsonNode rootNode, String fieldName) {
+        List<UUID> uuidList = new ArrayList<>();
+        if (!rootNode.has(fieldName) || rootNode.get(fieldName).isNull()) {
+            return uuidList;
+        }
+        JsonNode arrayNode = rootNode.get(fieldName);
+        if (!arrayNode.isArray()) {
+            throw new IllegalArgumentException("Field '" + fieldName + "' must be an array");
+        }
+        for (int i = 0; i < arrayNode.size(); i++) {
+            JsonNode uuidNode = arrayNode.get(i);
+            if (uuidNode.isNull() || !uuidNode.isTextual()) {
+                throw new IllegalArgumentException(
+                    "Field '" + fieldName + "[" + i + "]' must be a valid UUID string"
+                );
+            }
+            try {
+                UUID uuid = UUID.fromString(uuidNode.asText());
+                uuidList.add(uuid);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(
+                    "Invalid UUID format at '" + fieldName + "[" + i + "]: " + uuidNode.asText(), e
+                );
+            }
+        }
+        return uuidList;
     }
 }

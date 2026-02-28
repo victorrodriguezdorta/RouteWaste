@@ -8,12 +8,9 @@ import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-
 /**
  * InfrastructurePlan
  * 
@@ -25,12 +22,12 @@ public class InfrastructurePlan {
     public static final String PERIOD_NOT_DEFINED = "Planning period is not defined";
     public static final String MAX_BUDGET_NOT_DEFINED = "Maximum budget is not defined";
     public static final String TOTAL_COST_EXCEEDED = "Total cost exceeds maximum budget";
-    public static final String INVALID_ASSIGNMENT = "Container assignment is invalid";
+    public static final String INVALID_ASSIGNMENT = "Service assignment is invalid";
 
     private final UUID id;
     private PlanningPeriod period;
     private List<Facility> selectedFacilities;
-    private Map<Container, Facility> serviceAssignments;
+    private List<ServiceAssignment> serviceAssignments;
     private ServicePolicies servicePolicies;
     private MaximumBudget maxBudget;
     private TotalCost estimatedTotalCost;
@@ -54,7 +51,7 @@ public class InfrastructurePlan {
         this.maxBudget = maxBudget;
         this.servicePolicies = servicePolicies;
         this.selectedFacilities = new ArrayList<>();
-        this.serviceAssignments = new HashMap<>();
+        this.serviceAssignments = new ArrayList<>();
         this.estimatedTotalCost = new TotalCost(0.0);
     }
 
@@ -70,7 +67,7 @@ public class InfrastructurePlan {
         this.maxBudget = otherObject.maxBudget;
         this.servicePolicies = otherObject.servicePolicies;
         this.selectedFacilities = new ArrayList<>(otherObject.selectedFacilities);
-        this.serviceAssignments = new HashMap<>(otherObject.serviceAssignments);
+        this.serviceAssignments = new ArrayList<>(otherObject.serviceAssignments);
         this.estimatedTotalCost = otherObject.estimatedTotalCost;
     }
 
@@ -81,7 +78,7 @@ public class InfrastructurePlan {
      * @param id                 the plan identifier
      * @param period             the planning period
      * @param selectedFacilities the list of selected facilities
-     * @param serviceAssignments the map of container to facility assignments
+     * @param serviceAssignments the list of service assignments
      * @param servicePolicies    the service policies
      * @param maxBudget          the maximum budget allowed
      * @param estimatedTotalCost the estimated total cost
@@ -89,7 +86,7 @@ public class InfrastructurePlan {
     public InfrastructurePlan(UUID id,
             PlanningPeriod period,
             List<Facility> selectedFacilities,
-            Map<Container, Facility> serviceAssignments,
+            List<ServiceAssignment> serviceAssignments,
             ServicePolicies servicePolicies,
             MaximumBudget maxBudget,
             TotalCost estimatedTotalCost) {
@@ -98,7 +95,7 @@ public class InfrastructurePlan {
         this.id = id;
         this.period = period;
         this.selectedFacilities = selectedFacilities != null ? new ArrayList<>(selectedFacilities) : new ArrayList<>();
-        this.serviceAssignments = serviceAssignments != null ? new HashMap<>(serviceAssignments) : new HashMap<>();
+        this.serviceAssignments = serviceAssignments != null ? new ArrayList<>(serviceAssignments) : new ArrayList<>();
         this.servicePolicies = servicePolicies;
         this.maxBudget = maxBudget;
         this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
@@ -129,17 +126,16 @@ public class InfrastructurePlan {
     }
 
     /**
-     * Assigns a container to a facility.
+     * Adds a service assignment to the plan.
      *
-     * @param container Container to assign
-     * @param facility  Facility to assign to
+     * @param assignment ServiceAssignment to add
      */
-    public void assignContainerToFacility(Container container, Facility facility) {
-        if (container == null || facility == null) {
+    public void addServiceAssignment(ServiceAssignment assignment) {
+        if (assignment == null) {
             throw new IllegalArgumentException(INVALID_ASSIGNMENT);
         }
-        facility.assignWasteDemand(container.getWasteDemand());
-        serviceAssignments.put(container, facility);
+        assignment.getFacility().assignWasteDemand(assignment.getContainer().getWasteDemand());
+        serviceAssignments.add(assignment);
         recalculateTotalCost();
     }
 
@@ -155,6 +151,21 @@ public class InfrastructurePlan {
     }
 
     /**
+     * Clears all facilities from the plan.
+     */
+    public void clearFacilities() {
+        selectedFacilities.clear();
+    }
+
+    /**
+     * Clears all service assignments from the plan.
+     */
+    public void clearServiceAssignments() {
+        serviceAssignments.clear();
+        recalculateTotalCost();
+    }
+
+    /**
      * Recalculates the total estimated cost of the plan.
      */
     public void recalculateTotalCost() {
@@ -162,8 +173,8 @@ public class InfrastructurePlan {
         for (Facility facility : selectedFacilities) {
             total += facility.getOpeningFixedCost().getAmount();
         }
-        for (Map.Entry<Container, Facility> entry : serviceAssignments.entrySet()) {
-            total += entry.getValue().getOpeningFixedCost().getAmount();
+        for (ServiceAssignment assignment : serviceAssignments) {
+            total += assignment.getTransportCost().getAmount();
         }
         TotalCost newCost = new TotalCost(total);
         if (newCost.greaterThan(this.maxBudget)) {
@@ -178,8 +189,8 @@ public class InfrastructurePlan {
      * @return true if the plan is valid, false otherwise
      */
     public boolean isPlanValid() {
-        for (Map.Entry<Container, Facility> entry : serviceAssignments.entrySet()) {
-            Facility facility = entry.getValue();
+        for (ServiceAssignment assignment : serviceAssignments) {
+            Facility facility = assignment.getFacility();
             if (facility.getStatus().isDiscarded()) {
                 return false;
             }
@@ -219,12 +230,12 @@ public class InfrastructurePlan {
     }
 
     /**
-     * Returns the service assignments map.
+     * Returns the list of service assignments.
      *
-     * @return an unmodifiable map of container to facility assignments
+     * @return an unmodifiable list of service assignments
      */
-    public Map<Container, Facility> getServiceAssignments() {
-        return Collections.unmodifiableMap(serviceAssignments);
+    public List<ServiceAssignment> getServiceAssignments() {
+        return Collections.unmodifiableList(serviceAssignments);
     }
 
     /**
@@ -328,7 +339,7 @@ public class InfrastructurePlan {
                 id,
                 period,
                 selectedFacilities,
-                serviceAssignments.keySet(),
+                serviceAssignments,
                 estimatedTotalCost);
     }
 }

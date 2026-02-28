@@ -10,12 +10,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
-
 /**
  * In-memory InfrastructurePlanRepository for tests and local runs.
  */
-@Repository
 public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanRepository {
 
     private final Map<UUID, InfrastructurePlan> store = new LinkedHashMap<>();

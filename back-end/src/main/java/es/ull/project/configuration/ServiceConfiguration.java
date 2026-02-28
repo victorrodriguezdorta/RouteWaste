@@ -1,8 +1,5 @@
 package es.ull.project.configuration;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
@@ -29,6 +26,8 @@ import es.ull.project.application.service.vehicle.DeleteVehicleService;
 import es.ull.project.application.service.vehicle.ReadVehicleService;
 import es.ull.project.application.service.vehicle.UpdateVehicleService;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 /**
  * Configuration class for application services.
  * This class defines all service beans following the hexagonal architecture
@@ -173,11 +172,16 @@ public class ServiceConfiguration {
      * Creates a bean for the CreateInfrastructurePlanService.
      * 
      * @param repository the infrastructure plan repository
+     * @param facilityRepository the facility repository
+     * @param serviceAssignmentRepository the service assignment repository
      * @return a new CreateInfrastructurePlanService instance
      */
     @Bean
-    public CreateInfrastructurePlanService createInfrastructurePlanService(InfrastructurePlanRepository repository) {
-        return new CreateInfrastructurePlanService(repository);
+    public CreateInfrastructurePlanService createInfrastructurePlanService(
+            InfrastructurePlanRepository repository,
+            FacilityRepository facilityRepository,
+            ServiceAssignmentRepository serviceAssignmentRepository) {
+        return new CreateInfrastructurePlanService(repository, facilityRepository, serviceAssignmentRepository);
     }
 
     /**
@@ -195,11 +199,16 @@ public class ServiceConfiguration {
      * Creates a bean for the UpdateInfrastructurePlanService.
      * 
      * @param repository the infrastructure plan repository
+     * @param facilityRepository the facility repository
+     * @param serviceAssignmentRepository the service assignment repository
      * @return a new UpdateInfrastructurePlanService instance
      */
     @Bean
-    public UpdateInfrastructurePlanService updateInfrastructurePlanService(InfrastructurePlanRepository repository) {
-        return new UpdateInfrastructurePlanService(repository);
+    public UpdateInfrastructurePlanService updateInfrastructurePlanService(
+            InfrastructurePlanRepository repository,
+            FacilityRepository facilityRepository,
+            ServiceAssignmentRepository serviceAssignmentRepository) {
+        return new UpdateInfrastructurePlanService(repository, facilityRepository, serviceAssignmentRepository);
     }
 
     /**

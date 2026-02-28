@@ -3,6 +3,7 @@ package es.ull.project.adapter.rest.deserialization.infrastructureplan;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -43,26 +44,22 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
     @Override
     public InfrastructurePlanPostRequestBody deserialize(JsonParser parser, DeserializationContext context) 
             throws IOException {
-        
         JsonNode rootNode = parser.getCodec().readTree(parser);
         List<FieldError> errors = new ArrayList<>();
-        
-        // Parse all fields, accumulating errors instead of throwing immediately
         PlanningPeriod period = parsePeriod(rootNode, errors);
         MaximumBudget maxBudget = parseMaxBudget(rootNode, errors);
         ServicePolicies servicePolicies = parseServicePolicies(rootNode, errors);
-        
-        // If there are any validation errors, throw ValidationException with all of them
+        List<UUID> selectedFacilityIds = parseUuidList(rootNode, JsonFields.SELECTED_FACILITY_IDS, errors);
+        List<UUID> serviceAssignmentIds = parseUuidList(rootNode, JsonFields.SERVICE_ASSIGNMENT_IDS, errors);
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-        
-        // Create and populate request body
         InfrastructurePlanPostRequestBody requestBody = new InfrastructurePlanPostRequestBody();
         requestBody.period = period;
         requestBody.maxBudget = maxBudget;
         requestBody.servicePolicies = servicePolicies;
-        
+        requestBody.selectedFacilityIds = selectedFacilityIds;
+        requestBody.serviceAssignmentIds = serviceAssignmentIds;
         return requestBody;
     }
 
@@ -227,5 +224,45 @@ public class InfrastructurePlanPostRequestBodyDeserializer extends JsonDeseriali
             ));
             return null;
         }
+    }
+
+    /**
+     * Parses an optional array of UUID strings from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @param fieldName the name of the field containing the UUID array
+     * @param errors list to accumulate validation errors
+     * @return list of parsed UUIDs, or empty list if field is missing/null
+     */
+    private List<UUID> parseUuidList(JsonNode rootNode, String fieldName, List<FieldError> errors) {
+        List<UUID> uuidList = new ArrayList<>();
+        if (!rootNode.has(fieldName) || rootNode.get(fieldName).isNull()) {
+            return uuidList;
+        }
+        JsonNode arrayNode = rootNode.get(fieldName);
+        if (!arrayNode.isArray()) {
+            errors.add(new FieldError(fieldName, "Must be an array"));
+            return uuidList;
+        }
+        for (int i = 0; i < arrayNode.size(); i++) {
+            JsonNode uuidNode = arrayNode.get(i);
+            if (uuidNode.isNull() || !uuidNode.isTextual()) {
+                errors.add(new FieldError(
+                    fieldName + "[" + i + "]",
+                    "Must be a valid UUID string"
+                ));
+                continue;
+            }
+            try {
+                UUID uuid = UUID.fromString(uuidNode.asText());
+                uuidList.add(uuid);
+            } catch (IllegalArgumentException e) {
+                errors.add(new FieldError(
+                    fieldName + "[" + i + "]",
+                    "Invalid UUID format: " + uuidNode.asText()
+                ));
+            }
+        }
+        return uuidList;
     }
 }

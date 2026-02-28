@@ -1,5 +1,15 @@
 package es.ull.project.adapter.rest.controller;
 
+import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
+import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
+import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
+import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
+import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
+import es.ull.project.domain.entity.Vehicle;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -15,16 +25,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
-import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
-import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
-import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
-import es.ull.project.application.service.vehicle.CreateVehicleService;
-import es.ull.project.application.service.vehicle.DeleteVehicleService;
-import es.ull.project.application.service.vehicle.ReadVehicleService;
-import es.ull.project.application.service.vehicle.UpdateVehicleService;
-import es.ull.project.domain.entity.Vehicle;
 
 /**
  * VehicleController
@@ -47,28 +47,28 @@ public class VehicleController {
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private ReadVehicleService readVehicleService;
+    private ReadVehicleUseCase readVehicleUseCase;
 
     /**
      * Use case for creating new vehicles.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private CreateVehicleService createVehicleService;
+    private CreateVehicleUseCase createVehicleUseCase;
 
     /**
      * Use case for updating existing vehicles.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private UpdateVehicleService updateVehicleService;
+    private UpdateVehicleUseCase updateVehicleUseCase;
 
     /**
      * Use case for deleting vehicles.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private DeleteVehicleService deleteVehicleService;
+    private DeleteVehicleUseCase deleteVehicleUseCase;
 
     /**
      * GET /vehicles/
@@ -82,7 +82,7 @@ public class VehicleController {
      */
     @GetMapping("/")
     public ResponseEntity<List<VehicleResponseBody>> getVehicles() {
-        List<Vehicle> vehicles = this.readVehicleService.fetchAll();
+        List<Vehicle> vehicles = this.readVehicleUseCase.fetchAll();
         List<VehicleResponseBody> responseBodies = vehicles.stream()
                 .map(VehicleResponseMapper::toResponseBody)
                 .toList();
@@ -103,7 +103,7 @@ public class VehicleController {
     public ResponseEntity<VehicleResponseBody> getVehicleById(@PathVariable String id) {
         try {
             UUID vehicleId = UUID.fromString(id);
-            Vehicle vehicle = this.readVehicleService.fetch(vehicleId);
+            Vehicle vehicle = this.readVehicleUseCase.fetch(vehicleId);
             VehicleResponseBody responseBody = VehicleResponseMapper.toResponseBody(vehicle);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {
@@ -129,7 +129,7 @@ public class VehicleController {
     @PostMapping("/")
     public ResponseEntity<VehicleResponseBody> createVehicle(@RequestBody VehiclePostRequestBody requestBody) {
         try {
-            Vehicle createdVehicle = this.createVehicleService.create(
+            Vehicle createdVehicle = this.createVehicleUseCase.create(
                     requestBody.vehicleType,
                     requestBody.transportCapacity,
                     requestBody.costPerKilometer
@@ -162,7 +162,7 @@ public class VehicleController {
             @RequestBody VehiclePutRequestBody requestBody) {
         try {
             UUID vehicleId = UUID.fromString(id);
-            Vehicle updatedVehicle = this.updateVehicleService.update(
+            Vehicle updatedVehicle = this.updateVehicleUseCase.update(
                     vehicleId,
                     requestBody.vehicleType,
                     requestBody.transportCapacity,
@@ -194,7 +194,7 @@ public class VehicleController {
     public ResponseEntity<VehicleResponseBody> deleteVehicle(@PathVariable String id) {
         try {
             UUID vehicleId = UUID.fromString(id);
-            Vehicle deletedVehicle = this.deleteVehicleService.delete(vehicleId);
+            Vehicle deletedVehicle = this.deleteVehicleUseCase.delete(vehicleId);
             VehicleResponseBody responseBody = VehicleResponseMapper.toResponseBody(deletedVehicle);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {

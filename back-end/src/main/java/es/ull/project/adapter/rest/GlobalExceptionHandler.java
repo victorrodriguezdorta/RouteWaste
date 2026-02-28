@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -31,6 +33,8 @@ import es.ull.project.adapter.rest.response.ErrorResponse;
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * Handles deserialization errors when the request body cannot be parsed.
@@ -61,11 +65,10 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-            "ValidationError",
-            "Validation failed",
-            ex.getErrors()
-        );
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.error = "ValidationError";
+        errorResponse.message = "Validation failed";
+        errorResponse.details = ex.getErrors();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -81,6 +84,23 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleValidationError(IllegalArgumentException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles illegal state errors.
+     * This typically occurs when:
+     * - Business invariant violations (e.g., facility capacity exceeded)
+     * - Operations on entities in invalid states (e.g., discarded facilities)
+     * - Domain logic constraints are violated
+     * 
+     * @param ex the IllegalStateException thrown by domain entities
+     * @return ResponseEntity with error message and HTTP 400 (BAD_REQUEST)
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalStateError(IllegalStateException ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -114,8 +134,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleGenericError(Exception ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "An internal error occurred. Please try again later.");
-        System.err.println("Unhandled exception: " + ex.getClass().getName() + " - " + ex.getMessage());
-        ex.printStackTrace();
+        logger.error("Unhandled exception: {} - {}", ex.getClass().getName(), ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

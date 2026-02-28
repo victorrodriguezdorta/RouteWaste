@@ -1,21 +1,31 @@
 package es.ull.project.adapter.rest.mapper;
 
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
+import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.entity.ServiceAssignment;
+
+import java.util.ArrayList;
 
 /**
  * Mapper class to convert InfrastructurePlan domain entities to InfrastructurePlanResponseBody DTOs
  * This class handles the transformation between the domain layer and the REST adapter layer
+ * Includes complete facility and container information using their respective mappers
  */
 public class InfrastructurePlanResponseMapper {
 
+    private static final String UTILITY_CLASS_EXCEPTION_MESSAGE = "Utility class cannot be instantiated";
+
+    /**
+     * Private constructor to prevent instantiation of utility class.
+     */
     private InfrastructurePlanResponseMapper() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+        throw new UnsupportedOperationException(UTILITY_CLASS_EXCEPTION_MESSAGE);
     }
 
     /**
      * Converts an InfrastructurePlan domain entity to an InfrastructurePlanResponseBody DTO
-     * Maps all the infrastructure plan properties including nested objects (budget, cost, policies)
+     * Uses FacilityResponseMapper and ContainerResponseMapper to include complete entity information
      *
      * @param plan The InfrastructurePlan domain entity to convert
      * @return InfrastructurePlanResponseBody DTO ready to be serialized as JSON
@@ -23,29 +33,17 @@ public class InfrastructurePlanResponseMapper {
     public static InfrastructurePlanResponseBody toResponseBody(InfrastructurePlan plan) {
         InfrastructurePlanResponseBody responseBody = new InfrastructurePlanResponseBody();
         responseBody.id = plan.getId();
-        responseBody.period = plan.getPeriod().getValue();
-        responseBody.maxBudget = new InfrastructurePlanResponseBody.MaximumBudgetData();
-        responseBody.maxBudget.amount = plan.getMaxBudget().getAmount();
-        if (plan.getMaxBudget().getCurrency().isPresent()) {
-            responseBody.maxBudget.currency = plan.getMaxBudget().getCurrency().get().getCode();
+        responseBody.period = plan.getPeriod();
+        responseBody.maxBudget = plan.getMaxBudget();
+        responseBody.estimatedTotalCost = plan.getEstimatedTotalCost();
+        responseBody.servicePolicies = plan.getServicePolicies();
+        responseBody.selectedFacilities = new ArrayList<>();
+        for (Facility facility : plan.getSelectedFacilities()) {
+            responseBody.selectedFacilities.add(FacilityResponseMapper.toResponseBody(facility));
         }
-        responseBody.estimatedTotalCost = new InfrastructurePlanResponseBody.TotalCostData();
-        responseBody.estimatedTotalCost.amount = plan.getEstimatedTotalCost().getAmount();
-        if (plan.getEstimatedTotalCost().getCurrency().isPresent()) {
-            responseBody.estimatedTotalCost.currency = plan.getEstimatedTotalCost().getCurrency().get().getCode();
-        }
-        responseBody.servicePolicies = new InfrastructurePlanResponseBody.ServicePoliciesData();
-        if (plan.getServicePolicies().getMaxServiceDistance().isPresent()) {
-            responseBody.servicePolicies.maxServiceDistance = plan.getServicePolicies().getMaxServiceDistance().get();
-        }
-        if (plan.getServicePolicies().getMaxServiceTime().isPresent()) {
-            responseBody.servicePolicies.maxServiceTime = plan.getServicePolicies().getMaxServiceTime().get();
-        }
-        if (plan.getServicePolicies().getMaxInfrastructureCount().isPresent()) {
-            responseBody.servicePolicies.maxInfrastructureCount = plan.getServicePolicies().getMaxInfrastructureCount().get();
-        }
-        if (plan.getServicePolicies().getMaxEmissions().isPresent()) {
-            responseBody.servicePolicies.maxEmissions = plan.getServicePolicies().getMaxEmissions().get();
+        responseBody.serviceAssignments = new ArrayList<>();
+        for (ServiceAssignment assignment : plan.getServiceAssignments()) {
+            responseBody.serviceAssignments.add(ServiceAssignmentResponseMapper.toResponseBody(assignment));
         }
         return responseBody;
     }

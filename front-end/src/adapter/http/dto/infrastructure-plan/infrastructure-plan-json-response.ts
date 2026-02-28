@@ -1,26 +1,26 @@
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Container } from '../../../../domain/entity/container';
 import { Facility } from '../../../../domain/entity/facility';
 import { InfrastructurePlan } from '../../../../domain/entity/infrastructure-plan';
+import { ServiceAssignment } from '../../../../domain/entity/service-assignment';
 import { MaximumBudget } from '../../../../domain/valueobject/cost/maximum-budget';
 import { ServicePolicies } from '../../../../domain/valueobject/policy/service-policies';
 import { PlanningPeriod } from '../../../../domain/valueobject/time/planning-period';
-import { ContainerJsonResponse } from '../container/container-json-response';
 import { FacilityJsonResponse } from '../facility/facility-json-response';
+import { ServiceAssignmentJsonResponse } from '../service-assignment/service-assignment-json-response';
 
 /**
  * InfrastructurePlanJsonResponse DTO
  *
  * Represents the JSON payload returned by the backend API for an
  * InfrastructurePlan resource. Uses primitive fields and nested DTOs for
- * facilities and containers. Provides `toInfrastructurePlan` to convert the
+ * facilities and service assignments. Provides `toInfrastructurePlan` to convert the
  * payload into the domain `InfrastructurePlan` entity.
  */
 export class InfrastructurePlanJsonResponse {
   id: string;
   period: string;
   selectedFacilities?: FacilityJsonResponse[];
-  serviceAssignments?: Array<{ container: ContainerJsonResponse; facility: FacilityJsonResponse }>;
+  serviceAssignments?: ServiceAssignmentJsonResponse[];
   servicePolicies?: { maxServiceDistance?: number | null; maxServiceTime?: number | null; maxInfrastructureCount?: number | null; maxEmissions?: number | null } | null;
   maxBudget: { amount: number; currency?: string };
   estimatedTotalCost?: { amount: number; currency?: string };
@@ -30,7 +30,7 @@ export class InfrastructurePlanJsonResponse {
     period: string,
     maxBudget: { amount: number; currency?: string },
     selectedFacilities?: FacilityJsonResponse[],
-    serviceAssignments?: Array<{ container: ContainerJsonResponse; facility: FacilityJsonResponse }>,
+    serviceAssignments?: ServiceAssignmentJsonResponse[],
     servicePolicies?: { maxServiceDistance?: number | null; maxServiceTime?: number | null; maxInfrastructureCount?: number | null; maxEmissions?: number | null } | null,
     estimatedTotalCost?: { amount: number; currency?: string }
   ) {
@@ -45,9 +45,8 @@ export class InfrastructurePlanJsonResponse {
 
   /**
    * Convert the JSON response into a domain `InfrastructurePlan` entity.
-   * Nested facilities and containers (if present) are converted using their
-   * respective DTO helpers and added to the plan. Assignments are applied
-   * via `assignContainerToFacility` which will perform domain validations.
+   * Nested facilities and service assignments (if present) are converted using their
+   * respective DTO helpers and added to the plan.
    */
   public static toInfrastructurePlan(data: InfrastructurePlanJsonResponse): InfrastructurePlan {
     const id = new UllUUID(data.id);
@@ -57,7 +56,6 @@ export class InfrastructurePlanJsonResponse {
 
     const plan = new InfrastructurePlan(period, maxBudget, servicePolicies, id);
 
-    // Add selected facilities if present
     if (data.selectedFacilities) {
       for (const f of data.selectedFacilities) {
         const facility: Facility = FacilityJsonResponse.toFacility(f);
@@ -65,16 +63,13 @@ export class InfrastructurePlanJsonResponse {
       }
     }
 
-    // Apply service assignments if present
     if (data.serviceAssignments) {
       for (const a of data.serviceAssignments) {
-        const container: Container = ContainerJsonResponse.toContainer(a.container);
-        const facility: Facility = FacilityJsonResponse.toFacility(a.facility);
-        plan.assignContainerToFacility(container, facility);
+        const assignment: ServiceAssignment = ServiceAssignmentJsonResponse.toServiceAssignment(a);
+        plan.addServiceAssignment(assignment);
       }
     }
 
-    // estimatedTotalCost is computed by domain; ignore provided value or leave as is
     return plan;
   }
 }

@@ -1,8 +1,14 @@
 package es.ull.project.adapter.rest.controller;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import es.ull.project.adapter.rest.mapper.ContainerResponseMapper;
+import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
+import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
+import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
+import es.ull.project.application.usecase.container.CreateContainerUseCase;
+import es.ull.project.application.usecase.container.DeleteContainerUseCase;
+import es.ull.project.application.usecase.container.ReadContainerUseCase;
+import es.ull.project.application.usecase.container.UpdateContainerUseCase;
+import es.ull.project.domain.entity.Container;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,15 +22,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.ull.project.adapter.rest.mapper.ContainerResponseMapper;
-import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
-import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
-import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
-import es.ull.project.application.service.container.CreateContainerService;
-import es.ull.project.application.service.container.DeleteContainerService;
-import es.ull.project.application.service.container.ReadContainerService;
-import es.ull.project.application.service.container.UpdateContainerService;
-import es.ull.project.domain.entity.Container;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 /**
  * ContainerController
@@ -47,28 +47,28 @@ public class ContainerController {
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private ReadContainerService readContainerService;
+    private ReadContainerUseCase readContainerUseCase;
 
     /**
      * Use case for creating new containers.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private CreateContainerService createContainerService;
+    private CreateContainerUseCase createContainerUseCase;
 
     /**
      * Use case for updating existing containers.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private UpdateContainerService updateContainerService;
+    private UpdateContainerUseCase updateContainerUseCase;
 
     /**
      * Use case for deleting containers.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private DeleteContainerService deleteContainerService;
+    private DeleteContainerUseCase deleteContainerUseCase;
 
     /**
      * GET /containers/
@@ -82,7 +82,7 @@ public class ContainerController {
      */
     @GetMapping("/")
     public ResponseEntity<List<ContainerResponseBody>> getContainers() {
-        List<Container> containers = this.readContainerService.fetchAll();
+        List<Container> containers = this.readContainerUseCase.fetchAll();
         List<ContainerResponseBody> responseBodies = containers.stream()
                 .map(ContainerResponseMapper::toResponseBody)
                 .toList();
@@ -103,7 +103,7 @@ public class ContainerController {
     public ResponseEntity<ContainerResponseBody> getContainerById(@PathVariable String id) {
         try {
             UUID containerId = UUID.fromString(id);
-            Container container = this.readContainerService.fetch(containerId);
+            Container container = this.readContainerUseCase.fetch(containerId);
             ContainerResponseBody responseBody = ContainerResponseMapper.toResponseBody(container);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {
@@ -129,7 +129,7 @@ public class ContainerController {
     @PostMapping("/")
     public ResponseEntity<ContainerResponseBody> createContainer(@RequestBody ContainerPostRequestBody requestBody) {
         try {
-            Container createdContainer = this.createContainerService.create(
+            Container createdContainer = this.createContainerUseCase.create(
                     requestBody.location,
                     requestBody.wasteType,
                     requestBody.wasteDemand,
@@ -163,7 +163,7 @@ public class ContainerController {
             @RequestBody ContainerPutRequestBody requestBody) {
         try {
             UUID containerId = UUID.fromString(id);
-            Container updatedContainer = this.updateContainerService.update(
+            Container updatedContainer = this.updateContainerUseCase.update(
                     containerId,
                     requestBody.location,
                     requestBody.wasteType,
@@ -196,7 +196,7 @@ public class ContainerController {
     public ResponseEntity<ContainerResponseBody> deleteContainer(@PathVariable String id) {
         try {
             UUID containerId = UUID.fromString(id);
-            Container deletedContainer = this.deleteContainerService.delete(containerId);
+            Container deletedContainer = this.deleteContainerUseCase.delete(containerId);
             ContainerResponseBody responseBody = ContainerResponseMapper.toResponseBody(deletedContainer);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {

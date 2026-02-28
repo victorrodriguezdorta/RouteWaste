@@ -1,17 +1,17 @@
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { PlanningPeriod } from '../valueobject/time/planning-period';
 import { MaximumBudget } from '../valueobject/cost/maximum-budget';
-import { ServicePolicies } from '../valueobject/policy/service-policies';
-import { Facility } from './facility';
-import { Container } from './container';
 import { TotalCost } from '../valueobject/cost/total-cost';
+import { ServicePolicies } from '../valueobject/policy/service-policies';
+import { PlanningPeriod } from '../valueobject/time/planning-period';
+import { Facility } from './facility';
+import { ServiceAssignment } from './service-assignment';
 
 /**
  * InfrastructurePlan
  *
  * Represents a complete infrastructure planning decision for a planning horizon.
  *
- * Holds selected facilities, container->facility assignments, budgets and
+ * Holds selected facilities, service assignments, budgets and
  * service policies. Provides operations to modify the plan and to
  * re-evaluate estimated costs and validity.
  */
@@ -19,7 +19,7 @@ export class InfrastructurePlan {
   readonly id: UllUUID;
   private period: PlanningPeriod;
   private selectedFacilities: Facility[];
-  private serviceAssignments: Map<Container, Facility>;
+  private serviceAssignments: ServiceAssignment[];
   private servicePolicies?: ServicePolicies | null;
   private maxBudget: MaximumBudget;
   private estimatedTotalCost: TotalCost;
@@ -40,7 +40,7 @@ export class InfrastructurePlan {
     this.maxBudget = maxBudget;
     this.servicePolicies = servicePolicies ?? null;
     this.selectedFacilities = [];
-    this.serviceAssignments = new Map();
+    this.serviceAssignments = [];
     this.estimatedTotalCost = new TotalCost(0);
   }
 
@@ -53,8 +53,8 @@ export class InfrastructurePlan {
   /** Return a copy of the selected facilities array. */
   getSelectedFacilities(): ReadonlyArray<Facility> { return this.selectedFacilities.slice(); }
 
-  /** Return the map of service assignments. */
-  getServiceAssignments(): ReadonlyMap<Container, Facility> { return this.serviceAssignments; }
+  /** Return the array of service assignments. */
+  getServiceAssignments(): ReadonlyArray<ServiceAssignment> { return this.serviceAssignments.slice(); }
 
   /** Return the maximum budget value object. */
   getMaxBudget(): MaximumBudget { return this.maxBudget; }
@@ -73,16 +73,14 @@ export class InfrastructurePlan {
   }
 
   /**
-   * Create an assignment between a container and a facility and
-   * recalculate costs. Throws on invalid input or when facility
-   * capacity/status prevents the assignment.
+   * Add a service assignment to the plan.
+   * Recalculates costs after adding.
+   * @throws Error when assignment is null
    */
-  assignContainerToFacility(container: Container, facility: Facility): void {
-    if (!container || !facility) throw new Error('Invalid assignment');
-    // Check facility capacity and status
-    facility.assignWasteDemand(container.getWasteDemand());
-    this.serviceAssignments.set(container, facility);
-    // Recalculate costs
+  addServiceAssignment(assignment: ServiceAssignment): void {
+    if (!assignment) throw new Error('Invalid assignment');
+    assignment.facility.assignWasteDemand(assignment.container.getWasteDemand());
+    this.serviceAssignments.push(assignment);
     this.recalculateTotalCost();
   }
 
@@ -92,11 +90,10 @@ export class InfrastructurePlan {
     for (const facility of this.selectedFacilities) {
       total += facility.getOpeningFixedCost().getAmount();
     }
-    for (const facility of this.serviceAssignments.values()) {
-      total += facility.getOpeningFixedCost().getAmount();
+    for (const assignment of this.serviceAssignments) {
+      total += assignment.transportCost.getAmount();
     }
     const newCost = new TotalCost(total);
-    // Compare numeric amounts against maxBudget
     if (newCost.getAmount() > this.maxBudget.getAmount()) {
       throw new Error('Total cost exceeds maximum budget');
     }
@@ -105,10 +102,9 @@ export class InfrastructurePlan {
 
   /** Validate the plan: capacities and statuses of assigned facilities. */
   isPlanValid(): boolean {
-    for (const facility of this.serviceAssignments.values()) {
+    for (const assignment of this.serviceAssignments) {
+      const facility = assignment.facility;
       if (facility.getStatus() === undefined) return false;
-      // check discarded
-      // facility status helper exists in enum if needed elsewhere
       const totalDemand = facility.getAssignedWasteDemand();
       if (totalDemand.greaterThan(facility.getCapacity())) return false;
     }
@@ -128,5 +124,5 @@ export class InfrastructurePlan {
   equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof InfrastructurePlan)) return false; return this.id.equals(other.id); }
 
   /** Human-readable representation for debugging. */
-  toString(): string { return `InfrastructurePlan={id=${this.id}, period=${this.period}, facilities=${this.selectedFacilities}, assignments=${Array.from(this.serviceAssignments.keys())}, totalCost=${this.estimatedTotalCost}}`; }
+  toString(): string { return `InfrastructurePlan={id=${this.id}, period=${this.period}, facilities=${this.selectedFacilities}, assignments=${this.serviceAssignments}, totalCost=${this.estimatedTotalCost}}`; }
 }

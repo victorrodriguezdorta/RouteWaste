@@ -1,8 +1,5 @@
 package es.ull.project.adapter.rest.deserialization.facility;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -17,6 +14,9 @@ import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.location.Location;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * FacilityPutRequestBodyDeserializer

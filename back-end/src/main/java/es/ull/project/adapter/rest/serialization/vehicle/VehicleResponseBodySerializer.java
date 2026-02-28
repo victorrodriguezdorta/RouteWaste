@@ -1,13 +1,13 @@
 package es.ull.project.adapter.rest.serialization.vehicle;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
+
+import java.io.IOException;
 
 /**
  * Custom JSON serializer for VehicleResponseBody
@@ -37,16 +37,16 @@ public class VehicleResponseBodySerializer extends StdSerializer<VehicleResponse
     public void serialize(VehicleResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
         gen.writeStringField(JsonFields.ID, value.id.toString());
-        gen.writeStringField(JsonFields.VEHICLE_TYPE, value.vehicleType);
+        gen.writeStringField(JsonFields.VEHICLE_TYPE, value.vehicleType.name());
         gen.writeObjectFieldStart(JsonFields.TRANSPORT_CAPACITY);
-        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.transportCapacity.value);
-        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.transportCapacity.quantityUnit);
-        gen.writeStringField(JsonFields.TIME_UNIT, value.transportCapacity.timeUnit);
+        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.transportCapacity.getValue());
+        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.transportCapacity.getQuantityUnit().getValue());
+        gen.writeStringField(JsonFields.TIME_UNIT, value.transportCapacity.getTimeUnit().name());
         gen.writeEndObject();
         gen.writeObjectFieldStart(JsonFields.COST_PER_KILOMETER);
-        gen.writeNumberField(JsonFields.AMOUNT, value.costPerKilometer.amount);
-        if (value.costPerKilometer.currency != null) {
-            gen.writeStringField(JsonFields.CURRENCY, value.costPerKilometer.currency);
+        gen.writeNumberField(JsonFields.AMOUNT, value.costPerKilometer.getAmount());
+        if (value.costPerKilometer.getCurrency().isPresent()) {
+            gen.writeStringField(JsonFields.CURRENCY, value.costPerKilometer.getCurrency().get().getCode());
         }
         gen.writeEndObject();
         gen.writeEndObject();

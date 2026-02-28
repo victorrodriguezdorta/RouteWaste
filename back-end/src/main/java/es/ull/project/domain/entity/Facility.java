@@ -100,7 +100,7 @@ public class Facility {
         this.capacity = capacity;
         this.openingFixedCost = openingFixedCost;
         this.status = status;
-        this.assignedWasteDemand = new WasteDemand(0.0);
+        this.assignedWasteDemand = new WasteDemand(0.0, capacity.getQuantityUnit(), capacity.getTimeUnit());
     }
 
     /**
@@ -149,7 +149,7 @@ public class Facility {
         this.capacity = capacity;
         this.openingFixedCost = openingFixedCost;
         this.status = status;
-        this.assignedWasteDemand = assignedWasteDemand != null ? assignedWasteDemand : new WasteDemand(0.0);
+        this.assignedWasteDemand = assignedWasteDemand != null ? assignedWasteDemand : new WasteDemand(0.0, capacity.getQuantityUnit(), capacity.getTimeUnit());
     }
 
     /**

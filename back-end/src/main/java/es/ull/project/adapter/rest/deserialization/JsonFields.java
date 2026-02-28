@@ -80,6 +80,8 @@ public final class JsonFields {
     public static final String PERIOD = "period";
     public static final String MAX_BUDGET = "maxBudget";
     public static final String SERVICE_POLICIES = "servicePolicies";
+    public static final String SELECTED_FACILITY_IDS = "selectedFacilityIds";
+    public static final String SERVICE_ASSIGNMENT_IDS = "serviceAssignmentIds";
 
     /**
      * ServicePolicies fields

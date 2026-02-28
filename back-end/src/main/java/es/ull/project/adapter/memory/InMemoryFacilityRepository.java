@@ -1,8 +1,5 @@
 package es.ull.project.adapter.memory;
 
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.domain.entity.Facility;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,12 +7,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.domain.entity.Facility;
 
 /**
  * In-memory FacilityRepository for tests and local runs.
  */
-@Repository
 public class InMemoryFacilityRepository implements FacilityRepository {
 
     private final Map<UUID, Facility> store = new LinkedHashMap<>();

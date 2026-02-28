@@ -1,5 +1,15 @@
 package es.ull.project.adapter.rest.controller;
 
+import es.ull.project.adapter.rest.mapper.InfrastructurePlanResponseMapper;
+import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPostRequestBody;
+import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPutRequestBody;
+import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
+import es.ull.project.application.usecase.infrastructureplan.CreateInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.infrastructureplan.UpdateInfrastructurePlanUseCase;
+import es.ull.project.domain.entity.InfrastructurePlan;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -15,16 +25,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import es.ull.project.adapter.rest.mapper.InfrastructurePlanResponseMapper;
-import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPostRequestBody;
-import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPutRequestBody;
-import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
-import es.ull.project.application.service.infrastructureplan.CreateInfrastructurePlanService;
-import es.ull.project.application.service.infrastructureplan.DeleteInfrastructurePlanService;
-import es.ull.project.application.service.infrastructureplan.ReadInfrastructurePlanService;
-import es.ull.project.application.service.infrastructureplan.UpdateInfrastructurePlanService;
-import es.ull.project.domain.entity.InfrastructurePlan;
 
 /**
  * InfrastructurePlanController
@@ -47,28 +47,28 @@ public class InfrastructurePlanController {
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private ReadInfrastructurePlanService readInfrastructurePlanService;
+    private ReadInfrastructurePlanUseCase readInfrastructurePlanUseCase;
 
     /**
      * Use case for creating new infrastructure plans.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private CreateInfrastructurePlanService createInfrastructurePlanService;
+    private CreateInfrastructurePlanUseCase createInfrastructurePlanUseCase;
 
     /**
      * Use case for updating existing infrastructure plans.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private UpdateInfrastructurePlanService updateInfrastructurePlanService;
+    private UpdateInfrastructurePlanUseCase updateInfrastructurePlanUseCase;
 
     /**
      * Use case for deleting infrastructure plans.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private DeleteInfrastructurePlanService deleteInfrastructurePlanService;
+    private DeleteInfrastructurePlanUseCase deleteInfrastructurePlanUseCase;
 
     /**
      * GET /infrastructure-plans/
@@ -82,7 +82,7 @@ public class InfrastructurePlanController {
      */
     @GetMapping("/")
     public ResponseEntity<List<InfrastructurePlanResponseBody>> getInfrastructurePlans() {
-        List<InfrastructurePlan> plans = this.readInfrastructurePlanService.fetchAll();
+        List<InfrastructurePlan> plans = this.readInfrastructurePlanUseCase.fetchAll();
         List<InfrastructurePlanResponseBody> responseBodies = plans.stream()
                 .map(InfrastructurePlanResponseMapper::toResponseBody)
                 .toList();
@@ -103,7 +103,7 @@ public class InfrastructurePlanController {
     public ResponseEntity<InfrastructurePlanResponseBody> getInfrastructurePlanById(@PathVariable String id) {
         try {
             UUID planId = UUID.fromString(id);
-            InfrastructurePlan plan = this.readInfrastructurePlanService.fetch(planId);
+            InfrastructurePlan plan = this.readInfrastructurePlanUseCase.fetch(planId);
             InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(plan);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {
@@ -128,17 +128,15 @@ public class InfrastructurePlanController {
      */
     @PostMapping("/")
     public ResponseEntity<InfrastructurePlanResponseBody> createInfrastructurePlan(@RequestBody InfrastructurePlanPostRequestBody requestBody) {
-        try {
-            InfrastructurePlan createdPlan = this.createInfrastructurePlanService.create(
-                    requestBody.period,
-                    requestBody.maxBudget,
-                    requestBody.servicePolicies
-            );
-            InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(createdPlan);
-            return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        InfrastructurePlan createdPlan = this.createInfrastructurePlanUseCase.create(
+                requestBody.period,
+                requestBody.maxBudget,
+                requestBody.servicePolicies,
+                requestBody.selectedFacilityIds,
+                requestBody.serviceAssignmentIds
+        );
+        InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(createdPlan);
+        return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
     }
 
     /**
@@ -160,21 +158,17 @@ public class InfrastructurePlanController {
     public ResponseEntity<InfrastructurePlanResponseBody> updateInfrastructurePlan(
             @PathVariable String id,
             @RequestBody InfrastructurePlanPutRequestBody requestBody) {
-        try {
-            UUID planId = UUID.fromString(id);
-            InfrastructurePlan updatedPlan = this.updateInfrastructurePlanService.update(
-                    planId,
-                    requestBody.period,
-                    requestBody.maxBudget,
-                    requestBody.servicePolicies
-            );
-            InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(updatedPlan);
-            return new ResponseEntity<>(responseBody, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        UUID planId = UUID.fromString(id);
+        InfrastructurePlan updatedPlan = this.updateInfrastructurePlanUseCase.update(
+                planId,
+                requestBody.period,
+                requestBody.maxBudget,
+                requestBody.servicePolicies,
+                requestBody.selectedFacilityIds,
+                requestBody.serviceAssignmentIds
+        );
+        InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(updatedPlan);
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
     /**
@@ -192,15 +186,9 @@ public class InfrastructurePlanController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<InfrastructurePlanResponseBody> deleteInfrastructurePlan(@PathVariable String id) {
-        try {
-            UUID planId = UUID.fromString(id);
-            InfrastructurePlan deletedPlan = this.deleteInfrastructurePlanService.delete(planId);
-            InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(deletedPlan);
-            return new ResponseEntity<>(responseBody, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        UUID planId = UUID.fromString(id);
+        InfrastructurePlan deletedPlan = this.deleteInfrastructurePlanUseCase.delete(planId);
+        InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(deletedPlan);
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 }

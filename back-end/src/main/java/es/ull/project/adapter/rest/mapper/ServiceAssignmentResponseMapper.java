@@ -10,17 +10,24 @@ import es.ull.project.domain.entity.ServiceAssignment;
  */
 public class ServiceAssignmentResponseMapper {
 
+    private static final String UTILITY_CLASS_ERROR_MESSAGE = "Utility class cannot be instantiated";
+
     /**
      * Private constructor to prevent instantiation of utility class.
      */
     private ServiceAssignmentResponseMapper() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+        throw new UnsupportedOperationException(UTILITY_CLASS_ERROR_MESSAGE);
     }
 
     /**
-     * Converts a ServiceAssignment domain entity to a ServiceAssignmentResponseBody DTO
-     * Maps all the service assignment properties including nested objects (waste demand, distance, service time, transport cost)
-     * and complete container and facility entities.
+     * Converts a ServiceAssignment domain entity to a ServiceAssignmentResponseBody DTO.
+     * 
+     * Following DDD principles, this mapper passes domain value objects directly
+     * to the DTO instead of converting them to primitives. The serializer will
+     * extract the necessary fields when converting to JSON.
+     * 
+     * Maps all the service assignment properties including value objects (waste demand,
+     * distance, service time, transport cost) and complete container and facility entities.
      *
      * @param assignment The ServiceAssignment domain entity to convert
      * @return ServiceAssignmentResponseBody DTO ready to be serialized as JSON
@@ -30,20 +37,10 @@ public class ServiceAssignmentResponseMapper {
         responseBody.id = assignment.getId();
         responseBody.container = ContainerResponseMapper.toResponseBody(assignment.getContainer());
         responseBody.facility = FacilityResponseMapper.toResponseBody(assignment.getFacility());
-        responseBody.wasteDemand = new ServiceAssignmentResponseBody.WasteDemandData();
-        responseBody.wasteDemand.value = assignment.getWasteDemand().getValue();
-        responseBody.wasteDemand.quantityUnit = assignment.getWasteDemand().getQuantityUnit().getValue();
-        responseBody.wasteDemand.timeUnit = assignment.getWasteDemand().getTimeUnit().name();
-        responseBody.distance = new ServiceAssignmentResponseBody.DistanceData();
-        responseBody.distance.meters = assignment.getDistance().toMeters();
-        responseBody.distance.kilometers = assignment.getDistance().toKilometers();
-        responseBody.serviceTime = new ServiceAssignmentResponseBody.ServiceTimeData();
-        responseBody.serviceTime.minutes = assignment.getServiceTime().getValue();
-        responseBody.transportCost = new ServiceAssignmentResponseBody.TransportCostData();
-        responseBody.transportCost.amount = assignment.getTransportCost().getAmount();
-        if (assignment.getTransportCost().getCurrency().isPresent()) {
-            responseBody.transportCost.currency = assignment.getTransportCost().getCurrency().get().getCode();
-        }
+        responseBody.wasteDemand = assignment.getWasteDemand();
+        responseBody.distance = assignment.getDistance();
+        responseBody.serviceTime = assignment.getServiceTime();
+        responseBody.transportCost = assignment.getTransportCost();
         return responseBody;
     }
 }

@@ -1,5 +1,15 @@
 package es.ull.project.adapter.rest.controller;
 
+import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
+import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
+import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
+import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
+import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
+import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
+import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
+import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
+import es.ull.project.domain.entity.Facility;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -15,16 +25,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
-import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
-import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
-import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
-import es.ull.project.application.service.facility.CreateFacilityService;
-import es.ull.project.application.service.facility.DeleteFacilityService;
-import es.ull.project.application.service.facility.ReadFacilityService;
-import es.ull.project.application.service.facility.UpdateFacilityService;
-import es.ull.project.domain.entity.Facility;
 
 /**
  * FacilityController
@@ -47,28 +47,28 @@ public class FacilityController {
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private ReadFacilityService readFacilityService;
+    private ReadFacilityUseCase readFacilityUseCase;
 
     /**
      * Use case for creating new facilities.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private CreateFacilityService createFacilityService;
+    private CreateFacilityUseCase createFacilityUseCase;
 
     /**
      * Use case for updating existing facilities.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private UpdateFacilityService updateFacilityService;
+    private UpdateFacilityUseCase updateFacilityUseCase;
 
     /**
      * Use case for deleting facilities.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private DeleteFacilityService deleteFacilityService;
+    private DeleteFacilityUseCase deleteFacilityUseCase;
 
     /**
      * GET /facilities/
@@ -82,7 +82,7 @@ public class FacilityController {
      */
     @GetMapping("/")
     public ResponseEntity<List<FacilityResponseBody>> getFacilities() {
-        List<Facility> facilities = this.readFacilityService.fetchAll();
+        List<Facility> facilities = this.readFacilityUseCase.fetchAll();
         List<FacilityResponseBody> responseBodies = facilities.stream()
                 .map(FacilityResponseMapper::toResponseBody)
                 .toList();
@@ -103,7 +103,7 @@ public class FacilityController {
     public ResponseEntity<FacilityResponseBody> getFacilityById(@PathVariable String id) {
         try {
             UUID facilityId = UUID.fromString(id);
-            Facility facility = this.readFacilityService.fetch(facilityId);
+            Facility facility = this.readFacilityUseCase.fetch(facilityId);
             FacilityResponseBody responseBody = FacilityResponseMapper.toResponseBody(facility);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {
@@ -129,7 +129,7 @@ public class FacilityController {
     @PostMapping("/")
     public ResponseEntity<FacilityResponseBody> createFacility(@RequestBody FacilityPostRequestBody requestBody) {
         try {
-            Facility createdFacility = this.createFacilityService.create(
+            Facility createdFacility = this.createFacilityUseCase.create(
                     requestBody.facilityType,
                     requestBody.location,
                     requestBody.capacity,
@@ -164,7 +164,7 @@ public class FacilityController {
             @RequestBody FacilityPutRequestBody requestBody) {
         try {
             UUID facilityId = UUID.fromString(id);
-            Facility updatedFacility = this.updateFacilityService.update(
+            Facility updatedFacility = this.updateFacilityUseCase.update(
                     facilityId,
                     requestBody.facilityType,
                     requestBody.location,
@@ -198,7 +198,7 @@ public class FacilityController {
     public ResponseEntity<FacilityResponseBody> deleteFacility(@PathVariable String id) {
         try {
             UUID facilityId = UUID.fromString(id);
-            Facility deletedFacility = this.deleteFacilityService.delete(facilityId);
+            Facility deletedFacility = this.deleteFacilityUseCase.delete(facilityId);
             FacilityResponseBody responseBody = FacilityResponseMapper.toResponseBody(deletedFacility);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {

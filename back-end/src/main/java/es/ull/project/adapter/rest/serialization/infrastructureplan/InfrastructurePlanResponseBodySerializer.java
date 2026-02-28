@@ -1,20 +1,23 @@
 package es.ull.project.adapter.rest.serialization.infrastructureplan;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
+import es.ull.project.adapter.rest.serialization.facility.FacilityResponseBodySerializer;
+
+import java.io.IOException;
 
 /**
  * Custom JSON serializer for InfrastructurePlanResponseBody
  * This serializer manually controls how InfrastructurePlan response data is converted to JSON format
- * It follows the Jackson serialization pattern using JsonGenerator
+ * Includes complete facility and container information in the response
  */
 public class InfrastructurePlanResponseBodySerializer extends StdSerializer<InfrastructurePlanResponseBody> {
+
+    private final FacilityResponseBodySerializer facilitySerializer = new FacilityResponseBodySerializer();
 
     /**
      * Default constructor for the serializer
@@ -26,7 +29,7 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
 
     /**
      * Serializes an InfrastructurePlanResponseBody object into JSON format
-     * This method writes each field of the infrastructure plan to the JSON output stream
+     * Extracts primitives from domain value objects during serialization
      *
      * @param value    The InfrastructurePlanResponseBody object to serialize
      * @param gen      JsonGenerator to write JSON content
@@ -37,31 +40,41 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
     public void serialize(InfrastructurePlanResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
         gen.writeStringField(JsonFields.ID, value.id.toString());
-        gen.writeStringField(JsonFields.PERIOD, value.period);
+        gen.writeStringField(JsonFields.PERIOD, value.period.getValue());
+        gen.writeArrayFieldStart("selectedFacilities");
+        for (var facility : value.selectedFacilities) {
+            facilitySerializer.serialize(facility, gen, provider);
+        }
+        gen.writeEndArray();
+        gen.writeArrayFieldStart("serviceAssignments");
+        for (var assignment : value.serviceAssignments) {
+            gen.writeObject(assignment);
+        }
+        gen.writeEndArray();
         gen.writeObjectFieldStart(JsonFields.MAX_BUDGET);
-        gen.writeNumberField(JsonFields.AMOUNT, value.maxBudget.amount);
-        if (value.maxBudget.currency != null) {
-            gen.writeStringField(JsonFields.CURRENCY, value.maxBudget.currency);
+        gen.writeNumberField(JsonFields.AMOUNT, value.maxBudget.getAmount());
+        if (value.maxBudget.getCurrency().isPresent()) {
+            gen.writeStringField(JsonFields.CURRENCY, value.maxBudget.getCurrency().get().getCode());
         }
         gen.writeEndObject();
         gen.writeObjectFieldStart("estimatedTotalCost");
-        gen.writeNumberField(JsonFields.AMOUNT, value.estimatedTotalCost.amount);
-        if (value.estimatedTotalCost.currency != null) {
-            gen.writeStringField(JsonFields.CURRENCY, value.estimatedTotalCost.currency);
+        gen.writeNumberField(JsonFields.AMOUNT, value.estimatedTotalCost.getAmount());
+        if (value.estimatedTotalCost.getCurrency().isPresent()) {
+            gen.writeStringField(JsonFields.CURRENCY, value.estimatedTotalCost.getCurrency().get().getCode());
         }
         gen.writeEndObject();
         gen.writeObjectFieldStart(JsonFields.SERVICE_POLICIES);
-        if (value.servicePolicies.maxServiceDistance != null) {
-            gen.writeNumberField(JsonFields.MAX_SERVICE_DISTANCE, value.servicePolicies.maxServiceDistance);
+        if (value.servicePolicies.getMaxServiceDistance().isPresent()) {
+            gen.writeNumberField(JsonFields.MAX_SERVICE_DISTANCE, value.servicePolicies.getMaxServiceDistance().get());
         }
-        if (value.servicePolicies.maxServiceTime != null) {
-            gen.writeNumberField(JsonFields.MAX_SERVICE_TIME, value.servicePolicies.maxServiceTime);
+        if (value.servicePolicies.getMaxServiceTime().isPresent()) {
+            gen.writeNumberField(JsonFields.MAX_SERVICE_TIME, value.servicePolicies.getMaxServiceTime().get());
         }
-        if (value.servicePolicies.maxInfrastructureCount != null) {
-            gen.writeNumberField(JsonFields.MAX_INFRASTRUCTURE_COUNT, value.servicePolicies.maxInfrastructureCount);
+        if (value.servicePolicies.getMaxInfrastructureCount().isPresent()) {
+            gen.writeNumberField(JsonFields.MAX_INFRASTRUCTURE_COUNT, value.servicePolicies.getMaxInfrastructureCount().get());
         }
-        if (value.servicePolicies.maxEmissions != null) {
-            gen.writeNumberField(JsonFields.MAX_EMISSIONS, value.servicePolicies.maxEmissions);
+        if (value.servicePolicies.getMaxEmissions().isPresent()) {
+            gen.writeNumberField(JsonFields.MAX_EMISSIONS, value.servicePolicies.getMaxEmissions().get());
         }
         gen.writeEndObject();
         gen.writeEndObject();

@@ -1,12 +1,5 @@
 package es.ull.project.application.service.serviceassignment;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import es.ull.project.adapter.rest.exception.FieldError;
-import es.ull.project.adapter.rest.exception.ValidationException;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
@@ -18,6 +11,11 @@ import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.ServiceTime;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service responsible for creating new service assignments in the system.
@@ -56,7 +54,7 @@ public class CreateServiceAssignmentService implements CreateServiceAssignmentUs
      * 
      * This method first validates that both Container and Facility entities exist
      * by checking their respective repositories. If one or both entities do not exist,
-     * a ValidationException is thrown with all the validation errors in structured format.
+     * an IllegalArgumentException is thrown with details about missing entities.
      * Once both entities are retrieved, a new ServiceAssignment is created with
      * the complete entity references and persisted to the database.
      *
@@ -67,21 +65,21 @@ public class CreateServiceAssignmentService implements CreateServiceAssignmentUs
      * @param serviceTime the time required to service the container
      * @param transportCost the transportation cost for this assignment
      * @return the newly created and persisted service assignment
-     * @throws ValidationException if the container or facility (or both) do not exist
+     * @throws IllegalArgumentException if the container or facility (or both) do not exist
      */
     @Override
     public ServiceAssignment create(UUID containerId, UUID facilityId, WasteDemand wasteDemand, Distance distance, ServiceTime serviceTime, TransportationVariableCost transportCost) {
-        List<FieldError> errors = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
         Optional<Container> containerOpt = containerRepository.findById(containerId);
         if (containerOpt.isEmpty()) {
-            errors.add(new FieldError("containerId", "Container with id " + containerId + " not found"));
+            errors.add("Container with id " + containerId + " not found");
         }
         Optional<Facility> facilityOpt = facilityRepository.findById(facilityId);
         if (facilityOpt.isEmpty()) {
-            errors.add(new FieldError("facilityId", "Facility with id " + facilityId + " not found"));
+            errors.add("Facility with id " + facilityId + " not found");
         }
         if (!errors.isEmpty()) {
-            throw new ValidationException(errors);
+            throw new IllegalArgumentException(String.join("; ", errors));
         }
         Container container = containerOpt.get();
         Facility facility = facilityOpt.get();

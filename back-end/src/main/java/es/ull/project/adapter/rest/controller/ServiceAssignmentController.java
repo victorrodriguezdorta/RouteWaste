@@ -22,10 +22,10 @@ import es.ull.project.adapter.rest.mapper.ServiceAssignmentResponseMapper;
 import es.ull.project.adapter.rest.request.serviceassignment.ServiceAssignmentPostRequestBody;
 import es.ull.project.adapter.rest.request.serviceassignment.ServiceAssignmentPutRequestBody;
 import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
-import es.ull.project.application.service.serviceassignment.CreateServiceAssignmentService;
-import es.ull.project.application.service.serviceassignment.DeleteServiceAssignmentService;
-import es.ull.project.application.service.serviceassignment.ReadServiceAssignmentService;
-import es.ull.project.application.service.serviceassignment.UpdateServiceAssignmentService;
+import es.ull.project.application.usecase.serviceassignment.CreateServiceAssignmentUseCase;
+import es.ull.project.application.usecase.serviceassignment.DeleteServiceAssignmentUseCase;
+import es.ull.project.application.usecase.serviceassignment.ReadServiceAssignmentUseCase;
+import es.ull.project.application.usecase.serviceassignment.UpdateServiceAssignmentUseCase;
 import es.ull.project.domain.entity.ServiceAssignment;
 
 /**
@@ -49,28 +49,28 @@ public class ServiceAssignmentController {
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private ReadServiceAssignmentService readServiceAssignmentService;
+    private ReadServiceAssignmentUseCase readServiceAssignmentUseCase;
 
     /**
      * Use case for creating new service assignments.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private CreateServiceAssignmentService createServiceAssignmentService;
+    private CreateServiceAssignmentUseCase createServiceAssignmentUseCase;
 
     /**
      * Use case for updating existing service assignments.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private UpdateServiceAssignmentService updateServiceAssignmentService;
+    private UpdateServiceAssignmentUseCase updateServiceAssignmentUseCase;
 
     /**
      * Use case for deleting service assignments.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private DeleteServiceAssignmentService deleteServiceAssignmentService;
+    private DeleteServiceAssignmentUseCase deleteServiceAssignmentUseCase;
 
     /**
      * GET /service-assignments/
@@ -84,7 +84,7 @@ public class ServiceAssignmentController {
      */
     @GetMapping("/")
     public ResponseEntity<List<ServiceAssignmentResponseBody>> getServiceAssignments() {
-        List<ServiceAssignment> assignments = this.readServiceAssignmentService.fetchAll();
+        List<ServiceAssignment> assignments = this.readServiceAssignmentUseCase.fetchAll();
         List<ServiceAssignmentResponseBody> responseBodies = assignments.stream()
                 .map(ServiceAssignmentResponseMapper::toResponseBody)
                 .toList();
@@ -105,7 +105,7 @@ public class ServiceAssignmentController {
     public ResponseEntity<ServiceAssignmentResponseBody> getServiceAssignmentById(@PathVariable String id) {
         try {
             UUID assignmentId = UUID.fromString(id);
-            ServiceAssignment assignment = this.readServiceAssignmentService.fetch(assignmentId);
+            ServiceAssignment assignment = this.readServiceAssignmentUseCase.fetch(assignmentId);
             ServiceAssignmentResponseBody responseBody = ServiceAssignmentResponseMapper.toResponseBody(assignment);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {
@@ -131,9 +131,9 @@ public class ServiceAssignmentController {
      *         or HTTP 400 (BAD_REQUEST) with error message if validation fails or entities are not found
      */
     @PostMapping("/")
-    public ResponseEntity<?> createServiceAssignment(@RequestBody ServiceAssignmentPostRequestBody requestBody) {
+    public ResponseEntity<Object> createServiceAssignment(@RequestBody ServiceAssignmentPostRequestBody requestBody) {
         try {
-            ServiceAssignment createdAssignment = this.createServiceAssignmentService.create(
+            ServiceAssignment createdAssignment = this.createServiceAssignmentUseCase.create(
                     requestBody.containerId,
                     requestBody.facilityId,
                     requestBody.wasteDemand,
@@ -173,7 +173,7 @@ public class ServiceAssignmentController {
             UUID assignmentId = UUID.fromString(id);
             UUID containerId = requestBody.container != null ? requestBody.container.getId() : null;
             UUID facilityId = requestBody.facility != null ? requestBody.facility.getId() : null;
-            ServiceAssignment updatedAssignment = this.updateServiceAssignmentService.update(
+            ServiceAssignment updatedAssignment = this.updateServiceAssignmentUseCase.update(
                     assignmentId,
                     containerId,
                     facilityId,
@@ -208,7 +208,7 @@ public class ServiceAssignmentController {
     public ResponseEntity<ServiceAssignmentResponseBody> deleteServiceAssignment(@PathVariable String id) {
         try {
             UUID assignmentId = UUID.fromString(id);
-            ServiceAssignment deletedAssignment = this.deleteServiceAssignmentService.delete(assignmentId);
+            ServiceAssignment deletedAssignment = this.deleteServiceAssignmentUseCase.delete(assignmentId);
             ServiceAssignmentResponseBody responseBody = ServiceAssignmentResponseMapper.toResponseBody(deletedAssignment);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {

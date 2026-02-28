@@ -9,11 +9,13 @@ import es.ull.project.domain.entity.Vehicle;
  */
 public class VehicleResponseMapper {
 
+    private static final String UTILITY_CLASS_ERROR_MESSAGE = "This is a utility class and cannot be instantiated";
+
     /**
      * Private constructor to prevent instantiation of this utility class
      */
     private VehicleResponseMapper() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+        throw new UnsupportedOperationException(UTILITY_CLASS_ERROR_MESSAGE);
     }
 
     /**
@@ -26,16 +28,9 @@ public class VehicleResponseMapper {
     public static VehicleResponseBody toResponseBody(Vehicle vehicle) {
         VehicleResponseBody responseBody = new VehicleResponseBody();
         responseBody.id = vehicle.getId();
-        responseBody.vehicleType = vehicle.getVehicleType().name();
-        responseBody.transportCapacity = new VehicleResponseBody.TransportCapacityData();
-        responseBody.transportCapacity.value = vehicle.getTransportCapacity().getValue();
-        responseBody.transportCapacity.quantityUnit = vehicle.getTransportCapacity().getQuantityUnit().getValue();
-        responseBody.transportCapacity.timeUnit = vehicle.getTransportCapacity().getTimeUnit().name();
-        responseBody.costPerKilometer = new VehicleResponseBody.CostPerKilometerData();
-        responseBody.costPerKilometer.amount = vehicle.getCostPerKilometer().getAmount();
-        if (vehicle.getCostPerKilometer().getCurrency().isPresent()) {
-            responseBody.costPerKilometer.currency = vehicle.getCostPerKilometer().getCurrency().get().getCode();
-        }
+        responseBody.vehicleType = vehicle.getVehicleType();
+        responseBody.transportCapacity = vehicle.getTransportCapacity();
+        responseBody.costPerKilometer = vehicle.getCostPerKilometer();
         return responseBody;
     }
 }

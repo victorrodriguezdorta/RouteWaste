@@ -25,10 +25,13 @@ public class ServiceAssignmentResponseBodySerializer extends StdSerializer<Servi
     }
 
     /**
-     * Serializes a ServiceAssignmentResponseBody object into JSON format
-     * This method writes each field of the service assignment to the JSON output stream,
-     * including complete container and facility entities that will be automatically
-     * serialized by their respective serializers.
+     * Serializes a ServiceAssignmentResponseBody object into JSON format.
+     * 
+     * This method extracts fields from domain value objects and writes them to JSON.
+     * For each value object (WasteDemand, Distance, ServiceTime, TransportationVariableCost),
+     * it calls the appropriate getter methods defined in the domain layer.
+     * 
+     * Container and facility entities are automatically serialized by their respective serializers.
      *
      * @param value    The ServiceAssignmentResponseBody object to serialize
      * @param gen      JsonGenerator to write JSON content
@@ -42,21 +45,21 @@ public class ServiceAssignmentResponseBodySerializer extends StdSerializer<Servi
         gen.writeObjectField(JsonFields.CONTAINER, value.container);
         gen.writeObjectField(JsonFields.FACILITY, value.facility);
         gen.writeObjectFieldStart(JsonFields.WASTE_DEMAND);
-        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.wasteDemand.value);
-        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.wasteDemand.quantityUnit);
-        gen.writeStringField(JsonFields.TIME_UNIT, value.wasteDemand.timeUnit);
+        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.wasteDemand.getValue());
+        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.wasteDemand.getQuantityUnit().getValue());
+        gen.writeStringField(JsonFields.TIME_UNIT, value.wasteDemand.getTimeUnit().name());
         gen.writeEndObject();
         gen.writeObjectFieldStart(JsonFields.DISTANCE);
-        gen.writeNumberField(JsonFields.METERS, value.distance.meters);
-        gen.writeNumberField(JsonFields.KILOMETERS, value.distance.kilometers);
+        gen.writeNumberField(JsonFields.METERS, value.distance.toMeters());
+        gen.writeNumberField(JsonFields.KILOMETERS, value.distance.toKilometers());
         gen.writeEndObject();
         gen.writeObjectFieldStart(JsonFields.SERVICE_TIME);
-        gen.writeNumberField(JsonFields.MINUTES, value.serviceTime.minutes);
+        gen.writeNumberField(JsonFields.MINUTES, value.serviceTime.getValue());
         gen.writeEndObject();
         gen.writeObjectFieldStart(JsonFields.TRANSPORT_COST);
-        gen.writeNumberField(JsonFields.AMOUNT, value.transportCost.amount);
-        if (value.transportCost.currency != null) {
-            gen.writeStringField(JsonFields.CURRENCY, value.transportCost.currency);
+        gen.writeNumberField(JsonFields.AMOUNT, value.transportCost.getAmount());
+        if (value.transportCost.getCurrency().isPresent()) {
+            gen.writeStringField(JsonFields.CURRENCY, value.transportCost.getCurrency().get().getCode());
         }
         gen.writeEndObject();
         gen.writeEndObject();
