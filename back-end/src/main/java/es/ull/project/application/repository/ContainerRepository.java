@@ -1,10 +1,10 @@
 package es.ull.project.application.repository;
 
-import es.ull.project.domain.entity.Container;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import es.ull.project.domain.entity.Container;
 
 /**
  * Repository interface for the Container aggregate.
@@ -51,4 +51,14 @@ public interface ContainerRepository {
      * @return optional containing the container when found
      */
     public abstract Optional<Container> findById(UUID id);
+
+    /**
+     * Find multiple containers by their identifiers (batch operation).
+     * This method is optimized for retrieving multiple entities at once,
+     * reducing the number of database queries (solving N+1 problem).
+     *
+     * @param ids collection of container UUIDs
+     * @return list of found containers (may be less than requested if some don't exist)
+     */
+    public abstract List<Container> findAllById(List<UUID> ids);
 }

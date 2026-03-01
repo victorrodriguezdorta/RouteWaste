@@ -1,10 +1,10 @@
 package es.ull.project.adapter.mongo.document.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import es.ull.project.adapter.mongo.document.valueobject.CapacityDocument;
 import es.ull.project.adapter.mongo.document.valueobject.TransportationVariableCostDocument;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "vehicles")
 public class VehicleDocument {

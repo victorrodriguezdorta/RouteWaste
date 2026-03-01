@@ -1,10 +1,10 @@
 package es.ull.project.application.repository;
 
-import es.ull.project.domain.entity.Facility;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import es.ull.project.domain.entity.Facility;
 
 /**
  * Repository interface for the Facility aggregate.
@@ -51,4 +51,14 @@ public interface FacilityRepository {
      * @return optional containing the facility when present
      */
     public abstract Optional<Facility> findById(UUID id);
+
+    /**
+     * Find multiple facilities by their identifiers (batch operation).
+     * This method is optimized for retrieving multiple entities at once,
+     * reducing the number of database queries (solving N+1 problem).
+     *
+     * @param ids collection of facility UUIDs
+     * @return list of found facilities (may be less than requested if some don't exist)
+     */
+    public abstract List<Facility> findAllById(List<UUID> ids);
 }

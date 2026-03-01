@@ -3,6 +3,7 @@ package es.ull.project.adapter.mongo.document.entity;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import es.ull.project.adapter.mongo.document.valueobject.MaximumBudgetDocument;
@@ -15,7 +16,11 @@ public class InfrastructurePlanDocument {
     private String id;
 
     private String planningPeriod;
+    
+    @Indexed
     private List<String> selectedFacilityIds;
+    
+    @Indexed
     private List<String> serviceAssignmentIds;
     private ServicePoliciesDocument servicePolicies;
     private MaximumBudgetDocument maxBudget;

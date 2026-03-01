@@ -75,4 +75,53 @@ public class InMemoryServiceAssignmentRepository implements ServiceAssignmentRep
     public Optional<ServiceAssignment> findById(UUID id) {
         return Optional.ofNullable(store.get(id));
     }
+
+    /**
+     * Finds all service assignments that reference a specific container.
+     *
+     * @param containerId the container UUID
+     * @return list of service assignments using this container
+     */
+    @Override
+    public List<ServiceAssignment> findByContainerId(UUID containerId) {
+        if (containerId == null) {
+            return List.of();
+        }
+        return store.values().stream()
+                .filter(sa -> sa.getContainer() != null && containerId.equals(sa.getContainer().getId()))
+                .toList();
+    }
+
+    /**
+     * Finds all service assignments that reference a specific facility.
+     *
+     * @param facilityId the facility UUID
+     * @return list of service assignments using this facility
+     */
+    @Override
+    public List<ServiceAssignment> findByFacilityId(UUID facilityId) {
+        if (facilityId == null) {
+            return List.of();
+        }
+        return store.values().stream()
+                .filter(sa -> sa.getFacility() != null && facilityId.equals(sa.getFacility().getId()))
+                .toList();
+    }
+
+    /**
+     * Finds multiple service assignments by their identifiers (batch operation).
+     *
+     * @param ids collection of service assignment UUIDs
+     * @return list of found service assignments
+     */
+    @Override
+    public List<ServiceAssignment> findAllById(List<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return ids.stream()
+                .map(store::get)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+    }
 }

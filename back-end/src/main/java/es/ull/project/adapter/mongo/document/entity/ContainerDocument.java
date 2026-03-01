@@ -1,11 +1,10 @@
 package es.ull.project.adapter.mongo.document.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import es.ull.project.adapter.mongo.document.valueobject.LocationDocument;
 import es.ull.project.adapter.mongo.document.valueobject.WasteDemandDocument;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 /**
  * MongoDB document representation for Container aggregate.
  */

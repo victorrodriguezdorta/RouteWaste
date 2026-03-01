@@ -1,19 +1,23 @@
 package es.ull.project.adapter.mongo.document.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import es.ull.project.adapter.mongo.document.valueobject.DistanceDocument;
 import es.ull.project.adapter.mongo.document.valueobject.ServiceTimeDocument;
 import es.ull.project.adapter.mongo.document.valueobject.TransportationVariableCostDocument;
 import es.ull.project.adapter.mongo.document.valueobject.WasteDemandDocument;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "service_assignment")
 public class ServiceAssignmentDocument {
     @Id
     private String id;
 
+    @Indexed
     private String containerId;
+    
+    @Indexed
     private String facilityId;
     private DistanceDocument distance;
     private ServiceTimeDocument serviceTime;

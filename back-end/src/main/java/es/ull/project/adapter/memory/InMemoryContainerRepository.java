@@ -76,4 +76,21 @@ public class InMemoryContainerRepository implements ContainerRepository {
     public Optional<Container> findById(UUID id) {
         return Optional.ofNullable(store.get(id));
     }
+
+    /**
+     * Finds multiple containers by their identifiers (batch operation).
+     *
+     * @param ids collection of container UUIDs
+     * @return list of found containers
+     */
+    @Override
+    public List<Container> findAllById(List<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return ids.stream()
+                .map(store::get)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+    }
 }

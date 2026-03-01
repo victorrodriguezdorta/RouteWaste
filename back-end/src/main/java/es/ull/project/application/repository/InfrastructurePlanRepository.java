@@ -1,10 +1,10 @@
 package es.ull.project.application.repository;
 
-import es.ull.project.domain.entity.InfrastructurePlan;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import es.ull.project.domain.entity.InfrastructurePlan;
 
 /**
  * Repository interface for InfrastructurePlan aggregates.
@@ -50,4 +50,20 @@ public interface InfrastructurePlanRepository {
      * @return optional with the plan if present
      */
     public abstract Optional<InfrastructurePlan> findById(UUID id);
+
+    /**
+     * Find all infrastructure plans that include a specific facility.
+     *
+     * @param facilityId the facility UUID
+     * @return list of infrastructure plans using this facility
+     */
+    public abstract List<InfrastructurePlan> findByFacilityId(UUID facilityId);
+
+    /**
+     * Find all infrastructure plans that include a specific service assignment.
+     *
+     * @param serviceAssignmentId the service assignment UUID
+     * @return list of infrastructure plans using this service assignment
+     */
+    public abstract List<InfrastructurePlan> findByServiceAssignmentId(UUID serviceAssignmentId);
 }

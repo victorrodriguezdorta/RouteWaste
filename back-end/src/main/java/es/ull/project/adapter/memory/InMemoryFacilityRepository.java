@@ -75,4 +75,19 @@ public class InMemoryFacilityRepository implements FacilityRepository {
     public Optional<Facility> findById(UUID id) {
         return Optional.ofNullable(store.get(id));
     }
-}
+    /**
+     * Finds multiple facilities by their identifiers (batch operation).
+     *
+     * @param ids collection of facility UUIDs
+     * @return list of found facilities
+     */
+    @Override
+    public List<Facility> findAllById(List<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return ids.stream()
+                .map(store::get)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+    }}

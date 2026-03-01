@@ -6,9 +6,13 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataAccessException;
+
 import es.ull.project.adapter.mongo.document.entity.VehicleDocument;
 import es.ull.project.adapter.mongo.document.valueobject.CapacityDocument;
 import es.ull.project.adapter.mongo.document.valueobject.TransportationVariableCostDocument;
+import es.ull.project.adapter.mongo.exception.DataCorruptionException;
+import es.ull.project.adapter.mongo.exception.PersistenceException;
 import es.ull.project.adapter.mongo.spring.VehicleSpringRepository;
 import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.domain.entity.Vehicle;
@@ -33,12 +37,23 @@ public class MongoDbVehicleRepository implements VehicleRepository {
         if (entity == null) {
             return;
         }
-        this.springRepo.deleteById(entity.getId().toString());
+        try {
+            this.springRepo.deleteById(entity.getId().toString());
+        } catch (DataAccessException e) {
+            throw new PersistenceException(
+                "Failed to delete Vehicle with ID: " + entity.getId(), e);
+        }
     }
 
     @Override
     public List<Vehicle> fetchAll() {
-        return this.springRepo.findAll().stream().map(this::toDomain).collect(Collectors.toList());
+        try {
+            return this.springRepo.findAll().stream()
+                    .map(this::toDomain)
+                    .collect(Collectors.toList());
+        } catch (DataAccessException e) {
+            throw new PersistenceException("Failed to fetch all Vehicles", e);
+        }
     }
 
     @Override
@@ -51,9 +66,14 @@ public class MongoDbVehicleRepository implements VehicleRepository {
         if (entity == null) {
             return null;
         }
-        VehicleDocument doc = toDocument(entity);
-        VehicleDocument saved = this.springRepo.save(doc);
-        return toDomain(saved);
+        try {
+            VehicleDocument doc = toDocument(entity);
+            VehicleDocument saved = this.springRepo.save(doc);
+            return toDomain(saved);
+        } catch (DataAccessException e) {
+            throw new PersistenceException(
+                "Failed to save Vehicle with ID: " + entity.getId(), e);
+        }
     }
 
     @Override
@@ -61,22 +81,59 @@ public class MongoDbVehicleRepository implements VehicleRepository {
         if (id == null) {
             return Optional.empty();
         }
-        return this.springRepo.findById(id.toString()).map(this::toDomain);
+        try {
+            return this.springRepo.findById(id.toString()).map(this::toDomain);
+        } catch (DataAccessException e) {
+            throw new PersistenceException(
+                "Failed to find Vehicle with ID: " + id, e);
+        }
     }
 
     private Vehicle toDomain(VehicleDocument doc) {
         if (doc == null) {
             return null;
         }
-        UUID id = UUID.fromString(doc.getId());
-        VehicleType type = VehicleType.valueOf(doc.getVehicleType());
-        CapacityDocument cap = doc.getTransportCapacity();
-        QuantityUnit qu = new QuantityUnit(cap.getQuantityUnit());
-        TimeUnit timeUnit = TimeUnit.valueOf(cap.getTimeUnit());
-        Capacity capacity = new Capacity(cap.getValue(), qu, timeUnit);
-        TransportationVariableCostDocument costDoc = doc.getCostPerKilometer();
-        TransportationVariableCost cost = new TransportationVariableCost(costDoc.getAmount(), costDoc.getCurrency());
-        return new Vehicle(id, type, capacity, cost);
+        
+        try {
+            // Validate document ID
+            if (doc.getId() == null || doc.getId().isBlank()) {
+                throw new DataCorruptionException("VehicleDocument", "id", doc.getId(),
+                    "ID cannot be null or empty");
+            }
+            UUID id = UUID.fromString(doc.getId());
+            
+            // Validate and convert VehicleType
+            if (doc.getVehicleType() == null || doc.getVehicleType().isBlank()) {
+                throw new DataCorruptionException("VehicleDocument", "vehicleType", doc.getVehicleType(),
+                    "VehicleType cannot be null or empty");
+            }
+            VehicleType type = VehicleType.valueOf(doc.getVehicleType());
+            
+            // Validate and convert Capacity
+            CapacityDocument cap = doc.getTransportCapacity();
+            if (cap == null) {
+                throw new DataCorruptionException("VehicleDocument", "transportCapacity", null,
+                    "TransportCapacity cannot be null");
+            }
+            QuantityUnit qu = new QuantityUnit(cap.getQuantityUnit());
+            TimeUnit timeUnit = TimeUnit.valueOf(cap.getTimeUnit());
+            Capacity capacity = new Capacity(cap.getValue(), qu, timeUnit);
+            
+            // Validate and convert TransportationVariableCost
+            TransportationVariableCostDocument costDoc = doc.getCostPerKilometer();
+            if (costDoc == null) {
+                throw new DataCorruptionException("VehicleDocument", "costPerKilometer", null,
+                    "CostPerKilometer cannot be null");
+            }
+            TransportationVariableCost cost = new TransportationVariableCost(
+                costDoc.getAmount(), costDoc.getCurrency());
+            
+            return new Vehicle(id, type, capacity, cost);
+            
+        } catch (IllegalArgumentException e) {
+            throw new DataCorruptionException(
+                "Invalid data format in VehicleDocument: " + e.getMessage(), e);
+        }
     }
 
     private VehicleDocument toDocument(Vehicle entity) {

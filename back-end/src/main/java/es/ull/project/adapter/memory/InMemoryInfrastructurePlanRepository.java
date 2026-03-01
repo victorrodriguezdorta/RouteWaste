@@ -1,14 +1,14 @@
 package es.ull.project.adapter.memory;
 
-import es.ull.project.application.repository.InfrastructurePlanRepository;
-import es.ull.project.domain.entity.InfrastructurePlan;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import es.ull.project.application.repository.InfrastructurePlanRepository;
+import es.ull.project.domain.entity.InfrastructurePlan;
 
 /**
  * In-memory InfrastructurePlanRepository for tests and local runs.
@@ -74,5 +74,39 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
     @Override
     public Optional<InfrastructurePlan> findById(UUID id) {
         return Optional.ofNullable(store.get(id));
+    }
+
+    /**
+     * Finds all infrastructure plans that include a specific facility.
+     *
+     * @param facilityId the facility UUID
+     * @return list of infrastructure plans using this facility
+     */
+    @Override
+    public List<InfrastructurePlan> findByFacilityId(UUID facilityId) {
+        if (facilityId == null) {
+            return List.of();
+        }
+        return store.values().stream()
+                .filter(plan -> plan.getSelectedFacilities().stream()
+                        .anyMatch(f -> facilityId.equals(f.getId())))
+                .toList();
+    }
+
+    /**
+     * Finds all infrastructure plans that include a specific service assignment.
+     *
+     * @param serviceAssignmentId the service assignment UUID
+     * @return list of infrastructure plans using this service assignment
+     */
+    @Override
+    public List<InfrastructurePlan> findByServiceAssignmentId(UUID serviceAssignmentId) {
+        if (serviceAssignmentId == null) {
+            return List.of();
+        }
+        return store.values().stream()
+                .filter(plan -> plan.getServiceAssignments().stream()
+                        .anyMatch(sa -> serviceAssignmentId.equals(sa.getId())))
+                .toList();
     }
 }

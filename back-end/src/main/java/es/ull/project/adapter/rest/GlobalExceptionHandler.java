@@ -3,6 +3,7 @@ package es.ull.project.adapter.rest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import es.ull.project.adapter.rest.exception.ValidationException;
 import es.ull.project.adapter.rest.response.ErrorResponse;
+import es.ull.project.application.exception.ReferentialIntegrityException;
 
 /**
  * GlobalExceptionHandler
@@ -120,6 +122,31 @@ public class GlobalExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage() != null ? ex.getMessage() : "Resource not found");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handles referential integrity violations when attempting to delete entities.
+     * This occurs when an entity cannot be deleted because other entities still reference it.
+     * Returns a detailed response with the entity type and list of referencing entity IDs.
+     * 
+     * @param ex the ReferentialIntegrityException thrown by services
+     * @return ResponseEntity with error details and HTTP 409 (CONFLICT)
+     */
+    @ExceptionHandler(ReferentialIntegrityException.class)
+    public ResponseEntity<Map<String, Object>> handleReferentialIntegrityError(ReferentialIntegrityException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", String.format("This %s can't be deleted because other entities are using it", 
+            ex.getEntityType().toLowerCase()));
+        
+        Map<String, Object> referencingEntities = new HashMap<>();
+        referencingEntities.put(ex.getReferencingType(), 
+            ex.getReferencingIds().stream()
+                .map(Object::toString)
+                .collect(Collectors.toList()));
+        
+        errorResponse.put("referencedBy", referencingEntities);
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     /**

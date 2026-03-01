@@ -1,5 +1,8 @@
 package es.ull.project.configuration;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
@@ -25,9 +28,6 @@ import es.ull.project.application.service.vehicle.CreateVehicleService;
 import es.ull.project.application.service.vehicle.DeleteVehicleService;
 import es.ull.project.application.service.vehicle.ReadVehicleService;
 import es.ull.project.application.service.vehicle.UpdateVehicleService;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 /**
  * Configuration class for application services.
  * This class defines all service beans following the hexagonal architecture
@@ -73,11 +73,13 @@ public class ServiceConfiguration {
      * Creates a bean for the DeleteContainerService.
      * 
      * @param repository the container repository
+     * @param serviceAssignmentRepository the service assignment repository for referential integrity checks
      * @return a new DeleteContainerService instance
      */
     @Bean
-    public DeleteContainerService deleteContainerService(ContainerRepository repository) {
-        return new DeleteContainerService(repository);
+    public DeleteContainerService deleteContainerService(ContainerRepository repository,
+                                                          ServiceAssignmentRepository serviceAssignmentRepository) {
+        return new DeleteContainerService(repository, serviceAssignmentRepository);
     }
 
     /**
@@ -117,11 +119,15 @@ public class ServiceConfiguration {
      * Creates a bean for the DeleteFacilityService.
      * 
      * @param repository the facility repository
+     * @param serviceAssignmentRepository the service assignment repository for referential integrity checks
+     * @param infrastructurePlanRepository the infrastructure plan repository for referential integrity checks
      * @return a new DeleteFacilityService instance
      */
     @Bean
-    public DeleteFacilityService deleteFacilityService(FacilityRepository repository) {
-        return new DeleteFacilityService(repository);
+    public DeleteFacilityService deleteFacilityService(FacilityRepository repository,
+                                                        ServiceAssignmentRepository serviceAssignmentRepository,
+                                                        InfrastructurePlanRepository infrastructurePlanRepository) {
+        return new DeleteFacilityService(repository, serviceAssignmentRepository, infrastructurePlanRepository);
     }
 
     /**
@@ -268,10 +274,12 @@ public class ServiceConfiguration {
      * Creates a bean for the DeleteServiceAssignmentService.
      * 
      * @param repository the service assignment repository
+     * @param infrastructurePlanRepository the infrastructure plan repository for referential integrity checks
      * @return a new DeleteServiceAssignmentService instance
      */
     @Bean
-    public DeleteServiceAssignmentService deleteServiceAssignmentService(ServiceAssignmentRepository repository) {
-        return new DeleteServiceAssignmentService(repository);
+    public DeleteServiceAssignmentService deleteServiceAssignmentService(ServiceAssignmentRepository repository,
+                                                                          InfrastructurePlanRepository infrastructurePlanRepository) {
+        return new DeleteServiceAssignmentService(repository, infrastructurePlanRepository);
     }
 }
