@@ -2,6 +2,7 @@ package es.ull.project.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import es.ull.project.adapter.memory.InMemoryContainerRepository;
 import es.ull.project.adapter.memory.InMemoryFacilityRepository;
@@ -19,6 +20,7 @@ import es.ull.project.application.repository.VehicleRepository;
  * This class defines beans for repository implementations that store data in memory.
  */
 @Configuration
+@Profile("memory")
 public class MemoryConfiguration {
 
     /**

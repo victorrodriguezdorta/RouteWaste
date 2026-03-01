@@ -1,3 +1,7 @@
+# Como ejecutar mongo db en docker para que funcione
+docker run -d --name mongo-tfg -p 27017:27017 -e MONGO_INITDB_DATABASE=sensor-app mongo:6 
+
+
 # Dominio del problema
 
 - Dónde localizar infraestructuras (bases, estaciones de transferencia, plantas, etc.).
