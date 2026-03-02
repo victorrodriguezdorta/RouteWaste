@@ -1,5 +1,8 @@
 package es.ull.project.adapter.rest;
 
+import es.ull.project.adapter.rest.exception.ValidationException;
+import es.ull.project.adapter.rest.response.ErrorResponse;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -11,10 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import es.ull.project.adapter.rest.exception.ValidationException;
-import es.ull.project.adapter.rest.response.ErrorResponse;
-
 /**
  * GlobalExceptionHandler
  * 

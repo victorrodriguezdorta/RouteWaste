@@ -1,8 +1,8 @@
 package es.ull.project.adapter.rest.response;
 
-import java.util.List;
-
 import es.ull.project.adapter.rest.exception.FieldError;
+
+import java.util.List;
 
 /**
  * ErrorResponse

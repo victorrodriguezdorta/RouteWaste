@@ -1,8 +1,5 @@
 package es.ull.project.configuration;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import es.ull.project.adapter.memory.InMemoryContainerRepository;
 import es.ull.project.adapter.memory.InMemoryFacilityRepository;
 import es.ull.project.adapter.memory.InMemoryInfrastructurePlanRepository;
@@ -13,6 +10,9 @@ import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.repository.VehicleRepository;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration class for in-memory repositories.

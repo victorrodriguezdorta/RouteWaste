@@ -1,11 +1,5 @@
 package es.ull.project.adapter.rest.deserialization.serviceassignment;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -21,6 +15,12 @@ import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.ServiceTime;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * ServiceAssignmentPostRequestBodyDeserializer

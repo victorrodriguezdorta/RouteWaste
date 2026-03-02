@@ -1,7 +1,5 @@
 package es.ull.project.adapter.rest.serialization.serviceassignment;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -9,6 +7,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
 
+import java.io.IOException;
 /**
  * Custom JSON serializer for ServiceAssignmentResponseBody
  * This serializer manually controls how ServiceAssignment response data is converted to JSON format
