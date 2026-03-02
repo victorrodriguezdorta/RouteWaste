@@ -1,4 +1,4 @@
-package es.ull.project.adapter.mongodb;
+package es.ull.project.adapter.mongodb.repository;
 
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.domain.entity.Container;

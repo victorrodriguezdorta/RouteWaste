@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: back-end
+  
+  # Allow bean definition overriding (required for Spring Boot 3.4.11 compatibility)
+  main:
+    allow-bean-definition-overriding: true
+  
+  # MongoDB configuration
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/db-application # URI of MongoDB
+      database: db-application # Database name
+
+# Enable detailed logging for debugging
+logging:
+  level:
+    org.springframework.web: DEBUG
+    es.ull.project: DEBUG
+
+# Error handling configuration
+# - include-message: always show error messages
+# - include-stacktrace: never show stack traces in responses (security and cleanliness)
+# - include-binding-errors: never show binding errors details
+# The GlobalExceptionHandler will provide clean, user-friendly error messages
+server:
+  error:
+    include-message: always
+    include-stacktrace: never
+    include-binding-errors: never
