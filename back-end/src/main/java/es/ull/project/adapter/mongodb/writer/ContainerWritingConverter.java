@@ -1,0 +1,54 @@
+package es.ull.project.adapter.mongodb.writer;
+
+import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.domain.entity.Container;
+
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.WritingConverter;
+import org.springframework.lang.NonNull;
+
+/**
+ * ContainerWritingConverter
+ *
+ * Implements custom conversion logic for transforming Container entities
+ * into MongoDB documents. This converter handles the serialization of
+ * Container objects including their value objects (Location, WasteDemand)
+ * into a MongoDB-compatible document structure.
+ */
+@WritingConverter
+public class ContainerWritingConverter implements Converter<Container, Document> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ContainerWritingConverter.class);
+
+    /**
+     * Converts a Container entity into a MongoDB Document.
+     *
+     * @param container Container entity to convert
+     * @return MongoDB Document representation of the Container
+     */
+    @Override
+    public Document convert(@NonNull Container container) {
+        logger.info("Container with id '{}' to be written", container.getId());
+        Document document = new Document();
+        document.put(MongoFields.ID, container.getId());
+        Document locationDocument = new Document();
+        locationDocument.put(MongoFields.LATITUDE, container.getLocation().getLatitude());
+        locationDocument.put(MongoFields.LONGITUDE, container.getLocation().getLongitude());
+        locationDocument.put(MongoFields.POSTAL_ADDRESS, container.getLocation().getPostalAddress());
+        locationDocument.put(MongoFields.GIS_REFERENCE, container.getLocation().getGISReference());
+        document.put(MongoFields.LOCATION, locationDocument);
+        document.put(MongoFields.WASTE_TYPE, container.getWasteType().toString());
+        Document wasteDemandDocument = new Document();
+        wasteDemandDocument.put(MongoFields.WASTE_DEMAND_VALUE, container.getWasteDemand().getValue());
+        wasteDemandDocument.put(MongoFields.WASTE_DEMAND_QUANTITY_UNIT, container.getWasteDemand().getQuantityUnit().getValue());
+        wasteDemandDocument.put(MongoFields.WASTE_DEMAND_TIME_UNIT, container.getWasteDemand().getTimeUnit().toString());
+        document.put(MongoFields.WASTE_DEMAND, wasteDemandDocument);
+        container.getServiceZone().ifPresent(serviceZone -> 
+            document.put(MongoFields.SERVICE_ZONE, serviceZone.toString())
+        );
+        return document;
+    }
+}

@@ -1,21 +1,5 @@
 package es.ull.project.configuration;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-
-import es.ull.project.adapter.mongodb.repository.ContainerMongoRepository;
-import es.ull.project.adapter.mongodb.repository.FacilityMongoRepository;
-import es.ull.project.adapter.mongodb.repository.InfrastructurePlanMongoRepository;
-import es.ull.project.adapter.mongodb.repository.ServiceAssignmentMongoRepository;
-import es.ull.project.adapter.mongodb.repository.VehicleMongoRepository;
-import es.ull.project.application.repository.ContainerRepository;
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.application.repository.InfrastructurePlanRepository;
-import es.ull.project.application.repository.ServiceAssignmentRepository;
-import es.ull.project.application.repository.VehicleRepository;
-
 import java.util.Arrays;
 
 import org.bson.UuidRepresentation;
@@ -31,6 +15,17 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.lang.NonNull;
+
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+
+import es.ull.project.adapter.mongodb.writer.ContainerWritingConverter;
+import es.ull.project.adapter.mongodb.writer.FacilityWritingConverter;
+import es.ull.project.adapter.mongodb.writer.InfrastructurePlanWritingConverter;
+import es.ull.project.adapter.mongodb.writer.ServiceAssignmentWritingConverter;
+import es.ull.project.adapter.mongodb.writer.VehicleWritingConverter;
 
 /**
  * MongoDB configuration class.
@@ -112,56 +107,11 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration {
     @Bean
     public @NonNull MongoCustomConversions customConversions() {
         return new MongoCustomConversions(
-                Arrays.asList());
-    }
-
-    /**
-     * Create ContainerRepository bean.
-     *
-     * @return ContainerRepository implementation
-     */
-    @Bean
-    public ContainerRepository containerRepository() {
-        return new ContainerMongoRepository();
-    }
-
-    /**
-     * Create FacilityRepository bean.
-     *
-     * @return FacilityRepository implementation
-     */
-    @Bean
-    public FacilityRepository facilityRepository() {
-        return new FacilityMongoRepository();
-    }
-
-    /**
-     * Create VehicleRepository bean.
-     *
-     * @return VehicleRepository implementation
-     */
-    @Bean
-    public VehicleRepository vehicleRepository() {
-        return new VehicleMongoRepository();
-    }
-
-    /**
-     * Create ServiceAssignmentRepository bean.
-     *
-     * @return ServiceAssignmentRepository implementation
-     */
-    @Bean
-    public ServiceAssignmentRepository serviceAssignmentRepository() {
-        return new ServiceAssignmentMongoRepository();
-    }
-
-    /**
-     * Create InfrastructurePlanRepository bean.
-     *
-     * @return InfrastructurePlanRepository implementation
-     */
-    @Bean
-    public InfrastructurePlanRepository infrastructurePlanRepository() {
-        return new InfrastructurePlanMongoRepository();
+                Arrays.asList(
+                        new ContainerWritingConverter(),
+                        new FacilityWritingConverter(),
+                        new InfrastructurePlanWritingConverter(),
+                        new ServiceAssignmentWritingConverter(),
+                        new VehicleWritingConverter()));
     }
 }
