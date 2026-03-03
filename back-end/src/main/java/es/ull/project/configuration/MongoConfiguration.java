@@ -3,9 +3,11 @@ package es.ull.project.configuration;
 import java.util.Arrays;
 
 import org.bson.UuidRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
@@ -21,11 +23,19 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
+import es.ull.project.adapter.mongodb.reader.ContainerReadingConverter;
+import es.ull.project.adapter.mongodb.reader.FacilityReadingConverter;
+import es.ull.project.adapter.mongodb.reader.InfrastructurePlanReadingConverter;
+import es.ull.project.adapter.mongodb.reader.ServiceAssignmentReadingConverter;
+import es.ull.project.adapter.mongodb.reader.VehicleReadingConverter;
 import es.ull.project.adapter.mongodb.writer.ContainerWritingConverter;
 import es.ull.project.adapter.mongodb.writer.FacilityWritingConverter;
 import es.ull.project.adapter.mongodb.writer.InfrastructurePlanWritingConverter;
 import es.ull.project.adapter.mongodb.writer.ServiceAssignmentWritingConverter;
 import es.ull.project.adapter.mongodb.writer.VehicleWritingConverter;
+import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.application.repository.ServiceAssignmentRepository;
 
 /**
  * MongoDB configuration class.
@@ -44,6 +54,45 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration {
 
     @Value("${spring.data.mongodb.database}")
     private String databaseName;
+
+    @Lazy
+    @Autowired
+    private ContainerRepository containerRepository;
+
+    @Lazy
+    @Autowired
+    private FacilityRepository facilityRepository;
+
+    @Lazy
+    @Autowired
+    private ServiceAssignmentRepository serviceAssignmentRepository;
+
+    /**
+     * Returns the ContainerRepository instance.
+     *
+     * @return ContainerRepository
+     */
+    public ContainerRepository containerRepository() {
+        return this.containerRepository;
+    }
+
+    /**
+     * Returns the FacilityRepository instance.
+     *
+     * @return FacilityRepository
+     */
+    public FacilityRepository facilityRepository() {
+        return this.facilityRepository;
+    }
+
+    /**
+     * Returns the ServiceAssignmentRepository instance.
+     *
+     * @return ServiceAssignmentRepository
+     */
+    public ServiceAssignmentRepository serviceAssignmentRepository() {
+        return this.serviceAssignmentRepository;
+    }
 
     /**
      * Configure the MongoDB client with UUID support.
@@ -108,10 +157,15 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration {
     public @NonNull MongoCustomConversions customConversions() {
         return new MongoCustomConversions(
                 Arrays.asList(
+                        new ContainerReadingConverter(),
                         new ContainerWritingConverter(),
+                        new FacilityReadingConverter(),
                         new FacilityWritingConverter(),
+                        new InfrastructurePlanReadingConverter(this),
                         new InfrastructurePlanWritingConverter(),
+                        new ServiceAssignmentReadingConverter(this),
                         new ServiceAssignmentWritingConverter(),
+                        new VehicleReadingConverter(),
                         new VehicleWritingConverter()));
     }
 }
