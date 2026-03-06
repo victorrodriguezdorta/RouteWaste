@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 /**
  * InfrastructurePlan
  * 
@@ -24,12 +25,46 @@ public class InfrastructurePlan {
     public static final String TOTAL_COST_EXCEEDED = "Total cost exceeds maximum budget";
     public static final String INVALID_ASSIGNMENT = "Service assignment is invalid";
 
+    /**
+     * Unique identifier for the infrastructure plan.
+     * It is a computed attribute.
+     */
     private final UUID id;
+
+    /**
+     * Planning period for which the infrastructure plan is designed.
+     * It is a required attribute.
+     */
     private PlanningPeriod period;
+
+    /**
+     * List of facilities selected to be part of the infrastructure plan.
+     * It is a computed attribute.
+     */
     private List<Facility> selectedFacilities;
+
+    /**
+     * List of service assignments linking containers to facilities.
+     * It is a computed attribute.
+     */
     private List<ServiceAssignment> serviceAssignments;
+
+    /**
+     * Service policies that must be complied with in the plan.
+     * It is a required attribute.
+     */
     private ServicePolicies servicePolicies;
+
+    /**
+     * Maximum budget allowed for the infrastructure plan.
+     * It is a required attribute.
+     */
     private MaximumBudget maxBudget;
+
+    /**
+     * Estimated total cost of implementing the infrastructure plan.
+     * It is a computed attribute.
+     */
     private TotalCost estimatedTotalCost;
 
     /**

@@ -106,7 +106,6 @@ public class ServiceAssignmentReadingConverter implements Converter<Document, Se
                 distance,
                 serviceTime,
                 transportCost);
-
         return serviceAssignment;
     }
 }

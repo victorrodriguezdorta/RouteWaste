@@ -23,24 +23,25 @@ public class Vehicle {
     /**
      * Identifier of the vehicle.
      * It is required and immutable.
+     * It is a computed attribute.
      */
     private final UUID id;
 
     /**
      * Enumeration of vehicle type (e.g., LIGHT_TRUCK, HEAVY_TRUCK...)
-     * It is required.
+     * It is a required attribute.
      */
     private VehicleType vehicleType;
 
     /**
      * Transport capacity of the vehicle.
-     * It is required.
+     * It is a required attribute.
      */
     private Capacity transportCapacity;
 
     /**
      * Cost per kilometer of operation.
-     * It is required.
+     * It is a required attribute.
      */
     private TransportationVariableCost costPerKilometer;
 

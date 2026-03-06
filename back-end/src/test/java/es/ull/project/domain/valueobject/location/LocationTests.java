@@ -1,8 +1,10 @@
 package es.ull.project.domain.valueobject.location;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class LocationTests {
 
@@ -28,7 +30,7 @@ public class LocationTests {
                 IllegalArgumentException.class,
                 () -> new Location(100.0, 20.0, "123 Main St", "GIS-001")
         );
-        assertEquals("Latitude must be between -90 and 90", exception.getMessage());
+        assertEquals("Latitude must be lesser or equals to 90.0", exception.getMessage());
     }
 
     /**
@@ -40,7 +42,7 @@ public class LocationTests {
                 IllegalArgumentException.class,
                 () -> new Location(10.0, 200.0, "123 Main St", "GIS-001")
         );
-        assertEquals("Longitude must be between -180 and 180", exception.getMessage());
+        assertEquals("Longitude must be lesser or equals to 180.0", exception.getMessage());
     }
 
     /**

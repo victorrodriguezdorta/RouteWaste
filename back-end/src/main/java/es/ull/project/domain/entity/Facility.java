@@ -34,6 +34,7 @@ public class Facility {
     /**
      * Identifier of the facility.
      * It is a required and immutable attribute.
+     * It is a computed attribute.
      */
     private final UUID id;
 

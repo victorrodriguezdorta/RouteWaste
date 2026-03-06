@@ -29,13 +29,46 @@ public class ServiceAssignment {
     public static final String TRANSPORT_COST_NOT_DEFINED = "Transportation cost is not defined";
     public static final String POLICY_VIOLATION = "Service assignment violates service policies";
 
+    /**
+     * Unique identifier for the service assignment.
+     * It is a computed attribute.
+     */
     private final UUID id;
+
+    /**
+     * Container being serviced in this assignment.
+     * It is a required attribute.
+     */
     private final Container container;
+
+    /**
+     * Facility providing the service in this assignment.
+     * It is a required attribute.
+     */
     private final Facility facility;
 
+    /**
+     * Waste demand of the container that needs to be serviced.
+     * It is a required attribute.
+     */
     private final WasteDemand wasteDemand;
+
+    /**
+     * Distance between the container and the facility.
+     * It is a required attribute.
+     */
     private final Distance distance;
+
+    /**
+     * Service time required for this assignment.
+     * It is a required attribute.
+     */
     private final ServiceTime serviceTime;
+
+    /**
+     * Transportation cost for servicing this assignment.
+     * It is a required attribute.
+     */
     private final TransportationVariableCost transportCost;
 
     /**

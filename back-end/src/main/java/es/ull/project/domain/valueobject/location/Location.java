@@ -1,5 +1,7 @@
 package es.ull.project.domain.valueobject.location;
 
+import es.ull.utils.geolocation.UllGeolocationPoint;
+
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -11,16 +13,6 @@ import java.util.regex.Pattern;
  * This is a mandatory value object in the domain.
  */
 public final class Location {
-
-    /**
-     * Latitude and longitude constraints.
-     */
-    private static final double MIN_LATITUDE = -90.0;
-    private static final double MAX_LATITUDE = 90.0;
-    private static final double MIN_LONGITUDE = -180.0;
-    private static final double MAX_LONGITUDE = 180.0;
-    private static final String ERROR_RANGE_LATITUDE = "Latitude must be between -90 and 90";
-    private static final String ERROR_RANGE_LONGITUDE = "Longitude must be between -180 and 180";
 
     /**
      * Postal address constraints.
@@ -47,16 +39,10 @@ public final class Location {
     private static final int ZERO = 0;
 
     /**
-     * Latitude in decimal degrees.
+     * Geolocation point containing latitude and longitude.
      * It is a required attribute.
      */
-    private final double latitude;
-
-    /**
-     * Longitude in decimal degrees.
-     * It is a required attribute.
-     */
-    private final double longitude;
+    private final UllGeolocationPoint point;
 
     /**
      * Postal address.
@@ -80,29 +66,11 @@ public final class Location {
      * @param gisReference GIS reference. (Geographic Information System)
      */
     public Location(double latitude, double longitude, String postalAddress, String gisReference) {
-        this.validateCoordinates(latitude, longitude);
+        this.point = new UllGeolocationPoint(longitude, latitude);
         this.validatePostalAddress(postalAddress);
         this.validateGISReference(gisReference);
-        this.latitude = latitude;
-        this.longitude = longitude;
         this.postalAddress = postalAddress;
         this.gisReference = gisReference;
-    }
-
-    /**
-     * Validates that the coordinates are within valid ranges.
-     *
-     * @param latitude the latitude to validate
-     * @param longitude the longitude to validate
-     * @throws IllegalArgumentException if coordinates are out of range
-     */
-    private void validateCoordinates(double latitude, double longitude) {
-        if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE) {
-            throw new IllegalArgumentException(ERROR_RANGE_LATITUDE);
-        }
-        if (longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
-            throw new IllegalArgumentException(ERROR_RANGE_LONGITUDE);
-        }
     }
 
     /**
@@ -147,12 +115,21 @@ public final class Location {
     }
 
     /**
+     * Returns the geolocation point.
+     *
+     * @return the geolocation point
+     */
+    public UllGeolocationPoint getPoint() {
+        return point;
+    }
+
+    /**
      * Returns the latitude in decimal degrees.
      *
      * @return the latitude
      */
     public double getLatitude() {
-        return latitude;
+        return point.getLatitude();
     }
 
     /**
@@ -161,7 +138,7 @@ public final class Location {
      * @return the longitude
      */
     public double getLongitude() {
-        return longitude;
+        return point.getLongitude();
     }
 
     /**
@@ -197,8 +174,7 @@ public final class Location {
             return false;
         }
         Location other = (Location) otherObject;
-        return Double.compare(other.latitude, latitude) == ZERO &&
-               Double.compare(other.longitude, longitude) == ZERO &&
+        return point.equals(other.point) &&
                postalAddress.equals(other.postalAddress) &&
                gisReference.equals(other.gisReference);
     }
@@ -210,7 +186,7 @@ public final class Location {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(latitude, longitude, postalAddress, gisReference);
+        return Objects.hash(point, postalAddress, gisReference);
     }
 
     /**
@@ -221,6 +197,6 @@ public final class Location {
     @Override
     public String toString() {
         return String.format("Location={latitude=%s, longitude=%s, postalAddress='%s', gisReference='%s'}",
-                latitude, longitude, postalAddress, gisReference);
+                point.getLatitude(), point.getLongitude(), postalAddress, gisReference);
     }
 }

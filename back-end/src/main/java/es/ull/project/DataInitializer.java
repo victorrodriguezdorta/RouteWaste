@@ -1,12 +1,5 @@
 package es.ull.project;
 
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.domain.entity.Container;
@@ -22,6 +15,13 @@ import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Location;
 
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
 /**
  * DataInitializer
  *
@@ -36,12 +36,24 @@ public class DataInitializer implements CommandLineRunner {
     private final ContainerRepository containerRepository;
     private final FacilityRepository facilityRepository;
 
+    /**
+     * Constructor for DataInitializer.
+     *
+     * @param containerRepository Repository for container persistence operations.
+     * @param facilityRepository Repository for facility persistence operations.
+     */
     public DataInitializer(ContainerRepository containerRepository,
                            FacilityRepository facilityRepository) {
         this.containerRepository = containerRepository;
         this.facilityRepository = facilityRepository;
     }
 
+    /**
+     * Runs the initialization logic when the application starts.
+     * Creates test containers and facilities in the database.
+     *
+     * @param args Command line arguments passed to the application.
+     */
     @Override
     public void run(String... args) {
         logger.info("Initializing database with test data...");
@@ -50,6 +62,10 @@ public class DataInitializer implements CommandLineRunner {
         logger.info("Database initialization completed.");
     }
 
+    /**
+     * Creates and persists a test container in the database.
+     * The container is created with predefined location, waste type, and demand values.
+     */
     private void createTestContainer() {
         Location location = new Location(
                 28.4682,
@@ -72,6 +88,10 @@ public class DataInitializer implements CommandLineRunner {
         logger.info("Test Container saved with ID: {}", container.getId());
     }
 
+    /**
+     * Creates and persists a test facility in the database.
+     * The facility is created with predefined type, location, capacity, and cost values.
+     */
     private void createTestFacility() {
         Location location = new Location(
                 28.4850,
