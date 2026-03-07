@@ -2,6 +2,10 @@ spring:
   application:
     name: back-end-test
   
+  # Active test profile
+  profiles:
+    active: test
+  
   # Allow bean definition overriding
   main:
     allow-bean-definition-overriding: true
