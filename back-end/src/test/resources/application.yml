@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: back-end-test
+  
+  # Allow bean definition overriding
+  main:
+    allow-bean-definition-overriding: true
+  
+  # MongoDB configuration for tests
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/db-application-test
+      database: db-application-test
+
+# Minimal logging for tests
+logging:
+  level:
+    org.springframework.web: WARN
+    es.ull.project: INFO
+
+# Error handling configuration
+server:
+  error:
+    include-message: always
+    include-stacktrace: never
+    include-binding-errors: never
