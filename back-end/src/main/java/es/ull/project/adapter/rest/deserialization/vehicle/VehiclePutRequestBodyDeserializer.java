@@ -1,5 +1,7 @@
 package es.ull.project.adapter.rest.deserialization.vehicle;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -7,14 +9,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
+import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.demand.QuantityUnit;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * VehiclePutRequestBodyDeserializer
@@ -109,7 +109,7 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
                 throw new IllegalArgumentException("Required field '" + JsonFields.TIME_UNIT + "' is missing");
             }
             String timeUnitStr = capacityNode.get(JsonFields.TIME_UNIT).asText();
-            TimeUnit timeUnit = TimeUnit.valueOf(timeUnitStr.toUpperCase());
+            TimeUnit timeUnit = TimeUnit.fromString(timeUnitStr);
             return new Capacity(value, quantityUnit, timeUnit);
         } catch (Exception e) {
             throw new IllegalArgumentException(

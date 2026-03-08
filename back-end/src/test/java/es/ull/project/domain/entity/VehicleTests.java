@@ -1,19 +1,25 @@
 package es.ull.project.domain.entity;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
+import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.demand.QuantityUnit;
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import java.util.concurrent.TimeUnit;
 
 class VehicleTests {
 
 	// Helpers
 	private static Capacity randomCapacity() {
-		return new Capacity(5000.0, new QuantityUnit("kg"), TimeUnit.DAYS);
+		return new Capacity(5000.0, new QuantityUnit("kg"), TimeUnit.DAY);
 	}
 
 	private static TransportationVariableCost randomCost() {
@@ -124,7 +130,7 @@ class VehicleTests {
 	@Test
 	void updateTransportCapacity_valid() {
 		Vehicle v = randomVehicle();
-		Capacity newCap = new Capacity(6000.0, new QuantityUnit("kg"), TimeUnit.DAYS);
+		Capacity newCap = new Capacity(6000.0, new QuantityUnit("kg"), TimeUnit.DAY);
 		v.updateTransportCapacity(newCap);
 		assertEquals(newCap, v.getTransportCapacity());
 	}

@@ -1,7 +1,8 @@
 package es.ull.project.domain.valueobject.demand;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+
+import es.ull.project.domain.enumerate.TimeUnit;
 
 /**
  * WasteDemand
@@ -69,7 +70,7 @@ public final class WasteDemand {
      * @param value Demand value
      */
     public WasteDemand(double value) {
-        this(value, new QuantityUnit("tons"), TimeUnit.DAYS);
+        this(value, new QuantityUnit("tons"), TimeUnit.DAY);
     }
 
     /**

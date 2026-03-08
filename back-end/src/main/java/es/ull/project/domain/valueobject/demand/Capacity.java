@@ -1,7 +1,8 @@
 package es.ull.project.domain.valueobject.demand;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+
+import es.ull.project.domain.enumerate.TimeUnit;
 
 /**
  * Capacity

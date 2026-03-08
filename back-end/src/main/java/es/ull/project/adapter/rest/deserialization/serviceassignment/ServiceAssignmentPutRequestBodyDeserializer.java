@@ -1,5 +1,7 @@
 package es.ull.project.adapter.rest.deserialization.serviceassignment;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -12,6 +14,7 @@ import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.enumerate.ServiceZone;
+import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
@@ -22,9 +25,6 @@ import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.Location;
 import es.ull.project.domain.valueobject.location.ServiceTime;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * ServiceAssignmentPutRequestBodyDeserializer
@@ -203,7 +203,7 @@ public class ServiceAssignmentPutRequestBodyDeserializer extends JsonDeserialize
         String quantityUnitStr = demandNode.get(JsonFields.QUANTITY_UNIT).asText();
         QuantityUnit quantityUnit = new QuantityUnit(quantityUnitStr);
         String timeUnitStr = demandNode.get(JsonFields.TIME_UNIT).asText();
-        TimeUnit timeUnit = TimeUnit.valueOf(timeUnitStr.toUpperCase());
+        TimeUnit timeUnit = TimeUnit.fromString(timeUnitStr);
         return new WasteDemand(value, quantityUnit, timeUnit);
     }
 
@@ -226,7 +226,7 @@ public class ServiceAssignmentPutRequestBodyDeserializer extends JsonDeserialize
         String quantityUnitStr = capacityNode.get(JsonFields.QUANTITY_UNIT).asText();
         QuantityUnit quantityUnit = new QuantityUnit(quantityUnitStr);
         String timeUnitStr = capacityNode.get(JsonFields.TIME_UNIT).asText();
-        TimeUnit timeUnit = TimeUnit.valueOf(timeUnitStr.toUpperCase());
+        TimeUnit timeUnit = TimeUnit.fromString(timeUnitStr);
         return new Capacity(value, quantityUnit, timeUnit);
     }
 

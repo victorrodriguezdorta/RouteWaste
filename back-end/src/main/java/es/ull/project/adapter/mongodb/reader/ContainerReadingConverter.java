@@ -1,15 +1,6 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.fields.MongoFields;
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.enumerate.ServiceZone;
-import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
-import es.ull.project.domain.valueobject.location.Location;
-
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -17,6 +8,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.lang.NonNull;
+
+import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.ServiceZone;
+import es.ull.project.domain.enumerate.TimeUnit;
+import es.ull.project.domain.enumerate.WasteType;
+import es.ull.project.domain.valueobject.demand.QuantityUnit;
+import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.location.Location;
 
 /**
  * ContainerReadingConverter
@@ -51,7 +51,7 @@ public class ContainerReadingConverter implements Converter<Document, Container>
         String quantityUnitValue = wasteDemandDocument.getString(MongoFields.WASTE_DEMAND_QUANTITY_UNIT);
         QuantityUnit quantityUnit = new QuantityUnit(quantityUnitValue);
         String timeUnitString = wasteDemandDocument.getString(MongoFields.WASTE_DEMAND_TIME_UNIT);
-        TimeUnit timeUnit = TimeUnit.valueOf(timeUnitString);
+        TimeUnit timeUnit = TimeUnit.fromString(timeUnitString);
         WasteDemand wasteDemand = new WasteDemand(wasteDemandValue, quantityUnit, timeUnit);
         ServiceZone serviceZone = null;
         if (document.containsKey(MongoFields.SERVICE_ZONE)) {

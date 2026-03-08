@@ -23,7 +23,7 @@ import { VehiclePutJsonRequest } from './dto/vehicle/vehicle-put-json-request';
  * RESTful API calls.
  */
 export class VehicleHttpRepository implements VehicleRepository {
-  private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'vehicles';
+  private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'vehicles/';
   private headers: Headers = new Headers();
 
   /**
@@ -90,7 +90,7 @@ export class VehicleHttpRepository implements VehicleRepository {
   public async getById(
     command: GetVehicleCommand
   ): Promise<Either<DataError, GetVehicleResult>> {
-    const url = `${this.API_URL}/${command.vehicleId.toString()}`;
+    const url = `${this.API_URL}${command.vehicleId.toString()}`;
 
     return new Promise((resolve, reject) => {
       http
@@ -152,7 +152,7 @@ export class VehicleHttpRepository implements VehicleRepository {
   public async update(
     command: UpdateVehicleCommand
   ): Promise<Either<DataError, UpdateVehicleResult>> {
-    const url = `${this.API_URL}/${command.vehicleId.toString()}`;
+    const url = `${this.API_URL}${command.vehicleId.toString()}`;
     const body = VehiclePutJsonRequest.toRequest(command);
 
     return new Promise((resolve) => {
@@ -185,7 +185,7 @@ export class VehicleHttpRepository implements VehicleRepository {
   public async delete(
     command: DeleteVehicleCommand
   ): Promise<Either<DataError, DeleteVehicleResult>> {
-    const url = `${this.API_URL}/${command.vehicleId.toString()}`;
+    const url = `${this.API_URL}${command.vehicleId.toString()}`;
 
     return new Promise((resolve) => {
       http

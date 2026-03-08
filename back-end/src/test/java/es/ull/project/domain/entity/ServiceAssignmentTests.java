@@ -1,21 +1,26 @@
 package es.ull.project.domain.entity;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Test;
 
 import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.enumerate.ServiceZone;
+import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
+import es.ull.project.domain.valueobject.location.Location;
 import es.ull.project.domain.valueobject.location.ServiceTime;
-import es.ull.project.domain.valueobject.demand.Capacity;
-import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 
 class ServiceAssignmentTests {
@@ -50,7 +55,7 @@ class ServiceAssignmentTests {
         return new Capacity(
             100.0 + Math.random() * 500.0,
             new QuantityUnit("tons"),
-            TimeUnit.DAYS
+            TimeUnit.DAY
         );
     }
 

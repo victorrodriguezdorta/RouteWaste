@@ -1,5 +1,9 @@
 package es.ull.project.adapter.rest.deserialization.facility;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -11,16 +15,12 @@ import es.ull.project.adapter.rest.exception.ValidationException;
 import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.location.Location;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * FacilityPostRequestBodyDeserializer
@@ -219,7 +219,7 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
         } else {
             try {
                 String timeUnitStr = capacityNode.get(JsonFields.TIME_UNIT).asText();
-                timeUnit = TimeUnit.valueOf(timeUnitStr.toUpperCase());
+                timeUnit = TimeUnit.fromString(timeUnitStr);
             } catch (Exception e) {
                 errors.add(new FieldError(
                     JsonFields.CAPACITY + "." + JsonFields.TIME_UNIT,

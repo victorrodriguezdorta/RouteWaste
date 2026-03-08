@@ -1,10 +1,15 @@
 package es.ull.project.domain.valueobject.demand;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.jupiter.api.Assertions.*;
+import es.ull.project.domain.enumerate.TimeUnit;
 
 public class CapacityTests {
 
@@ -14,11 +19,11 @@ public class CapacityTests {
     @Test
     void constructor_validValue() {
         QuantityUnit unit = new QuantityUnit("kg");
-        Capacity capacity = new Capacity(10.0, unit, TimeUnit.DAYS);
+        Capacity capacity = new Capacity(10.0, unit, TimeUnit.DAY);
 
         assertEquals(10.0, capacity.getValue());
         assertEquals(unit, capacity.getQuantityUnit());
-        assertEquals(TimeUnit.DAYS, capacity.getTimeUnit());
+        assertEquals(TimeUnit.DAY, capacity.getTimeUnit());
     }
 
     /**
@@ -30,7 +35,7 @@ public class CapacityTests {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> new Capacity(-1.0, unit, TimeUnit.DAYS)
+                () -> new Capacity(-1.0, unit, TimeUnit.DAY)
         );
 
         assertEquals(
@@ -46,7 +51,7 @@ public class CapacityTests {
     void constructor_quantityUnitNotDefined() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> new Capacity(5.0, null, TimeUnit.DAYS)
+                () -> new Capacity(5.0, null, TimeUnit.DAY)
         );
 
         assertEquals(
@@ -79,11 +84,11 @@ public class CapacityTests {
     @Test
     void getters() {
         QuantityUnit unit = new QuantityUnit("tons");
-        Capacity capacity = new Capacity(3.5, unit, TimeUnit.HOURS);
+        Capacity capacity = new Capacity(3.5, unit, TimeUnit.WEEK);
 
         assertEquals(3.5, capacity.getValue());
         assertEquals(unit, capacity.getQuantityUnit());
-        assertEquals(TimeUnit.HOURS, capacity.getTimeUnit());
+        assertEquals(TimeUnit.WEEK, capacity.getTimeUnit());
     }
 
     /**
@@ -91,7 +96,7 @@ public class CapacityTests {
      */
     @Test
     void setter_value() {
-        Capacity original = new Capacity(5.0, new QuantityUnit("kg"), TimeUnit.DAYS);
+        Capacity original = new Capacity(5.0, new QuantityUnit("kg"), TimeUnit.DAY);
         Capacity updated = original.setValue(10.0);
 
         assertNotSame(original, updated);
@@ -105,7 +110,7 @@ public class CapacityTests {
      */
     @Test
     void setter_quantityUnit() {
-        Capacity original = new Capacity(5.0, new QuantityUnit("kg"), TimeUnit.DAYS);
+        Capacity original = new Capacity(5.0, new QuantityUnit("kg"), TimeUnit.DAY);
         QuantityUnit newUnit = new QuantityUnit("tons");
 
         Capacity updated = original.setQuantityUnit(newUnit);
@@ -119,12 +124,12 @@ public class CapacityTests {
      */
     @Test
     void setter_timeUnit() {
-        Capacity original = new Capacity(5.0, new QuantityUnit("kg"), TimeUnit.DAYS);
+        Capacity original = new Capacity(5.0, new QuantityUnit("kg"), TimeUnit.DAY);
 
-        Capacity updated = original.setTimeUnit(TimeUnit.HOURS);
+        Capacity updated = original.setTimeUnit(TimeUnit.WEEK);
 
         assertNotSame(original, updated);
-        assertEquals(TimeUnit.HOURS, updated.getTimeUnit());
+        assertEquals(TimeUnit.WEEK, updated.getTimeUnit());
     }
 
     /**
@@ -134,8 +139,8 @@ public class CapacityTests {
     void greaterThan_validComparison() {
         QuantityUnit unit = new QuantityUnit("kg");
 
-        Capacity lower = new Capacity(5.0, unit, TimeUnit.DAYS);
-        Capacity higher = new Capacity(10.0, unit, TimeUnit.DAYS);
+        Capacity lower = new Capacity(5.0, unit, TimeUnit.DAY);
+        Capacity higher = new Capacity(10.0, unit, TimeUnit.DAY);
 
         assertTrue(higher.greaterThan(lower));
         assertFalse(lower.greaterThan(higher));
@@ -146,7 +151,7 @@ public class CapacityTests {
      */
     @Test
     void greaterThan_otherIsNull() {
-        Capacity capacity = new Capacity(5.0, new QuantityUnit("kg"), TimeUnit.DAYS);
+        Capacity capacity = new Capacity(5.0, new QuantityUnit("kg"), TimeUnit.DAY);
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -167,13 +172,13 @@ public class CapacityTests {
         Capacity capacity1 = new Capacity(
                 5.0,
                 new QuantityUnit("kg"),
-                TimeUnit.DAYS
+                TimeUnit.DAY
         );
 
         Capacity capacity2 = new Capacity(
                 3.0,
                 new QuantityUnit("tons"),
-                TimeUnit.DAYS
+                TimeUnit.DAY
         );
 
         IllegalArgumentException exception = assertThrows(
@@ -194,9 +199,9 @@ public class CapacityTests {
     void equalsMethod() {
         QuantityUnit unit = new QuantityUnit("kg");
 
-        Capacity capacity1 = new Capacity(5.0, unit, TimeUnit.DAYS);
-        Capacity capacity2 = new Capacity(5.0, unit, TimeUnit.DAYS);
-        Capacity capacity3 = new Capacity(10.0, unit, TimeUnit.DAYS);
+        Capacity capacity1 = new Capacity(5.0, unit, TimeUnit.DAY);
+        Capacity capacity2 = new Capacity(5.0, unit, TimeUnit.DAY);
+        Capacity capacity3 = new Capacity(10.0, unit, TimeUnit.DAY);
 
         assertEquals(capacity1, capacity1);
         assertNotEquals(capacity1, null);
@@ -212,9 +217,9 @@ public class CapacityTests {
     void hashCodeMethod() {
         QuantityUnit unit = new QuantityUnit("kg");
 
-        Capacity capacity1 = new Capacity(5.0, unit, TimeUnit.DAYS);
-        Capacity capacity2 = new Capacity(5.0, unit, TimeUnit.DAYS);
-        Capacity capacity3 = new Capacity(10.0, unit, TimeUnit.DAYS);
+        Capacity capacity1 = new Capacity(5.0, unit, TimeUnit.DAY);
+        Capacity capacity2 = new Capacity(5.0, unit, TimeUnit.DAY);
+        Capacity capacity3 = new Capacity(10.0, unit, TimeUnit.DAY);
 
         assertEquals(capacity1.hashCode(), capacity2.hashCode());
         assertNotEquals(capacity1.hashCode(), capacity3.hashCode());
@@ -228,12 +233,13 @@ public class CapacityTests {
         Capacity capacity = new Capacity(
                 5.0,
                 new QuantityUnit("kg"),
-                TimeUnit.DAYS
+                TimeUnit.DAY
         );
 
         assertEquals(
-                "Capacity={value=5.0, unit=kg/days}",
+                "Capacity={value=5.0, unit=kg/day}",
                 capacity.toString()
         );
     }
 }
+

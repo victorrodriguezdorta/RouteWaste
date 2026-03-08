@@ -1,5 +1,9 @@
 package es.ull.project.adapter.rest.deserialization.container;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -10,15 +14,11 @@ import es.ull.project.adapter.rest.exception.FieldError;
 import es.ull.project.adapter.rest.exception.ValidationException;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.domain.enumerate.ServiceZone;
+import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Location;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * ContainerPostRequestBodyDeserializer

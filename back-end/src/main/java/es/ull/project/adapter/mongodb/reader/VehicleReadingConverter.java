@@ -1,15 +1,6 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.fields.MongoFields;
-import es.ull.project.domain.entity.Vehicle;
-import es.ull.project.domain.enumerate.VehicleType;
-import es.ull.project.domain.valueobject.cost.Currency;
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
-
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -17,6 +8,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.lang.NonNull;
+
+import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.TimeUnit;
+import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.cost.Currency;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.demand.Capacity;
+import es.ull.project.domain.valueobject.demand.QuantityUnit;
 
 /**
  * VehicleReadingConverter
@@ -46,7 +46,7 @@ public class VehicleReadingConverter implements Converter<Document, Vehicle> {
         String capacityQuantityUnitValue = capacityDocument.getString(MongoFields.CAPACITY_QUANTITY_UNIT);
         QuantityUnit capacityQuantityUnit = new QuantityUnit(capacityQuantityUnitValue);
         String capacityTimeUnitString = capacityDocument.getString(MongoFields.CAPACITY_TIME_UNIT);
-        TimeUnit capacityTimeUnit = TimeUnit.valueOf(capacityTimeUnitString);
+        TimeUnit capacityTimeUnit = TimeUnit.fromString(capacityTimeUnitString);
         Capacity transportCapacity = new Capacity(capacityValue, capacityQuantityUnit, capacityTimeUnit);
         Document costDocument = (Document) document.get(MongoFields.COST_PER_KILOMETER);
         double costAmount = costDocument.getDouble(MongoFields.COST_PER_KILOMETER_AMOUNT);

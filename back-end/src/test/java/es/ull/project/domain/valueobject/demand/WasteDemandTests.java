@@ -1,10 +1,15 @@
 package es.ull.project.domain.valueobject.demand;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.jupiter.api.Assertions.*;
+import es.ull.project.domain.enumerate.TimeUnit;
 
 public class WasteDemandTests {
 
@@ -14,7 +19,7 @@ public class WasteDemandTests {
     @Test
     void constructor_validValue() {
         QuantityUnit unit = new QuantityUnit("tons");
-        TimeUnit timeUnit = TimeUnit.DAYS;
+        TimeUnit timeUnit = TimeUnit.DAY;
 
         WasteDemand demand = new WasteDemand(10.5, unit, timeUnit);
 
@@ -32,7 +37,7 @@ public class WasteDemandTests {
 
         assertEquals(5.0, demand.getValue());
         assertEquals(new QuantityUnit("tons"), demand.getQuantityUnit());
-        assertEquals(TimeUnit.DAYS, demand.getTimeUnit());
+        assertEquals(TimeUnit.DAY, demand.getTimeUnit());
     }
 
     /**
@@ -44,7 +49,7 @@ public class WasteDemandTests {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> new WasteDemand(-1.0, unit, TimeUnit.DAYS)
+                () -> new WasteDemand(-1.0, unit, TimeUnit.DAY)
         );
 
         assertEquals(
@@ -60,7 +65,7 @@ public class WasteDemandTests {
     void constructor_quantityUnitNull() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> new WasteDemand(5.0, null, TimeUnit.DAYS)
+                () -> new WasteDemand(5.0, null, TimeUnit.DAY)
         );
 
         assertEquals(
@@ -93,7 +98,7 @@ public class WasteDemandTests {
     @Test
     void getters() {
         QuantityUnit unit = new QuantityUnit("kg");
-        TimeUnit timeUnit = TimeUnit.HOURS;
+        TimeUnit timeUnit = TimeUnit.WEEK;
 
         WasteDemand demand = new WasteDemand(3.2, unit, timeUnit);
 
@@ -136,10 +141,10 @@ public class WasteDemandTests {
     void setter_timeUnit() {
         WasteDemand original = new WasteDemand(5.0);
 
-        WasteDemand updated = original.setTimeUnit(TimeUnit.HOURS);
+        WasteDemand updated = original.setTimeUnit(TimeUnit.WEEK);
 
         assertNotSame(original, updated);
-        assertEquals(TimeUnit.HOURS, updated.getTimeUnit());
+        assertEquals(TimeUnit.WEEK, updated.getTimeUnit());
     }
 
     /**
@@ -148,8 +153,8 @@ public class WasteDemandTests {
     @Test
     void add_valid() {
         QuantityUnit unit = new QuantityUnit("tons");
-        WasteDemand d1 = new WasteDemand(5.0, unit, TimeUnit.DAYS);
-        WasteDemand d2 = new WasteDemand(3.0, unit, TimeUnit.DAYS);
+        WasteDemand d1 = new WasteDemand(5.0, unit, TimeUnit.DAY);
+        WasteDemand d2 = new WasteDemand(3.0, unit, TimeUnit.DAY);
 
         WasteDemand result = d1.add(d2);
 
@@ -179,8 +184,8 @@ public class WasteDemandTests {
      */
     @Test
     void add_unitsDoNotMatch() {
-        WasteDemand d1 = new WasteDemand(5.0, new QuantityUnit("tons"), TimeUnit.DAYS);
-        WasteDemand d2 = new WasteDemand(3.0, new QuantityUnit("kg"), TimeUnit.DAYS);
+        WasteDemand d1 = new WasteDemand(5.0, new QuantityUnit("tons"), TimeUnit.DAY);
+        WasteDemand d2 = new WasteDemand(3.0, new QuantityUnit("kg"), TimeUnit.DAY);
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -242,8 +247,9 @@ public class WasteDemandTests {
         WasteDemand demand = new WasteDemand(5.0);
 
         assertEquals(
-                "WasteDemand=5.0 QuantityUnit={value='tons'}/DAYS",
+                "WasteDemand=5.0 QuantityUnit={value='tons'}/DAY",
                 demand.toString()
         );
     }
 }
+

@@ -1,16 +1,23 @@
 package es.ull.project.domain.entity;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
-import es.ull.project.domain.valueobject.location.Location;
-import es.ull.project.domain.valueobject.demand.Capacity;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
+import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.demand.QuantityUnit;
-import java.util.concurrent.TimeUnit;
+import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.location.Location;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
 
 class FacilityTests {
     
@@ -29,7 +36,7 @@ class FacilityTests {
         return new Capacity(
             100.0 + Math.random() * 500.0,
             new QuantityUnit("tons"),
-            TimeUnit.DAYS
+            TimeUnit.DAY
         );
     }
     
@@ -221,7 +228,7 @@ class FacilityTests {
     
     @Test
     void assignWasteDemand_valid() {
-        Capacity capacity = new Capacity(100.0, new QuantityUnit("tons"), TimeUnit.DAYS);
+        Capacity capacity = new Capacity(100.0, new QuantityUnit("tons"), TimeUnit.DAY);
         Facility facility = new Facility(
             FacilityType.random(),
             randomLocation(),
@@ -238,7 +245,7 @@ class FacilityTests {
     
     @Test
     void assignWasteDemand_multiple() {
-        Capacity capacity = new Capacity(100.0, new QuantityUnit("tons"), TimeUnit.DAYS);
+        Capacity capacity = new Capacity(100.0, new QuantityUnit("tons"), TimeUnit.DAY);
         Facility facility = new Facility(
             FacilityType.random(),
             randomLocation(),
@@ -258,7 +265,7 @@ class FacilityTests {
     
     @Test
     void assignWasteDemand_capacityExceeded() {
-        Capacity capacity = new Capacity(50.0, new QuantityUnit("tons"), TimeUnit.DAYS);
+        Capacity capacity = new Capacity(50.0, new QuantityUnit("tons"), TimeUnit.DAY);
         Facility facility = new Facility(
             FacilityType.random(),
             randomLocation(),

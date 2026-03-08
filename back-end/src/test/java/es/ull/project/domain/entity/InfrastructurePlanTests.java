@@ -1,18 +1,8 @@
 package es.ull.project.domain.entity;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.concurrent.TimeUnit;
-
-import org.junit.jupiter.api.Test;
-
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
@@ -25,6 +15,17 @@ import es.ull.project.domain.valueobject.location.Location;
 import es.ull.project.domain.valueobject.location.ServiceTime;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+
 
 class InfrastructurePlanTests {
 
@@ -46,7 +47,7 @@ class InfrastructurePlanTests {
     }
 
     private static Capacity randomCapacity() {
-        return new Capacity(100.0, new QuantityUnit("tons"), TimeUnit.DAYS);
+        return new Capacity(100.0, new QuantityUnit("tons"), TimeUnit.DAY);
     }
 
     private static Facility randomFacility() {

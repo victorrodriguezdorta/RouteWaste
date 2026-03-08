@@ -1,18 +1,6 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.fields.MongoFields;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
-import es.ull.project.domain.valueobject.cost.Currency;
-import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
-import es.ull.project.domain.valueobject.location.Location;
-
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -20,6 +8,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.lang.NonNull;
+
+import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.enumerate.TimeUnit;
+import es.ull.project.domain.valueobject.cost.Currency;
+import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
+import es.ull.project.domain.valueobject.demand.Capacity;
+import es.ull.project.domain.valueobject.demand.QuantityUnit;
+import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.location.Location;
 
 /**
  * FacilityReadingConverter
@@ -56,7 +56,7 @@ public class FacilityReadingConverter implements Converter<Document, Facility> {
         String capacityQuantityUnitValue = capacityDocument.getString(MongoFields.CAPACITY_QUANTITY_UNIT);
         QuantityUnit capacityQuantityUnit = new QuantityUnit(capacityQuantityUnitValue);
         String capacityTimeUnitString = capacityDocument.getString(MongoFields.CAPACITY_TIME_UNIT);
-        TimeUnit capacityTimeUnit = TimeUnit.valueOf(capacityTimeUnitString);
+        TimeUnit capacityTimeUnit = TimeUnit.fromString(capacityTimeUnitString);
         Capacity capacity = new Capacity(capacityValue, capacityQuantityUnit, capacityTimeUnit);
         Document openingFixedCostDocument = (Document) document.get(MongoFields.OPENING_FIXED_COST);
         double openingFixedCostAmount = openingFixedCostDocument.getDouble(MongoFields.OPENING_FIXED_COST_AMOUNT);
@@ -74,7 +74,7 @@ public class FacilityReadingConverter implements Converter<Document, Facility> {
         String wasteDemandQuantityUnitValue = wasteDemandDocument.getString(MongoFields.WASTE_DEMAND_QUANTITY_UNIT);
         QuantityUnit wasteDemandQuantityUnit = new QuantityUnit(wasteDemandQuantityUnitValue);
         String wasteDemandTimeUnitString = wasteDemandDocument.getString(MongoFields.WASTE_DEMAND_TIME_UNIT);
-        TimeUnit wasteDemandTimeUnit = TimeUnit.valueOf(wasteDemandTimeUnitString);
+        TimeUnit wasteDemandTimeUnit = TimeUnit.fromString(wasteDemandTimeUnitString);
         WasteDemand assignedWasteDemand = new WasteDemand(wasteDemandValue, wasteDemandQuantityUnit, wasteDemandTimeUnit);
         Facility facility = new Facility(
                 id,

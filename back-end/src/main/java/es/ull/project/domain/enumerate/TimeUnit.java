@@ -36,6 +36,7 @@ public enum TimeUnit {
 
     /**
      * Returns the TimeUnit that matches the given string.
+     * Accepts both singular (DAY) and plural forms (DAYS) for backwards compatibility.
      *
      * @param stringToCheck String representation of the time unit.
      * @return TimeUnit matching the string.
@@ -46,6 +47,10 @@ public enum TimeUnit {
             throw new IllegalArgumentException(ERROR_TIME_UNIT_NOT_DEFINED);
         }
         stringToCheck = stringToCheck.trim().toUpperCase();
+        // Remove trailing 'S' for backwards compatibility with plural forms (DAYS, WEEKS, etc.)
+        if (stringToCheck.endsWith("S")) {
+            stringToCheck = stringToCheck.substring(0, stringToCheck.length() - 1);
+        }
         for (TimeUnit timeUnit : values()) {
             if (timeUnit.name().equals(stringToCheck)) {
                 return timeUnit;
