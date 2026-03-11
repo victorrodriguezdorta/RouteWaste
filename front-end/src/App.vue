@@ -13,7 +13,6 @@ const vehicleRepo = new VehicleHttpRepository();
 const vehicleList = ref<Vehicle[]>([]);
 const vehicleDetails = ref<Vehicle | null>(null);
 
-// Métodos de prueba
 const getVehicles = async () => {
   console.log('=== Testing list vehicles ===');
   const result = await vehicleRepo.list({ page: 0, pageSize: 10 });
@@ -56,49 +55,11 @@ const registerVehicle = async () => {
   );
 };
 
-const updateVehicle = async (id: string) => {
-  console.log('=== Testing update vehicle ===');
-  try {
-    const vehicleId = new UllUUID(id);
-    const result = await vehicleRepo.update({
-      vehicleId,
-      updatedFields: {
-        vehicleType: VehicleType.TRANSFER_TRUCK,
-        transportCapacity: new Capacity(10, new QuantityUnit('tons'), TimeUnit.DAY),
-        costPerKilometer: new TransportationVariableCost(2.00)
-      }
-    });
-    result.fold(
-      error => console.error('Error updating vehicle:', error),
-      data => console.log('Vehicle updated successfully:', data)
-    );
-  } catch (error) {
-    console.error('Error parsing UUID:', error);
-  }
-};
-
-const deleteVehicle = async (id: string) => {
-  console.log('=== Testing delete vehicle ===');
-  try {
-    const vehicleId = new UllUUID(id);
-    const result = await vehicleRepo.delete({ vehicleId });
-    result.fold(
-      error => console.error('Error deleting vehicle:', error),
-      data => console.log('Vehicle deleted successfully:', data)
-    );
-  } catch (error) {
-    console.error('Error parsing UUID:', error);
-  }
-};
-
-// Ejecutar pruebas al cargar el componente
 onMounted(() => {
   getVehicles();
-  // NOTA: Usa un ID existente de tu base de datos
   const testId = '96f712e9-4d17-4214-b15e-598078f32518';
   getVehicleById(testId);
   registerVehicle();
-  // Comentadas para no modificar/eliminar datos existentes
   // updateVehicle(testId);
   // deleteVehicle(testId);
 });

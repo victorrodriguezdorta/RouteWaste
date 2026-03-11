@@ -163,9 +163,9 @@ export class InfrastructurePlanInfo {
     const facilityIds = selectedFacilities.map(facility => facility.getId().getValue());
 
     // Extract service assignments as simple objects
-    const serviceAssignments = Array.from(assignments.entries()).map(([container, facility]) => ({
-      containerId: container.getId().getValue(),
-      facilityId: facility.getId().getValue(),
+    const serviceAssignments = assignments.map(assignment => ({
+      containerId: assignment.container.getId().getValue(),
+      facilityId: assignment.facility.getId().getValue(),
     }));
 
     // Extract estimated cost data

@@ -9,11 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
     "@ull-tfg/ull-tfg-typescript": "1.0.0",
     "@ull-tfg/ull-tfg-vue": "1.0.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.29",
-    "vue-router": "5"
+    "vue-i18n": "^10.0.8",
+    "vue-router": "5",
+    "vuetify": "^3.12.2"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",
