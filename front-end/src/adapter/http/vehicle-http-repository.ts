@@ -1,8 +1,8 @@
 import {
-    Either,
-    http,
-    type ApiError,
-    type DataError,
+  Either,
+  http,
+  type ApiError,
+  type DataError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { VehicleRepository } from '../../application/repository/vehicle-repository';
 import type { CreateVehicleCommand, CreateVehicleResult } from '../../application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
@@ -12,6 +12,7 @@ import type { ListVehiclesCommand, ListVehiclesResult } from '../../application/
 import type { UpdateVehicleCommand, UpdateVehicleResult } from '../../application/usecase/vehicle-management/update-vehicle/update-vehicle-use-case';
 // Import DTOs (assuming they exist)
 import { VehicleJsonResponse } from './dto/vehicle/vehicle-json-response';
+import type { VehiclePageJsonResponse } from './dto/vehicle/vehicle-page-json-response';
 import { VehiclePostJsonRequest } from './dto/vehicle/vehicle-post-json-request';
 import { VehiclePutJsonRequest } from './dto/vehicle/vehicle-put-json-request';
 
@@ -48,10 +49,16 @@ export class VehicleHttpRepository implements VehicleRepository {
     command?: ListVehiclesCommand
   ): Promise<Either<DataError, ListVehiclesResult>> {
     let url = this.API_URL;
-    
-    // Build query parameters for pagination
-    if (command?.page !== undefined && command?.pageSize !== undefined) {
-      url += `?page=${command.page}&size=${command.pageSize}`;
+    const requestedPage = command?.page ?? 0;
+    const requestedSize = command?.pageSize ?? 10;
+
+    // Build query parameters for pagination, sort and filter
+    url += `?page=${requestedPage}&size=${requestedSize}`;
+    if (command?.sortBy) {
+      url += `&sortBy=${encodeURIComponent(command.sortBy)}&sortOrder=${command.sortOrder ?? 'asc'}`;
+    }
+    if (command?.vehicleType) {
+      url += `&vehicleType=${encodeURIComponent(command.vehicleType)}`;
     }
 
     return new Promise((resolve, reject) => {
@@ -59,14 +66,30 @@ export class VehicleHttpRepository implements VehicleRepository {
         .get(url, this.headers)
         .then(response => {
           if (response.ok) {
-            response.json().then((data: VehicleJsonResponse[]) => {
-              const convertedData: ListVehiclesResult = [];
-              
-              // Transform each JSON response to domain entity
-              data.forEach(vehicle => {
-                convertedData.push(VehicleJsonResponse.toVehicle(vehicle));
-              });
-              
+            response.json().then((data: VehiclePageJsonResponse | VehicleJsonResponse[]) => {
+              // Backward compatibility: accept old array response or new paginated response.
+              let convertedData: ListVehiclesResult;
+
+              if (Array.isArray(data)) {
+                const items = data.map((vehicle: VehicleJsonResponse) => VehicleJsonResponse.toVehicle(vehicle));
+                convertedData = {
+                  items,
+                  totalElements: items.length,
+                  totalPages: items.length > 0 ? 1 : 0,
+                  page: requestedPage,
+                  size: requestedSize,
+                };
+              } else {
+                const items = data.content.map((vehicle: VehicleJsonResponse) => VehicleJsonResponse.toVehicle(vehicle));
+                convertedData = {
+                  items,
+                  totalElements: data.totalElements,
+                  totalPages: data.totalPages,
+                  page: data.page,
+                  size: data.size,
+                };
+              }
+
               resolve(Either.right(convertedData));
             });
           } else {

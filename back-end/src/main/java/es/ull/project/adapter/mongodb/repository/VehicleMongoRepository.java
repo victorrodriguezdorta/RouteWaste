@@ -1,18 +1,22 @@
 package es.ull.project.adapter.mongodb.repository;
 
-import es.ull.project.application.repository.VehicleRepository;
-import es.ull.project.domain.entity.Vehicle;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+
+import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
 
 /**
  * MongoDB implementation of the VehicleRepository interface.
@@ -61,6 +65,42 @@ public class VehicleMongoRepository implements VehicleRepository {
     @Override
     public List<Vehicle> findAll() {
         return this.mongoTemplate.findAll(Vehicle.class, COLLECTION_NAME);
+    }
+
+    /**
+     * Find all vehicles using pagination.
+     *
+     * @param pageable pagination information
+     * @return page of vehicles
+     */
+    @Override
+    public Page<Vehicle> findAll(Pageable pageable) {
+        Query query = new Query().with(pageable);
+        List<Vehicle> vehicles = this.mongoTemplate.find(query, Vehicle.class, COLLECTION_NAME);
+        long total = this.mongoTemplate.count(new Query(), Vehicle.class, COLLECTION_NAME);
+        return new PageImpl<>(vehicles, pageable, total);
+    }
+
+    /**
+     * Find vehicles with pagination and an optional type filter.
+     *
+     * @param pageable    pagination and sort configuration
+     * @param vehicleType optional vehicle type filter (null means no filter)
+     * @return page of matching vehicles
+     */
+    @Override
+    public Page<Vehicle> findAll(Pageable pageable, VehicleType vehicleType) {
+        Query dataQuery = new Query();
+        Query countQuery = new Query();
+        if (vehicleType != null) {
+            Criteria criteria = Criteria.where("vehicleType").is(vehicleType);
+            dataQuery.addCriteria(criteria);
+            countQuery.addCriteria(criteria);
+        }
+        dataQuery.with(pageable);
+        List<Vehicle> vehicles = this.mongoTemplate.find(dataQuery, Vehicle.class, COLLECTION_NAME);
+        long total = this.mongoTemplate.count(countQuery, Vehicle.class, COLLECTION_NAME);
+        return new PageImpl<>(vehicles, pageable, total);
     }
 
     /**

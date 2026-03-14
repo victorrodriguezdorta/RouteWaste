@@ -73,6 +73,8 @@
     "list": {
       "title": "Vehicles",
       "addButton": "Add Vehicle",
+      "filterByType": "Filter by type",
+      "filterAll": "All types",
       "table": {
         "headers": {
           "type": "Vehicle Type",

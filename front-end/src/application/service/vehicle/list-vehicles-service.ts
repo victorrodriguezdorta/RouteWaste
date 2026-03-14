@@ -27,6 +27,9 @@ export class ListVehiclesService implements ListVehiclesUseCase {
     async execute(command?: ListVehiclesCommand): Promise<Either<DataError, ListVehiclesResult>> {
         const page = command?.page;
         const pageSize = command?.pageSize;
-        return this.vehicleRepository.list({ page, pageSize });
+        const sortBy = command?.sortBy;
+        const sortOrder = command?.sortOrder;
+        const vehicleType = command?.vehicleType;
+        return this.vehicleRepository.list({ page, pageSize, sortBy, sortOrder, vehicleType });
     }
 }

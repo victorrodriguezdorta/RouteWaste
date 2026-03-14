@@ -1,10 +1,14 @@
 package es.ull.project.application.repository;
 
-import es.ull.project.domain.entity.Vehicle;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
 
 /**
  * Repository interface for Vehicle aggregate roots.
@@ -34,6 +38,23 @@ public interface VehicleRepository {
      * @return list of vehicles
      */
     public abstract List<Vehicle> findAll();
+
+    /**
+     * Find vehicles using pagination.
+     *
+     * @param pageable pagination configuration
+     * @return page of vehicles
+     */
+    public abstract Page<Vehicle> findAll(Pageable pageable);
+
+    /**
+     * Find vehicles using pagination and an optional type filter.
+     *
+     * @param pageable    pagination and sort configuration
+     * @param vehicleType optional vehicle type to filter by (null means no filter)
+     * @return page of matching vehicles
+     */
+    public abstract Page<Vehicle> findAll(Pageable pageable, VehicleType vehicleType);
 
     /**
      * Save or update a vehicle.

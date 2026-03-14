@@ -1,11 +1,11 @@
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 import {
-    CreateVehicleService,
-    DeleteVehicleService,
-    GetVehicleService,
-    ListVehiclesService,
-    UpdateVehicleService
+  CreateVehicleService,
+  DeleteVehicleService,
+  GetVehicleService,
+  ListVehiclesService,
+  UpdateVehicleService
 } from '../../../application/service/vehicle';
 import type { Vehicle } from '../../../domain/entity/vehicle';
 import { VehicleHttpRepository } from '../../http/vehicle-http-repository';
@@ -32,6 +32,15 @@ export const useVehicleStore = defineStore('Vehicle', {
   state: () => ({
     /** Array of all vehicles retrieved from the backend */
     vehicles: [] as Vehicle[],
+
+    /** Total amount of vehicles available in backend */
+    totalVehicles: 0,
+
+    /** Current zero-based page index loaded from backend */
+    currentPage: 0,
+
+    /** Current requested page size */
+    rowsPerPage: 10,
     
     /** Currently selected vehicle (if any) */
     vehicle: undefined as Vehicle | undefined,
@@ -82,20 +91,26 @@ export const useVehicleStore = defineStore('Vehicle', {
    */
   actions: {
     /**
-     * Retrieve all vehicles from the backend with optional pagination
-     * 
-     * @param page Optional page number for pagination
-     * @param rowsPerPage Optional number of items per page
+     * Retrieve all vehicles from the backend with optional pagination, sort and filter
+     *
+     * @param page         Optional page number (0-based)
+     * @param rowsPerPage  Optional number of items per page
+     * @param sortBy       Optional sort column key ('capacity', 'cost' or 'type')
+     * @param sortOrder    Optional sort direction ('asc' or 'desc')
+     * @param vehicleType  Optional vehicle type enum name to filter by
      */
-    async getVehicles(page?: number, rowsPerPage?: number) {
+    async getVehicles(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', vehicleType?: string) {
       this.loading = true;
       this.vehicles = [];
+
+      const requestedPage = page ?? this.currentPage;
+      const requestedRowsPerPage = rowsPerPage ?? this.rowsPerPage;
       
       // Create service instance with repository
       const listService = new ListVehiclesService(this.vehicleRepository);
       
       // Execute the list operation
-      const result = await listService.execute({ page, pageSize: rowsPerPage });
+      const result = await listService.execute({ page: requestedPage, pageSize: requestedRowsPerPage, sortBy, sortOrder, vehicleType });
       
       // Handle the result using Either pattern
       result.fold(
@@ -106,7 +121,10 @@ export const useVehicleStore = defineStore('Vehicle', {
         },
         data => {
           // Success case: update state with vehicles
-          this.vehicles = data;
+          this.vehicles = data.items;
+          this.totalVehicles = data.totalElements;
+          this.currentPage = data.page;
+          this.rowsPerPage = data.size;
           this.loading = false;
         }
       );

@@ -1,12 +1,16 @@
 package es.ull.project.application.service.vehicle;
 
-import es.ull.project.application.repository.VehicleRepository;
-import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
-import es.ull.project.domain.entity.Vehicle;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
 
 /**
  * Service responsible for reading vehicle data from the system.
@@ -46,5 +50,28 @@ public class ReadVehicleService implements ReadVehicleUseCase {
     @Override
     public List<Vehicle> fetchAll() {
         return this.repository.findAll();
+    }
+
+    /**
+     * Retrieves vehicles from the system using pagination.
+     *
+     * @param pageable pagination information
+     * @return a page containing vehicles
+     */
+    @Override
+    public Page<Vehicle> fetchAll(Pageable pageable) {
+        return this.repository.findAll(pageable);
+    }
+
+    /**
+     * Retrieves vehicles using pagination and an optional type filter.
+     *
+     * @param pageable    pagination and sort information
+     * @param vehicleType optional vehicle type to filter by
+     * @return a page containing matching vehicles
+     */
+    @Override
+    public Page<Vehicle> fetchAll(Pageable pageable, VehicleType vehicleType) {
+        return this.repository.findAll(pageable, vehicleType);
     }
 }

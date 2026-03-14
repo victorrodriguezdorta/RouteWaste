@@ -5,6 +5,10 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,17 +18,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
+import es.ull.project.adapter.rest.response.vehicle.VehiclePageResponseBody;
 import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
 import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
 
 /**
  * VehicleController
@@ -72,21 +79,69 @@ public class VehicleController {
 
     /**
      * GET /vehicles/
-     * 
-     * Retrieves all vehicles in the system.
-     * 
-     * This endpoint returns a list of all available vehicles without pagination.
-     * The vehicles are returned as VehicleResponseBody DTOs serialized to JSON.
-     * 
-     * @return ResponseEntity containing a list of all vehicles and HTTP 200 (OK) status
+     *
+     * Retrieves vehicles in the system with pagination, optional sort and optional type filter.
+     *
+     * @param page        page index (0-based, default 0)
+     * @param size        page size (default 10)
+     * @param sortBy      optional column to sort by: "capacity", "cost" or "type"
+     * @param sortOrder   sort direction: "asc" (default) or "desc"
+     * @param vehicleType optional vehicle type filter (enum name, e.g. "COLLECTION_TRUCK")
+     * @return paginated list of vehicles or 400 if parameters are invalid
      */
     @GetMapping("/")
-    public ResponseEntity<List<VehicleResponseBody>> getVehicles() {
-        List<Vehicle> vehicles = this.readVehicleUseCase.fetchAll();
-        List<VehicleResponseBody> responseBodies = vehicles.stream()
+    public ResponseEntity<VehiclePageResponseBody> getVehicles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) String vehicleType) {
+        if (page < 0 || size <= 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Map frontend column key to the actual MongoDB / domain field name
+        String mongoSortField = switch (sortBy != null ? sortBy : "") {
+            case "capacity" -> "transportCapacity.value";
+            case "cost"     -> "costPerKilometer.amount";
+            case "type"     -> "vehicleType";
+            default         -> null;
+        };
+
+        Sort sort = Sort.unsorted();
+        if (mongoSortField != null) {
+            Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder)
+                    ? Sort.Direction.DESC
+                    : Sort.Direction.ASC;
+            sort = Sort.by(direction, mongoSortField);
+        }
+
+        VehicleType vehicleTypeFilter = null;
+        if (vehicleType != null && !vehicleType.isBlank()) {
+            try {
+                vehicleTypeFilter = VehicleType.valueOf(vehicleType);
+            } catch (IllegalArgumentException e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Vehicle> vehiclePage = this.readVehicleUseCase.fetchAll(pageable, vehicleTypeFilter);
+        List<VehicleResponseBody> responseBodies = vehiclePage.getContent().stream()
                 .map(VehicleResponseMapper::toResponseBody)
                 .toList();
-        return new ResponseEntity<>(responseBodies, HttpStatus.OK);
+
+        VehiclePageResponseBody response = new VehiclePageResponseBody();
+        response.content = responseBodies;
+        response.totalElements = vehiclePage.getTotalElements();
+        response.totalPages = vehiclePage.getTotalPages();
+        response.page = vehiclePage.getNumber();
+        response.size = vehiclePage.getSize();
+        response.numberOfElements = vehiclePage.getNumberOfElements();
+        response.first = vehiclePage.isFirst();
+        response.last = vehiclePage.isLast();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**

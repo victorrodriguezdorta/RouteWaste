@@ -1,9 +1,13 @@
 package es.ull.project.application.usecase.vehicle;
 
-import es.ull.project.domain.entity.Vehicle;
-
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
 
 /**
  * Use case interface for reading vehicles.
@@ -26,4 +30,21 @@ public interface ReadVehicleUseCase {
      * @return a list containing all vehicles
      */
     List<Vehicle> fetchAll();
+
+    /**
+     * Retrieves vehicles using pagination parameters.
+     *
+     * @param pageable pagination information
+     * @return a page of vehicles
+     */
+    Page<Vehicle> fetchAll(Pageable pageable);
+
+    /**
+     * Retrieves vehicles with pagination and an optional type filter.
+     *
+     * @param pageable    pagination and sort information
+     * @param vehicleType optional vehicle type to filter by (null means no filter)
+     * @return a page of vehicles
+     */
+    Page<Vehicle> fetchAll(Pageable pageable, VehicleType vehicleType);
 }

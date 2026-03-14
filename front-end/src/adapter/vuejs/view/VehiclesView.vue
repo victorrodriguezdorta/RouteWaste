@@ -30,9 +30,9 @@
     <!-- Main content area -->
     <v-row justify="center">
       <v-col cols="12" md="10" lg="10">
-        <!-- Add vehicle button -->
-        <v-row class="mb-4">
-          <v-col cols="12" class="d-flex justify-start">
+        <!-- Add vehicle button and type filter -->
+        <v-row class="mb-4" align="center">
+          <v-col cols="12" sm="auto">
             <v-btn
               color="primary"
               prepend-icon="mdi-plus"
@@ -42,22 +42,38 @@
               {{ t('vehicle.list.addButton') }}
             </v-btn>
           </v-col>
+          <v-spacer />
+          <v-col cols="12" sm="4" md="3">
+            <v-select
+              v-model="selectedVehicleTypeFilter"
+              :items="vehicleTypeFilterOptions"
+              :label="t('vehicle.list.filterByType')"
+              item-title="title"
+              item-value="value"
+              clearable
+              density="compact"
+              hide-details
+              @update:model-value="onVehicleTypeFilterChange"
+            />
+          </v-col>
         </v-row>
 
         <!-- Vehicles data table -->
         <v-card>
-          <v-data-table
+          <v-data-table-server
             :headers="headers"
             :items="vehicleItems"
             :loading="loading"
+            :items-length="totalVehicles"
+            v-model:page="tablePage"
             :items-per-page="itemsPerPage"
             :items-per-page-options="[
               { value: 5, title: '5' },
               { value: 10, title: '10' },
               { value: 25, title: '25' },
-              { value: 50, title: '50' },
-              { value: -1, title: t('vehicle.list.table.allItems') }
+              { value: 50, title: '50' }
             ]"
+            @update:options="onTableOptionsUpdate"
             item-value="id"
             hover
             class="elevation-2"
@@ -135,7 +151,7 @@
                 </v-btn>
               </v-alert>
             </template>
-          </v-data-table>
+          </v-data-table-server>
         </v-card>
       </v-col>
     </v-row>
@@ -195,12 +211,16 @@ const { t } = useI18n();
 
 // Store instance and reactive references
 const vehicleStore = useVehicleStore();
-const { vehicles, vehicleNotification, loading } = storeToRefs(vehicleStore);
+const { vehicles, vehicleNotification, loading, totalVehicles, currentPage, rowsPerPage } = storeToRefs(vehicleStore);
 
 // Local component state
 const dialogDelete = ref(false);
 const selectedIdVehicle = ref('');
+const tablePage = ref(1);
 const itemsPerPage = ref(10);
+const selectedVehicleTypeFilter = ref<string | undefined>(undefined);
+const currentSortBy = ref<string | undefined>(undefined);
+const currentSortOrder = ref<'asc' | 'desc'>('asc');
 
 // Table column headers configuration
 const headers = [
@@ -231,6 +251,16 @@ const headers = [
 ];
 
 /**
+ * Options for the vehicle type filter select
+ */
+const vehicleTypeFilterOptions = computed(() =>
+  Object.values(VehicleType).map(type => ({
+    value: type as string,
+    title: t(`vehicle.add.vehicleTypes.${type}`),
+  }))
+);
+
+/**
  * Computed table items with formatted vehicle data
  * Transforms domain entities into display-friendly objects
  * @returns Array of formatted vehicle objects for the table
@@ -248,14 +278,46 @@ const vehicleItems = computed(() => {
  * Load vehicles when component mounts
  */
 onMounted(async () => {
-  await loadVehicles();
+  await loadVehicles(currentPage.value, rowsPerPage.value);
+  tablePage.value = currentPage.value + 1;
+  itemsPerPage.value = rowsPerPage.value;
 });
 
 /**
  * Fetch vehicles from the server via store
  */
-const loadVehicles = async () => {
-  await vehicleStore.getVehicles();
+const loadVehicles = async (page: number, size: number, sortBy?: string, sortOrder?: 'asc' | 'desc', vehicleType?: string) => {
+  currentSortBy.value = sortBy;
+  currentSortOrder.value = sortOrder ?? 'asc';
+  await vehicleStore.getVehicles(page, size, sortBy, sortOrder, vehicleType);
+};
+
+/**
+ * Handle pagination and sort changes coming from Vuetify table.
+ * Vuetify pages are 1-based, backend pages are 0-based.
+ */
+const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: number; sortBy: { key: string; order: 'asc' | 'desc' }[] }) => {
+  const requestedSize = options.itemsPerPage;
+  if (requestedSize <= 0) {
+    return;
+  }
+
+  const requestedPage = Math.max(options.page - 1, 0);
+  const newSortBy = options.sortBy[0]?.key;
+  const newSortOrder = options.sortBy[0]?.order ?? 'asc';
+
+  await loadVehicles(requestedPage, requestedSize, newSortBy, newSortOrder, selectedVehicleTypeFilter.value);
+  tablePage.value = currentPage.value + 1;
+  itemsPerPage.value = rowsPerPage.value;
+};
+
+/**
+ * Handle vehicle type filter changes — resets to first page.
+ */
+const onVehicleTypeFilterChange = async (newType: string | null) => {
+  const vehicleType = newType ?? undefined;
+  await loadVehicles(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, vehicleType);
+  tablePage.value = currentPage.value + 1;
 };
 
 /**
@@ -328,7 +390,13 @@ const deleteItem = (itemId: string) => {
  */
 const confirmDelete = async () => {
   await vehicleStore.deleteVehicle(selectedIdVehicle.value);
-  await loadVehicles();
+
+  await loadVehicles(currentPage.value, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedVehicleTypeFilter.value);
+  if (vehicles.value.length === 0 && currentPage.value > 0) {
+    await loadVehicles(currentPage.value - 1, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedVehicleTypeFilter.value);
+  }
+
+  tablePage.value = currentPage.value + 1;
   dialogDelete.value = false;
   selectedIdVehicle.value = '';
 };
