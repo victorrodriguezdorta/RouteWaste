@@ -77,6 +77,22 @@ public class TransportationVariableCostTests {
     }
 
     /**
+     * Constructor - zero amount
+     */
+    @Test
+    void constructor_zeroAmount() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> new TransportationVariableCost(0.0)
+        );
+
+        assertEquals(
+                "Transportation variable cost cannot be zero",
+                exception.getMessage()
+        );
+    }
+
+    /**
      * Constructor - null currency object
      */
     @Test
@@ -182,16 +198,41 @@ public class TransportationVariableCostTests {
     }
 
     /**
-     * Subtract operation - result negative becomes zero
+     * Subtract operation - result negative throws exception
      */
     @Test
-    void subtract_negativeResultBecomesZero() {
+    void subtract_negativeResultThrowsException() {
         TransportationVariableCost cost1 = new TransportationVariableCost(5.0, "EUR");
         TransportationVariableCost cost2 = new TransportationVariableCost(10.0, "EUR");
 
-        TransportationVariableCost result = cost1.subtract(cost2);
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> cost1.subtract(cost2)
+        );
 
-        assertEquals(0.00, result.getAmount());
+        assertEquals(
+                "Result of operation would be zero or negative",
+                exception.getMessage()
+        );
+    }
+
+    /**
+     * Subtract operation - result zero throws exception
+     */
+    @Test
+    void subtract_zeroResultThrowsException() {
+        TransportationVariableCost cost1 = new TransportationVariableCost(10.0, "EUR");
+        TransportationVariableCost cost2 = new TransportationVariableCost(10.0, "EUR");
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> cost1.subtract(cost2)
+        );
+
+        assertEquals(
+                "Result of operation would be zero or negative",
+                exception.getMessage()
+        );
     }
 
     /**

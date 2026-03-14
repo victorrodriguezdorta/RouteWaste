@@ -1,8 +1,8 @@
 import {
-  Either,
-  http,
-  type ApiError,
-  type DataError,
+    Either,
+    http,
+    type ApiError,
+    type DataError,
 } from '@ull-tfg/ull-tfg-typescript';
 import type { VehicleRepository } from '../../application/repository/vehicle-repository';
 import type { CreateVehicleCommand, CreateVehicleResult } from '../../application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
@@ -123,7 +123,7 @@ export class VehicleHttpRepository implements VehicleRepository {
   ): Promise<Either<DataError, CreateVehicleResult>> {
     const body = VehiclePostJsonRequest.toRequest(command);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       http
         .post(this.API_URL, body, this.headers)
         .then(response => {
@@ -133,7 +133,8 @@ export class VehicleHttpRepository implements VehicleRepository {
             });
           } else {
             response.json().then((data: ApiError) => {
-              reject(Either.left(data));
+              data.kind = 'ApiError';
+              resolve(Either.left(data));
             });
           }
         })

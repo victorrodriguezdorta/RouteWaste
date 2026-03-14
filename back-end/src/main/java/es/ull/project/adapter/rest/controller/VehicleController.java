@@ -128,17 +128,13 @@ public class VehicleController {
      */
     @PostMapping("/")
     public ResponseEntity<VehicleResponseBody> createVehicle(@RequestBody VehiclePostRequestBody requestBody) {
-        try {
-            Vehicle createdVehicle = this.createVehicleUseCase.create(
-                    requestBody.vehicleType,
-                    requestBody.transportCapacity,
-                    requestBody.costPerKilometer
-            );
-            VehicleResponseBody responseBody = VehicleResponseMapper.toResponseBody(createdVehicle);
-            return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        Vehicle createdVehicle = this.createVehicleUseCase.create(
+                requestBody.vehicleType,
+                requestBody.transportCapacity,
+                requestBody.costPerKilometer
+        );
+        VehicleResponseBody responseBody = VehicleResponseMapper.toResponseBody(createdVehicle);
+        return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
     }
 
     /**
@@ -172,8 +168,6 @@ public class VehicleController {
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 

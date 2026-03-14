@@ -31,8 +31,8 @@ else
 fi
 
 # Back-end
-docker run -v $(pwd):/data ${IMAGE_NAME} --test JAVA_HEXAGONAL --uri file:/data --component back-end
+# docker run -v $(pwd):/data ${IMAGE_NAME} --test JAVA_HEXAGONAL --uri file:/data --component back-end
 # Front-end
-# docker run -v $(pwd):/data ${IMAGE_NAME} --test TYPESCRIPT_HEXAGONAL --uri file:/data --component front-end
+docker run -v $(pwd):/data ${IMAGE_NAME} --test TYPESCRIPT_HEXAGONAL --uri file:/data --component front-end
 # Summary
 docker run -v $(pwd):/data ${IMAGE_NAME} --summary

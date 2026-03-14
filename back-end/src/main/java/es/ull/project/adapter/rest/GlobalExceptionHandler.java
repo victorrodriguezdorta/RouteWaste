@@ -1,8 +1,5 @@
 package es.ull.project.adapter.rest;
 
-import es.ull.project.adapter.rest.exception.ValidationException;
-import es.ull.project.adapter.rest.response.ErrorResponse;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -14,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import es.ull.project.adapter.rest.exception.ValidationException;
+import es.ull.project.adapter.rest.response.ErrorResponse;
 /**
  * GlobalExceptionHandler
  * 
@@ -82,9 +82,17 @@ public class GlobalExceptionHandler {
      * @return ResponseEntity with error message and HTTP 400 (BAD_REQUEST)
      */
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleValidationError(IllegalArgumentException ex) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleValidationError(IllegalArgumentException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.error = "ValidationError";
+        errorResponse.message = ex.getMessage();
+        errorResponse.details = new java.util.ArrayList<>();
+        
+        // Add the error as a general detail
+        es.ull.project.adapter.rest.exception.FieldError fieldError = 
+            new es.ull.project.adapter.rest.exception.FieldError("general", ex.getMessage());
+        errorResponse.details.add(fieldError);
+        
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 

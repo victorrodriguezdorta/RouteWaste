@@ -292,7 +292,19 @@ export const useVehicleStore = defineStore('Vehicle', {
       // Determine error message based on error kind
       let errorMessage = 'An unexpected error occurred';
       
-      if (error.kind === 'ValidationError') {
+      if (error.kind === 'ApiError' || error.error === 'ValidationError') {
+        // If the error has validation details, format them
+        if (error.details && error.details.length > 0) {
+          const detailMessages = error.details.map((detail: any) => 
+            `${detail.field}: ${detail.issue || detail.message}`
+          ).join('; ');
+          errorMessage = detailMessages;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else {
+          errorMessage = 'Invalid vehicle data';
+        }
+      } else if (error.kind === 'ValidationError') {
         errorMessage = error.message || 'Invalid vehicle data';
       } else if (error.kind === 'NotFoundError') {
         errorMessage = 'Vehicle not found';

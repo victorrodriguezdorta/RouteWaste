@@ -1,0 +1,106 @@
+{
+  "vehicle": {
+    "add": {
+      "title": "Agregar Vehículo",
+      "cardTitle": "Información del Vehículo",
+      "fields": {
+        "vehicleType": "Tipo de Vehículo *",
+        "capacityValue": "Valor de Capacidad *",
+        "capacityUnit": "Unidad (ej: tons, kg) *",
+        "timeUnit": "Unidad de Tiempo *",
+        "costPerKilometer": "Costo por Kilómetro *",
+        "currencyCode": "Código de Moneda (ej: EUR, USD) *"
+      },
+      "alerts": {
+        "requiredFields": "Los campos marcados con * son obligatorios"
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "save": "Guardar"
+      },
+      "vehicleTypes": {
+        "COLLECTION_TRUCK": "Camión de Recolección",
+        "TRANSFER_TRUCK": "Camión de Transferencia",
+        "SUPPORT_VEHICLE": "Vehículo de Soporte"
+      },
+      "timeUnits": {
+        "DAY": "Día",
+        "WEEK": "Semana",
+        "MONTH": "Mes",
+        "YEAR": "Año"
+      }
+    },
+    "edit": {
+      "title": "Editar Vehículo",
+      "titleWithType": "Editar Vehículo - {type}",
+      "cardTitle": "Información del Vehículo",
+      "loading": "Cargando vehículo...",
+      "fields": {
+        "vehicleType": "Tipo de Vehículo *",
+        "capacityValue": "Valor de Capacidad *",
+        "capacityUnit": "Unidad (ej: tons, kg) *",
+        "timeUnit": "Unidad de Tiempo *",
+        "costPerKilometer": "Costo por Kilómetro *",
+        "currencyCode": "Código de Moneda (ej: EUR, USD) *"
+      },
+      "alerts": {
+        "requiredFields": "Los campos marcados con * son obligatorios"
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "update": "Actualizar"
+      }
+    },
+    "show": {
+      "title": "Detalles del Vehículo",
+      "titleWithType": "Vehículo - {type}",
+      "cardTitle": "Información del Vehículo",
+      "loading": "Cargando vehículo...",
+      "fields": {
+        "vehicleType": "Tipo de Vehículo",
+        "capacityValue": "Valor de Capacidad",
+        "capacityUnit": "Unidad",
+        "timeUnit": "Unidad de Tiempo",
+        "costPerKilometer": "Costo por Kilómetro",
+        "currencyCode": "Código de Moneda",
+        "vehicleId": "ID del Vehículo"
+      },
+      "buttons": {
+        "back": "Volver",
+        "edit": "Editar"
+      }
+    },
+    "list": {
+      "title": "Vehículos",
+      "addButton": "Agregar Vehículo",
+      "table": {
+        "headers": {
+          "type": "Tipo de Vehículo",
+          "capacity": "Capacidad",
+          "cost": "Costo por Km",
+          "actions": "Acciones"
+        },
+        "tooltips": {
+          "view": "Ver detalles",
+          "edit": "Editar",
+          "delete": "Eliminar"
+        },
+        "noData": "No hay vehículos registrados.",
+        "addFirst": "Agregar el primero",
+        "allItems": "Todos"
+      },
+      "deleteDialog": {
+        "title": "Confirmar Eliminación",
+        "message": "¿Está seguro que desea eliminar este vehículo? Esta acción no se puede deshacer.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar"
+      },
+      "timeUnits": {
+        "DAY": "día",
+        "WEEK": "semana",
+        "MONTH": "mes",
+        "YEAR": "año"
+      }
+    }
+  }
+}

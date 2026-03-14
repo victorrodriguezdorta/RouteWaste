@@ -15,6 +15,8 @@ public final class TransportationVariableCost {
 
     private static final String ERROR_AMOUNT_NOT_DEFINED = "Transportation variable cost is not defined";
     private static final String ERROR_AMOUNT_NEGATIVE = "Transportation variable cost cannot be negative";
+    private static final String ERROR_AMOUNT_ZERO = "Transportation variable cost cannot be zero";
+    private static final String ERROR_AMOUNT_RESULT_INVALID = "Result of operation would be zero or negative";
     private static final String ERROR_CURRENCY_INVALID = "Currency cannot be null or empty";
     private static final String ERROR_CURRENCY_MISMATCH = "Cannot operate on costs with different currencies";
     private static final int ZERO = 0;
@@ -80,6 +82,9 @@ public final class TransportationVariableCost {
         if (amount < ZERO) {
             throw new IllegalArgumentException(ERROR_AMOUNT_NEGATIVE);
         }
+        if (amount == ZERO) {
+            throw new IllegalArgumentException(ERROR_AMOUNT_ZERO);
+        }
     }
 
     /**
@@ -139,17 +144,17 @@ public final class TransportationVariableCost {
 
     /**
      * Subtracts another transportation cost from this one.
-     * Both costs must have the same currency. Result cannot be negative (minimum is 0).
+     * Both costs must have the same currency. Result must be greater than 0.
      *
      * @param other The transportation cost to subtract.
-     * @return New TransportationVariableCost with the difference (minimum 0).
-     * @throws IllegalArgumentException if currencies don't match.
+     * @return New TransportationVariableCost with the difference.
+     * @throws IllegalArgumentException if currencies don't match or result would be zero or negative.
      */
     public TransportationVariableCost subtract(TransportationVariableCost other) {
         checkCurrencyCompatibility(other);
         double result = this.amount.subtract(other.amount).doubleValue();
-        if (result < ZERO) {
-            result = ZERO;
+        if (result <= ZERO) {
+            throw new IllegalArgumentException(ERROR_AMOUNT_RESULT_INVALID);
         }
         return new TransportationVariableCost(result, this.currency);
     }

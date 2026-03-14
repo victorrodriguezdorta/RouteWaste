@@ -1,106 +1,27 @@
 <script setup lang="ts">
-import { VehicleHttpRepository } from '@/adapter/http/vehicle-http-repository';
-import { Vehicle } from '@/domain/entity/vehicle';
-import { TimeUnit } from '@/domain/enumerate/time-unit';
-import { VehicleType } from '@/domain/enumerate/vehicle-type';
-import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
-import { Capacity } from '@/domain/valueobject/demand/capacity';
-import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
-import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { onMounted, ref } from 'vue';
-
-const vehicleRepo = new VehicleHttpRepository();
-const vehicleList = ref<Vehicle[]>([]);
-const vehicleDetails = ref<Vehicle | null>(null);
-
-const getVehicles = async () => {
-  console.log('=== Testing list vehicles ===');
-  const result = await vehicleRepo.list({ page: 0, pageSize: 10 });
-  result.fold(
-    error => console.error('Error getting vehicles:', error),
-    data => {
-      console.log('Vehicles retrieved successfully:', data);
-      vehicleList.value = data;
-    }
-  );
-};
-
-const getVehicleById = async (id: string) => {
-  console.log('=== Testing get vehicle by ID ===');
-  try {
-    const vehicleId = new UllUUID(id);
-    const result = await vehicleRepo.getById({ vehicleId });
-    result.fold(
-      error => console.error('Error getting vehicle:', error),
-      data => {
-        console.log('Vehicle retrieved successfully:', data);
-        vehicleDetails.value = data;
-      }
-    );
-  } catch (error) {
-    console.error('Error parsing UUID:', error);
-  }
-};
-
-const registerVehicle = async () => {
-  console.log('=== Testing register vehicle ===');
-  const result = await vehicleRepo.create({
-    vehicleType: VehicleType.COLLECTION_TRUCK,
-    transportCapacity: new Capacity(5, new QuantityUnit('tons'), TimeUnit.DAY),
-    costPerKilometer: new TransportationVariableCost(1.50)
-  });
-  result.fold(
-    error => console.error('Error registering vehicle:', error),
-    data => console.log('Vehicle registered successfully:', data)
-  );
-};
-
-onMounted(() => {
-  getVehicles();
-  const testId = '96f712e9-4d17-4214-b15e-598078f32518';
-  getVehicleById(testId);
-  registerVehicle();
-  // updateVehicle(testId);
-  // deleteVehicle(testId);
-});
+import LanguageSwitcher from './adapter/vuejs/components/LanguageSwitcher.vue';
 </script>
 
 <template>
-  <div>
-    <h1>HTTP Repository Test - Vehicle</h1>
-    
-    <h2>Vehicles List:</h2>
-    <ul v-if="vehicleList.length > 0">
-      <li v-for="vehicle in vehicleList" :key="vehicle.getId().toString()">
-        <strong>ID:</strong> {{ vehicle.getId().toString() }}<br />
-        <strong>Type:</strong> {{ vehicle.getVehicleType() }}<br />
-        <strong>Capacity:</strong> {{ vehicle.getTransportCapacity().getValue() }} 
-        {{ vehicle.getTransportCapacity().quantityUnit.value }}/{{ vehicle.getTransportCapacity().timeUnit }}<br />
-        <strong>Cost per km:</strong> {{ vehicle.getCostPerKilometer().amount }} 
-        {{ vehicle.getCostPerKilometer().currency.code }}
-      </li>
-    </ul>
-    <p v-else>No vehicles found or still loading...</p>
+  <v-app>
+    <!-- App bar with language switcher -->
+    <v-app-bar color="primary" prominent>
+      <v-app-bar-title>Sensor App</v-app-bar-title>
+      <v-spacer></v-spacer>
+      <language-switcher />
+    </v-app-bar>
 
-    <h2>Vehicle Details (by ID):</h2>
-    <div v-if="vehicleDetails">
-      <p>
-        <strong>ID:</strong> {{ vehicleDetails.getId().toString() }}<br />
-        <strong>Type:</strong> {{ vehicleDetails.getVehicleType() }}<br />
-        <strong>Capacity:</strong> {{ vehicleDetails.getTransportCapacity().getValue() }} 
-        {{ vehicleDetails.getTransportCapacity().quantityUnit.value }}/{{ vehicleDetails.getTransportCapacity().timeUnit }}<br />
-        <strong>Cost per km:</strong> {{ vehicleDetails.getCostPerKilometer().amount }} 
-        {{ vehicleDetails.getCostPerKilometer().currency.code }}
-      </p>
-    </div>
-    <p v-else>No vehicle details available or still loading...</p>
-
-    <p><em>Check the browser console for detailed test results</em></p>
-  </div>
+    <v-main>
+      <router-view />
+    </v-main>
+  </v-app>
 </template>
 
 <style scoped>
-/* Asegurar que todo el texto sea negro y legible */
+</style>
+
+<style scoped>
+
 div {
   color: #000000;
 }

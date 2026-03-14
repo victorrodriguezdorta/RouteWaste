@@ -1,0 +1,106 @@
+{
+  "vehicle": {
+    "add": {
+      "title": "Add Vehicle",
+      "cardTitle": "Vehicle Information",
+      "fields": {
+        "vehicleType": "Vehicle Type *",
+        "capacityValue": "Capacity Value *",
+        "capacityUnit": "Unit (e.g., tons, kg) *",
+        "timeUnit": "Time Unit *",
+        "costPerKilometer": "Cost per Kilometer *",
+        "currencyCode": "Currency Code (e.g., EUR, USD) *"
+      },
+      "alerts": {
+        "requiredFields": "Fields marked with * are required"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "vehicleTypes": {
+        "COLLECTION_TRUCK": "Collection Truck",
+        "TRANSFER_TRUCK": "Transfer Truck",
+        "SUPPORT_VEHICLE": "Support Vehicle"
+      },
+      "timeUnits": {
+        "DAY": "Day",
+        "WEEK": "Week",
+        "MONTH": "Month",
+        "YEAR": "Year"
+      }
+    },
+    "edit": {
+      "title": "Edit Vehicle",
+      "titleWithType": "Edit Vehicle - {type}",
+      "cardTitle": "Vehicle Information",
+      "loading": "Loading vehicle...",
+      "fields": {
+        "vehicleType": "Vehicle Type *",
+        "capacityValue": "Capacity Value *",
+        "capacityUnit": "Unit (e.g., tons, kg) *",
+        "timeUnit": "Time Unit *",
+        "costPerKilometer": "Cost per Kilometer *",
+        "currencyCode": "Currency Code (e.g., EUR, USD) *"
+      },
+      "alerts": {
+        "requiredFields": "Fields marked with * are required"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "update": "Update"
+      }
+    },
+    "show": {
+      "title": "Vehicle Details",
+      "titleWithType": "Vehicle - {type}",
+      "cardTitle": "Vehicle Information",
+      "loading": "Loading vehicle...",
+      "fields": {
+        "vehicleType": "Vehicle Type",
+        "capacityValue": "Capacity Value",
+        "capacityUnit": "Unit",
+        "timeUnit": "Time Unit",
+        "costPerKilometer": "Cost per Kilometer",
+        "currencyCode": "Currency Code",
+        "vehicleId": "Vehicle ID"
+      },
+      "buttons": {
+        "back": "Back",
+        "edit": "Edit"
+      }
+    },
+    "list": {
+      "title": "Vehicles",
+      "addButton": "Add Vehicle",
+      "table": {
+        "headers": {
+          "type": "Vehicle Type",
+          "capacity": "Capacity",
+          "cost": "Cost per Km",
+          "actions": "Actions"
+        },
+        "tooltips": {
+          "view": "View details",
+          "edit": "Edit",
+          "delete": "Delete"
+        },
+        "noData": "No vehicles registered.",
+        "addFirst": "Add the first one",
+        "allItems": "All"
+      },
+      "deleteDialog": {
+        "title": "Confirm Deletion",
+        "message": "Are you sure you want to delete this vehicle? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "timeUnits": {
+        "DAY": "day",
+        "WEEK": "week",
+        "MONTH": "month",
+        "YEAR": "year"
+      }
+    }
+  }
+}
