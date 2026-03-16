@@ -104,5 +104,79 @@
         "YEAR": "year"
       }
     }
+  },
+  "container": {
+    "add": {
+      "title": "Add Container",
+      "cardTitle": "Container Information",
+      "fields": {
+        "latitude": "Latitude *",
+        "longitude": "Longitude *",
+        "postalAddress": "Postal Address *",
+        "gisReference": "GIS Reference *",
+        "wasteType": "Waste Type *",
+        "wasteDemandValue": "Waste Demand *",
+        "wasteDemandQuantityUnit": "Demand Unit (e.g., kg, tons) *",
+        "wasteDemandTimeUnit": "Time Unit *",
+        "serviceZone": "Service Zone"
+      },
+      "alerts": {
+        "requiredFields": "Fields marked with * are required"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "wasteTypes": {
+        "ORGANIC": "Organic",
+        "PACKAGING": "Packaging",
+        "PAPER_CARDBOARD": "Paper and Cardboard",
+        "GLASS": "Glass",
+        "RESIDUAL": "Residual"
+      },
+      "serviceZones": {
+        "NEIGHBORHOOD": "Neighborhood",
+        "DISTRICT": "District",
+        "GEOGRAPHICAL_AREA": "Geographical Area"
+      },
+      "timeUnits": {
+        "DAY": "Day",
+        "WEEK": "Week",
+        "MONTH": "Month",
+        "YEAR": "Year"
+      }
+    },
+    "list": {
+      "title": "Containers",
+      "addButton": "Add Container",
+      "filterByWasteType": "Filter by waste type",
+      "table": {
+        "headers": {
+          "wasteType": "Waste Type",
+          "wasteDemand": "Demand",
+          "serviceZone": "Service Zone",
+          "location": "Location",
+          "actions": "Actions"
+        },
+        "tooltips": {
+          "delete": "Delete"
+        },
+        "notAssigned": "Not assigned",
+        "noData": "No containers registered.",
+        "addFirst": "Add the first one"
+      },
+      "deleteDialog": {
+        "title": "Confirm Deletion",
+        "message": "Are you sure you want to delete this container? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "timeUnits": {
+        "DAY": "day",
+        "WEEK": "week",
+        "MONTH": "month",
+        "YEAR": "year"
+      }
+    }
   }
 }

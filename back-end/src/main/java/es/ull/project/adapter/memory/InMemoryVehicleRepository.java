@@ -92,7 +92,7 @@ public class InMemoryVehicleRepository implements VehicleRepository {
         if (vehicleType != null) {
             stream = stream.filter(v -> vehicleType.equals(v.getVehicleType()));
         }
-
+        
         if (pageable.getSort().isSorted()) {
             Comparator<Vehicle> comparator = null;
             for (Sort.Order order : pageable.getSort()) {

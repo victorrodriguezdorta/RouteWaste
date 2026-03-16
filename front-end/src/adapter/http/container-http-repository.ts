@@ -24,7 +24,7 @@ import { ContainerPutJsonRequest } from './dto/container/container-put-json-requ
  * RESTful API calls.
  */
 export class ContainerHttpRepository implements ContainerRepository {
-  private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'containers';
+  private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'containers/';
   private headers: Headers = new Headers();
 
   /**
@@ -91,7 +91,7 @@ export class ContainerHttpRepository implements ContainerRepository {
   public async getById(
     command: GetContainerCommand
   ): Promise<Either<DataError, GetContainerResult>> {
-    const url = `${this.API_URL}/${command.containerId.toString()}`;
+    const url = `${this.API_URL}${command.containerId.toString()}`;
 
     return new Promise((resolve, reject) => {
       http
@@ -153,7 +153,7 @@ export class ContainerHttpRepository implements ContainerRepository {
   public async update(
     command: UpdateContainerCommand
   ): Promise<Either<DataError, UpdateContainerResult>> {
-    const url = `${this.API_URL}/${command.containerId.toString()}`;
+    const url = `${this.API_URL}${command.containerId.toString()}`;
     const body = ContainerPutJsonRequest.toRequest(command);
 
     return new Promise((resolve) => {
@@ -186,7 +186,7 @@ export class ContainerHttpRepository implements ContainerRepository {
   public async delete(
     command: DeleteContainerCommand
   ): Promise<Either<DataError, DeleteContainerResult>> {
-    const url = `${this.API_URL}/${command.containerId.toString()}`;
+    const url = `${this.API_URL}${command.containerId.toString()}`;
 
     return new Promise((resolve) => {
       http
@@ -216,7 +216,7 @@ export class ContainerHttpRepository implements ContainerRepository {
   public async filter(
     command: FilterContainersCommand
   ): Promise<Either<DataError, FilterContainersResult>> {
-    let url = this.API_URL + '/filter?';
+    let url = this.API_URL + 'filter?';
     const params: string[] = [];
 
     // Build query parameters for filtering

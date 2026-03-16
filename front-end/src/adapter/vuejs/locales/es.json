@@ -104,5 +104,79 @@
         "YEAR": "año"
       }
     }
+  },
+  "container": {
+    "add": {
+      "title": "Agregar Contenedor",
+      "cardTitle": "Información del Contenedor",
+      "fields": {
+        "latitude": "Latitud *",
+        "longitude": "Longitud *",
+        "postalAddress": "Dirección Postal *",
+        "gisReference": "Referencia GIS *",
+        "wasteType": "Tipo de Residuo *",
+        "wasteDemandValue": "Demanda de Residuo *",
+        "wasteDemandQuantityUnit": "Unidad de Demanda (ej: kg, tons) *",
+        "wasteDemandTimeUnit": "Unidad de Tiempo *",
+        "serviceZone": "Zona de Servicio"
+      },
+      "alerts": {
+        "requiredFields": "Los campos marcados con * son obligatorios"
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "save": "Guardar"
+      },
+      "wasteTypes": {
+        "ORGANIC": "Orgánico",
+        "PACKAGING": "Envases",
+        "PAPER_CARDBOARD": "Papel y Cartón",
+        "GLASS": "Vidrio",
+        "RESIDUAL": "Residual"
+      },
+      "serviceZones": {
+        "NEIGHBORHOOD": "Barrio",
+        "DISTRICT": "Distrito",
+        "GEOGRAPHICAL_AREA": "Área Geográfica"
+      },
+      "timeUnits": {
+        "DAY": "Día",
+        "WEEK": "Semana",
+        "MONTH": "Mes",
+        "YEAR": "Año"
+      }
+    },
+    "list": {
+      "title": "Contenedores",
+      "addButton": "Agregar Contenedor",
+      "filterByWasteType": "Filtrar por tipo de residuo",
+      "table": {
+        "headers": {
+          "wasteType": "Tipo de Residuo",
+          "wasteDemand": "Demanda",
+          "serviceZone": "Zona de Servicio",
+          "location": "Ubicación",
+          "actions": "Acciones"
+        },
+        "tooltips": {
+          "delete": "Eliminar"
+        },
+        "notAssigned": "Sin asignar",
+        "noData": "No hay contenedores registrados.",
+        "addFirst": "Agregar el primero"
+      },
+      "deleteDialog": {
+        "title": "Confirmar Eliminación",
+        "message": "¿Está seguro que desea eliminar este contenedor? Esta acción no se puede deshacer.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar"
+      },
+      "timeUnits": {
+        "DAY": "día",
+        "WEEK": "semana",
+        "MONTH": "mes",
+        "YEAR": "año"
+      }
+    }
   }
 }

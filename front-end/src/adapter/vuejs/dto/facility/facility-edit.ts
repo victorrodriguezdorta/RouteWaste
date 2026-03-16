@@ -1,13 +1,13 @@
+import { Facility } from '@/domain/entity/facility';
+import { FacilityStatus, facilityStatusFromString } from '@/domain/enumerate/facility-status';
+import { FacilityType, facilityTypeFromString } from '@/domain/enumerate/facility-type';
+import { TimeUnit, timeUnitFromString } from '@/domain/enumerate/time-unit';
+import { Currency } from '@/domain/valueobject/cost/currency';
+import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
+import { Capacity } from '@/domain/valueobject/demand/capacity';
+import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
+import { Location } from '@/domain/valueobject/location/location';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Facility } from '../../../../domain/entity/facility';
-import { FacilityStatus, facilityStatusFromString } from '../../../../domain/enumerate/facility-status';
-import { FacilityType, facilityTypeFromString } from '../../../../domain/enumerate/facility-type';
-import { TimeUnit, timeUnitFromString } from '../../../../domain/enumerate/time-unit';
-import { Currency } from '../../../../domain/valueobject/cost/currency';
-import { OpeningFixedCost } from '../../../../domain/valueobject/cost/opening-fixed-cost';
-import { Capacity } from '../../../../domain/valueobject/demand/capacity';
-import { QuantityUnit } from '../../../../domain/valueobject/demand/quantity-unit';
-import { Location } from '../../../../domain/valueobject/location/location';
 
 /**
  * FacilityEdit

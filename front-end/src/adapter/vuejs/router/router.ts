@@ -14,6 +14,11 @@ const routes: RouteRecordRaw[] = [
         redirect: '/vehicles',
     },
     {
+        path: '/containers',
+        name: 'Containers',
+        component: () => import('../view/ContainersView.vue'),
+    },
+    {
         path: '/vehicles',
         name: 'Vehicles',
         component: () => import('../view/VehiclesView.vue'),
@@ -34,6 +39,11 @@ const routes: RouteRecordRaw[] = [
         name: 'ShowVehicle',
         component: () => import('../view/ShowVehicle.vue'),
         props: true,
+    },
+    {
+        path: '/containers/add',
+        name: 'AddContainer',
+        component: () => import('../view/AddContainer.vue'),
     },
 ];
 
