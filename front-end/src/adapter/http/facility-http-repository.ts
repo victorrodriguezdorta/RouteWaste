@@ -1,20 +1,19 @@
+import { FacilityJsonResponse } from '@/adapter/http/dto/facility/facility-json-response';
+import { FacilityPostJsonRequest } from '@/adapter/http/dto/facility/facility-post-json-request';
+import { FacilityPutJsonRequest } from '@/adapter/http/dto/facility/facility-put-json-request';
+import type { FacilityRepository } from '@/application/repository/facility-repository';
+import type { CreateFacilityCommand, CreateFacilityResult } from '@/application/usecase/facility-management/create-facility/create-facility-use-case';
+import type { DeleteFacilityCommand, DeleteFacilityResult } from '@/application/usecase/facility-management/delete-facility/delete-facility-use-case';
+import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '@/application/usecase/facility-management/filter-facilities/filter-facilities-use-case';
+import type { GetFacilityCommand, GetFacilityResult } from '@/application/usecase/facility-management/get-facility/get-facility-use-case';
+import type { ListFacilitiesCommand, ListFacilitiesResult } from '@/application/usecase/facility-management/list-facilities/list-facilities-use-case';
+import type { UpdateFacilityCommand, UpdateFacilityResult } from '@/application/usecase/facility-management/update-facility/update-facility-use-case';
 import {
   Either,
   http,
   type ApiError,
   type DataError,
 } from '@ull-tfg/ull-tfg-typescript';
-import type { FacilityRepository } from '../../application/repository/facility-repository';
-import type { CreateFacilityCommand, CreateFacilityResult } from '../../application/usecase/facility-management/create-facility/create-facility-use-case';
-import type { DeleteFacilityCommand, DeleteFacilityResult } from '../../application/usecase/facility-management/delete-facility/delete-facility-use-case';
-import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '../../application/usecase/facility-management/filter-facilities/filter-facilities-use-case';
-import type { GetFacilityCommand, GetFacilityResult } from '../../application/usecase/facility-management/get-facility/get-facility-use-case';
-import type { ListFacilitiesCommand, ListFacilitiesResult } from '../../application/usecase/facility-management/list-facilities/list-facilities-use-case';
-import type { UpdateFacilityCommand, UpdateFacilityResult } from '../../application/usecase/facility-management/update-facility/update-facility-use-case';
-// Import DTOs
-import { FacilityJsonResponse } from './dto/facility/facility-json-response';
-import { FacilityPostJsonRequest } from './dto/facility/facility-post-json-request';
-import { FacilityPutJsonRequest } from './dto/facility/facility-put-json-request';
 
 /**
  * HTTP repository implementation for Facility entity.
@@ -24,7 +23,14 @@ import { FacilityPutJsonRequest } from './dto/facility/facility-put-json-request
  * RESTful API calls.
  */
 export class FacilityHttpRepository implements FacilityRepository {
+  /**
+   * Base URL for facility API endpoints.
+   */
   private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'facilities';
+
+  /**
+   * HTTP headers for API requests including authorization and content type.
+   */
   private headers: Headers = new Headers();
 
   /**
@@ -43,7 +49,7 @@ export class FacilityHttpRepository implements FacilityRepository {
    * Retrieve a list of facilities with optional pagination.
    * 
    * @param command Optional pagination parameters (page, pageSize).
-   * @return Either a DataError or a list of Facility entities.
+   * @returns Either a DataError or a list of Facility entities.
    */
   public async list(
     command?: ListFacilitiesCommand
@@ -86,7 +92,7 @@ export class FacilityHttpRepository implements FacilityRepository {
    * Retrieve a specific facility by its identifier.
    * 
    * @param command Data containing the id of the facility to retrieve.
-   * @return Either a DataError or the Facility entity.
+   * @returns Either a DataError or the Facility entity.
    */
   public async getById(
     command: GetFacilityCommand
@@ -117,7 +123,7 @@ export class FacilityHttpRepository implements FacilityRepository {
    * Create a new facility in the system.
    * 
    * @param command Data required to create the facility.
-   * @return Either a DataError or the created Facility entity.
+   * @returns Either a DataError or the created Facility entity.
    */
   public async create(
     command: CreateFacilityCommand
@@ -148,7 +154,7 @@ export class FacilityHttpRepository implements FacilityRepository {
    * Update an existing facility.
    * 
    * @param command Data required to update the facility (including id).
-   * @return Either a DataError or the updated Facility entity.
+   * @returns Either a DataError or the updated Facility entity.
    */
   public async update(
     command: UpdateFacilityCommand
@@ -181,7 +187,7 @@ export class FacilityHttpRepository implements FacilityRepository {
    * Delete a facility by its identifier.
    * 
    * @param command Data containing the id of the facility to delete.
-   * @return Either a DataError or true on successful deletion.
+   * @returns Either a DataError or true on successful deletion.
    */
   public async delete(
     command: DeleteFacilityCommand
@@ -211,7 +217,7 @@ export class FacilityHttpRepository implements FacilityRepository {
    * Filter facilities by criteria.
    * 
    * @param command Filter criteria for facilities (facilityType, status, etc).
-   * @return Either a DataError or a list of matching Facility entities.
+   * @returns Either a DataError or a list of matching Facility entities.
    */
   public async filter(
     command: FilterFacilitiesCommand

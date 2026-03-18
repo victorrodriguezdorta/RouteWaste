@@ -1,6 +1,6 @@
 // Use case contract for validating an infrastructure plan
 
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { ValidateInfrastructurePlanCommand } from './validate-infrastructure-plan-command';
 import type { ValidateInfrastructurePlanResult } from './validate-infrastructure-plan-result';
 
@@ -22,3 +22,4 @@ export interface ValidateInfrastructurePlanUseCase {
 // Re-export types for convenience
 export type { ValidateInfrastructurePlanCommand } from './validate-infrastructure-plan-command';
 export type { ValidateInfrastructurePlanResult } from './validate-infrastructure-plan-result';
+

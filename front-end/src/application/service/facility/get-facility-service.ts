@@ -1,6 +1,6 @@
+import type { FacilityRepository } from '@/application/repository/facility-repository';
+import type { GetFacilityCommand, GetFacilityResult, GetFacilityUseCase } from '@/application/usecase/facility-management/get-facility/get-facility-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { FacilityRepository } from '../../repository/facility-repository';
-import type { GetFacilityCommand, GetFacilityResult, GetFacilityUseCase } from '../../usecase/facility-management/get-facility/get-facility-use-case';
 
 /**
  * @brief Service implementing the GetFacility use case.
@@ -9,6 +9,9 @@ import type { GetFacilityCommand, GetFacilityResult, GetFacilityUseCase } from '
  * `getById` method returning an `Either<DataError, Facility>`.
  */
 export class GetFacilityService implements GetFacilityUseCase {
+    /**
+     * Repository used to query facilities by id.
+     */
     private readonly facilityRepository: FacilityRepository;
 
     /**
@@ -22,7 +25,7 @@ export class GetFacilityService implements GetFacilityUseCase {
     /**
      * @brief Execute the get facility use case.
      * @param command Data containing the id of the facility to retrieve.
-     * @return Either a `DataError` or the `Facility` entity.
+     * @returns Either a `DataError` or the `Facility` entity.
      */
     async execute(command: GetFacilityCommand): Promise<Either<DataError, GetFacilityResult>> {
         return this.facilityRepository.getById(command);

@@ -1,18 +1,17 @@
+import { ServiceAssignmentJsonResponse } from '@/adapter/http/dto/service-assignment/service-assignment-json-response';
+import { ServiceAssignmentPostJsonRequest } from '@/adapter/http/dto/service-assignment/service-assignment-post-json-request';
+import { ServiceAssignmentPutJsonRequest } from '@/adapter/http/dto/service-assignment/service-assignment-put-json-request';
+import type { ServiceAssignmentRepository } from '@/application/repository/service-assignment-repository';
+import type { AssignContainerToFacilityCommand, AssignContainerToFacilityResult } from '@/application/usecase/service-assignment-management/assign-container-to-facility/assign-container-to-facility-use-case';
+import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult } from '@/application/usecase/service-assignment-management/list-service-assignments/list-service-assignments-use-case';
+import type { RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult } from '@/application/usecase/service-assignment-management/remove-service-assignment/remove-service-assignment-use-case';
+import type { UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '@/application/usecase/service-assignment-management/update-service-assignment/update-service-assignment-use-case';
 import {
   Either,
   http,
   type ApiError,
   type DataError,
 } from '@ull-tfg/ull-tfg-typescript';
-import type { ServiceAssignmentRepository } from '../../application/repository/service-assignment-repository';
-import type { AssignContainerToFacilityCommand, AssignContainerToFacilityResult } from '../../application/usecase/service-assignment-management/assign-container-to-facility/assign-container-to-facility-use-case';
-import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult } from '../../application/usecase/service-assignment-management/list-service-assignments/list-service-assignments-use-case';
-import type { RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult } from '../../application/usecase/service-assignment-management/remove-service-assignment/remove-service-assignment-use-case';
-import type { UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '../../application/usecase/service-assignment-management/update-service-assignment/update-service-assignment-use-case';
-// Import DTOs
-import { ServiceAssignmentJsonResponse } from './dto/service-assignment/service-assignment-json-response';
-import { ServiceAssignmentPostJsonRequest } from './dto/service-assignment/service-assignment-post-json-request';
-import { ServiceAssignmentPutJsonRequest } from './dto/service-assignment/service-assignment-put-json-request';
 
 /**
  * HTTP repository implementation for ServiceAssignment entity.
@@ -22,7 +21,14 @@ import { ServiceAssignmentPutJsonRequest } from './dto/service-assignment/servic
  * containers to facilities through RESTful API calls.
  */
 export class ServiceAssignmentHttpRepository implements ServiceAssignmentRepository {
+  /**
+   * Base URL for service assignment API endpoints.
+   */
   private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'service-assignments';
+
+  /**
+   * HTTP headers for API requests including authorization and content type.
+   */
   private headers: Headers = new Headers();
 
   /**
@@ -41,7 +47,7 @@ export class ServiceAssignmentHttpRepository implements ServiceAssignmentReposit
    * Retrieve a list of service assignments with optional pagination and filters.
    * 
    * @param command Optional pagination and filter parameters (page, pageSize).
-   * @return Either a DataError or a list of ServiceAssignment entities.
+   * @returns Either a DataError or a list of ServiceAssignment entities.
    */
   public async list(
     command?: ListServiceAssignmentsCommand
@@ -84,7 +90,7 @@ export class ServiceAssignmentHttpRepository implements ServiceAssignmentReposit
    * Assign a container to a facility in the system.
    * 
    * @param command Data required to create the service assignment.
-   * @return Either a DataError or the created ServiceAssignment entity.
+   * @returns Either a DataError or the created ServiceAssignment entity.
    */
   public async assignContainerToFacility(
     command: AssignContainerToFacilityCommand
@@ -115,7 +121,7 @@ export class ServiceAssignmentHttpRepository implements ServiceAssignmentReposit
    * Update an existing service assignment.
    * 
    * @param command Data required to update the assignment (including id).
-   * @return Either a DataError or the updated ServiceAssignment entity.
+   * @returns Either a DataError or the updated ServiceAssignment entity.
    */
   public async update(
     command: UpdateServiceAssignmentCommand
@@ -148,7 +154,7 @@ export class ServiceAssignmentHttpRepository implements ServiceAssignmentReposit
    * Remove a service assignment by its identifier.
    * 
    * @param command Data containing the id of the assignment to remove.
-   * @return Either a DataError or true on successful removal.
+   * @returns Either a DataError or true on successful removal.
    */
   public async delete(
     command: RemoveServiceAssignmentCommand

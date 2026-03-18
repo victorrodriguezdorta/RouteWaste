@@ -1,3 +1,5 @@
+import { ContainerJsonResponse } from '@/adapter/http/dto/container/container-json-response';
+import { FacilityJsonResponse } from '@/adapter/http/dto/facility/facility-json-response';
 import { Container } from '@/domain/entity/container';
 import { Facility } from '@/domain/entity/facility';
 import { ServiceAssignment } from '@/domain/entity/service-assignment';
@@ -8,8 +10,6 @@ import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
 import { Distance } from '@/domain/valueobject/location/distance';
 import { ServiceTime } from '@/domain/valueobject/location/service-time';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { ContainerJsonResponse } from '../container/container-json-response';
-import { FacilityJsonResponse } from '../facility/facility-json-response';
 
 /**
  * ServiceAssignmentJsonResponse DTO
@@ -20,12 +20,39 @@ import { FacilityJsonResponse } from '../facility/facility-json-response';
  * `Container` and `Facility` DTO converters.
  */
 export class ServiceAssignmentJsonResponse {
+  /**
+   * Unique identifier for the service assignment.
+   */
   id: string;
+
+  /**
+   * Container associated with this service assignment.
+   */
   container: any;
+
+  /**
+   * Facility associated with this service assignment.
+   */
   facility: any;
+
+  /**
+   * Waste demand information including value, quantity unit, and time unit.
+   */
   wasteDemand: { value: number; quantityUnit: string; timeUnit: string };
+
+  /**
+   * Distance in meters for this service assignment.
+   */
   distanceMeters: number;
+
+  /**
+   * Service time in minutes for this service assignment.
+   */
   serviceTimeMinutes: number;
+
+  /**
+   * Transport cost including amount and optional currency.
+   */
   transportCost: { amount: number; currency?: string };
 
   constructor(
@@ -50,6 +77,8 @@ export class ServiceAssignmentJsonResponse {
    * Convert the JSON response into a domain `ServiceAssignment` entity.
    * Uses `ContainerJsonResponse.toContainer` and `FacilityJsonResponse.toFacility`
    * to rebuild nested entities and constructs the required value objects.
+   * @param data The service assignment JSON response data.
+   * @returns The converted domain ServiceAssignment entity.
    */
   public static toServiceAssignment(data: ServiceAssignmentJsonResponse): ServiceAssignment {
     const id = new UllUUID(data.id);

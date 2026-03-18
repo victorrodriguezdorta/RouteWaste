@@ -10,6 +10,9 @@ import type { DeleteContainerCommand, DeleteContainerResult, DeleteContainerUseC
  * indicating success or an error wrapped in `Either`.
  */
 export class DeleteContainerService implements DeleteContainerUseCase {
+    /**
+     * Repository used to perform delete operations.
+     */
     private readonly containerRepository: ContainerRepository;
 
     /**
@@ -23,7 +26,7 @@ export class DeleteContainerService implements DeleteContainerUseCase {
     /**
      * @brief Execute the delete container use case.
      * @param command Data containing the id of the container to delete.
-     * @return Either a `DataError` or a boolean indicating success.
+     * @returns Either a `DataError` or a boolean indicating success.
      */
     async execute(command: DeleteContainerCommand): Promise<Either<DataError, DeleteContainerResult>> {
         return this.containerRepository.delete(command);

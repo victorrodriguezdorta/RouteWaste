@@ -1,13 +1,4 @@
-/**
- * Represents a generated report
- */
-export interface GeneratedReport {
-    reportId: string;
-    title: string;
-    generatedAt: Date;
-    content: string;
-    format: 'pdf' | 'html' | 'json';
-}
+import type { GeneratedReport } from './generated-report';
 
 // Result type for the use case
 export type GenerateReportResult = GeneratedReport;

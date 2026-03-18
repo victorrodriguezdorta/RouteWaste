@@ -1,11 +1,11 @@
+import { Vehicle } from '@/domain/entity/vehicle';
+import { TimeUnit, timeUnitFromString } from '@/domain/enumerate/time-unit';
+import { VehicleType, vehicleTypeFromString } from '@/domain/enumerate/vehicle-type';
+import { Currency } from '@/domain/valueobject/cost/currency';
+import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
+import { Capacity } from '@/domain/valueobject/demand/capacity';
+import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Vehicle } from '../../../../domain/entity/vehicle';
-import { TimeUnit, timeUnitFromString } from '../../../../domain/enumerate/time-unit';
-import { VehicleType, vehicleTypeFromString } from '../../../../domain/enumerate/vehicle-type';
-import { Currency } from '../../../../domain/valueobject/cost/currency';
-import { TransportationVariableCost } from '../../../../domain/valueobject/cost/transportation-variable-cost';
-import { Capacity } from '../../../../domain/valueobject/demand/capacity';
-import { QuantityUnit } from '../../../../domain/valueobject/demand/quantity-unit';
 
 /**
  * VehicleEdit
