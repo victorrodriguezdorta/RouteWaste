@@ -1,6 +1,6 @@
+import type { VehicleRepository } from '@/application/repository/vehicle-repository';
+import type { CreateVehicleCommand, CreateVehicleResult, CreateVehicleUseCase } from '@/application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { VehicleRepository } from '../../repository/vehicle-repository';
-import type { CreateVehicleCommand, CreateVehicleResult, CreateVehicleUseCase } from '../../usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
 
 /**
  * @brief Service implementing the CreateVehicle use case.

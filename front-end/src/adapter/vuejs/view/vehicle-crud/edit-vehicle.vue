@@ -5,27 +5,25 @@
 -->
 <template>
   <v-container>
-    <!-- Loading state with spinner -->
-    <v-row v-if="loading" justify="center">
-      <v-col cols="12" class="text-center">
-        <v-progress-circular
-          indeterminate
-          color="primary"
-          size="64"
-        ></v-progress-circular>
-        <p class="mt-4">{{ t('vehicle.edit.loading') }}</p>
-      </v-col>
-    </v-row>
+    <!-- Loading state with LoaderDialog -->
+    <LoaderDialog
+      v-if="loading"
+      :dialog="loading"
+      title="Loading..."
+      :message="t('vehicle.edit.loading')"
+      color="primary"
+      persistent
+    />
 
     <!-- Main content (shown when not loading) -->
     <template v-else>
       <!-- Page title with dynamic vehicle type -->
       <v-row justify="center">
-        <v-col cols="12" md="8" lg="6">
-          <h2 class="text-h4 mb-4 text-center">
-            <v-icon class="mr-2">mdi-pencil</v-icon>
-            {{ title }}
-          </h2>
+        <v-col cols="12" md="8" lg="6" class="text-center mb-4">
+          <div class="d-flex align-center justify-center">
+            <v-icon class="mr-2 text-h5">mdi-pencil</v-icon>
+            <SectionTitle :title="title" />
+          </div>
         </v-col>
       </v-row>
 
@@ -67,90 +65,15 @@
                   required
                 ></v-select>
 
-                <!-- Transport capacity (value and quantity unit) -->
-                <v-row>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model.number="editVehicle!.capacityValue"
-                      :rules="[
-                        (value: number) =>
-                          VehicleEdit.externalValidateCapacityValue(value),
-                      ]"
-                      :label="t('vehicle.edit.fields.capacityValue')"
-                      color="primary"
-                      type="number"
-                      prepend-icon="mdi-package-variant"
-                      min="0"
-                      step="0.1"
-                      required
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="editVehicle!.capacityQuantityUnit"
-                      :rules="[
-                        (value: string) =>
-                          VehicleEdit.externalValidateCapacityQuantityUnit(value),
-                      ]"
-                      :label="t('vehicle.edit.fields.capacityUnit')"
-                      color="primary"
-                      prepend-icon="mdi-weight"
-                      required
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-
-                <!-- Time unit for capacity -->
-                <v-select
-                  v-model="editVehicle!.capacityTimeUnit"
-                  :items="timeUnitOptions"
-                  item-title="title"
-                  item-value="value"
-                  :rules="[
-                    (value: string) =>
-                      VehicleEdit.externalValidateCapacityTimeUnit(value),
-                  ]"
-                  :label="t('vehicle.edit.fields.timeUnit')"
-                  color="primary"
-                  prepend-icon="mdi-clock-outline"
-                  required
-                ></v-select>
-
-                <!-- Cost per kilometer and currency code -->
-                <v-row>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model.number="editVehicle!.costPerKilometer"
-                      :rules="[
-                        (value: number) =>
-                          VehicleEdit.externalValidateCostPerKilometer(value),
-                      ]"
-                      :label="t('vehicle.edit.fields.costPerKilometer')"
-                      color="primary"
-                      type="number"
-                      prepend-icon="mdi-currency-eur"
-                      min="0"
-                      step="0.01"
-                      required
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="editVehicle!.currencyCode"
-                      :rules="[
-                        (value: string) =>
-                          VehicleEdit.externalValidateCurrencyCode(value),
-                      ]"
-                      :label="t('vehicle.edit.fields.currencyCode')"
-                      color="primary"
-                      prepend-icon="mdi-cash"
-                      required
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
+                <!-- Transport capacity (value, quantity unit, time unit) and Cost fields -->
+                <VehicleFormFields 
+                  v-if="editVehicle"
+                  :vehicle="editVehicle"
+                  @update:vehicle="editVehicle = $event"
+                />
 
                 <v-alert type="info" variant="tonal" class="mt-4">
-                  {{ t('vehicle.edit.alerts.requiredFields') }}
+                  {{ t('common.alerts.requiredFields') }}
                 </v-alert>
               </v-form>
             </v-card-text>
@@ -162,7 +85,7 @@
                 variant="text"
                 color="grey"
               >
-                {{ t('vehicle.edit.buttons.cancel') }}
+                {{ t('common.buttons.cancel') }}
               </v-btn>
               <v-btn
                 @click="validate"
@@ -170,7 +93,7 @@
                 variant="elevated"
                 color="success"
               >
-                {{ t('vehicle.edit.buttons.update') }}
+                {{ t('common.buttons.update') }}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -189,15 +112,16 @@
  * Uses VehicleEdit DTO for data transfer and validation.
  */
 
+import { LoaderDialog, SectionTitle } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { TimeUnit, timeUnitValues } from '../../../domain/enumerate/time-unit';
-import { VehicleType, vehicleTypeValues } from '../../../domain/enumerate/vehicle-type';
-import { VehicleEdit } from '../dto/vehicle/vehicle-edit';
-import router from '../router/router';
-import { useVehicleStore } from '../stores/vehicle-store';
+import { VehicleType, vehicleTypeValues } from '../../../../domain/enumerate/vehicle-type';
+import VehicleFormFields from '../../components/vehicle/vehicle-form-fields.vue';
+import { VehicleEdit } from '../../dto/vehicle/vehicle-edit';
+import router from '../../router/router';
+import { useVehicleStore } from '../../stores/vehicle-store';
 
 // Vue I18n composable for translations
 const { t, locale } = useI18n();
@@ -216,7 +140,6 @@ const editVehicle = ref<VehicleEdit>();
 
 // Options for dropdown selectors
 const vehicleTypeOptions = ref<{ title: string; value: string }[]>([]);
-const timeUnitOptions = ref<{ title: string; value: string }[]>([]);
 
 /**
  * Initialize view when component mounts
@@ -225,7 +148,6 @@ const timeUnitOptions = ref<{ title: string; value: string }[]>([]);
 onMounted(async () => {
   loading.value = true;
   setVehicleTypeOptions();
-  setTimeUnitOptions();
   await vehicleStore.getVehicleById(vehicleId.value);
   setVehicle();
   loading.value = false;
@@ -234,7 +156,6 @@ onMounted(async () => {
 // Re-apply translations when locale changes
 watch(locale, () => {
   setVehicleTypeOptions();
-  setTimeUnitOptions();
   if (vehicle.value) {
     setVehicle();
   } else {
@@ -277,33 +198,12 @@ const setVehicleTypeOptions = () => {
 };
 
 /**
- * Set up time unit options for the dropdown
- * Maps enum values to human-readable labels
- */
-const setTimeUnitOptions = () => {
-  const units = timeUnitValues();
-  timeUnitOptions.value = units.map((unit) => ({
-    title: formatTimeUnit(unit),
-    value: unit,
-  }));
-};
-
-/**
  * Format vehicle type enum to display string using i18n
  * @param type - VehicleType enum value
  * @returns Formatted vehicle type label
  */
 const formatVehicleType = (type: VehicleType): string => {
   return t(`vehicle.add.vehicleTypes.${type}`);
-};
-
-/**
- * Format time unit enum to display string using i18n
- * @param unit - TimeUnit enum value
- * @returns Formatted time unit label
- */
-const formatTimeUnit = (unit: TimeUnit): string => {
-  return t(`vehicle.add.timeUnits.${unit}`);
 };
 
 /**

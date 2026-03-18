@@ -1,7 +1,7 @@
 // OptimizeRoutesUseCase.ts
 // Use case contract for optimizing collection routes
 
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { OptimizeRoutesCommand } from './optimize-routes-command';
 import type { OptimizeRoutesResult } from './optimize-routes-result';
 

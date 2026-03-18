@@ -1,6 +1,6 @@
+import type { VehicleRepository } from '@/application/repository/vehicle-repository';
+import type { DeleteVehicleCommand, DeleteVehicleResult, DeleteVehicleUseCase } from '@/application/usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { VehicleRepository } from '../../repository/vehicle-repository';
-import type { DeleteVehicleCommand, DeleteVehicleResult, DeleteVehicleUseCase } from '../../usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';
 
 /**
  * @brief Service implementing the DeleteVehicle use case.

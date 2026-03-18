@@ -1,6 +1,6 @@
+import type { ServiceAssignmentRepository } from '@/application/repository/service-assignment-repository';
+import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult, ListServiceAssignmentsUseCase } from '@/application/usecase/service-assignment-management/list-service-assignments/list-service-assignments-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { ServiceAssignmentRepository } from '../../repository/service-assignment-repository';
-import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult, ListServiceAssignmentsUseCase } from '../../usecase/service-assignment-management/list-service-assignments/list-service-assignments-use-case';
 
 /**
  * @brief Service implementing the ListServiceAssignments use case.
@@ -8,6 +8,7 @@ import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult, ListS
  * Delegates listing to `ServiceAssignmentRepository`.
  */
 export class ListServiceAssignmentsService implements ListServiceAssignmentsUseCase {
+    /** The repository used to persist and retrieve service assignments. */
     private readonly serviceAssignmentRepository: ServiceAssignmentRepository;
 
     /**
@@ -21,7 +22,7 @@ export class ListServiceAssignmentsService implements ListServiceAssignmentsUseC
     /**
      * @brief Execute the list service assignments use case.
      * @param command Optional pagination and filters.
-     * @return Either a `DataError` or an array of `ServiceAssignment` entities.
+     * @returns Either a `DataError` or an array of `ServiceAssignment` entities.
      */
     async execute(command?: ListServiceAssignmentsCommand): Promise<Either<DataError, ListServiceAssignmentsResult>> {
         const page = command?.page;

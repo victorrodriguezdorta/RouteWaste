@@ -1,6 +1,6 @@
+import type { FacilityRepository } from '@/application/repository/facility-repository';
+import type { DeleteFacilityCommand, DeleteFacilityResult, DeleteFacilityUseCase } from '@/application/usecase/facility-management/delete-facility/delete-facility-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { FacilityRepository } from '../../repository/facility-repository';
-import type { DeleteFacilityCommand, DeleteFacilityResult, DeleteFacilityUseCase } from '../../usecase/facility-management/delete-facility/delete-facility-use-case';
 
 /**
  * @brief Service implementing the DeleteFacility use case.
@@ -9,6 +9,7 @@ import type { DeleteFacilityCommand, DeleteFacilityResult, DeleteFacilityUseCase
  * indicating success or an error wrapped in `Either`.
  */
 export class DeleteFacilityService implements DeleteFacilityUseCase {
+    /** Repository for performing facility delete operations */
     private readonly facilityRepository: FacilityRepository;
 
     /**
@@ -22,7 +23,7 @@ export class DeleteFacilityService implements DeleteFacilityUseCase {
     /**
      * @brief Execute the delete facility use case.
      * @param command Data containing the id of the facility to delete.
-     * @return Either a `DataError` or a boolean indicating success.
+     * @returns Either a `DataError` or a boolean indicating success.
      */
     async execute(command: DeleteFacilityCommand): Promise<Either<DataError, DeleteFacilityResult>> {
         return this.facilityRepository.delete(command);

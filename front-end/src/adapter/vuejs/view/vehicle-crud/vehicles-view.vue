@@ -7,11 +7,11 @@
   <v-container fluid>
     <!-- Page title -->
     <v-row justify="center">
-      <v-col cols="12" md="10" lg="10">
-        <h2 class="text-h4 mb-4 text-center">
-          <v-icon class="mr-2">mdi-truck-multiple</v-icon>
-          {{ t('vehicle.list.title') }}
-        </h2>
+      <v-col cols="12" md="10" lg="10" class="text-center mb-4">
+        <div class="d-flex align-center justify-center">
+          <v-icon class="mr-2 text-h5">mdi-truck-multiple</v-icon>
+          <SectionTitle :title="t('vehicle.list.title')" />
+        </div>
       </v-col>
     </v-row>
 
@@ -97,44 +97,33 @@
 
             <!-- Actions column (View, Edit, Delete buttons) -->
             <template v-slot:item.actions="{ item }">
-              <v-tooltip :text="t('vehicle.list.table.tooltips.view')" location="top">
-                <template v-slot:activator="{ props }">
-                  <v-btn
-                    v-bind="props"
-                    icon="mdi-eye"
-                    size="small"
-                    variant="text"
-                    color="info"
-                    @click="showItem(item.id)"
-                  ></v-btn>
-                </template>
-              </v-tooltip>
-
-              <v-tooltip :text="t('vehicle.list.table.tooltips.edit')" location="top">
-                <template v-slot:activator="{ props }">
-                  <v-btn
-                    v-bind="props"
-                    icon="mdi-pencil"
-                    size="small"
-                    variant="text"
-                    color="success"
-                    @click="editItem(item.id)"
-                  ></v-btn>
-                </template>
-              </v-tooltip>
-
-              <v-tooltip :text="t('vehicle.list.table.tooltips.delete')" location="top">
-                <template v-slot:activator="{ props }">
-                  <v-btn
-                    v-bind="props"
-                    icon="mdi-delete"
-                    size="small"
-                    variant="text"
-                    color="error"
-                    @click="deleteItem(item.id)"
-                  ></v-btn>
-                </template>
-              </v-tooltip>
+              <ButtonTooltip
+                text=""
+                icon="mdi-eye"
+                :tooltip="t('vehicle.list.table.tooltips.view')"
+                color="info"
+                size="small"
+                variant="text"
+                @click="showItem(item.id)"
+              />
+              <ButtonTooltip
+                text=""
+                icon="mdi-pencil"
+                :tooltip="t('vehicle.list.table.tooltips.edit')"
+                color="success"
+                size="small"
+                variant="text"
+                @click="editItem(item.id)"
+              />
+              <ButtonTooltip
+                text=""
+                icon="mdi-delete"
+                :tooltip="t('vehicle.list.table.tooltips.delete')"
+                color="error"
+                size="small"
+                variant="text"
+                @click="deleteItem(item.id)"
+              />
             </template>
 
             <!-- Empty state when no vehicles exist -->
@@ -157,36 +146,17 @@
     </v-row>
 
     <!-- Delete confirmation dialog -->
-    <v-dialog v-model="dialogDelete" max-width="500">
-      <v-card>
-        <v-card-title class="text-h5 bg-error text-white">
-          <v-icon class="mr-2">mdi-alert</v-icon>
-          {{ t('vehicle.list.deleteDialog.title') }}
-        </v-card-title>
-        <v-card-text class="pt-4">
-          <v-alert type="warning" variant="tonal">
-            {{ t('vehicle.list.deleteDialog.message') }}
-          </v-alert>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="grey"
-            variant="text"
-            @click="dialogDelete = false"
-          >
-            {{ t('vehicle.list.deleteDialog.cancel') }}
-          </v-btn>
-          <v-btn
-            color="error"
-            variant="elevated"
-            @click="confirmDelete"
-          >
-            {{ t('vehicle.list.deleteDialog.confirm') }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <ErrorMessage
+      :model-value="dialogDelete"
+      :title="t('vehicle.list.deleteDialog.title')"
+      :error-message="t('vehicle.list.deleteDialog.message')"
+      :reason="''"
+      :cancel-text="t('common.buttons.cancel')"
+      :retry-text="t('common.buttons.delete')"
+      @update:model-value="dialogDelete = $event"
+      @cancel="dialogDelete = false"
+      @retry="confirmDelete"
+    />
   </v-container>
 </template>
 
@@ -199,12 +169,13 @@
  * Uses Vuetify data table with pagination and action buttons.
  */
 
+import { ButtonTooltip, ErrorMessage, SectionTitle } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { VehicleType } from '../../../domain/enumerate/vehicle-type';
-import router from '../router/router';
-import { useVehicleStore } from '../stores/vehicle-store';
+import { VehicleType } from '../../../../domain/enumerate/vehicle-type';
+import router from '../../router/router';
+import { useVehicleStore } from '../../stores/vehicle-store';
 
 // Vue I18n composable for translations
 const { t } = useI18n();
@@ -335,7 +306,7 @@ const formatVehicleType = (type: VehicleType): string => {
  * @returns Short formatted time unit
  */
 const formatTimeUnitShort = (unit: string): string => {
-  return t(`vehicle.list.timeUnits.${unit}`);
+  return t(`common.timeUnitsLowercase.${unit}`);
 };
 
 /**

@@ -7,11 +7,11 @@
   <v-container>
     <!-- Page title -->
     <v-row justify="center">
-      <v-col cols="12" md="8" lg="6">
-        <h2 class="text-h4 mb-4 text-center">
-          <v-icon class="mr-2">mdi-plus-circle</v-icon>
-          {{ t('vehicle.add.title') }}
-        </h2>
+      <v-col cols="12" md="8" lg="6" class="text-center mb-4">
+        <div class="d-flex align-center justify-center">
+          <v-icon class="mr-2 text-h5">mdi-plus-circle</v-icon>
+          <SectionTitle :title="t('vehicle.add.title')" />
+        </div>
       </v-col>
     </v-row>
 
@@ -53,90 +53,14 @@
                 required
               ></v-select>
 
-              <!-- Transport capacity (value and quantity unit) -->
-              <v-row>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    v-model.number="newVehicle.capacityValue"
-                    :rules="[
-                      (value: number) =>
-                        VehicleAdd.externalValidateCapacityValue(value),
-                    ]"
-                    :label="t('vehicle.add.fields.capacityValue')"
-                    color="primary"
-                    type="number"
-                    prepend-icon="mdi-package-variant"
-                    min="0"
-                    step="0.1"
-                    required
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    v-model="newVehicle.capacityQuantityUnit"
-                    :rules="[
-                      (value: string) =>
-                        VehicleAdd.externalValidateCapacityQuantityUnit(value),
-                    ]"
-                    :label="t('vehicle.add.fields.capacityUnit')"
-                    color="primary"
-                    prepend-icon="mdi-weight"
-                    required
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-
-              <!-- Time unit for capacity -->
-              <v-select
-                v-model="newVehicle.capacityTimeUnit"
-                :items="timeUnitOptions"
-                item-title="title"
-                item-value="value"
-                :rules="[
-                  (value: string) =>
-                    VehicleAdd.externalValidateCapacityTimeUnit(value),
-                ]"
-                :label="t('vehicle.add.fields.timeUnit')"
-                color="primary"
-                prepend-icon="mdi-clock-outline"
-                required
-              ></v-select>
-
-              <!-- Cost per kilometer and currency code -->
-              <v-row>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    v-model.number="newVehicle.costPerKilometer"
-                    :rules="[
-                      (value: number) =>
-                        VehicleAdd.externalValidateCostPerKilometer(value),
-                    ]"
-                    :label="t('vehicle.add.fields.costPerKilometer')"
-                    color="primary"
-                    type="number"
-                    prepend-icon="mdi-currency-eur"
-                    min="0"
-                    step="0.01"
-                    required
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    v-model="newVehicle.currencyCode"
-                    :rules="[
-                      (value: string) =>
-                        VehicleAdd.externalValidateCurrencyCode(value),
-                    ]"
-                    :label="t('vehicle.add.fields.currencyCode')"
-                    color="primary"
-                    prepend-icon="mdi-cash"
-                    required
-                  ></v-text-field>
-                </v-col>
-              </v-row>
+              <!-- Transport capacity (value, quantity unit, time unit) and Cost fields -->
+              <VehicleFormFields 
+                :vehicle="newVehicle"
+                @update:vehicle="newVehicle = $event"
+              />
 
               <v-alert type="info" variant="tonal" class="mt-4">
-                {{ t('vehicle.add.alerts.requiredFields') }}
+                {{ t('common.alerts.requiredFields') }}
               </v-alert>
             </v-form>
           </v-card-text>
@@ -148,7 +72,7 @@
               variant="text"
               color="grey"
             >
-              {{ t('vehicle.add.buttons.cancel') }}
+              {{ t('common.buttons.cancel') }}
             </v-btn>
             <v-btn
               @click="validate"
@@ -157,7 +81,7 @@
               color="success"
               :loading="loading"
             >
-              {{ t('vehicle.add.buttons.save') }}
+              {{ t('common.buttons.save') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -173,16 +97,19 @@
  * Composition API component for creating new vehicles.
  * Uses VehicleAdd DTO for data transfer and validation.
  * Integrates with Pinia store for state management.
+ * Uses ull-tfg-vue components for form fields.
  */
 
+import { SectionTitle } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { TimeUnit, timeUnitValues } from '../../../domain/enumerate/time-unit';
-import { VehicleType, vehicleTypeValues } from '../../../domain/enumerate/vehicle-type';
-import { VehicleAdd } from '../dto/vehicle/vehicle-add';
-import router from '../router/router';
-import { useVehicleStore } from '../stores/vehicle-store';
+import { TimeUnit, timeUnitValues } from '../../../../domain/enumerate/time-unit';
+import { VehicleType, vehicleTypeValues } from '../../../../domain/enumerate/vehicle-type';
+import VehicleFormFields from '../../components/vehicle/vehicle-form-fields.vue';
+import { VehicleAdd } from '../../dto/vehicle/vehicle-add';
+import router from '../../router/router';
+import { useVehicleStore } from '../../stores/vehicle-store';
 
 // Vue I18n composable for translations
 const { t, locale } = useI18n();
@@ -263,7 +190,7 @@ const formatVehicleType = (type: VehicleType): string => {
  * @returns Formatted time unit label
  */
 const formatTimeUnit = (unit: TimeUnit): string => {
-  return t(`vehicle.add.timeUnits.${unit}`);
+  return t(`common.timeUnits.${unit}`);
 };
 
 /**

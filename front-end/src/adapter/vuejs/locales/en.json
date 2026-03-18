@@ -1,33 +1,48 @@
 {
+  "common": {
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "update": "Update",
+      "delete": "Delete",
+      "back": "Back",
+      "edit": "Edit"
+    },
+    "timeUnits": {
+      "DAY": "Day",
+      "WEEK": "Week",
+      "MONTH": "Month",
+      "YEAR": "Year"
+    },
+    "timeUnitsLowercase": {
+      "DAY": "day",
+      "WEEK": "week",
+      "MONTH": "month",
+      "YEAR": "year"
+    },
+    "alerts": {
+      "requiredFields": "Fields marked with * are required"
+    },
+    "validationMessages": {
+      "maxDecimals": "Maximum {maxDecimals} decimal places allowed"
+    }
+  },
   "vehicle": {
     "add": {
       "title": "Add Vehicle",
       "cardTitle": "Vehicle Information",
       "fields": {
-        "vehicleType": "Vehicle Type *",
-        "capacityValue": "Capacity Value *",
-        "capacityUnit": "Unit (e.g., tons, kg) *",
-        "timeUnit": "Time Unit *",
-        "costPerKilometer": "Cost per Kilometer *",
-        "currencyCode": "Currency Code (e.g., EUR, USD) *"
-      },
-      "alerts": {
-        "requiredFields": "Fields marked with * are required"
-      },
-      "buttons": {
-        "cancel": "Cancel",
-        "save": "Save"
+        "vehicleType": "Vehicle Type",
+        "capacityValue": "Capacity Value",
+        "capacityUnit": "Unit (e.g., tons, kg)",
+        "timeUnit": "Time Unit",
+        "costPerKilometer": "Cost per Kilometer",
+        "currencyCode": "Currency Code (e.g., EUR, USD)"
       },
       "vehicleTypes": {
         "COLLECTION_TRUCK": "Collection Truck",
         "TRANSFER_TRUCK": "Transfer Truck",
         "SUPPORT_VEHICLE": "Support Vehicle"
-      },
-      "timeUnits": {
-        "DAY": "Day",
-        "WEEK": "Week",
-        "MONTH": "Month",
-        "YEAR": "Year"
       }
     },
     "edit": {
@@ -36,19 +51,12 @@
       "cardTitle": "Vehicle Information",
       "loading": "Loading vehicle...",
       "fields": {
-        "vehicleType": "Vehicle Type *",
-        "capacityValue": "Capacity Value *",
-        "capacityUnit": "Unit (e.g., tons, kg) *",
-        "timeUnit": "Time Unit *",
-        "costPerKilometer": "Cost per Kilometer *",
-        "currencyCode": "Currency Code (e.g., EUR, USD) *"
-      },
-      "alerts": {
-        "requiredFields": "Fields marked with * are required"
-      },
-      "buttons": {
-        "cancel": "Cancel",
-        "update": "Update"
+        "vehicleType": "Vehicle Type",
+        "capacityValue": "Capacity Value",
+        "capacityUnit": "Unit (e.g., tons, kg)",
+        "timeUnit": "Time Unit",
+        "costPerKilometer": "Cost per Kilometer",
+        "currencyCode": "Currency Code (e.g., EUR, USD)"
       }
     },
     "show": {
@@ -64,10 +72,6 @@
         "costPerKilometer": "Cost per Kilometer",
         "currencyCode": "Currency Code",
         "vehicleId": "Vehicle ID"
-      },
-      "buttons": {
-        "back": "Back",
-        "edit": "Edit"
       }
     },
     "list": {
@@ -93,15 +97,7 @@
       },
       "deleteDialog": {
         "title": "Confirm Deletion",
-        "message": "Are you sure you want to delete this vehicle? This action cannot be undone.",
-        "cancel": "Cancel",
-        "confirm": "Delete"
-      },
-      "timeUnits": {
-        "DAY": "day",
-        "WEEK": "week",
-        "MONTH": "month",
-        "YEAR": "year"
+        "message": "Are you sure you want to delete this vehicle? This action cannot be undone."
       }
     }
   },
@@ -110,22 +106,15 @@
       "title": "Add Container",
       "cardTitle": "Container Information",
       "fields": {
-        "latitude": "Latitude *",
-        "longitude": "Longitude *",
-        "postalAddress": "Postal Address *",
-        "gisReference": "GIS Reference *",
-        "wasteType": "Waste Type *",
-        "wasteDemandValue": "Waste Demand *",
-        "wasteDemandQuantityUnit": "Demand Unit (e.g., kg, tons) *",
-        "wasteDemandTimeUnit": "Time Unit *",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "postalAddress": "Postal Address",
+        "gisReference": "GIS Reference",
+        "wasteType": "Waste Type",
+        "wasteDemandValue": "Waste Demand",
+        "wasteDemandQuantityUnit": "Demand Unit (e.g., kg, tons)",
+        "wasteDemandTimeUnit": "Time Unit",
         "serviceZone": "Service Zone"
-      },
-      "alerts": {
-        "requiredFields": "Fields marked with * are required"
-      },
-      "buttons": {
-        "cancel": "Cancel",
-        "save": "Save"
       },
       "wasteTypes": {
         "ORGANIC": "Organic",
@@ -138,12 +127,6 @@
         "NEIGHBORHOOD": "Neighborhood",
         "DISTRICT": "District",
         "GEOGRAPHICAL_AREA": "Geographical Area"
-      },
-      "timeUnits": {
-        "DAY": "Day",
-        "WEEK": "Week",
-        "MONTH": "Month",
-        "YEAR": "Year"
       }
     },
     "list": {
@@ -167,15 +150,7 @@
       },
       "deleteDialog": {
         "title": "Confirm Deletion",
-        "message": "Are you sure you want to delete this container? This action cannot be undone.",
-        "cancel": "Cancel",
-        "confirm": "Delete"
-      },
-      "timeUnits": {
-        "DAY": "day",
-        "WEEK": "week",
-        "MONTH": "month",
-        "YEAR": "year"
+        "message": "Are you sure you want to delete this container? This action cannot be undone."
       }
     }
   }

@@ -1,6 +1,6 @@
+import type { OptimizationAndReportsRepository } from '@/application/repository/optimization-and-reports-repository';
+import type { CalculateCostsCommand, CalculateCostsUseCase, CostCalculationResult } from '@/application/usecase/optimization-and-reports/calculate-costs/calculate-costs-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { OptimizationAndReportsRepository } from '../../repository/optimization-and-reports-repository';
-import type { CalculateCostsCommand, CalculateCostsUseCase, CostCalculationResult } from '../../usecase/optimization-and-reports/calculate-costs/calculate-costs-use-case';
 
 
 /**

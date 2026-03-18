@@ -1,6 +1,6 @@
+import type { VehicleRepository } from '@/application/repository/vehicle-repository';
+import type { GetVehicleCommand, GetVehicleResult, GetVehicleUseCase } from '@/application/usecase/vehicle-management/get-vehicle/get-vehicle-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { VehicleRepository } from '../../repository/vehicle-repository';
-import type { GetVehicleCommand, GetVehicleResult, GetVehicleUseCase } from '../../usecase/vehicle-management/get-vehicle/get-vehicle-use-case';
 
 /**
  * @brief Service implementing the GetVehicle use case.

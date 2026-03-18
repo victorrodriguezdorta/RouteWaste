@@ -1,15 +1,16 @@
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
+
+import { FacilityHttpRepository } from '@/adapter/http/facility-http-repository';
 import {
-    CreateFacilityService,
-    DeleteFacilityService,
-    FilterFacilitiesService,
-    GetFacilityService,
-    ListFacilitiesService,
-    UpdateFacilityService
-} from '../../../application/service/facility';
-import type { Facility } from '../../../domain/entity/facility';
-import { FacilityHttpRepository } from '../../http/facility-http-repository';
+  CreateFacilityService,
+  DeleteFacilityService,
+  FilterFacilitiesService,
+  GetFacilityService,
+  ListFacilitiesService,
+  UpdateFacilityService
+} from '@/application/service/facility';
+import type { Facility } from '@/domain/entity/facility';
 
 /**
  * Facility Store

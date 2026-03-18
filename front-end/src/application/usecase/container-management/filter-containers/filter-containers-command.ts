@@ -1,5 +1,5 @@
-import { WasteType } from '../../../../domain/enumerate/waste-type';
-import { ServiceZone } from '../../../../domain/enumerate/service-zone';
+import { ServiceZone } from '@/domain/enumerate/service-zone';
+import { WasteType } from '@/domain/enumerate/waste-type';
 
 /**
  * Command object for filtering containers

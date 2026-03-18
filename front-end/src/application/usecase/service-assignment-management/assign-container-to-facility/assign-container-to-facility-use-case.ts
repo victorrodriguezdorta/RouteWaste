@@ -4,7 +4,7 @@ export type { AssignContainerToFacilityResult } from './assign-container-to-faci
 // AssignContainerToFacilityUseCase.ts
 // Use case contract for assigning a container to a facility
 
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { AssignContainerToFacilityCommand } from './assign-container-to-facility-command';
 import type { AssignContainerToFacilityResult } from './assign-container-to-facility-result';
 

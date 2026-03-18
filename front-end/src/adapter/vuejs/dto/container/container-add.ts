@@ -1,10 +1,10 @@
-import { Container } from '../../../../domain/entity/container';
-import { ServiceZone, serviceZoneFromString } from '../../../../domain/enumerate/service-zone';
-import { TimeUnit, timeUnitFromString } from '../../../../domain/enumerate/time-unit';
-import { WasteType, wasteTypeFromString } from '../../../../domain/enumerate/waste-type';
-import { QuantityUnit } from '../../../../domain/valueobject/demand/quantity-unit';
-import { WasteDemand } from '../../../../domain/valueobject/demand/waste-demand';
-import { Location } from '../../../../domain/valueobject/location/location';
+import { Container } from '@/domain/entity/container';
+import { ServiceZone, serviceZoneFromString } from '@/domain/enumerate/service-zone';
+import { TimeUnit, timeUnitFromString } from '@/domain/enumerate/time-unit';
+import { WasteType, wasteTypeFromString } from '@/domain/enumerate/waste-type';
+import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
+import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import { Location } from '@/domain/valueobject/location/location';
 
 /**
  * ContainerAdd

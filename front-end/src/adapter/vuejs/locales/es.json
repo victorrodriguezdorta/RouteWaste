@@ -1,33 +1,48 @@
 {
+  "common": {
+    "buttons": {
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "update": "Actualizar",
+      "delete": "Eliminar",
+      "back": "Volver",
+      "edit": "Editar"
+    },
+    "timeUnits": {
+      "DAY": "Día",
+      "WEEK": "Semana",
+      "MONTH": "Mes",
+      "YEAR": "Año"
+    },
+    "timeUnitsLowercase": {
+      "DAY": "día",
+      "WEEK": "semana",
+      "MONTH": "mes",
+      "YEAR": "año"
+    },
+    "alerts": {
+      "requiredFields": "Los campos marcados con * son obligatorios"
+    },
+    "validationMessages": {
+      "maxDecimals": "Máximo {maxDecimals} decimales permitidos"
+    }
+  },
   "vehicle": {
     "add": {
       "title": "Agregar Vehículo",
       "cardTitle": "Información del Vehículo",
       "fields": {
-        "vehicleType": "Tipo de Vehículo *",
-        "capacityValue": "Valor de Capacidad *",
-        "capacityUnit": "Unidad (ej: tons, kg) *",
-        "timeUnit": "Unidad de Tiempo *",
-        "costPerKilometer": "Costo por Kilómetro *",
-        "currencyCode": "Código de Moneda (ej: EUR, USD) *"
-      },
-      "alerts": {
-        "requiredFields": "Los campos marcados con * son obligatorios"
-      },
-      "buttons": {
-        "cancel": "Cancelar",
-        "save": "Guardar"
+        "vehicleType": "Tipo de Vehículo",
+        "capacityValue": "Valor de Capacidad",
+        "capacityUnit": "Unidad (ej: tons, kg)",
+        "timeUnit": "Unidad de Tiempo",
+        "costPerKilometer": "Costo por Kilómetro",
+        "currencyCode": "Código de Moneda (ej: EUR, USD)"
       },
       "vehicleTypes": {
         "COLLECTION_TRUCK": "Camión de Recolección",
         "TRANSFER_TRUCK": "Camión de Transferencia",
         "SUPPORT_VEHICLE": "Vehículo de Soporte"
-      },
-      "timeUnits": {
-        "DAY": "Día",
-        "WEEK": "Semana",
-        "MONTH": "Mes",
-        "YEAR": "Año"
       }
     },
     "edit": {
@@ -36,19 +51,12 @@
       "cardTitle": "Información del Vehículo",
       "loading": "Cargando vehículo...",
       "fields": {
-        "vehicleType": "Tipo de Vehículo *",
-        "capacityValue": "Valor de Capacidad *",
-        "capacityUnit": "Unidad (ej: tons, kg) *",
-        "timeUnit": "Unidad de Tiempo *",
-        "costPerKilometer": "Costo por Kilómetro *",
-        "currencyCode": "Código de Moneda (ej: EUR, USD) *"
-      },
-      "alerts": {
-        "requiredFields": "Los campos marcados con * son obligatorios"
-      },
-      "buttons": {
-        "cancel": "Cancelar",
-        "update": "Actualizar"
+        "vehicleType": "Tipo de Vehículo",
+        "capacityValue": "Valor de Capacidad",
+        "capacityUnit": "Unidad (ej: tons, kg)",
+        "timeUnit": "Unidad de Tiempo",
+        "costPerKilometer": "Costo por Kilómetro",
+        "currencyCode": "Código de Moneda (ej: EUR, USD)"
       }
     },
     "show": {
@@ -64,10 +72,6 @@
         "costPerKilometer": "Costo por Kilómetro",
         "currencyCode": "Código de Moneda",
         "vehicleId": "ID del Vehículo"
-      },
-      "buttons": {
-        "back": "Volver",
-        "edit": "Editar"
       }
     },
     "list": {
@@ -93,15 +97,7 @@
       },
       "deleteDialog": {
         "title": "Confirmar Eliminación",
-        "message": "¿Está seguro que desea eliminar este vehículo? Esta acción no se puede deshacer.",
-        "cancel": "Cancelar",
-        "confirm": "Eliminar"
-      },
-      "timeUnits": {
-        "DAY": "día",
-        "WEEK": "semana",
-        "MONTH": "mes",
-        "YEAR": "año"
+        "message": "¿Está seguro que desea eliminar este vehículo? Esta acción no se puede deshacer."
       }
     }
   },
@@ -110,22 +106,15 @@
       "title": "Agregar Contenedor",
       "cardTitle": "Información del Contenedor",
       "fields": {
-        "latitude": "Latitud *",
-        "longitude": "Longitud *",
-        "postalAddress": "Dirección Postal *",
-        "gisReference": "Referencia GIS *",
-        "wasteType": "Tipo de Residuo *",
-        "wasteDemandValue": "Demanda de Residuo *",
-        "wasteDemandQuantityUnit": "Unidad de Demanda (ej: kg, tons) *",
-        "wasteDemandTimeUnit": "Unidad de Tiempo *",
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "postalAddress": "Dirección Postal",
+        "gisReference": "Referencia GIS",
+        "wasteType": "Tipo de Residuo",
+        "wasteDemandValue": "Demanda de Residuo",
+        "wasteDemandQuantityUnit": "Unidad de Demanda (ej: kg, tons)",
+        "wasteDemandTimeUnit": "Unidad de Tiempo",
         "serviceZone": "Zona de Servicio"
-      },
-      "alerts": {
-        "requiredFields": "Los campos marcados con * son obligatorios"
-      },
-      "buttons": {
-        "cancel": "Cancelar",
-        "save": "Guardar"
       },
       "wasteTypes": {
         "ORGANIC": "Orgánico",
@@ -138,12 +127,6 @@
         "NEIGHBORHOOD": "Barrio",
         "DISTRICT": "Distrito",
         "GEOGRAPHICAL_AREA": "Área Geográfica"
-      },
-      "timeUnits": {
-        "DAY": "Día",
-        "WEEK": "Semana",
-        "MONTH": "Mes",
-        "YEAR": "Año"
       }
     },
     "list": {
@@ -167,15 +150,7 @@
       },
       "deleteDialog": {
         "title": "Confirmar Eliminación",
-        "message": "¿Está seguro que desea eliminar este contenedor? Esta acción no se puede deshacer.",
-        "cancel": "Cancelar",
-        "confirm": "Eliminar"
-      },
-      "timeUnits": {
-        "DAY": "día",
-        "WEEK": "semana",
-        "MONTH": "mes",
-        "YEAR": "año"
+        "message": "¿Está seguro que desea eliminar este contenedor? Esta acción no se puede deshacer."
       }
     }
   }

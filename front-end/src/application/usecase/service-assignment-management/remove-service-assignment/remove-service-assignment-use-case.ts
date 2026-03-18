@@ -4,7 +4,7 @@ export type { RemoveServiceAssignmentResult } from './remove-service-assignment-
 // RemoveServiceAssignmentUseCase.ts
 // Use case contract for removing a service assignment
 
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { RemoveServiceAssignmentCommand } from './remove-service-assignment-command';
 import type { RemoveServiceAssignmentResult } from './remove-service-assignment-result';
 

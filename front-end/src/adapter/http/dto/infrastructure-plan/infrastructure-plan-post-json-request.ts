@@ -1,4 +1,4 @@
-import type { CreateInfrastructurePlanCommand } from '../../../../application/usecase/infrastructure-plan-management/create-infrastructure-plan/create-infrastructure-plan-command';
+import type { CreateInfrastructurePlanCommand } from '@/application/usecase/infrastructure-plan-management/create-infrastructure-plan/create-infrastructure-plan-command';
 
 /**
  * InfrastructurePlanPostJsonRequest DTO

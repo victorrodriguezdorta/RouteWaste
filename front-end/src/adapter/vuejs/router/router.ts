@@ -1,12 +1,17 @@
 import {
-    createRouter,
-    createWebHistory,
-    type Router,
-    //type NavigationGuardNext,
-    //type RouteLocationNormalized,
-    type RouteRecordRaw,
+  createRouter,
+  createWebHistory,
+  type Router,
+  //type NavigationGuardNext,
+  //type RouteLocationNormalized,
+  type RouteRecordRaw,
 } from 'vue-router';
 
+/**
+ * Vue Router configuration for the Vehicle Management App.
+ * Defines routes for listing, adding, editing, and showing vehicles.
+ * Uses lazy loading for route components to optimize performance.
+ */
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
@@ -14,36 +19,26 @@ const routes: RouteRecordRaw[] = [
         redirect: '/vehicles',
     },
     {
-        path: '/containers',
-        name: 'Containers',
-        component: () => import('../view/ContainersView.vue'),
-    },
-    {
         path: '/vehicles',
         name: 'Vehicles',
-        component: () => import('../view/VehiclesView.vue'),
+        component: () => import('../view/vehicle-crud/vehicles-view.vue'),
     },
     {
         path: '/vehicles/add',
         name: 'AddVehicle',
-        component: () => import('../view/AddVehicle.vue'),
+        component: () => import('../view/vehicle-crud/add-vehicle.vue'),
     },
     {
         path: '/vehicles/:id/edit',
         name: 'EditVehicle',
-        component: () => import('../view/EditVehicle.vue'),
+        component: () => import('../view/vehicle-crud/edit-vehicle.vue'),
         props: true,
     },
     {
         path: '/vehicles/:id',
         name: 'ShowVehicle',
-        component: () => import('../view/ShowVehicle.vue'),
+        component: () => import('../view/vehicle-crud/show-vehicle.vue'),
         props: true,
-    },
-    {
-        path: '/containers/add',
-        name: 'AddContainer',
-        component: () => import('../view/AddContainer.vue'),
     },
 ];
 

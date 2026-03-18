@@ -1,6 +1,6 @@
 // Use case contract for calculating costs
 
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { CalculateCostsCommand } from './calculate-costs-command';
 import type { CostCalculationResult } from './calculate-costs-result';
 
@@ -19,3 +19,4 @@ export interface CalculateCostsUseCase {
 // Re-export types for convenience
 export type { CalculateCostsCommand } from './calculate-costs-command';
 export type { CostCalculationResult } from './calculate-costs-result';
+

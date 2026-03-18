@@ -5,27 +5,25 @@
 -->
 <template>
   <v-container>
-    <!-- Loading state with spinner -->
-    <v-row v-if="loading" justify="center">
-      <v-col cols="12" class="text-center">
-        <v-progress-circular
-          indeterminate
-          color="primary"
-          size="64"
-        ></v-progress-circular>
-        <p class="mt-4">{{ t('vehicle.show.loading') }}</p>
-      </v-col>
-    </v-row>
+    <!-- Loading state with LoaderDialog -->
+    <LoaderDialog
+      v-if="loading"
+      :dialog="loading"
+      title="Loading..."
+      :message="t('vehicle.show.loading')"
+      color="primary"
+      persistent
+    />
 
     <!-- Main content (shown when not loading and vehicle is loaded) -->
     <template v-else-if="vehicleInfo">
       <!-- Page title with vehicle type -->
       <v-row justify="center">
-        <v-col cols="12" md="8" lg="6">
-          <h2 class="text-h4 mb-4 text-center">
-            <v-icon class="mr-2">mdi-eye</v-icon>
-            {{ title }}
-          </h2>
+        <v-col cols="12" md="8" lg="6" class="text-center mb-4">
+          <div class="d-flex align-center justify-center">
+            <v-icon class="mr-2 text-h5">mdi-eye</v-icon>
+            <SectionTitle :title="title" />
+          </div>
         </v-col>
       </v-row>
 
@@ -49,30 +47,12 @@
                   readonly
                 ></v-text-field>
 
-                <!-- Transport capacity (read-only) -->
-                <v-row>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      :model-value="vehicleInfo.capacityValue"
-                      :label="t('vehicle.show.fields.capacityValue')"
-                      color="primary"
-                      type="number"
-                      prepend-icon="mdi-package-variant"
-                      disabled
-                      readonly
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      :model-value="vehicleInfo.capacityQuantityUnit"
-                      :label="t('vehicle.show.fields.capacityUnit')"
-                      color="primary"
-                      prepend-icon="mdi-weight"
-                      disabled
-                      readonly
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
+                <!-- Transport capacity (read-only) and Cost fields (read-only) -->
+                <VehicleFormFields 
+                  v-if="vehicleInfo"
+                  :vehicle="vehicleInfo"
+                  :readonly="true"
+                />
 
                 <!-- Time unit (read-only) -->
                 <v-text-field
@@ -83,31 +63,6 @@
                   disabled
                   readonly
                 ></v-text-field>
-
-                <!-- Cost per kilometer (read-only) -->
-                <v-row>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      :model-value="vehicleInfo.costPerKilometer"
-                      :label="t('vehicle.show.fields.costPerKilometer')"
-                      color="primary"
-                      type="number"
-                      prepend-icon="mdi-currency-eur"
-                      disabled
-                      readonly
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      :model-value="vehicleInfo.currencyCode"
-                      :label="t('vehicle.show.fields.currencyCode')"
-                      color="primary"
-                      prepend-icon="mdi-cash"
-                      disabled
-                      readonly
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
 
                 <!-- Vehicle UUID (read-only) -->
                 <v-text-field
@@ -130,7 +85,7 @@
                 variant="text"
                 color="grey"
               >
-                {{ t('vehicle.show.buttons.back') }}
+                {{ t('common.buttons.back') }}
               </v-btn>
               <v-btn
                 @click="goToEdit"
@@ -138,7 +93,7 @@
                 variant="elevated"
                 color="primary"
               >
-                {{ t('vehicle.show.buttons.edit') }}
+                {{ t('common.buttons.edit') }}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -157,15 +112,17 @@
  * Uses VehicleInfo DTO for data display.
  */
 
+import { LoaderDialog, SectionTitle } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { TimeUnit } from '../../../domain/enumerate/time-unit';
-import { VehicleType } from '../../../domain/enumerate/vehicle-type';
-import { VehicleInfo } from '../dto/vehicle/vehicle-info';
-import router from '../router/router';
-import { useVehicleStore } from '../stores/vehicle-store';
+import { TimeUnit } from '../../../../domain/enumerate/time-unit';
+import { VehicleType } from '../../../../domain/enumerate/vehicle-type';
+import VehicleFormFields from '../../components/vehicle/vehicle-form-fields.vue';
+import { VehicleInfo } from '../../dto/vehicle/vehicle-info';
+import router from '../../router/router';
+import { useVehicleStore } from '../../stores/vehicle-store';
 
 // Vue I18n composable for translations
 const { t, locale } = useI18n();
@@ -238,7 +195,7 @@ const formatVehicleType = (type: VehicleType): string => {
  * @returns Formatted time unit label
  */
 const formatTimeUnit = (unit: TimeUnit): string => {
-  return t(`vehicle.add.timeUnits.${unit}`);
+  return t(`common.timeUnits.${unit}`);
 };
 
 /**

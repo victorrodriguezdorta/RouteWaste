@@ -1,6 +1,6 @@
+import type { FacilityRepository } from '@/application/repository/facility-repository';
+import type { CreateFacilityCommand, CreateFacilityResult, CreateFacilityUseCase } from '@/application/usecase/facility-management/create-facility/create-facility-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { FacilityRepository } from '../../repository/facility-repository';
-import type { CreateFacilityCommand, CreateFacilityResult, CreateFacilityUseCase } from '../../usecase/facility-management/create-facility/create-facility-use-case';
 
 /**
  * @brief Service implementing the CreateFacility use case.
@@ -10,6 +10,7 @@ import type { CreateFacilityCommand, CreateFacilityResult, CreateFacilityUseCase
  * be available and will be provided later by the professor's infrastructure.
  */
 export class CreateFacilityService implements CreateFacilityUseCase {
+    /** The repository used to persist and manage facilities. */
     private readonly facilityRepository: FacilityRepository;
 
     /**
@@ -23,7 +24,7 @@ export class CreateFacilityService implements CreateFacilityUseCase {
     /**
      * @brief Execute the create facility use case.
      * @param command Input data required to create a facility.
-     * @return Either a `DataError` or the created `Facility` entity.
+     * @returns Either a `DataError` or the created `Facility` entity.
      */
     async execute(command: CreateFacilityCommand): Promise<Either<DataError, CreateFacilityResult>> {
         return this.facilityRepository.create(command);

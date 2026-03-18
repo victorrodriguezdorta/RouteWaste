@@ -1,4 +1,4 @@
-import type { CalculateCostsCommand } from '../../../application/usecase/optimization-and-reports/calculate-costs/calculate-costs-use-case';
+import type { CalculateCostsCommand } from '@/application/usecase/optimization-and-reports/calculate-costs/calculate-costs-use-case';
 
 /**
  * CalculateCostsJsonRequest

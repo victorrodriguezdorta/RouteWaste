@@ -1,10 +1,11 @@
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Vehicle } from '../../../../domain/entity/vehicle';
-import { timeUnitFromString } from '../../../../domain/enumerate/time-unit';
-import { vehicleTypeFromString } from '../../../../domain/enumerate/vehicle-type';
-import { TransportationVariableCost } from '../../../../domain/valueobject/cost/transportation-variable-cost';
-import { Capacity } from '../../../../domain/valueobject/demand/capacity';
-import { QuantityUnit } from '../../../../domain/valueobject/demand/quantity-unit';
+
+import { Vehicle } from '@/domain/entity/vehicle';
+import { timeUnitFromString } from '@/domain/enumerate/time-unit';
+import { vehicleTypeFromString } from '@/domain/enumerate/vehicle-type';
+import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
+import { Capacity } from '@/domain/valueobject/demand/capacity';
+import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
 
 /**
  * VehicleJsonResponse DTO

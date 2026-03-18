@@ -1,4 +1,4 @@
-import type { Container } from '../../../../domain/entity/container';
+import type { Container } from '@/domain/entity/container';
 
 /**
  * Result type for updating a container

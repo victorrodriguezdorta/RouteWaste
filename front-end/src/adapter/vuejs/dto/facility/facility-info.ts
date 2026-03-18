@@ -1,8 +1,8 @@
+import { Facility } from '@/domain/entity/facility';
+import { FacilityStatus } from '@/domain/enumerate/facility-status';
+import { FacilityType } from '@/domain/enumerate/facility-type';
+import { TimeUnit } from '@/domain/enumerate/time-unit';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Facility } from '../../../../domain/entity/facility';
-import { FacilityStatus } from '../../../../domain/enumerate/facility-status';
-import { FacilityType } from '../../../../domain/enumerate/facility-type';
-import { TimeUnit } from '../../../../domain/enumerate/time-unit';
 
 /**
  * FacilityInfo

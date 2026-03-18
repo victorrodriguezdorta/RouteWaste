@@ -1,13 +1,13 @@
+import { Container } from '@/domain/entity/container';
+import { Facility } from '@/domain/entity/facility';
+import { ServiceAssignment } from '@/domain/entity/service-assignment';
+import { timeUnitFromString } from '@/domain/enumerate/time-unit';
+import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
+import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
+import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import { Distance } from '@/domain/valueobject/location/distance';
+import { ServiceTime } from '@/domain/valueobject/location/service-time';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Container } from '../../../../domain/entity/container';
-import { Facility } from '../../../../domain/entity/facility';
-import { ServiceAssignment } from '../../../../domain/entity/service-assignment';
-import { timeUnitFromString } from '../../../../domain/enumerate/time-unit';
-import { TransportationVariableCost } from '../../../../domain/valueobject/cost/transportation-variable-cost';
-import { QuantityUnit } from '../../../../domain/valueobject/demand/quantity-unit';
-import { WasteDemand } from '../../../../domain/valueobject/demand/waste-demand';
-import { Distance } from '../../../../domain/valueobject/location/distance';
-import { ServiceTime } from '../../../../domain/valueobject/location/service-time';
 import { ContainerJsonResponse } from '../container/container-json-response';
 import { FacilityJsonResponse } from '../facility/facility-json-response';
 

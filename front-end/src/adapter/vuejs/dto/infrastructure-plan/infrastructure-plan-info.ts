@@ -1,4 +1,4 @@
-import { InfrastructurePlan } from '../../../../domain/entity/infrastructure-plan';
+import { InfrastructurePlan } from '@/domain/entity/infrastructure-plan';
 
 /**
  * InfrastructurePlanInfo

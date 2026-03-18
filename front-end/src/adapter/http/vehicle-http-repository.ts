@@ -1,16 +1,17 @@
+import type { VehicleRepository } from '@/application/repository/vehicle-repository';
+import type { CreateVehicleCommand, CreateVehicleResult } from '@/application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
+import type { DeleteVehicleCommand, DeleteVehicleResult } from '@/application/usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';
+import type { GetVehicleCommand, GetVehicleResult } from '@/application/usecase/vehicle-management/get-vehicle/get-vehicle-use-case';
+import type { ListVehiclesCommand, ListVehiclesResult } from '@/application/usecase/vehicle-management/list-vehicles/list-vehicles-use-case';
+import type { UpdateVehicleCommand, UpdateVehicleResult } from '@/application/usecase/vehicle-management/update-vehicle/update-vehicle-use-case';
+import type {
+  ApiError,
+  DataError,
+} from '@ull-tfg/ull-tfg-typescript';
 import {
   Either,
   http,
-  type ApiError,
-  type DataError,
 } from '@ull-tfg/ull-tfg-typescript';
-import type { VehicleRepository } from '../../application/repository/vehicle-repository';
-import type { CreateVehicleCommand, CreateVehicleResult } from '../../application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
-import type { DeleteVehicleCommand, DeleteVehicleResult } from '../../application/usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';
-import type { GetVehicleCommand, GetVehicleResult } from '../../application/usecase/vehicle-management/get-vehicle/get-vehicle-use-case';
-import type { ListVehiclesCommand, ListVehiclesResult } from '../../application/usecase/vehicle-management/list-vehicles/list-vehicles-use-case';
-import type { UpdateVehicleCommand, UpdateVehicleResult } from '../../application/usecase/vehicle-management/update-vehicle/update-vehicle-use-case';
-// Import DTOs (assuming they exist)
 import { VehicleJsonResponse } from './dto/vehicle/vehicle-json-response';
 import type { VehiclePageJsonResponse } from './dto/vehicle/vehicle-page-json-response';
 import { VehiclePostJsonRequest } from './dto/vehicle/vehicle-post-json-request';
@@ -24,7 +25,10 @@ import { VehiclePutJsonRequest } from './dto/vehicle/vehicle-put-json-request';
  * RESTful API calls.
  */
 export class VehicleHttpRepository implements VehicleRepository {
+  /** The base API URL for vehicle endpoints. */
   private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'vehicles/';
+
+  /** HTTP headers for API requests including authentication and content type. */
   private headers: Headers = new Headers();
 
   /**
@@ -43,7 +47,7 @@ export class VehicleHttpRepository implements VehicleRepository {
    * Retrieve a list of vehicles with optional pagination.
    * 
    * @param command Optional pagination parameters (page, pageSize).
-   * @return Either a DataError or a list of Vehicle entities.
+   * @returns Either a DataError or a list of Vehicle entities.
    */
   public async list(
     command?: ListVehiclesCommand
@@ -108,7 +112,7 @@ export class VehicleHttpRepository implements VehicleRepository {
    * Retrieve a specific vehicle by its identifier.
    * 
    * @param command Data containing the id of the vehicle to retrieve.
-   * @return Either a DataError or the Vehicle entity.
+   * @returns Either a DataError or the Vehicle entity.
    */
   public async getById(
     command: GetVehicleCommand
@@ -139,7 +143,7 @@ export class VehicleHttpRepository implements VehicleRepository {
    * Create a new vehicle in the system.
    * 
    * @param command Data required to create the vehicle.
-   * @return Either a DataError or the created Vehicle entity.
+   * @returns Either a DataError or the created Vehicle entity.
    */
   public async create(
     command: CreateVehicleCommand
@@ -171,7 +175,7 @@ export class VehicleHttpRepository implements VehicleRepository {
    * Update an existing vehicle.
    * 
    * @param command Data required to update the vehicle (including id).
-   * @return Either a DataError or the updated Vehicle entity.
+   * @returns Either a DataError or the updated Vehicle entity.
    */
   public async update(
     command: UpdateVehicleCommand
@@ -204,7 +208,7 @@ export class VehicleHttpRepository implements VehicleRepository {
    * Delete a vehicle by its identifier.
    * 
    * @param command Data containing the id of the vehicle to delete.
-   * @return Either a DataError or true on successful deletion.
+   * @returns Either a DataError or true on successful deletion.
    */
   public async delete(
     command: DeleteVehicleCommand

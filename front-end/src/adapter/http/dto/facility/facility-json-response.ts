@@ -1,12 +1,12 @@
+import { Facility } from '@/domain/entity/facility';
+import { facilityStatusFromString } from '@/domain/enumerate/facility-status';
+import { facilityTypeFromString } from '@/domain/enumerate/facility-type';
+import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
+import { Capacity } from '@/domain/valueobject/demand/capacity';
+import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
+import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import { Location } from '@/domain/valueobject/location/location';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Facility } from '../../../../domain/entity/facility';
-import { facilityStatusFromString } from '../../../../domain/enumerate/facility-status';
-import { facilityTypeFromString } from '../../../../domain/enumerate/facility-type';
-import { OpeningFixedCost } from '../../../../domain/valueobject/cost/opening-fixed-cost';
-import { Capacity } from '../../../../domain/valueobject/demand/capacity';
-import { QuantityUnit } from '../../../../domain/valueobject/demand/quantity-unit';
-import { WasteDemand } from '../../../../domain/valueobject/demand/waste-demand';
-import { Location } from '../../../../domain/valueobject/location/location';
 
 /**
  * FacilityJsonResponse DTO

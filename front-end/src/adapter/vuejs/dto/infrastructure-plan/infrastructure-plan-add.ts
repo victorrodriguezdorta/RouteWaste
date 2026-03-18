@@ -1,8 +1,8 @@
-import { InfrastructurePlan } from '../../../../domain/entity/infrastructure-plan';
-import { Currency } from '../../../../domain/valueobject/cost/currency';
-import { MaximumBudget } from '../../../../domain/valueobject/cost/maximum-budget';
-import { ServicePolicies } from '../../../../domain/valueobject/policy/service-policies';
-import { PlanningPeriod } from '../../../../domain/valueobject/time/planning-period';
+import { InfrastructurePlan } from '@/domain/entity/infrastructure-plan';
+import { Currency } from '@/domain/valueobject/cost/currency';
+import { MaximumBudget } from '@/domain/valueobject/cost/maximum-budget';
+import { ServicePolicies } from '@/domain/valueobject/policy/service-policies';
+import { PlanningPeriod } from '@/domain/valueobject/time/planning-period';
 
 /**
  * InfrastructurePlanAdd

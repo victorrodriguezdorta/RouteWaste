@@ -1,10 +1,10 @@
+import { Container } from '@/domain/entity/container';
+import { serviceZoneFromString } from '@/domain/enumerate/service-zone';
+import { wasteTypeFromString } from '@/domain/enumerate/waste-type';
+import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
+import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import { Location } from '@/domain/valueobject/location/location';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Container } from '../../../../domain/entity/container';
-import { serviceZoneFromString } from '../../../../domain/enumerate/service-zone';
-import { wasteTypeFromString } from '../../../../domain/enumerate/waste-type';
-import { QuantityUnit } from '../../../../domain/valueobject/demand/quantity-unit';
-import { WasteDemand } from '../../../../domain/valueobject/demand/waste-demand';
-import { Location } from '../../../../domain/valueobject/location/location';
 
 /**
  * ContainerJsonResponse DTO
@@ -14,19 +14,28 @@ import { Location } from '../../../../domain/valueobject/location/location';
  * `toContainer` to convert the payload into the domain `Container` entity.
  */
 export class ContainerJsonResponse {
+  /** Unique identifier of the container */
   id: string;
+
+  /** Geographic location information of the container */
   location: {
     latitude: number;
     longitude: number;
     postalAddress: string;
     gisReference: string;
   };
+
+  /** Type/category of waste collected by this container */
   wasteType: string;
+
+  /** Expected waste demand information for this container */
   wasteDemand: {
     value: number;
     quantityUnit: string;
     timeUnit: string;
   };
+
+  /** Optional service zone identifier for this container */
   serviceZone?: string | null;
 
   constructor(
@@ -47,6 +56,8 @@ export class ContainerJsonResponse {
    * Convert JSON response into domain `Container` entity.
    * Builds the required value objects (`Location`, `WasteDemand`) and parses
    * enumerations for `WasteType` and `ServiceZone`.
+   * @param data The JSON response data to convert
+   * @returns A new Container domain entity
    */
   public static toContainer(data: ContainerJsonResponse): Container {
     const id = new UllUUID(data.id);

@@ -1,11 +1,11 @@
+import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
+import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import { Distance } from '@/domain/valueobject/location/distance';
+import { ServiceTime } from '@/domain/valueobject/location/service-time';
+import { ServicePolicies } from '@/domain/valueobject/policy/service-policies';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { Container } from './container';
 import { Facility } from './facility';
-import { WasteDemand } from '../valueobject/demand/waste-demand';
-import { Distance } from '../valueobject/location/distance';
-import { ServiceTime } from '../valueobject/location/service-time';
-import { TransportationVariableCost } from '../valueobject/cost/transportation-variable-cost';
-import { ServicePolicies } from '../valueobject/policy/service-policies';
 
 /**
  * ServiceAssignment
@@ -17,12 +17,25 @@ import { ServicePolicies } from '../valueobject/policy/service-policies';
  * by application logic.
  */
 export class ServiceAssignment {
+  /** Unique identifier for this service assignment */
   readonly id: UllUUID;
+
+  /** Source container entity for this assignment */
   readonly container: Container;
+
+  /** Target facility entity for this assignment */
   readonly facility: Facility;
+
+  /** Expected waste demand value object for this assignment */
   readonly wasteDemand: WasteDemand;
+
+  /** Distance value object representing meters between container and facility */
   readonly distance: Distance;
+
+  /** Service time value object representing minutes for service operation */
   readonly serviceTime: ServiceTime;
+
+  /** Transportation variable cost value object for this assignment */
   readonly transportCost: TransportationVariableCost;
 
   /**
@@ -63,12 +76,21 @@ export class ServiceAssignment {
     if (err) throw new Error('Service assignment violates service policies: ' + err);
   }
 
-  /** Return the identifier for this service assignment. */
+  /** Return the identifier for this service assignment.
+   * @returns The unique identifier of this service assignment
+   */
   getServiceAssignmentId(): UllUUID { return this.id; }
 
-  /** Compare by identity. */
+  /**
+   * Compare by identity.
+   * @param other Candidate object to compare with this service assignment
+   * @returns True if both assignments have the same identifier, false otherwise
+   */
   equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof ServiceAssignment)) return false; return this.id.equals(other.id); }
 
-  /** Human-readable representation useful for debugging. */
+  /**
+   * Human-readable representation useful for debugging.
+   * @returns A string representation of this service assignment
+   */
   toString(): string { return `ServiceAssignment={id=${this.id}, containerId=${this.container.getId()}, facilityId=${this.facility.getId()}, demand=${this.wasteDemand}, distance=${this.distance}, serviceTime=${this.serviceTime}, transportCost=${this.transportCost}}`; }
 }
