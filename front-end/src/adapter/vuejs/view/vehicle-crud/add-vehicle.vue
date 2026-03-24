@@ -66,23 +66,22 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn
+            <ButtonTooltip
               @click="goBack"
-              prepend-icon="mdi-arrow-left"
+              icon="mdi-arrow-left"
               variant="text"
               color="grey"
-            >
-              {{ t('common.buttons.cancel') }}
-            </v-btn>
-            <v-btn
+              :text="t('common.buttons.cancel')"
+              :tooltip="t('common.buttons.cancel')"
+            />
+            <ButtonTooltip
               @click="validate"
-              prepend-icon="mdi-content-save"
+              icon="mdi-content-save"
               variant="elevated"
               color="success"
-              :loading="loading"
-            >
-              {{ t('common.buttons.save') }}
-            </v-btn>
+              :text="t('common.buttons.save')"
+              :tooltip="t('common.buttons.save')"
+            />
           </v-card-actions>
         </v-card>
       </v-col>
@@ -100,7 +99,7 @@
  * Uses ull-tfg-vue components for form fields.
  */
 
-import { SectionTitle } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip, SectionTitle } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -116,7 +115,7 @@ const { t, locale } = useI18n();
 
 // Store instance and reactive references
 const vehicleStore = useVehicleStore();
-const { vehicleNotification, loading } = storeToRefs(vehicleStore);
+const { vehicleNotification } = storeToRefs(vehicleStore);
 
 // Form data - new vehicle to be created
 const newVehicle = ref<VehicleAdd>(

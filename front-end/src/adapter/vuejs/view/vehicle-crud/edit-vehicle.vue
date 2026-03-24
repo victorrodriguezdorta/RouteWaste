@@ -79,22 +79,22 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn
+              <ButtonTooltip
                 @click="goBack"
-                prepend-icon="mdi-arrow-left"
+                icon="mdi-arrow-left"
                 variant="text"
                 color="grey"
-              >
-                {{ t('common.buttons.cancel') }}
-              </v-btn>
-              <v-btn
+                :text="t('common.buttons.cancel')"
+                :tooltip="t('common.buttons.cancel')"
+              />
+              <ButtonTooltip
                 @click="validate"
-                prepend-icon="mdi-content-save"
+                icon="mdi-content-save"
                 variant="elevated"
                 color="success"
-              >
-                {{ t('common.buttons.update') }}
-              </v-btn>
+                :text="t('common.buttons.update')"
+                :tooltip="t('common.buttons.update')"
+              />
             </v-card-actions>
           </v-card>
         </v-col>
@@ -112,7 +112,7 @@
  * Uses VehicleEdit DTO for data transfer and validation.
  */
 
-import { LoaderDialog, SectionTitle } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip, LoaderDialog, SectionTitle } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';

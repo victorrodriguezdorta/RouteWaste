@@ -79,22 +79,22 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn
+              <ButtonTooltip
                 @click="goBack"
-                prepend-icon="mdi-arrow-left"
+                icon="mdi-arrow-left"
                 variant="text"
                 color="grey"
-              >
-                {{ t('common.buttons.back') }}
-              </v-btn>
-              <v-btn
+                :text="t('common.buttons.back')"
+                :tooltip="t('common.buttons.back')"
+              />
+              <ButtonTooltip
                 @click="goToEdit"
-                prepend-icon="mdi-pencil"
+                icon="mdi-pencil"
                 variant="elevated"
                 color="primary"
-              >
-                {{ t('common.buttons.edit') }}
-              </v-btn>
+                :text="t('common.buttons.edit')"
+                :tooltip="t('common.buttons.edit')"
+              />
             </v-card-actions>
           </v-card>
         </v-col>
@@ -112,7 +112,7 @@
  * Uses VehicleInfo DTO for data display.
  */
 
-import { LoaderDialog, SectionTitle } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip, LoaderDialog, SectionTitle } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';

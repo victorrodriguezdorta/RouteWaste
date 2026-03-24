@@ -33,14 +33,14 @@
         <!-- Add vehicle button and type filter -->
         <v-row class="mb-4" align="center">
           <v-col cols="12" sm="auto">
-            <v-btn
+            <ButtonTooltip
               color="primary"
-              prepend-icon="mdi-plus"
+              icon="mdi-plus"
               size="large"
               @click="addVehicle"
-            >
-              {{ t('vehicle.list.addButton') }}
-            </v-btn>
+              :text="t('vehicle.list.addButton')"
+              :tooltip="t('vehicle.list.addButton')"
+            />
           </v-col>
           <v-spacer />
           <v-col cols="12" sm="4" md="3">
@@ -130,14 +130,15 @@
             <template v-slot:no-data>
               <v-alert type="info" variant="tonal" class="ma-4">
                 {{ t('vehicle.list.table.noData') }}
-                <v-btn 
+                <ButtonTooltip 
                   color="primary" 
                   variant="text" 
+                  icon="mdi-plus"
                   @click="addVehicle"
                   class="ml-2"
-                >
-                  {{ t('vehicle.list.table.addFirst') }}
-                </v-btn>
+                  :text="t('vehicle.list.table.addFirst')"
+                  :tooltip="t('vehicle.list.table.addFirst')"
+                />
               </v-alert>
             </template>
           </v-data-table-server>
