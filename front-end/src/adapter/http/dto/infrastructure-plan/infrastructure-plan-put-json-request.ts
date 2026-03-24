@@ -1,4 +1,4 @@
-import type { UpdateInfrastructurePlanCommand } from '../../../../application/usecase/infrastructure-plan-management/update-infrastructure-plan/update-infrastructure-plan-command';
+import type { UpdateInfrastructurePlanCommand } from '@/application/usecase/infrastructure-plan-management/update-infrastructure-plan/update-infrastructure-plan-command';
 
 /**
  * InfrastructurePlanPutJsonRequest DTO
@@ -7,8 +7,17 @@ import type { UpdateInfrastructurePlanCommand } from '../../../../application/us
  * InfrastructurePlan. Only updated fields are included.
  */
 export class InfrastructurePlanPutJsonRequest {
+  /**
+   * Periodo de planificación de la infraestructura.
+   */
   period?: string;
+  /**
+   * Presupuesto máximo para la infraestructura.
+   */
   maxBudget?: { amount: number; currency?: string } | null;
+  /**
+   * Políticas de servicio aplicadas a la infraestructura.
+   */
   servicePolicies?: { maxServiceDistance?: number | null; maxServiceTime?: number | null; maxInfrastructureCount?: number | null; maxEmissions?: number | null } | null;
 
   constructor(period?: string, maxBudget?: { amount: number; currency?: string } | null, servicePolicies?: { maxServiceDistance?: number | null; maxServiceTime?: number | null; maxInfrastructureCount?: number | null; maxEmissions?: number | null } | null) {
@@ -17,7 +26,11 @@ export class InfrastructurePlanPutJsonRequest {
     this.servicePolicies = servicePolicies ?? null;
   }
 
-  /** Map an `UpdateInfrastructurePlanCommand` into a partial JSON request body. */
+  /**
+   * Mapea un `UpdateInfrastructurePlanCommand` a un cuerpo de solicitud JSON parcial.
+   * @param data Comando con los campos actualizados de la infraestructura.
+   * @returns Instancia de InfrastructurePlanPutJsonRequest con los campos actualizados.
+   */
   public static toRequest(data: UpdateInfrastructurePlanCommand): InfrastructurePlanPutJsonRequest {
     const updated = data.updatedFields;
     const period = updated.period ? updated.period.getValue() : undefined;

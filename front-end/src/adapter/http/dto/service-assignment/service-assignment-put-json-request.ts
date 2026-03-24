@@ -1,4 +1,4 @@
-import type { UpdateServiceAssignmentCommand } from '../../../../application/usecase/service-assignment-management/update-service-assignment/update-service-assignment-command';
+import type { UpdateServiceAssignmentCommand } from '@/application/usecase/service-assignment-management/update-service-assignment/update-service-assignment-command';
 
 /**
  * ServiceAssignmentPutJsonRequest DTO
@@ -7,9 +7,21 @@ import type { UpdateServiceAssignmentCommand } from '../../../../application/use
  * ServiceAssignment. Only updated fields are included to support partial updates.
  */
 export class ServiceAssignmentPutJsonRequest {
+  /**
+   * Demanda de residuo (valor, unidad de cantidad y unidad de tiempo).
+   */
   wasteDemand?: { value: number; quantityUnit: string; timeUnit: string } | undefined;
+  /**
+   * Distancia en metros.
+   */
   distanceMeters?: number | undefined;
+  /**
+   * Tiempo de servicio en minutos.
+   */
   serviceTimeMinutes?: number | undefined;
+  /**
+   * Coste de transporte (monto y moneda).
+   */
   transportCost?: { amount: number; currency?: string } | undefined;
 
   constructor(
@@ -24,7 +36,11 @@ export class ServiceAssignmentPutJsonRequest {
     this.transportCost = transportCost;
   }
 
-  /** Map an `UpdateServiceAssignmentCommand` into a partial JSON request body. */
+  /**
+   * Mapea un `UpdateServiceAssignmentCommand` a un cuerpo JSON parcial para la petición.
+   * @param data Comando con los campos actualizados.
+   * @returns Instancia de ServiceAssignmentPutJsonRequest con los campos correspondientes.
+   */
   public static toRequest(data: UpdateServiceAssignmentCommand): ServiceAssignmentPutJsonRequest {
     const f = data.updatedFields;
     return new ServiceAssignmentPutJsonRequest(

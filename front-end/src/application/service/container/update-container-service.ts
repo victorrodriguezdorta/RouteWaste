@@ -1,7 +1,7 @@
 
+import type { ContainerRepository } from '@/application/repository/container-repository';
+import type { UpdateContainerCommand, UpdateContainerResult, UpdateContainerUseCase } from '@/application/usecase/container-management/update-container/update-container-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { ContainerRepository } from '../../repository/container-repository';
-import type { UpdateContainerCommand, UpdateContainerResult, UpdateContainerUseCase } from '../../usecase/container-management/update-container/update-container-use-case';
 
 /**
  * @brief Service implementing the UpdateContainer use case.
@@ -10,6 +10,9 @@ import type { UpdateContainerCommand, UpdateContainerResult, UpdateContainerUseC
  * is responsible for performing the actual API call or persistence operation.
  */
 export class UpdateContainerService implements UpdateContainerUseCase {
+    /**
+     * Repositorio utilizado para realizar operaciones de actualización de contenedores.
+     */
     private readonly containerRepository: ContainerRepository;
 
     /**
@@ -21,9 +24,9 @@ export class UpdateContainerService implements UpdateContainerUseCase {
     }
 
     /**
-     * @brief Execute the update container use case.
-     * @param command Data required to update the container (id + partial fields).
-     * @return Either a `DataError` or the updated `Container` entity.
+     * Ejecuta el caso de uso para actualizar un contenedor.
+     * @param command Datos requeridos para actualizar el contenedor (id y campos parciales).
+     * @returns Either un `DataError` o la entidad `Container` actualizada.
      */
     async execute(command: UpdateContainerCommand): Promise<Either<DataError, UpdateContainerResult>> {
         return this.containerRepository.update(command);

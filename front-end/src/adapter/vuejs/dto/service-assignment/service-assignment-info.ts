@@ -1,4 +1,4 @@
-import { ServiceAssignment } from '../../../../domain/entity/service-assignment';
+import { ServiceAssignment } from '@/domain/entity/service-assignment';
 
 /**
  * ServiceAssignmentInfo

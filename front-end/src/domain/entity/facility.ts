@@ -1,10 +1,10 @@
+import { FacilityStatus, facilityStatusIsDiscarded } from '@/domain/enumerate/facility-status';
+import { FacilityType } from '@/domain/enumerate/facility-type';
+import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
+import { Capacity } from '@/domain/valueobject/demand/capacity';
+import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import { Location } from '@/domain/valueobject/location/location';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { FacilityType } from '../enumerate/facility-type';
-import { FacilityStatus, facilityStatusIsDiscarded } from '../enumerate/facility-status';
-import { Location } from '../valueobject/location/location';
-import { Capacity } from '../valueobject/demand/capacity';
-import { WasteDemand } from '../valueobject/demand/waste-demand';
-import { OpeningFixedCost } from '../valueobject/cost/opening-fixed-cost';
 
 /**
  * Facility
@@ -16,12 +16,39 @@ import { OpeningFixedCost } from '../valueobject/cost/opening-fixed-cost';
  * to update facility attributes used by the application layer.
  */
 export class Facility {
+  /**
+   * Identificador único de la instalación.
+   */
   readonly id: UllUUID;
+
+  /**
+   * Tipo de instalación (clasificación).
+   */
   private facilityType: FacilityType;
+
+  /**
+   * Ubicación geográfica de la instalación.
+   */
   private location: Location;
+
+  /**
+   * Capacidad máxima de la instalación.
+   */
   private capacity: Capacity;
+
+  /**
+   * Coste fijo de apertura de la instalación.
+   */
   private openingFixedCost: OpeningFixedCost;
+
+  /**
+   * Estado actual de la instalación.
+   */
   private status: FacilityStatus;
+
+  /**
+   * Demanda de residuos asignada actualmente a la instalación.
+   */
   private assignedWasteDemand: WasteDemand;
 
   /**
@@ -50,7 +77,11 @@ export class Facility {
     this.assignedWasteDemand = WasteDemand.withDefaultUnit(0);
   }
 
-  /** Return the facility identifier. */
+
+  /**
+   * Devuelve el identificador único de la instalación.
+   * @returns El identificador único de la instalación.
+   */
   getId(): UllUUID { return this.id; }
 
   /**
@@ -65,51 +96,109 @@ export class Facility {
     this.assignedWasteDemand = newTotal;
   }
 
+
+  /**
+   * Devuelve el tipo de instalación.
+   * @returns El tipo de instalación.
+   */
   getFacilityType(): FacilityType { return this.facilityType; }
+
+  /**
+   * Devuelve la ubicación de la instalación.
+   * @returns La ubicación de la instalación.
+   */
   getLocation(): Location { return this.location; }
+
+  /**
+   * Devuelve la capacidad máxima de la instalación.
+   * @returns La capacidad máxima de la instalación.
+   */
   getCapacity(): Capacity { return this.capacity; }
+
+  /**
+   * Devuelve el coste fijo de apertura de la instalación.
+   * @returns El coste fijo de apertura de la instalación.
+   */
   getOpeningFixedCost(): OpeningFixedCost { return this.openingFixedCost; }
+
+  /**
+   * Devuelve el estado actual de la instalación.
+   * @returns El estado actual de la instalación.
+   */
   getStatus(): FacilityStatus { return this.status; }
+
+  /**
+   * Devuelve la demanda de residuos actualmente asignada a la instalación.
+   * @returns La demanda de residuos asignada.
+   */
   getAssignedWasteDemand(): WasteDemand { return this.assignedWasteDemand; }
 
-  /** Update facility status. Throws when `status` is falsy. */
+
+  /**
+   * Actualiza el estado de la instalación.
+   * @param status Nuevo estado de la instalación.
+   */
   updateStatus(status: FacilityStatus): void {
     if (!status) throw new Error('Facility status is not defined');
     this.status = status;
   }
 
-  /** Update facility type. Throws when `ft` is falsy. */
+
+  /**
+   * Actualiza el tipo de instalación.
+   * @param ft Nuevo tipo de instalación.
+   */
   updateFacilityType(ft: FacilityType): void {
     if (!ft) throw new Error('Facility type is not defined');
     this.facilityType = ft;
   }
 
-  /** Update facility location. Throws when `loc` is falsy. */
+
+  /**
+   * Actualiza la ubicación de la instalación.
+   * @param loc Nueva ubicación de la instalación.
+   */
   updateLocation(loc: Location): void {
     if (!loc) throw new Error('Facility location is not defined');
     this.location = loc;
   }
 
-  /** Update facility capacity. Throws when `cap` is falsy. */
+
+  /**
+   * Actualiza la capacidad máxima de la instalación.
+   * @param cap Nueva capacidad máxima.
+   */
   updateCapacity(cap: Capacity): void {
     if (!cap) throw new Error('Facility capacity is not defined');
     this.capacity = cap;
   }
 
-  /** Update opening fixed cost. Throws when `cost` is falsy. */
+
+  /**
+   * Actualiza el coste fijo de apertura de la instalación.
+   * @param cost Nuevo coste fijo de apertura.
+   */
   updateOpeningFixedCost(cost: OpeningFixedCost): void {
     if (!cost) throw new Error('Opening fixed cost is not defined');
     this.openingFixedCost = cost;
   }
 
-  /** Equality by id. */
+
+  /**
+   * Compara si la instalación es igual a otra por id.
+   * @param other Otra instalación a comparar.
+   * @returns True si los ids son iguales, false en caso contrario.
+   */
   equals(other: unknown): boolean {
     if (this === other) return true;
     if (!(other instanceof Facility)) return false;
     return this.id.equals(other.id);
   }
 
-  /** Human-readable representation for debugging. */
+  /**
+   * Devuelve una representación legible de la instalación para depuración.
+   * @returns Cadena representando la instalación.
+   */
   toString(): string {
     return `Facility={id=${this.id}, type=${this.facilityType}, location=${this.location}, capacity=${this.capacity}, assignedDemand=${this.assignedWasteDemand}, openingCost=${this.openingFixedCost}, status=${this.status}`;
   }

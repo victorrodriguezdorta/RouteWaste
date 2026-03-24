@@ -1,7 +1,8 @@
 
+
+import type { ContainerRepository } from '@/application/repository/container-repository';
+import type { DeleteContainerCommand, DeleteContainerResult, DeleteContainerUseCase } from '@/application/usecase/container-management/delete-container/delete-container-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { ContainerRepository } from '../../repository/container-repository';
-import type { DeleteContainerCommand, DeleteContainerResult, DeleteContainerUseCase } from '../../usecase/container-management/delete-container/delete-container-use-case';
 
 /**
  * @brief Service implementing the DeleteContainer use case.

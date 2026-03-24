@@ -1,15 +1,16 @@
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
+
+import { InfrastructurePlanHttpRepository } from '@/adapter/http/infrastructure-plan-http-repository';
 import {
-    CreateInfrastructurePlanService,
-    DeleteInfrastructurePlanService,
-    GetInfrastructurePlanService,
-    ListInfrastructurePlansService,
-    UpdateInfrastructurePlanService,
-    ValidateInfrastructurePlanService
-} from '../../../application/service/infrastructure-plan';
-import type { InfrastructurePlan } from '../../../domain/entity/infrastructure-plan';
-import { InfrastructurePlanHttpRepository } from '../../http/infrastructure-plan-http-repository';
+  CreateInfrastructurePlanService,
+  DeleteInfrastructurePlanService,
+  GetInfrastructurePlanService,
+  ListInfrastructurePlansService,
+  UpdateInfrastructurePlanService,
+  ValidateInfrastructurePlanService
+} from '@/application/service/infrastructure-plan';
+import type { InfrastructurePlan } from '@/domain/entity/infrastructure-plan';
 
 /**
  * Infrastructure Plan Store

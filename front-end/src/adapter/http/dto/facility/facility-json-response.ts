@@ -16,12 +16,33 @@ import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
  * `toFacility` to convert the payload into the domain `Facility` entity.
  */
 export class FacilityJsonResponse {
+  /**
+   * Identificador único de la instalación.
+   */
   id: string;
+  /**
+   * Tipo de instalación.
+   */
   facilityType: string;
+  /**
+   * Ubicación de la instalación (latitud, longitud, dirección postal, referencia GIS).
+   */
   location: { latitude: number; longitude: number; postalAddress: string; gisReference: string };
+  /**
+   * Capacidad de la instalación (valor, unidad de cantidad, unidad de tiempo).
+   */
   capacity: { value: number; quantityUnit: string; timeUnit: string };
+  /**
+   * Coste fijo de apertura de la instalación.
+   */
   openingFixedCost: { amount: number; currency?: string };
+  /**
+   * Estado de la instalación.
+   */
   status: string;
+  /**
+   * Demanda de residuo asignada a la instalación (opcional).
+   */
   assignedWasteDemand?: { value: number; quantityUnit: string; timeUnit: string };
 
   constructor(
@@ -43,9 +64,10 @@ export class FacilityJsonResponse {
   }
 
   /**
-   * Convert the JSON response into a domain `Facility` entity.
-   * Builds Location, Capacity and OpeningFixedCost value objects and parses
-   * enums for facility type and status.
+   * Convierte la respuesta JSON en una entidad de dominio `Facility`.
+   * Construye los value objects Location, Capacity y OpeningFixedCost y parsea los enums de tipo y estado.
+   * @param data Objeto FacilityJsonResponse recibido del backend.
+   * @returns Instancia de Facility del dominio.
    */
   public static toFacility(data: FacilityJsonResponse): Facility {
     const id = new UllUUID(data.id);

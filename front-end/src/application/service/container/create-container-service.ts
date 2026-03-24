@@ -1,6 +1,6 @@
+import type { ContainerRepository } from '@/application/repository/container-repository';
+import type { CreateContainerCommand, CreateContainerResult, CreateContainerUseCase } from '@/application/usecase/container-management/create-container/create-container-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { ContainerRepository } from '../../repository/container-repository';
-import type { CreateContainerCommand, CreateContainerResult, CreateContainerUseCase } from '../../usecase/container-management/create-container/create-container-use-case';
 
 /**
  * @brief Service implementing the CreateContainer use case.
@@ -10,6 +10,9 @@ import type { CreateContainerCommand, CreateContainerResult, CreateContainerUseC
  * be available and will be provided later by the professor's infrastructure.
  */
 export class CreateContainerService implements CreateContainerUseCase {
+    /**
+     * Repository instance for container persistence operations.
+     */
     private readonly containerRepository: ContainerRepository;
 
     /**
@@ -23,7 +26,7 @@ export class CreateContainerService implements CreateContainerUseCase {
     /**
      * @brief Execute the create container use case.
      * @param command Input data required to create a container.
-     * @return Either a `DataError` or the created `Container` entity.
+     * @returns Either a `DataError` or the created `Container` entity.
      */
     async execute(command: CreateContainerCommand): Promise<Either<DataError, CreateContainerResult>> {
         return this.containerRepository.create(command);

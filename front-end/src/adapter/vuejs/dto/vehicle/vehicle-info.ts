@@ -1,7 +1,7 @@
+import { Vehicle } from '@/domain/entity/vehicle';
+import { TimeUnit } from '@/domain/enumerate/time-unit';
+import { VehicleType } from '@/domain/enumerate/vehicle-type';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Vehicle } from '../../../../domain/entity/vehicle';
-import { TimeUnit } from '../../../../domain/enumerate/time-unit';
-import { VehicleType } from '../../../../domain/enumerate/vehicle-type';
 
 /**
  * VehicleInfo

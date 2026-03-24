@@ -1,6 +1,6 @@
+import type { FacilityRepository } from '@/application/repository/facility-repository';
+import type { ListFacilitiesCommand, ListFacilitiesResult, ListFacilitiesUseCase } from '@/application/usecase/facility-management/list-facilities/list-facilities-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { FacilityRepository } from '../../repository/facility-repository';
-import type { ListFacilitiesCommand, ListFacilitiesResult, ListFacilitiesUseCase } from '../../usecase/facility-management/list-facilities/list-facilities-use-case';
 
 /**
  * @brief Service implementing the ListFacilities use case.
@@ -9,6 +9,10 @@ import type { ListFacilitiesCommand, ListFacilitiesResult, ListFacilitiesUseCase
  * directly to the repository; repository must return an `Either<DataError, Facility[]>`.
  */
 export class ListFacilitiesService implements ListFacilitiesUseCase {
+    /**
+     * Repositorio utilizado para listar las entidades Facility.
+     * Proporciona acceso a las operaciones de persistencia relacionadas con Facility.
+     */
     private readonly facilityRepository: FacilityRepository;
 
     /**

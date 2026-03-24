@@ -7,9 +7,21 @@ import type { CreateInfrastructurePlanCommand } from '@/application/usecase/infr
  * InfrastructurePlan. Uses primitive types and simple objects so it can be
  * serialized directly in the HTTP request.
  */
+
 export class InfrastructurePlanPostJsonRequest {
+  /**
+   * Periodo de planificación en formato string (ejemplo: '2026' o '2026-Q1').
+   */
   period: string;
+
+  /**
+   * Presupuesto máximo, incluyendo cantidad y moneda.
+   */
   maxBudget: { amount: number; currency?: string };
+
+  /**
+   * Políticas de servicio opcionales para el plan de infraestructura.
+   */
   servicePolicies?: { maxServiceDistance?: number | null; maxServiceTime?: number | null; maxInfrastructureCount?: number | null; maxEmissions?: number | null } | null;
 
   constructor(period: string, maxBudget: { amount: number; currency?: string }, servicePolicies?: { maxServiceDistance?: number | null; maxServiceTime?: number | null; maxInfrastructureCount?: number | null; maxEmissions?: number | null } | null) {
@@ -18,7 +30,11 @@ export class InfrastructurePlanPostJsonRequest {
     this.servicePolicies = servicePolicies ?? null;
   }
 
-  /** Map a `CreateInfrastructurePlanCommand` into a plain JSON request body. */
+  /**
+   * Mapea un `CreateInfrastructurePlanCommand` a un cuerpo de solicitud JSON plano.
+   * @param data Comando con los datos para crear el plan de infraestructura.
+   * @returns Una instancia de InfrastructurePlanPostJsonRequest lista para ser serializada.
+   */
   public static toRequest(data: CreateInfrastructurePlanCommand): InfrastructurePlanPostJsonRequest {
     const period = data.period.getValue();
     const maxBudget = { amount: data.maxBudget.getAmount(), currency: data.maxBudget.getCurrency().getCode() };

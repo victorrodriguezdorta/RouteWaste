@@ -1,4 +1,4 @@
-import type { UpdateContainerCommand } from '../../../../application/usecase/container-management/update-container/update-container-command';
+import type { UpdateContainerCommand } from '@/application/usecase/container-management/update-container/update-container-command';
 
 /**
  * ContainerPutJsonRequest DTO
@@ -8,9 +8,16 @@ import type { UpdateContainerCommand } from '../../../../application/usecase/con
  * straightforward serialization.
  */
 export class ContainerPutJsonRequest {
+  /** Geographic location of the container including coordinates and address information */
   location?: { latitude: number; longitude: number; postalAddress: string; gisReference: string };
+
+  /** Type of waste that the container holds */
   wasteType?: string;
+
+  /** Demand specification for waste management including value, quantity unit, and time unit */
   wasteDemand?: { value: number; quantityUnit: string; timeUnit: string };
+
+  /** Service zone identifier for the container or null if not assigned */
   serviceZone?: string | null;
 
   constructor(
@@ -27,6 +34,9 @@ export class ContainerPutJsonRequest {
 
   /**
    * Map an `UpdateContainerCommand` (domain partial update) into this DTO.
+   *
+   * @param data The UpdateContainerCommand containing the fields to update
+   * @returns A new ContainerPutJsonRequest instance with the mapped data
    */
   public static toRequest(data: UpdateContainerCommand): ContainerPutJsonRequest {
     const f = data.updatedFields;

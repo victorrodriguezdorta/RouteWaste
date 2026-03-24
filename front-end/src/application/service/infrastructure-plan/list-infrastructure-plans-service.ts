@@ -9,6 +9,9 @@ import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
  * directly to the repository; repository must return an `Either<DataError, InfrastructurePlan[]>`.
  */
 export class ListInfrastructurePlansService implements ListInfrastructurePlansUseCase {
+    /**
+     * Repositorio utilizado para listar los planes de infraestructura.
+     */
     private readonly infrastructurePlanRepository: InfrastructurePlanRepository;
 
     /**
@@ -25,6 +28,11 @@ export class ListInfrastructurePlansService implements ListInfrastructurePlansUs
      * @return Either a `DataError` or an array of `InfrastructurePlan` entities.
      */
     async execute(command?: ListInfrastructurePlansCommand): Promise<Either<DataError, ListInfrastructurePlansResult>> {
+        /**
+         * Ejecuta el caso de uso para listar los planes de infraestructura.
+         * @param command Parámetros opcionales de paginación.
+         * @returns Un objeto Either que contiene un DataError o un array de entidades InfrastructurePlan.
+         */
         const page = command?.page;
         const pageSize = command?.pageSize;
         return this.infrastructurePlanRepository.list({ page, pageSize });

@@ -1,13 +1,13 @@
+import { ServiceAssignmentHttpRepository } from '@/adapter/http/service-assignment-http-repository';
+import {
+  AssignContainerToFacilityService,
+  ListServiceAssignmentsService,
+  RemoveServiceAssignmentService,
+  UpdateServiceAssignmentService,
+} from '@/application/service/service-assignment';
+import type { ServiceAssignment } from '@/domain/entity/service-assignment';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
-import {
-    AssignContainerToFacilityService,
-    ListServiceAssignmentsService,
-    RemoveServiceAssignmentService,
-    UpdateServiceAssignmentService
-} from '../../../application/service/service-assignment';
-import type { ServiceAssignment } from '../../../domain/entity/service-assignment';
-import { ServiceAssignmentHttpRepository } from '../../http/service-assignment-http-repository';
 
 /**
  * Service Assignment Store

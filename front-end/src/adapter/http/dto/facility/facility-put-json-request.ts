@@ -1,4 +1,4 @@
-import type { UpdateFacilityCommand } from '../../../../application/usecase/facility-management/update-facility/update-facility-command';
+import type { UpdateFacilityCommand } from '@/application/usecase/facility-management/update-facility/update-facility-command';
 
 /**
  * FacilityPutJsonRequest DTO
@@ -8,10 +8,30 @@ import type { UpdateFacilityCommand } from '../../../../application/usecase/faci
  * straightforward serialization.
  */
 export class FacilityPutJsonRequest {
+
+  /**
+   * Tipo de instalación (opcional).
+   */
   facilityType?: string;
+
+  /**
+   * Ubicación de la instalación (opcional).
+   */
   location?: { latitude: number; longitude: number; postalAddress: string; gisReference: string };
+
+  /**
+   * Capacidad de la instalación (opcional).
+   */
   capacity?: { value: number; quantityUnit: string; timeUnit: string };
+
+  /**
+   * Coste fijo de apertura (opcional).
+   */
   openingFixedCost?: { amount: number; currency?: string };
+
+  /**
+   * Estado de la instalación (opcional).
+   */
   status?: string;
 
   constructor(
@@ -29,7 +49,9 @@ export class FacilityPutJsonRequest {
   }
 
   /**
-   * Map an `UpdateFacilityCommand` (domain partial update) into this DTO.
+   * Mapea un `UpdateFacilityCommand` (actualización parcial de dominio) a este DTO.
+   * @param data Comando de actualización de instalación.
+   * @returns Instancia de FacilityPutJsonRequest con los campos actualizados.
    */
   public static toRequest(data: UpdateFacilityCommand): FacilityPutJsonRequest {
     const f = data.updatedFields;

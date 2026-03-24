@@ -4,7 +4,10 @@
  * ISO 4217 currency code (e.g. EUR, USD).
  */
 export class Currency {
+  /** Regular expression pattern for validating ISO 4217 currency codes (3 uppercase letters) */
   private static readonly CODE_REGEX = /^[A-Z]{3}$/;
+
+  /** ISO 4217 currency code (e.g. EUR, USD, GBP) */
   readonly code: string;
 
   /**
@@ -31,6 +34,7 @@ export class Currency {
 
   /**
    * Return the ISO currency code.
+   * @returns The ISO 4217 currency code as a string
    */
   getCode(): string {
     return this.code;
@@ -39,6 +43,7 @@ export class Currency {
   /**
    * Return a new Currency with the provided code.
    * @param newCode ISO 4217 code
+   * @returns A new Currency instance with the provided code
    */
   setCode(newCode: string): Currency {
     return new Currency(newCode);
@@ -57,6 +62,7 @@ export class Currency {
 
   /**
    * Human-readable representation.
+   * @returns A formatted string representation of the Currency object
    */
   toString(): string {
     return `Currency={code='${this.code}'}`;

@@ -1,6 +1,6 @@
+import type { FacilityRepository } from '@/application/repository/facility-repository';
+import type { FilterFacilitiesCommand, FilterFacilitiesResult, FilterFacilitiesUseCase } from '@/application/usecase/facility-management/filter-facilities/filter-facilities-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { FacilityRepository } from '../../repository/facility-repository';
-import type { FilterFacilitiesCommand, FilterFacilitiesResult, FilterFacilitiesUseCase } from '../../usecase/facility-management/filter-facilities/filter-facilities-use-case';
 
 /**
  * @brief Service implementing the FilterFacilities use case.
@@ -9,6 +9,7 @@ import type { FilterFacilitiesCommand, FilterFacilitiesResult, FilterFacilitiesU
  * accept the filter criteria and return matching facilities wrapped in `Either`.
  */
 export class FilterFacilitiesService implements FilterFacilitiesUseCase {
+    /** Repository used to filter facilities. */
     private readonly facilityRepository: FacilityRepository;
 
     /**
@@ -22,7 +23,7 @@ export class FilterFacilitiesService implements FilterFacilitiesUseCase {
     /**
      * @brief Execute the filter facilities use case.
      * @param command Filter criteria for facilities.
-     * @return Either a `DataError` or an array of matching `Facility` entities.
+     * @returns Either a `DataError` or an array of matching `Facility` entities.
      */
     async execute(command: FilterFacilitiesCommand): Promise<Either<DataError, FilterFacilitiesResult>> {
         return this.facilityRepository.filter(command);

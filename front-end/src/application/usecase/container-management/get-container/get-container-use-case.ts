@@ -1,7 +1,7 @@
 // GetContainerUseCase.ts
 // Use case contract for getting a single container by id
 
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { GetContainerCommand } from './get-container-command';
 import type { GetContainerResult } from './get-container-result';
 
@@ -26,3 +26,4 @@ export interface GetContainerUseCase {
 // Re-export types for convenience
 export type { GetContainerCommand } from './get-container-command';
 export type { GetContainerResult } from './get-container-result';
+

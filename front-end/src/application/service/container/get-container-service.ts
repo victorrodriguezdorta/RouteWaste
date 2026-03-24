@@ -1,7 +1,7 @@
 
+import type { ContainerRepository } from '@/application/repository/container-repository';
+import type { GetContainerCommand, GetContainerResult, GetContainerUseCase } from '@/application/usecase/container-management/get-container/get-container-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { ContainerRepository } from '../../repository/container-repository';
-import type { GetContainerCommand, GetContainerResult, GetContainerUseCase } from '../../usecase/container-management/get-container/get-container-use-case';
 
 /**
  * @brief Service implementing the GetContainer use case.
@@ -10,6 +10,9 @@ import type { GetContainerCommand, GetContainerResult, GetContainerUseCase } fro
  * `getById` method returning an `Either<DataError, Container>`.
  */
 export class GetContainerService implements GetContainerUseCase {
+    /**
+     * Repositorio utilizado para consultar contenedores por id.
+     */
     private readonly containerRepository: ContainerRepository;
 
     /**
@@ -23,7 +26,7 @@ export class GetContainerService implements GetContainerUseCase {
     /**
      * @brief Execute the get container use case.
      * @param command Data containing the id of the container to retrieve.
-     * @return Either a `DataError` or the `Container` entity.
+     * @returns Either a `DataError` or the `Container` entity.
      */
     async execute(command: GetContainerCommand): Promise<Either<DataError, GetContainerResult>> {
         return this.containerRepository.getById(command);

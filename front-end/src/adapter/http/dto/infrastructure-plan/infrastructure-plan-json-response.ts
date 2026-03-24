@@ -1,12 +1,13 @@
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Facility } from '../../../../domain/entity/facility';
-import { InfrastructurePlan } from '../../../../domain/entity/infrastructure-plan';
-import { ServiceAssignment } from '../../../../domain/entity/service-assignment';
-import { MaximumBudget } from '../../../../domain/valueobject/cost/maximum-budget';
-import { ServicePolicies } from '../../../../domain/valueobject/policy/service-policies';
-import { PlanningPeriod } from '../../../../domain/valueobject/time/planning-period';
-import { FacilityJsonResponse } from '../facility/facility-json-response';
-import { ServiceAssignmentJsonResponse } from '../service-assignment/service-assignment-json-response';
+
+import { FacilityJsonResponse } from '@/adapter/http/dto/facility/facility-json-response';
+import { ServiceAssignmentJsonResponse } from '@/adapter/http/dto/service-assignment/service-assignment-json-response';
+import { Facility } from '@/domain/entity/facility';
+import { InfrastructurePlan } from '@/domain/entity/infrastructure-plan';
+import { ServiceAssignment } from '@/domain/entity/service-assignment';
+import { MaximumBudget } from '@/domain/valueobject/cost/maximum-budget';
+import { ServicePolicies } from '@/domain/valueobject/policy/service-policies';
+import { PlanningPeriod } from '@/domain/valueobject/time/planning-period';
 
 /**
  * InfrastructurePlanJsonResponse DTO
@@ -17,12 +18,25 @@ import { ServiceAssignmentJsonResponse } from '../service-assignment/service-ass
  * payload into the domain `InfrastructurePlan` entity.
  */
 export class InfrastructurePlanJsonResponse {
+  /** Unique identifier for the infrastructure plan */
   id: string;
+
+  /** Planning period for the infrastructure plan */
   period: string;
+
+  /** List of selected facilities in the plan */
   selectedFacilities?: FacilityJsonResponse[];
+
+  /** Service assignments associated with the plan */
   serviceAssignments?: ServiceAssignmentJsonResponse[];
+
+  /** Service policies defining operational constraints */
   servicePolicies?: { maxServiceDistance?: number | null; maxServiceTime?: number | null; maxInfrastructureCount?: number | null; maxEmissions?: number | null } | null;
+
+  /** Maximum budget allocated for the plan */
   maxBudget: { amount: number; currency?: string };
+
+  /** Estimated total cost of the plan */
   estimatedTotalCost?: { amount: number; currency?: string };
 
   constructor(
@@ -47,6 +61,9 @@ export class InfrastructurePlanJsonResponse {
    * Convert the JSON response into a domain `InfrastructurePlan` entity.
    * Nested facilities and service assignments (if present) are converted using their
    * respective DTO helpers and added to the plan.
+   *
+   * @param data - The infrastructure plan data from the JSON response
+   * @returns The converted domain InfrastructurePlan entity
    */
   public static toInfrastructurePlan(data: InfrastructurePlanJsonResponse): InfrastructurePlan {
     const id = new UllUUID(data.id);

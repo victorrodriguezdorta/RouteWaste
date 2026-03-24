@@ -1,16 +1,16 @@
+import type { InfrastructurePlanRepository } from '@/application/repository/infrastructure-plan-repository';
+import type { CreateInfrastructurePlanCommand, CreateInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/create-infrastructure-plan/create-infrastructure-plan-use-case';
+import type { DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/delete-infrastructure-plan/delete-infrastructure-plan-use-case';
+import type { GetInfrastructurePlanCommand, GetInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-use-case';
+import type { ListInfrastructurePlansCommand, ListInfrastructurePlansResult } from '@/application/usecase/infrastructure-plan-management/list-infrastructure-plans/list-infrastructure-plans-use-case';
+import type { UpdateInfrastructurePlanCommand, UpdateInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/update-infrastructure-plan/update-infrastructure-plan-use-case';
+import type { ValidateInfrastructurePlanCommand, ValidateInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/validate-infrastructure-plan/validate-infrastructure-plan-use-case';
 import {
   Either,
   http,
   type ApiError,
   type DataError,
 } from '@ull-tfg/ull-tfg-typescript';
-import type { InfrastructurePlanRepository } from '../../application/repository/infrastructure-plan-repository';
-import type { CreateInfrastructurePlanCommand, CreateInfrastructurePlanResult } from '../../application/usecase/infrastructure-plan-management/create-infrastructure-plan/create-infrastructure-plan-use-case';
-import type { DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '../../application/usecase/infrastructure-plan-management/delete-infrastructure-plan/delete-infrastructure-plan-use-case';
-import type { GetInfrastructurePlanCommand, GetInfrastructurePlanResult } from '../../application/usecase/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-use-case';
-import type { ListInfrastructurePlansCommand, ListInfrastructurePlansResult } from '../../application/usecase/infrastructure-plan-management/list-infrastructure-plans/list-infrastructure-plans-use-case';
-import type { UpdateInfrastructurePlanCommand, UpdateInfrastructurePlanResult } from '../../application/usecase/infrastructure-plan-management/update-infrastructure-plan/update-infrastructure-plan-use-case';
-import type { ValidateInfrastructurePlanCommand, ValidateInfrastructurePlanResult } from '../../application/usecase/infrastructure-plan-management/validate-infrastructure-plan/validate-infrastructure-plan-use-case';
 // Import DTOs
 import { InfrastructurePlanJsonResponse } from './dto/infrastructure-plan/infrastructure-plan-json-response';
 import { InfrastructurePlanPostJsonRequest } from './dto/infrastructure-plan/infrastructure-plan-post-json-request';
@@ -24,7 +24,16 @@ import { InfrastructurePlanPutJsonRequest } from './dto/infrastructure-plan/infr
  * RESTful API calls.
  */
 export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepository {
+  /**
+   * URL base de la API para las operaciones de InfrastructurePlan.
+   * Se construye usando la variable de entorno VITE_APP_API_URL.
+   */
   private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'infrastructure-plans';
+
+  /**
+   * Cabeceras HTTP utilizadas en las peticiones a la API.
+   * Incluye el tipo de contenido y puede incluir autenticación.
+   */
   private headers: Headers = new Headers();
 
   /**

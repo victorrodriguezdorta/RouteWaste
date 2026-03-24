@@ -39,9 +39,10 @@ export class VehiclePutJsonRequest {
   }
 
   /**
-   * Map a `UpdateVehicleCommand` (domain partial update) into this DTO.
-   * Extracts primitive values from any provided value objects.
-   * @param data domain update command
+   * Mapea un `UpdateVehicleCommand` (actualización parcial de dominio) a este DTO.
+   * Extrae valores primitivos de cualquier value object proporcionado.
+   * @param data Comando de actualización de dominio.
+   * @returns Una instancia de VehiclePutJsonRequest con los datos mapeados.
    */
   public static toRequest(data: UpdateVehicleCommand): VehiclePutJsonRequest {
     const f = data.updatedFields;

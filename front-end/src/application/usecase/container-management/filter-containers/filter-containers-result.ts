@@ -1,4 +1,4 @@
-import { Container } from '../../../../domain/entity/container';
+import { Container } from '@/domain/entity/container';
 
 /**
  * Result type for filtering containers

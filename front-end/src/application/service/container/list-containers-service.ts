@@ -1,7 +1,7 @@
 
+import type { ContainerRepository } from '@/application/repository/container-repository';
+import type { ListContainersCommand, ListContainersResult, ListContainersUseCase } from '@/application/usecase/container-management/list-containers/list-containers-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { ContainerRepository } from '../../repository/container-repository';
-import type { ListContainersCommand, ListContainersResult, ListContainersUseCase } from '../../usecase/container-management/list-containers/list-containers-use-case';
 
 /**
  * @brief Service implementing the ListContainers use case.
@@ -10,6 +10,11 @@ import type { ListContainersCommand, ListContainersResult, ListContainersUseCase
  * directly to the repository; repository must return an `Either<DataError, Container[]>`.
  */
 export class ListContainersService implements ListContainersUseCase {
+    /**
+     * Repositorio utilizado para listar contenedores.
+     * @remarks
+     * Este atributo almacena la instancia del repositorio que implementa la lógica de acceso a datos para contenedores.
+     */
     private readonly containerRepository: ContainerRepository;
 
     /**

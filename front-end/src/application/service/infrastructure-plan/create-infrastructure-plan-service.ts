@@ -1,6 +1,6 @@
+import type { InfrastructurePlanRepository } from '@/application/repository/infrastructure-plan-repository';
+import type { CreateInfrastructurePlanCommand, CreateInfrastructurePlanResult, CreateInfrastructurePlanUseCase } from '@/application/usecase/infrastructure-plan-management/create-infrastructure-plan/create-infrastructure-plan-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { InfrastructurePlanRepository } from '../../repository/infrastructure-plan-repository';
-import type { CreateInfrastructurePlanCommand, CreateInfrastructurePlanResult, CreateInfrastructurePlanUseCase } from '../../usecase/infrastructure-plan-management/create-infrastructure-plan/create-infrastructure-plan-use-case';
 
 /**
  * @brief Service implementing the CreateInfrastructurePlan use case.
@@ -10,6 +10,9 @@ import type { CreateInfrastructurePlanCommand, CreateInfrastructurePlanResult, C
  * assumed to be available and provided later by the infrastructure layer.
  */
 export class CreateInfrastructurePlanService implements CreateInfrastructurePlanUseCase {
+    /**
+     * Repositorio para la persistencia y gestión de planes de infraestructura.
+     */
     private readonly infrastructurePlanRepository: InfrastructurePlanRepository;
 
     /**
@@ -21,9 +24,9 @@ export class CreateInfrastructurePlanService implements CreateInfrastructurePlan
     }
 
     /**
-     * @brief Execute the create infrastructure plan use case.
-     * @param command Input data required to create an infrastructure plan.
-     * @return Either a `DataError` or the created `InfrastructurePlan` entity.
+     * @brief Ejecuta el caso de uso para crear un plan de infraestructura.
+     * @param command Datos de entrada requeridos para crear el plan.
+     * @returns Either un `DataError` o la entidad `InfrastructurePlan` creada.
      */
     async execute(command: CreateInfrastructurePlanCommand): Promise<Either<DataError, CreateInfrastructurePlanResult>> {
         return this.infrastructurePlanRepository.create(command);

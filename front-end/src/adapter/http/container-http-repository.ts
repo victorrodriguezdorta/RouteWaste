@@ -1,20 +1,21 @@
-import {
-    Either,
-    http,
-    type ApiError,
-    type DataError,
+import { ContainerJsonResponse } from '@/adapter/http/dto/container/container-json-response';
+import { ContainerPostJsonRequest } from '@/adapter/http/dto/container/container-post-json-request';
+import { ContainerPutJsonRequest } from '@/adapter/http/dto/container/container-put-json-request';
+import type { ContainerRepository } from '@/application/repository/container-repository';
+import type { CreateContainerCommand, CreateContainerResult } from '@/application/usecase/container-management/create-container/create-container-use-case';
+import type { DeleteContainerCommand, DeleteContainerResult } from '@/application/usecase/container-management/delete-container/delete-container-use-case';
+import type { FilterContainersCommand, FilterContainersResult } from '@/application/usecase/container-management/filter-containers/filter-containers-use-case';
+import type { GetContainerCommand, GetContainerResult } from '@/application/usecase/container-management/get-container/get-container-use-case';
+import type { ListContainersCommand, ListContainersResult } from '@/application/usecase/container-management/list-containers/list-containers-use-case';
+import type { UpdateContainerCommand, UpdateContainerResult } from '@/application/usecase/container-management/update-container/update-container-use-case';
+import type {
+  ApiError,
+  DataError,
 } from '@ull-tfg/ull-tfg-typescript';
-import type { ContainerRepository } from '../../application/repository/container-repository';
-import type { CreateContainerCommand, CreateContainerResult } from '../../application/usecase/container-management/create-container/create-container-use-case';
-import type { DeleteContainerCommand, DeleteContainerResult } from '../../application/usecase/container-management/delete-container/delete-container-use-case';
-import type { FilterContainersCommand, FilterContainersResult } from '../../application/usecase/container-management/filter-containers/filter-containers-use-case';
-import type { GetContainerCommand, GetContainerResult } from '../../application/usecase/container-management/get-container/get-container-use-case';
-import type { ListContainersCommand, ListContainersResult } from '../../application/usecase/container-management/list-containers/list-containers-use-case';
-import type { UpdateContainerCommand, UpdateContainerResult } from '../../application/usecase/container-management/update-container/update-container-use-case';
-// Import DTOs
-import { ContainerJsonResponse } from './dto/container/container-json-response';
-import { ContainerPostJsonRequest } from './dto/container/container-post-json-request';
-import { ContainerPutJsonRequest } from './dto/container/container-put-json-request';
+import {
+  Either,
+  http,
+} from '@ull-tfg/ull-tfg-typescript';
 
 /**
  * HTTP repository implementation for Container entity.
@@ -24,7 +25,14 @@ import { ContainerPutJsonRequest } from './dto/container/container-put-json-requ
  * RESTful API calls.
  */
 export class ContainerHttpRepository implements ContainerRepository {
+  /**
+   * Base URL for the API endpoint for container operations.
+   */
   private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'containers/';
+
+  /**
+   * HTTP headers for API requests including content type and authentication.
+   */
   private headers: Headers = new Headers();
 
   /**
@@ -43,7 +51,7 @@ export class ContainerHttpRepository implements ContainerRepository {
    * Retrieve a list of containers with optional pagination.
    * 
    * @param command Optional pagination parameters (page, pageSize).
-   * @return Either a DataError or a list of Container entities.
+   * @returns Either a DataError or a list of Container entities.
    */
   public async list(
     command?: ListContainersCommand
@@ -86,7 +94,7 @@ export class ContainerHttpRepository implements ContainerRepository {
    * Retrieve a specific container by its identifier.
    * 
    * @param command Data containing the id of the container to retrieve.
-   * @return Either a DataError or the Container entity.
+   * @returns Either a DataError or the Container entity.
    */
   public async getById(
     command: GetContainerCommand
@@ -117,7 +125,7 @@ export class ContainerHttpRepository implements ContainerRepository {
    * Create a new container in the system.
    * 
    * @param command Data required to create the container.
-   * @return Either a DataError or the created Container entity.
+   * @returns Either a DataError or the created Container entity.
    */
   public async create(
     command: CreateContainerCommand
@@ -148,7 +156,7 @@ export class ContainerHttpRepository implements ContainerRepository {
    * Update an existing container.
    * 
    * @param command Data required to update the container (including id).
-   * @return Either a DataError or the updated Container entity.
+   * @returns Either a DataError or the updated Container entity.
    */
   public async update(
     command: UpdateContainerCommand
@@ -181,7 +189,7 @@ export class ContainerHttpRepository implements ContainerRepository {
    * Delete a container by its identifier.
    * 
    * @param command Data containing the id of the container to delete.
-   * @return Either a DataError or true on successful deletion.
+   * @returns Either a DataError or true on successful deletion.
    */
   public async delete(
     command: DeleteContainerCommand
@@ -211,7 +219,7 @@ export class ContainerHttpRepository implements ContainerRepository {
    * Filter containers by criteria.
    * 
    * @param command Filter criteria for containers (wasteType, serviceZone, etc).
-   * @return Either a DataError or a list of matching Container entities.
+   * @returns Either a DataError or a list of matching Container entities.
    */
   public async filter(
     command: FilterContainersCommand

@@ -1,8 +1,8 @@
+import { Container } from '@/domain/entity/container';
+import { ServiceZone } from '@/domain/enumerate/service-zone';
+import { TimeUnit } from '@/domain/enumerate/time-unit';
+import { WasteType } from '@/domain/enumerate/waste-type';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { Container } from '../../../../domain/entity/container';
-import { ServiceZone } from '../../../../domain/enumerate/service-zone';
-import { TimeUnit } from '../../../../domain/enumerate/time-unit';
-import { WasteType } from '../../../../domain/enumerate/waste-type';
 
 /**
  * ContainerInfo

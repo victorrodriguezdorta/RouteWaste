@@ -9,6 +9,9 @@ import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
  * details to a provided `VehicleRepository`.
  */
 export class CreateVehicleService implements CreateVehicleUseCase {
+    /**
+     * Repositorio utilizado para persistir o reenviar las solicitudes de creación de vehículos.
+     */
     private readonly vehicleRepository: VehicleRepository;
 
     /**
@@ -20,9 +23,9 @@ export class CreateVehicleService implements CreateVehicleUseCase {
     }
 
     /**
-     * @brief Execute the create vehicle use case.
-     * @param command Input data required to create a vehicle.
-     * @return Either a `DataError` or the created `Vehicle` entity.
+     * Ejecuta el caso de uso para crear un vehículo.
+     * @param command Datos de entrada requeridos para crear un vehículo.
+     * @returns Una promesa que resuelve en un Either con un DataError o el resultado de la creación del vehículo.
      */
     async execute(command: CreateVehicleCommand): Promise<Either<DataError, CreateVehicleResult>> {
         return this.vehicleRepository.create(command);

@@ -4,7 +4,14 @@
  * Represents a unit of measurement for quantities (only letters allowed).
  */
 export class QuantityUnit {
+  /**
+   * Expresión regular para validar que la unidad solo contiene letras.
+   */
   private static readonly UNIT_REGEX = /^[a-zA-Z]+$/;
+
+  /**
+   * Valor de la unidad de cantidad (solo letras).
+   */
   readonly value: string;
 
   /**
@@ -27,24 +34,41 @@ export class QuantityUnit {
     if (!QuantityUnit.UNIT_REGEX.test(value)) throw new Error('Quantity unit format is invalid');
   }
 
-  /** Get raw unit string. */
+
+  /**
+   * Devuelve el valor de la unidad como string.
+   * @returns El valor de la unidad de cantidad.
+   */
   getValue(): string {
     return this.value;
   }
 
-  /** Return a new QuantityUnit with given value. */
+
+  /**
+   * Devuelve una nueva instancia de QuantityUnit con el valor proporcionado.
+   * @param newValue Nuevo valor para la unidad de cantidad.
+   * @returns Nueva instancia de QuantityUnit.
+   */
   setValue(newValue: string): QuantityUnit {
     return new QuantityUnit(newValue);
   }
 
-  /** Equality check by unit string. */
+
+  /**
+   * Comprueba la igualdad con otra instancia de QuantityUnit.
+   * @param other Objeto a comparar.
+   * @returns true si ambos objetos son QuantityUnit y tienen el mismo valor, false en caso contrario.
+   */
   equals(other: unknown): boolean {
     if (this === other) return true;
     if (!(other instanceof QuantityUnit)) return false;
     return this.value === other.value;
   }
 
-  /** Human-readable representation. */
+  /**
+   * Devuelve una representación legible de la unidad de cantidad.
+   * @returns Cadena representando la instancia QuantityUnit.
+   */
   toString(): string {
     return `QuantityUnit={value='${this.value}'}`;
   }

@@ -9,6 +9,9 @@ import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
  * indicating success or an error wrapped in `Either`.
  */
 export class DeleteVehicleService implements DeleteVehicleUseCase {
+    /**
+     * Repositorio utilizado para realizar operaciones de borrado de vehículos.
+     */
     private readonly vehicleRepository: VehicleRepository;
 
     /**
@@ -20,9 +23,9 @@ export class DeleteVehicleService implements DeleteVehicleUseCase {
     }
 
     /**
-     * @brief Execute the delete vehicle use case.
-     * @param command Data containing the id of the vehicle to delete.
-     * @return Either a `DataError` or a boolean indicating success.
+     * Ejecuta el caso de uso para eliminar un vehículo.
+     * @param command Datos que contienen el id del vehículo a eliminar.
+     * @returns Un Either con un DataError o un booleano indicando el éxito.
      */
     async execute(command: DeleteVehicleCommand): Promise<Either<DataError, DeleteVehicleResult>> {
         return this.vehicleRepository.delete(command);

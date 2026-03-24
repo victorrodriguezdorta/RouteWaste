@@ -1,5 +1,5 @@
-import { FacilityType } from '../../../../domain/enumerate/facility-type';
-import { FacilityStatus } from '../../../../domain/enumerate/facility-status';
+import { FacilityStatus } from '@/domain/enumerate/facility-status';
+import { FacilityType } from '@/domain/enumerate/facility-type';
 
 // Command object for input data
 export interface FilterFacilitiesCommand {

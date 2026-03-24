@@ -1,4 +1,4 @@
-import { Container } from '../../../../domain/entity/container';
+import { Container } from '@/domain/entity/container';
 
 /**
  * result type for creating a container

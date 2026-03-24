@@ -1,14 +1,14 @@
-import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { defineStore } from 'pinia';
+import { VehicleHttpRepository } from '@/adapter/http/vehicle-http-repository';
 import {
   CreateVehicleService,
   DeleteVehicleService,
   GetVehicleService,
   ListVehiclesService,
   UpdateVehicleService
-} from '../../../application/service/vehicle';
-import type { Vehicle } from '../../../domain/entity/vehicle';
-import { VehicleHttpRepository } from '../../http/vehicle-http-repository';
+} from '@/application/service/vehicle';
+import type { Vehicle } from '@/domain/entity/vehicle';
+import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
+import { defineStore } from 'pinia';
 
 /**
  * Vehicle Store

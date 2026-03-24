@@ -1,4 +1,4 @@
-import type { CreateFacilityCommand } from '../../../../application/usecase/facility-management/create-facility/create-facility-command';
+import type { CreateFacilityCommand } from '@/application/usecase/facility-management/create-facility/create-facility-command';
 
 /**
  * FacilityPostJsonRequest DTO
@@ -7,10 +7,29 @@ import type { CreateFacilityCommand } from '../../../../application/usecase/faci
  * Uses primitive types for all fields so it can be serialized directly.
  */
 export class FacilityPostJsonRequest {
+  /**
+   * Tipo de la instalación (facility).
+   */
   facilityType: string;
+
+  /**
+   * Ubicación de la instalación, incluyendo latitud, longitud, dirección postal y referencia GIS.
+   */
   location: { latitude: number; longitude: number; postalAddress: string; gisReference: string };
+
+  /**
+   * Capacidad de la instalación, incluyendo valor, unidad de cantidad y unidad de tiempo.
+   */
   capacity: { value: number; quantityUnit: string; timeUnit: string };
+
+  /**
+   * Coste fijo de apertura, incluyendo cantidad y moneda.
+   */
   openingFixedCost: { amount: number; currency?: string };
+
+  /**
+   * Estado de la instalación.
+   */
   status: string;
 
   constructor(
@@ -28,7 +47,9 @@ export class FacilityPostJsonRequest {
   }
 
   /**
-   * Map a `CreateFacilityCommand` (domain input) into this DTO.
+   * Mapea un `CreateFacilityCommand` (entrada de dominio) a este DTO.
+   * @param data Comando de creación de instalación a mapear.
+   * @returns Una instancia de FacilityPostJsonRequest con los datos mapeados.
    */
   public static toRequest(data: CreateFacilityCommand): FacilityPostJsonRequest {
     return new FacilityPostJsonRequest(

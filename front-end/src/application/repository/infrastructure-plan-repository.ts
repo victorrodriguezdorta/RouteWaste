@@ -1,10 +1,10 @@
+import type { CreateInfrastructurePlanCommand, CreateInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/create-infrastructure-plan/create-infrastructure-plan-use-case';
+import type { DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/delete-infrastructure-plan/delete-infrastructure-plan-use-case';
+import type { GetInfrastructurePlanCommand, GetInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-use-case';
+import type { ListInfrastructurePlansCommand, ListInfrastructurePlansResult } from '@/application/usecase/infrastructure-plan-management/list-infrastructure-plans/list-infrastructure-plans-use-case';
+import type { UpdateInfrastructurePlanCommand, UpdateInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/update-infrastructure-plan/update-infrastructure-plan-use-case';
+import type { ValidateInfrastructurePlanCommand, ValidateInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/validate-infrastructure-plan/validate-infrastructure-plan-use-case';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { CreateInfrastructurePlanCommand, CreateInfrastructurePlanResult } from '../usecase/infrastructure-plan-management/create-infrastructure-plan/create-infrastructure-plan-use-case';
-import type { DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '../usecase/infrastructure-plan-management/delete-infrastructure-plan/delete-infrastructure-plan-use-case';
-import type { GetInfrastructurePlanCommand, GetInfrastructurePlanResult } from '../usecase/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-use-case';
-import type { ListInfrastructurePlansCommand, ListInfrastructurePlansResult } from '../usecase/infrastructure-plan-management/list-infrastructure-plans/list-infrastructure-plans-use-case';
-import type { UpdateInfrastructurePlanCommand, UpdateInfrastructurePlanResult } from '../usecase/infrastructure-plan-management/update-infrastructure-plan/update-infrastructure-plan-use-case';
-import type { ValidateInfrastructurePlanCommand, ValidateInfrastructurePlanResult } from '../usecase/infrastructure-plan-management/validate-infrastructure-plan/validate-infrastructure-plan-use-case';
 
 /**
  * @brief Repository interface for InfrastructurePlan entity.

@@ -1,4 +1,4 @@
-import type { CreateVehicleCommand } from '../../../../application/usecase/vehicle-management/create-vehicle/create-vehicle-command';
+import type { CreateVehicleCommand } from '@/application/usecase/vehicle-management/create-vehicle/create-vehicle-command';
 
 /**
  * VehiclePostJsonRequest DTO
@@ -38,10 +38,11 @@ export class VehiclePostJsonRequest {
   }
 
   /**
-   * Map a `CreateVehicleCommand` (domain input) to this DTO.
-   * Extracts primitive values from domain value objects to produce a
-   * serializable payload for a POST request.
-   * @param data domain create command
+   * Mapea un `CreateVehicleCommand` (entrada de dominio) a este DTO.
+   * Extrae valores primitivos de los value objects de dominio para producir un
+   * payload serializable para una petición POST.
+   * @param data Comando de creación de vehículo del dominio.
+   * @returns Instancia de VehiclePostJsonRequest lista para enviar como payload.
    */
   public static toRequest(data: CreateVehicleCommand): VehiclePostJsonRequest {
     return new VehiclePostJsonRequest(

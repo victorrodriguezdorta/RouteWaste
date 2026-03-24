@@ -9,6 +9,9 @@ import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
  * `getById` method returning an `Either<DataError, Vehicle>`.
  */
 export class GetVehicleService implements GetVehicleUseCase {
+    /**
+     * Repositorio utilizado para consultar vehículos por su identificador.
+     */
     private readonly vehicleRepository: VehicleRepository;
 
     /**
@@ -20,9 +23,9 @@ export class GetVehicleService implements GetVehicleUseCase {
     }
 
     /**
-     * @brief Execute the get vehicle use case.
-     * @param command Data containing the id of the vehicle to retrieve.
-     * @return Either a `DataError` or the `Vehicle` entity.
+     * Ejecuta el caso de uso para obtener un vehículo.
+     * @param command Datos que contienen el id del vehículo a recuperar.
+     * @returns Una promesa que resuelve en un Either con un DataError o el resultado del vehículo recuperado.
      */
     async execute(command: GetVehicleCommand): Promise<Either<DataError, GetVehicleResult>> {
         return this.vehicleRepository.getById(command);

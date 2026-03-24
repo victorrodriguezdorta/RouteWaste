@@ -99,7 +99,10 @@ export class ServiceTime {
     return Math.abs(this.value - other.value) < Number.EPSILON;
   }
 
-  /** Human-readable representation. */
+  /**
+   * Human-readable representation.
+   * @returns Una cadena que representa el objeto ServiceTime.
+   */
   toString(): string {
     return `ServiceTime={value=${this.value}}`;
   }
