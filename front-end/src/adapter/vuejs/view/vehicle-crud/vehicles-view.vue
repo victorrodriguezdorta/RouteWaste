@@ -5,16 +5,6 @@
 -->
 <template>
   <v-container fluid>
-    <!-- Page title -->
-    <v-row justify="center">
-      <v-col cols="12" md="10" lg="10" class="text-center mb-4">
-        <div class="d-flex align-center justify-center">
-          <v-icon class="mr-2 text-h5">mdi-truck-multiple</v-icon>
-          <SectionTitle :title="t('vehicle.list.title')" />
-        </div>
-      </v-col>
-    </v-row>
-
     <!-- Notification snackbar for user feedback -->
     <v-snackbar
       v-model="vehicleNotification.flag"
@@ -27,124 +17,125 @@
       <p class="mb-0">{{ vehicleNotification.msg }}</p>
     </v-snackbar>
 
-    <!-- Main content area -->
-    <v-row justify="center">
-      <v-col cols="12" md="10" lg="10">
-        <!-- Add vehicle button and type filter -->
-        <v-row class="mb-4" align="center">
-          <v-col cols="12" sm="auto">
-            <ButtonTooltip
-              color="primary"
+    <CrudLayout
+      :title="t('vehicle.list.title')"
+      icon="mdi-truck-multiple"
+    >
+      <!-- Add vehicle button and type filter -->
+      <v-row class="mb-4" align="center">
+        <v-spacer />
+        <v-col cols="12" sm="4" md="3">
+          <v-select
+            v-model="selectedVehicleTypeFilter"
+            :items="vehicleTypeFilterOptions"
+            :label="t('vehicle.list.filterByType')"
+            item-title="title"
+            item-value="value"
+            clearable
+            density="compact"
+            hide-details
+            @update:model-value="onVehicleTypeFilterChange"
+          />
+        </v-col>
+      </v-row>
+
+      <!-- Vehicles data table -->
+      <v-data-table-server
+        :headers="headers"
+        :items="vehicleItems"
+        :loading="loading"
+        :items-length="totalVehicles"
+        v-model:page="tablePage"
+        :items-per-page="itemsPerPage"
+        :items-per-page-options="[
+          { value: 5, title: '5' },
+          { value: 10, title: '10' },
+          { value: 25, title: '25' },
+          { value: 50, title: '50' }
+        ]"
+        @update:options="onTableOptionsUpdate"
+        item-value="id"
+        hover
+        class="elevation-2"
+      >
+        <!-- Vehicle type column (with colored chip) -->
+        <template v-slot:item.type="{ item }">
+          <v-chip :color="getVehicleTypeColor(item.type)" size="small">
+            {{ item.type }}
+          </v-chip>
+        </template>
+
+        <!-- Capacity column -->
+        <template v-slot:item.capacity="{ item }">
+          {{ item.capacity }}
+        </template>
+
+        <!-- Cost column -->
+        <template v-slot:item.cost="{ item }">
+          {{ item.cost }}
+        </template>
+
+        <!-- Actions column (View, Edit, Delete buttons) -->
+        <template v-slot:item.actions="{ item }">
+          <ButtonTooltip
+            text=""
+            icon="mdi-eye"
+            :tooltip="t('vehicle.list.table.tooltips.view')"
+            color="info"
+            size="small"
+            variant="text"
+            @click="showItem(item.id)"
+          />
+          <ButtonTooltip
+            text=""
+            icon="mdi-pencil"
+            :tooltip="t('vehicle.list.table.tooltips.edit')"
+            color="success"
+            size="small"
+            variant="text"
+            @click="editItem(item.id)"
+          />
+          <ButtonTooltip
+            text=""
+            icon="mdi-delete"
+            :tooltip="t('vehicle.list.table.tooltips.delete')"
+            color="error"
+            size="small"
+            variant="text"
+            @click="deleteItem(item.id)"
+          />
+        </template>
+
+        <!-- Empty state when no vehicles exist -->
+        <template v-slot:no-data>
+          <v-alert type="info" variant="tonal" class="ma-4">
+            {{ t('vehicle.list.table.noData') }}
+            <ButtonTooltip 
+              color="primary" 
+              variant="text" 
               icon="mdi-plus"
-              size="large"
               @click="addVehicle"
-              :text="t('vehicle.list.addButton')"
-              :tooltip="t('vehicle.list.addButton')"
+              class="ml-2"
+              :text="t('vehicle.list.table.addFirst')"
+              :tooltip="t('vehicle.list.table.addFirst')"
             />
-          </v-col>
-          <v-spacer />
-          <v-col cols="12" sm="4" md="3">
-            <v-select
-              v-model="selectedVehicleTypeFilter"
-              :items="vehicleTypeFilterOptions"
-              :label="t('vehicle.list.filterByType')"
-              item-title="title"
-              item-value="value"
-              clearable
-              density="compact"
-              hide-details
-              @update:model-value="onVehicleTypeFilterChange"
-            />
-          </v-col>
-        </v-row>
+          </v-alert>
+        </template>
+      </v-data-table-server>
 
-        <!-- Vehicles data table -->
-        <v-card>
-          <v-data-table-server
-            :headers="headers"
-            :items="vehicleItems"
-            :loading="loading"
-            :items-length="totalVehicles"
-            v-model:page="tablePage"
-            :items-per-page="itemsPerPage"
-            :items-per-page-options="[
-              { value: 5, title: '5' },
-              { value: 10, title: '10' },
-              { value: 25, title: '25' },
-              { value: 50, title: '50' }
-            ]"
-            @update:options="onTableOptionsUpdate"
-            item-value="id"
-            hover
-            class="elevation-2"
-          >
-            <!-- Vehicle type column (with colored chip) -->
-            <template v-slot:item.type="{ item }">
-              <v-chip :color="getVehicleTypeColor(item.type)" size="small">
-                {{ item.type }}
-              </v-chip>
-            </template>
-
-            <!-- Capacity column -->
-            <template v-slot:item.capacity="{ item }">
-              {{ item.capacity }}
-            </template>
-
-            <!-- Cost column -->
-            <template v-slot:item.cost="{ item }">
-              {{ item.cost }}
-            </template>
-
-            <!-- Actions column (View, Edit, Delete buttons) -->
-            <template v-slot:item.actions="{ item }">
-              <ButtonTooltip
-                text=""
-                icon="mdi-eye"
-                :tooltip="t('vehicle.list.table.tooltips.view')"
-                color="info"
-                size="small"
-                variant="text"
-                @click="showItem(item.id)"
-              />
-              <ButtonTooltip
-                text=""
-                icon="mdi-pencil"
-                :tooltip="t('vehicle.list.table.tooltips.edit')"
-                color="success"
-                size="small"
-                variant="text"
-                @click="editItem(item.id)"
-              />
-              <ButtonTooltip
-                text=""
-                icon="mdi-delete"
-                :tooltip="t('vehicle.list.table.tooltips.delete')"
-                color="error"
-                size="small"
-                variant="text"
-                @click="deleteItem(item.id)"
-              />
-            </template>
-
-            <!-- Empty state when no vehicles exist -->
-            <template v-slot:no-data>
-              <v-alert type="info" variant="tonal" class="ma-4">
-                {{ t('vehicle.list.table.noData') }}
-                <ButtonTooltip 
-                  color="primary" 
-                  variant="text" 
-                  icon="mdi-plus"
-                  @click="addVehicle"
-                  class="ml-2"
-                  :text="t('vehicle.list.table.addFirst')"
-                  :tooltip="t('vehicle.list.table.addFirst')"
-                />
-              </v-alert>
-            </template>
-          </v-data-table-server>
-        </v-card>
-      </v-col>
-    </v-row>
+      <template #toolbar-append>
+        <ButtonTooltip
+          color="white"
+          icon="mdi-plus"
+          size="small"
+          variant="outlined"
+          @click="addVehicle"
+          :text="t('vehicle.list.addButton')"
+          :tooltip="t('vehicle.list.addButton')"
+          class="ml-2 mr-4"
+        />
+      </template>
+    </CrudLayout>
 
     <!-- Delete confirmation dialog -->
     <ErrorMessage
@@ -170,7 +161,8 @@
  * Uses Vuetify data table with pagination and action buttons.
  */
 
-import { ButtonTooltip, ErrorMessage, SectionTitle } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip, ErrorMessage } from '@ull-tfg/ull-tfg-vue';
+import CrudLayout from '../../components/common/CrudLayout.vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';

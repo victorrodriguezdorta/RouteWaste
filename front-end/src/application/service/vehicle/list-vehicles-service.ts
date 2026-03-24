@@ -9,6 +9,9 @@ import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
  * directly to the repository; repository must return an `Either<DataError, Vehicle[]>`.
  */
 export class ListVehiclesService implements ListVehiclesUseCase {
+    /**
+     * Repository used to list vehicles.
+     */
     private readonly vehicleRepository: VehicleRepository;
 
     /**
@@ -22,7 +25,7 @@ export class ListVehiclesService implements ListVehiclesUseCase {
     /**
      * @brief Execute the list vehicles use case.
      * @param command Optional pagination parameters.
-     * @return Either a `DataError` or an array of `Vehicle` entities.
+     * @returns Either a `DataError` or an array of `Vehicle` entities.
      */
     async execute(command?: ListVehiclesCommand): Promise<Either<DataError, ListVehiclesResult>> {
         const page = command?.page;

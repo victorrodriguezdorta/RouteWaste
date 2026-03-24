@@ -5,16 +5,6 @@
 -->
 <template>
   <v-container>
-    <!-- Page title -->
-    <v-row justify="center">
-      <v-col cols="12" md="8" lg="6" class="text-center mb-4">
-        <div class="d-flex align-center justify-center">
-          <v-icon class="mr-2 text-h5">mdi-plus-circle</v-icon>
-          <SectionTitle :title="t('vehicle.add.title')" />
-        </div>
-      </v-col>
-    </v-row>
-
     <!-- Notification snackbar for user feedback -->
     <v-snackbar
       v-model="vehicleNotification.flag"
@@ -27,65 +17,52 @@
       <p class="mb-0">{{ vehicleNotification.msg }}</p>
     </v-snackbar>
 
-    <!-- Main form for vehicle creation -->
-    <v-row justify="center">
-      <v-col cols="12" md="8" lg="6">
-        <v-card>
-          <v-card-title>
-            <v-icon class="mr-2">mdi-truck</v-icon>
-            {{ t('vehicle.add.cardTitle') }}
-          </v-card-title>
-          <v-card-text>
-            <v-form ref="vehicleForm">
-              <!-- Vehicle type selector -->
-              <v-select
-                v-model="newVehicle.vehicleType"
-                :items="vehicleTypeOptions"
-                item-title="title"
-                item-value="value"
-                :rules="[
-                  (value: string) =>
-                    VehicleAdd.externalValidateVehicleType(value),
-                ]"
-                :label="t('vehicle.add.fields.vehicleType')"
-                color="primary"
-                prepend-icon="mdi-truck-cargo-container"
-                required
-              ></v-select>
+    <CrudLayout
+      :title="t('vehicle.add.cardTitle')"
+      icon="mdi-truck"
+      :show-go-back="true"
+      :go-back="goBack"
+    >
+      <v-form ref="vehicleForm">
+        <!-- Vehicle type selector -->
+        <v-select
+          v-model="newVehicle.vehicleType"
+          :items="vehicleTypeOptions"
+          item-title="title"
+          item-value="value"
+          :rules="[
+            (value: string) =>
+              VehicleAdd.externalValidateVehicleType(value),
+          ]"
+          :label="t('vehicle.add.fields.vehicleType')"
+          color="primary"
+          prepend-icon="mdi-truck-cargo-container"
+          required
+        ></v-select>
 
-              <!-- Transport capacity (value, quantity unit, time unit) and Cost fields -->
-              <VehicleFormFields 
-                :vehicle="newVehicle"
-                @update:vehicle="newVehicle = $event"
-              />
+        <!-- Transport capacity (value, quantity unit, time unit) and Cost fields -->
+        <VehicleFormFields 
+          :vehicle="newVehicle"
+          @update:vehicle="newVehicle = $event"
+        />
 
-              <v-alert type="info" variant="tonal" class="mt-4">
-                {{ t('common.alerts.requiredFields') }}
-              </v-alert>
-            </v-form>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <ButtonTooltip
-              @click="goBack"
-              icon="mdi-arrow-left"
-              variant="text"
-              color="grey"
-              :text="t('common.buttons.cancel')"
-              :tooltip="t('common.buttons.cancel')"
-            />
-            <ButtonTooltip
-              @click="validate"
-              icon="mdi-content-save"
-              variant="elevated"
-              color="success"
-              :text="t('common.buttons.save')"
-              :tooltip="t('common.buttons.save')"
-            />
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+        <v-alert type="info" variant="tonal" class="mt-4">
+          {{ t('common.alerts.requiredFields') }}
+        </v-alert>
+      </v-form>
+
+      <template #toolbar-append>
+        <ButtonTooltip
+          @click="validate"
+          icon="mdi-content-save"
+          variant="elevated"
+          color="success"
+          :text="t('common.buttons.save')"
+          :tooltip="t('common.buttons.save')"
+          class="ml-2 mr-4"
+        />
+      </template>
+    </CrudLayout>
   </v-container>
 </template>
 
@@ -99,7 +76,8 @@
  * Uses ull-tfg-vue components for form fields.
  */
 
-import { ButtonTooltip, SectionTitle } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
+import CrudLayout from '../../components/common/CrudLayout.vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';

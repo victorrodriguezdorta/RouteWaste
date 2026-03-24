@@ -17,88 +17,65 @@
 
     <!-- Main content (shown when not loading and vehicle is loaded) -->
     <template v-else-if="vehicleInfo">
-      <!-- Page title with vehicle type -->
-      <v-row justify="center">
-        <v-col cols="12" md="8" lg="6" class="text-center mb-4">
-          <div class="d-flex align-center justify-center">
-            <v-icon class="mr-2 text-h5">mdi-eye</v-icon>
-            <SectionTitle :title="title" />
-          </div>
-        </v-col>
-      </v-row>
+      <CrudLayout
+        :title="title"
+        icon="mdi-eye"
+        :show-go-back="true"
+        :go-back="goBack"
+      >
+        <v-form>
+          <!-- Vehicle type (read-only) -->
+          <v-text-field
+            :model-value="formatVehicleType(vehicleInfo.vehicleType as VehicleType)"
+            :label="t('vehicle.show.fields.vehicleType')"
+            color="primary"
+            prepend-icon="mdi-truck-cargo-container"
+            disabled
+            readonly
+          ></v-text-field>
 
-      <!-- Vehicle information display (read-only) -->
-      <v-row justify="center">
-        <v-col cols="12" md="8" lg="6">
-          <v-card>
-            <v-card-title>
-              <v-icon class="mr-2">mdi-truck</v-icon>
-              {{ t('vehicle.show.cardTitle') }}
-            </v-card-title>
-            <v-card-text>
-              <v-form>
-                <!-- Vehicle type (read-only) -->
-                <v-text-field
-                  :model-value="formatVehicleType(vehicleInfo.vehicleType as VehicleType)"
-                  :label="t('vehicle.show.fields.vehicleType')"
-                  color="primary"
-                  prepend-icon="mdi-truck-cargo-container"
-                  disabled
-                  readonly
-                ></v-text-field>
+          <!-- Transport capacity (read-only) and Cost fields (read-only) -->
+          <VehicleFormFields 
+            v-if="vehicleInfo"
+            :vehicle="vehicleInfo"
+            :readonly="true"
+          />
 
-                <!-- Transport capacity (read-only) and Cost fields (read-only) -->
-                <VehicleFormFields 
-                  v-if="vehicleInfo"
-                  :vehicle="vehicleInfo"
-                  :readonly="true"
-                />
+          <!-- Time unit (read-only) -->
+          <v-text-field
+            :model-value="formatTimeUnit(vehicleInfo.capacityTimeUnit as TimeUnit)"
+            :label="t('vehicle.show.fields.timeUnit')"
+            color="primary"
+            prepend-icon="mdi-clock-outline"
+            disabled
+            readonly
+          ></v-text-field>
 
-                <!-- Time unit (read-only) -->
-                <v-text-field
-                  :model-value="formatTimeUnit(vehicleInfo.capacityTimeUnit as TimeUnit)"
-                  :label="t('vehicle.show.fields.timeUnit')"
-                  color="primary"
-                  prepend-icon="mdi-clock-outline"
-                  disabled
-                  readonly
-                ></v-text-field>
+          <!-- Vehicle UUID (read-only) -->
+          <v-text-field
+            :model-value="vehicleInfo.id"
+            :label="t('vehicle.show.fields.vehicleId')"
+            color="primary"
+            prepend-icon="mdi-identifier"
+            disabled
+            readonly
+            variant="outlined"
+            class="mt-4"
+          ></v-text-field>
+        </v-form>
 
-                <!-- Vehicle UUID (read-only) -->
-                <v-text-field
-                  :model-value="vehicleInfo.id"
-                  :label="t('vehicle.show.fields.vehicleId')"
-                  color="primary"
-                  prepend-icon="mdi-identifier"
-                  disabled
-                  readonly
-                  variant="outlined"
-                  class="mt-4"
-                ></v-text-field>
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <ButtonTooltip
-                @click="goBack"
-                icon="mdi-arrow-left"
-                variant="text"
-                color="grey"
-                :text="t('common.buttons.back')"
-                :tooltip="t('common.buttons.back')"
-              />
-              <ButtonTooltip
-                @click="goToEdit"
-                icon="mdi-pencil"
-                variant="elevated"
-                color="primary"
-                :text="t('common.buttons.edit')"
-                :tooltip="t('common.buttons.edit')"
-              />
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
+        <template #toolbar-append>
+          <ButtonTooltip
+            @click="goToEdit"
+            icon="mdi-pencil"
+            variant="elevated"
+            color="white"
+            :text="t('common.buttons.edit')"
+            :tooltip="t('common.buttons.edit')"
+            class="ml-2 mr-4"
+          />
+        </template>
+      </CrudLayout>
     </template>
   </v-container>
 </template>
@@ -112,7 +89,8 @@
  * Uses VehicleInfo DTO for data display.
  */
 
-import { ButtonTooltip, LoaderDialog, SectionTitle } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip, LoaderDialog } from '@ull-tfg/ull-tfg-vue';
+import CrudLayout from '../../components/common/CrudLayout.vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';

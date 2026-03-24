@@ -8,6 +8,9 @@ import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
  * Delegates update operation to a `VehicleRepository` implementation.
  */
 export class UpdateVehicleService implements UpdateVehicleUseCase {
+    /**
+     * Repository used to perform update operations.
+     */
     private readonly vehicleRepository: VehicleRepository;
 
     /**
@@ -21,7 +24,7 @@ export class UpdateVehicleService implements UpdateVehicleUseCase {
     /**
      * @brief Execute the update vehicle use case.
      * @param command Data required to update the vehicle (id + partial fields).
-     * @return Either a `DataError` or the updated `Vehicle` entity.
+     * @returns Either a `DataError` or the updated `Vehicle` entity.
      */
     async execute(command: UpdateVehicleCommand): Promise<Either<DataError, UpdateVehicleResult>> {
         return this.vehicleRepository.update(command);

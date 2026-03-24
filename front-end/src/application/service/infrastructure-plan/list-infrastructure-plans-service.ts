@@ -25,7 +25,7 @@ export class ListInfrastructurePlansService implements ListInfrastructurePlansUs
     /**
      * @brief Execute the list infrastructure plans use case.
      * @param command Optional pagination parameters.
-     * @return Either a `DataError` or an array of `InfrastructurePlan` entities.
+     * @returns Either a `DataError` or an array of `InfrastructurePlan` entities.
      */
     async execute(command?: ListInfrastructurePlansCommand): Promise<Either<DataError, ListInfrastructurePlansResult>> {
         /**

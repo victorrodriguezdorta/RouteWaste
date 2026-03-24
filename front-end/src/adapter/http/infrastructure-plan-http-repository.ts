@@ -52,7 +52,7 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
    * Retrieve a list of infrastructure plans with optional pagination.
    * 
    * @param command Optional pagination parameters (page, pageSize).
-   * @return Either a DataError or a list of InfrastructurePlan entities.
+   * @returns Either a DataError or a list of InfrastructurePlan entities.
    */
   public async list(
     command?: ListInfrastructurePlansCommand
@@ -95,7 +95,7 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
    * Retrieve a specific infrastructure plan by its identifier.
    * 
    * @param command Data containing the id of the infrastructure plan to retrieve.
-   * @return Either a DataError or the InfrastructurePlan entity.
+   * @returns Either a DataError or the InfrastructurePlan entity.
    */
   public async getById(
     command: GetInfrastructurePlanCommand
@@ -126,7 +126,7 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
    * Create a new infrastructure plan in the system.
    * 
    * @param command Data required to create the infrastructure plan.
-   * @return Either a DataError or the created InfrastructurePlan entity.
+   * @returns Either a DataError or the created InfrastructurePlan entity.
    */
   public async create(
     command: CreateInfrastructurePlanCommand
@@ -157,7 +157,7 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
    * Update an existing infrastructure plan.
    * 
    * @param command Data required to update the infrastructure plan (including id).
-   * @return Either a DataError or the updated InfrastructurePlan entity.
+   * @returns Either a DataError or the updated InfrastructurePlan entity.
    */
   public async update(
     command: UpdateInfrastructurePlanCommand
@@ -190,7 +190,7 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
    * Delete an infrastructure plan by its identifier.
    * 
    * @param command Data containing the id of the infrastructure plan to delete.
-   * @return Either a DataError or true on successful deletion.
+   * @returns Either a DataError or true on successful deletion.
    */
   public async delete(
     command: DeleteInfrastructurePlanCommand
@@ -220,7 +220,7 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
    * Validate an infrastructure plan.
    * 
    * @param command Data containing the id of the plan to validate.
-   * @return Either a DataError or a validation result.
+   * @returns Either a DataError or a validation result.
    */
   public async validate(
     command: ValidateInfrastructurePlanCommand

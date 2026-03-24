@@ -28,7 +28,7 @@ export class ListContainersService implements ListContainersUseCase {
     /**
      * @brief Execute the list containers use case.
      * @param command Optional pagination parameters.
-     * @return Either a `DataError` or an array of `Container` entities.
+     * @returns Either a `DataError` or an array of `Container` entities.
      */
     async execute(command?: ListContainersCommand): Promise<Either<DataError, ListContainersResult>> {
         const page = command?.page;

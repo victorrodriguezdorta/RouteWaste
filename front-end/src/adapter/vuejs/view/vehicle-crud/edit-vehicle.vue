@@ -17,16 +17,6 @@
 
     <!-- Main content (shown when not loading) -->
     <template v-else>
-      <!-- Page title with dynamic vehicle type -->
-      <v-row justify="center">
-        <v-col cols="12" md="8" lg="6" class="text-center mb-4">
-          <div class="d-flex align-center justify-center">
-            <v-icon class="mr-2 text-h5">mdi-pencil</v-icon>
-            <SectionTitle :title="title" />
-          </div>
-        </v-col>
-      </v-row>
-
       <!-- Notification snackbar for user feedback -->
       <v-snackbar
         v-model="vehicleNotification.flag"
@@ -39,66 +29,53 @@
         <p class="mb-0">{{ vehicleNotification.msg }}</p>
       </v-snackbar>
 
-      <!-- Edit form pre-populated with vehicle data -->
-      <v-row justify="center">
-        <v-col cols="12" md="8" lg="6">
-          <v-card>
-            <v-card-title>
-              <v-icon class="mr-2">mdi-truck</v-icon>
-              {{ t('vehicle.edit.cardTitle') }}
-            </v-card-title>
-            <v-card-text>
-              <v-form ref="vehicleForm">
-                <!-- Vehicle type selector -->
-                <v-select
-                  v-model="editVehicle!.vehicleType"
-                  :items="vehicleTypeOptions"
-                  item-title="title"
-                  item-value="value"
-                  :rules="[
-                    (value: string) =>
-                      VehicleEdit.externalValidateVehicleType(value),
-                  ]"
-                  :label="t('vehicle.edit.fields.vehicleType')"
-                  color="primary"
-                  prepend-icon="mdi-truck-cargo-container"
-                  required
-                ></v-select>
+      <CrudLayout
+        :title="title"
+        icon="mdi-pencil"
+        :show-go-back="true"
+        :go-back="goBack"
+      >
+        <v-form ref="vehicleForm">
+          <!-- Vehicle type selector -->
+          <v-select
+            v-model="editVehicle!.vehicleType"
+            :items="vehicleTypeOptions"
+            item-title="title"
+            item-value="value"
+            :rules="[
+              (value: string) =>
+                VehicleEdit.externalValidateVehicleType(value),
+            ]"
+            :label="t('vehicle.edit.fields.vehicleType')"
+            color="primary"
+            prepend-icon="mdi-truck-cargo-container"
+            required
+          ></v-select>
 
-                <!-- Transport capacity (value, quantity unit, time unit) and Cost fields -->
-                <VehicleFormFields 
-                  v-if="editVehicle"
-                  :vehicle="editVehicle"
-                  @update:vehicle="editVehicle = $event"
-                />
+          <!-- Transport capacity (value, quantity unit, time unit) and Cost fields -->
+          <VehicleFormFields 
+            v-if="editVehicle"
+            :vehicle="editVehicle"
+            @update:vehicle="editVehicle = $event"
+          />
 
-                <v-alert type="info" variant="tonal" class="mt-4">
-                  {{ t('common.alerts.requiredFields') }}
-                </v-alert>
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <ButtonTooltip
-                @click="goBack"
-                icon="mdi-arrow-left"
-                variant="text"
-                color="grey"
-                :text="t('common.buttons.cancel')"
-                :tooltip="t('common.buttons.cancel')"
-              />
-              <ButtonTooltip
-                @click="validate"
-                icon="mdi-content-save"
-                variant="elevated"
-                color="success"
-                :text="t('common.buttons.update')"
-                :tooltip="t('common.buttons.update')"
-              />
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
+          <v-alert type="info" variant="tonal" class="mt-4">
+            {{ t('common.alerts.requiredFields') }}
+          </v-alert>
+        </v-form>
+
+        <template #toolbar-append>
+          <ButtonTooltip
+            @click="validate"
+            icon="mdi-content-save"
+            variant="elevated"
+            color="success"
+            :text="t('common.buttons.update')"
+            :tooltip="t('common.buttons.update')"
+            class="ml-2 mr-4"
+          />
+        </template>
+      </CrudLayout>
     </template>
   </v-container>
 </template>
@@ -112,7 +89,8 @@
  * Uses VehicleEdit DTO for data transfer and validation.
  */
 
-import { ButtonTooltip, LoaderDialog, SectionTitle } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip, LoaderDialog } from '@ull-tfg/ull-tfg-vue';
+import CrudLayout from '../../components/common/CrudLayout.vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';

@@ -26,7 +26,7 @@ export class ListFacilitiesService implements ListFacilitiesUseCase {
     /**
      * @brief Execute the list facilities use case.
      * @param command Optional pagination parameters.
-     * @return Either a `DataError` or an array of `Facility` entities.
+     * @returns Either a `DataError` or an array of `Facility` entities.
      */
     async execute(command?: ListFacilitiesCommand): Promise<Either<DataError, ListFacilitiesResult>> {
         const page = command?.page;
