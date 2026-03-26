@@ -1,6 +1,6 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.Facility;
@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
-import org.springframework.lang.NonNull;
 
 /**
  * ServiceAssignmentReadingConverter
@@ -54,7 +53,7 @@ public class ServiceAssignmentReadingConverter implements Converter<Document, Se
      * @return ServiceAssignment entity reconstructed from the document
      */
     @Override
-    public ServiceAssignment convert(@NonNull Document document) {
+    public ServiceAssignment convert(Document document) {
         logger.info("ServiceAssignment to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         Container container = null;

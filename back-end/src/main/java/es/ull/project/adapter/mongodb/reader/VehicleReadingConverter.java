@@ -1,6 +1,7 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.VehicleType;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
-import org.springframework.lang.NonNull;
 
 /**
  * VehicleReadingConverter
@@ -28,6 +28,13 @@ import org.springframework.lang.NonNull;
 public class VehicleReadingConverter implements Converter<Document, Vehicle> {
     private static final Logger logger = LoggerFactory.getLogger(VehicleReadingConverter.class);
 
+    @SuppressWarnings("unused")
+    private final MongoConfiguration mongoConfiguration;
+
+    public VehicleReadingConverter(MongoConfiguration mongoConfiguration) {
+        this.mongoConfiguration = mongoConfiguration;
+    }
+
     /**
      * Converts a MongoDB Document into a Vehicle entity.
      *
@@ -35,7 +42,7 @@ public class VehicleReadingConverter implements Converter<Document, Vehicle> {
      * @return Vehicle entity reconstructed from the document
      */
     @Override
-    public Vehicle convert(@NonNull Document document) {
+    public Vehicle convert(Document document) {
         logger.info("Vehicle to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         VehicleType vehicleType = VehicleType.fromString(document.getString(MongoFields.VEHICLE_TYPE));

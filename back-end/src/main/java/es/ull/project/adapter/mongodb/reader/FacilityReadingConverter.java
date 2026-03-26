@@ -1,6 +1,7 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
@@ -17,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
-import org.springframework.lang.NonNull;
 
 /**
  * FacilityReadingConverter
@@ -32,6 +32,13 @@ public class FacilityReadingConverter implements Converter<Document, Facility> {
 
     private static final Logger logger = LoggerFactory.getLogger(FacilityReadingConverter.class);
 
+    @SuppressWarnings("unused")
+    private final MongoConfiguration mongoConfiguration;
+
+    public FacilityReadingConverter(MongoConfiguration mongoConfiguration) {
+        this.mongoConfiguration = mongoConfiguration;
+    }
+
     /**
      * Converts a MongoDB Document into a Facility entity.
      *
@@ -39,7 +46,7 @@ public class FacilityReadingConverter implements Converter<Document, Facility> {
      * @return Facility entity reconstructed from the document
      */
     @Override
-    public Facility convert(@NonNull Document document) {
+    public Facility convert(Document document) {
         logger.info("Facility to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         FacilityType facilityType = FacilityType.fromString(document.getString(MongoFields.FACILITY_TYPE));

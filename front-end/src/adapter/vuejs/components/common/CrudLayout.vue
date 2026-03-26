@@ -1,7 +1,6 @@
 <template>
   <v-container fluid>
     <v-row justify="center">
-      <!-- Usamos las propiedades para ajustar el tamaño según la vista -->
       <v-col cols="12" :md="contentMd" :lg="contentLg">
         <v-card class="elevation-2 rounded-lg">
           

@@ -1,4 +1,4 @@
-package es.ull.project.adapter.mongodb.fields;
+package es.ull.project.adapter.mongodb;
 
 /**
  * MongoFields

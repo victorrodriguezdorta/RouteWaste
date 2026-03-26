@@ -157,15 +157,15 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration {
     public @NonNull MongoCustomConversions customConversions() {
         return new MongoCustomConversions(
                 Arrays.asList(
-                        new ContainerReadingConverter(),
-                        new ContainerWritingConverter(),
-                        new FacilityReadingConverter(),
-                        new FacilityWritingConverter(),
+                        new ContainerReadingConverter(this),
+                        new ContainerWritingConverter(this),
+                        new FacilityReadingConverter(this),
+                        new FacilityWritingConverter(this),
                         new InfrastructurePlanReadingConverter(this),
-                        new InfrastructurePlanWritingConverter(),
+                        new InfrastructurePlanWritingConverter(this),
                         new ServiceAssignmentReadingConverter(this),
-                        new ServiceAssignmentWritingConverter(),
-                        new VehicleReadingConverter(),
-                        new VehicleWritingConverter()));
+                        new ServiceAssignmentWritingConverter(this),
+                        new VehicleReadingConverter(this),
+                        new VehicleWritingConverter(this)));
     }
 }

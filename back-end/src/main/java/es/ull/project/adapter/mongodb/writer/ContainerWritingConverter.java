@@ -1,6 +1,7 @@
 package es.ull.project.adapter.mongodb.writer;
 
-import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Container;
 
 import org.bson.Document;
@@ -8,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
-import org.springframework.lang.NonNull;
 
 /**
  * ContainerWritingConverter
@@ -23,6 +23,13 @@ public class ContainerWritingConverter implements Converter<Container, Document>
 
     private static final Logger logger = LoggerFactory.getLogger(ContainerWritingConverter.class);
 
+    @SuppressWarnings("unused")
+    private final MongoConfiguration mongoConfiguration;
+
+    public ContainerWritingConverter(MongoConfiguration mongoConfiguration) {
+        this.mongoConfiguration = mongoConfiguration;
+    }
+
     /**
      * Converts a Container entity into a MongoDB Document.
      *
@@ -30,7 +37,7 @@ public class ContainerWritingConverter implements Converter<Container, Document>
      * @return MongoDB Document representation of the Container
      */
     @Override
-    public Document convert(@NonNull Container container) {
+    public Document convert(Container container) {
         logger.info("Container with id '{}' to be written", container.getId());
         Document document = new Document();
         document.put(MongoFields.ID, container.getId());

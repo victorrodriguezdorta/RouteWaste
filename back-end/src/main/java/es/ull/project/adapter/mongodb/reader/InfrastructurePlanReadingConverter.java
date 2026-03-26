@@ -1,6 +1,6 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
-import org.springframework.lang.NonNull;
 
 /**
  * InfrastructurePlanReadingConverter
@@ -55,7 +54,7 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
      * @return The InfrastructurePlan entity.
      */
     @Override
-    public InfrastructurePlan convert(@NonNull Document document) {
+    public InfrastructurePlan convert(Document document) {
         logger.info("Reading InfrastructurePlan from MongoDB document");
         UUID id = document.get(MongoFields.ID, UUID.class);
         String periodValue = document.getString(MongoFields.PERIOD);

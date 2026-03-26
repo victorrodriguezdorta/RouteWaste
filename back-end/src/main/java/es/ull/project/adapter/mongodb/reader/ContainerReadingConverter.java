@@ -1,6 +1,7 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.TimeUnit;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
-import org.springframework.lang.NonNull;
 
 /**
  * ContainerReadingConverter
@@ -27,6 +27,13 @@ import org.springframework.lang.NonNull;
 @ReadingConverter
 public class ContainerReadingConverter implements Converter<Document, Container> {
     private static final Logger logger = LoggerFactory.getLogger(ContainerReadingConverter.class);
+
+    @SuppressWarnings("unused")
+    private final MongoConfiguration mongoConfiguration;
+
+    public ContainerReadingConverter(MongoConfiguration mongoConfiguration) {
+        this.mongoConfiguration = mongoConfiguration;
+    }
     /**
      * Converts a MongoDB Document into a Container entity.
      *
@@ -34,7 +41,7 @@ public class ContainerReadingConverter implements Converter<Document, Container>
      * @return Container entity reconstructed from the document
      */
     @Override
-    public Container convert(@NonNull Document document) {
+    public Container convert(Document document) {
         logger.info("Container to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         Document locationDocument = (Document) document.get(MongoFields.LOCATION);

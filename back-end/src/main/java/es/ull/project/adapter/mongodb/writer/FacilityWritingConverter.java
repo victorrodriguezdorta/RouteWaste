@@ -1,6 +1,7 @@
 package es.ull.project.adapter.mongodb.writer;
 
-import es.ull.project.adapter.mongodb.fields.MongoFields;
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Facility;
 
 import org.bson.Document;
@@ -8,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
-import org.springframework.lang.NonNull;
 
 /**
  * FacilityWritingConverter
@@ -21,6 +21,13 @@ public class FacilityWritingConverter implements Converter<Facility, Document> {
 
     private static final Logger logger = LoggerFactory.getLogger(FacilityWritingConverter.class);
 
+    @SuppressWarnings("unused")
+    private final MongoConfiguration mongoConfiguration;
+
+    public FacilityWritingConverter(MongoConfiguration mongoConfiguration) {
+        this.mongoConfiguration = mongoConfiguration;
+    }
+
     /**
      * Converts a Facility entity to a MongoDB Document.
      *
@@ -28,7 +35,7 @@ public class FacilityWritingConverter implements Converter<Facility, Document> {
      * @return The MongoDB Document representation of the Facility.
      */
     @Override
-    public Document convert(@NonNull Facility facility) {
+    public Document convert(Facility facility) {
         logger.info("Facility with id '{}' to be written", facility.getId());
         Document document = new Document();
         document.put(MongoFields.ID, facility.getId());
