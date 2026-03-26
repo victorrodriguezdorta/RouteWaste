@@ -1,8 +1,7 @@
-import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { DeleteVehicleCommand } from './delete-vehicle-command';
 import type { DeleteVehicleResult } from './delete-vehicle-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 
-// Re-export types for convenience
 export type { DeleteVehicleCommand } from './delete-vehicle-command';
 export type { DeleteVehicleResult } from './delete-vehicle-result';
 

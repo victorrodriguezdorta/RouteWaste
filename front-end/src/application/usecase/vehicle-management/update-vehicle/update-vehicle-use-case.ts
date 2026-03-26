@@ -1,13 +1,12 @@
-// Re-export types for convenience
-export type { UpdateVehicleCommand } from './update-vehicle-command';
-export type { UpdateVehicleResult } from './update-vehicle-result';
-// UpdateVehicleUseCase.ts
-// Use case contract for updating a vehicle
-
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { UpdateVehicleCommand } from './update-vehicle-command';
 import type { UpdateVehicleResult } from './update-vehicle-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 
+export type { UpdateVehicleCommand } from './update-vehicle-command';
+export type { UpdateVehicleResult } from './update-vehicle-result';
+
+// UpdateVehicleUseCase.ts
+// Use case contract for updating a vehicle
 // Use case contract
 export interface UpdateVehicleUseCase {
     /**

@@ -1,14 +1,12 @@
-// Re-export types for convenience
-export type { FilterFacilitiesCommand } from './filter-facilities-command';
-export type { FilterFacilitiesResult } from './filter-facilities-result';
-// FilterFacilitiesUseCase.ts
-// Use case contract for filtering facilities
-
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { FilterFacilitiesCommand } from './filter-facilities-command';
 import type { FilterFacilitiesResult } from './filter-facilities-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 
+export type { FilterFacilitiesCommand } from './filter-facilities-command';
+export type { FilterFacilitiesResult } from './filter-facilities-result';
 
+// FilterFacilitiesUseCase.ts
+// Use case contract for filtering facilities
 /**
  * Use case for filtering facilities based on criteria.
  * Input: filter parameters (facilityType, status, etc.)

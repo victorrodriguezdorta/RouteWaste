@@ -1,6 +1,3 @@
-import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { defineStore } from 'pinia';
-
 import { InfrastructurePlanHttpRepository } from '@/adapter/http/infrastructure-plan-http-repository';
 import {
   CreateInfrastructurePlanService,
@@ -11,6 +8,8 @@ import {
   ValidateInfrastructurePlanService
 } from '@/application/service/infrastructure-plan';
 import type { InfrastructurePlan } from '@/domain/entity/infrastructure-plan';
+import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
+import { defineStore } from 'pinia';
 
 /**
  * Infrastructure Plan Store

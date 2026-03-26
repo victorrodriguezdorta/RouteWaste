@@ -1,8 +1,11 @@
-// Use case contract for deleting an infrastructure plan
-
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { DeleteInfrastructurePlanCommand } from './delete-infrastructure-plan-command';
 import type { DeleteInfrastructurePlanResult } from './delete-infrastructure-plan-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { DeleteInfrastructurePlanCommand } from './delete-infrastructure-plan-command';
+export type { DeleteInfrastructurePlanResult } from './delete-infrastructure-plan-result';
+
+// Use case contract for deleting an infrastructure plan
 
 /**
  * Use case contract for deleting an infrastructure plan
@@ -16,6 +19,3 @@ export interface DeleteInfrastructurePlanUseCase {
     execute(command: DeleteInfrastructurePlanCommand): Promise<Either<DataError, DeleteInfrastructurePlanResult>>;
 }
 
-// Re-export types for convenience
-export type { DeleteInfrastructurePlanCommand } from './delete-infrastructure-plan-command';
-export type { DeleteInfrastructurePlanResult } from './delete-infrastructure-plan-result';

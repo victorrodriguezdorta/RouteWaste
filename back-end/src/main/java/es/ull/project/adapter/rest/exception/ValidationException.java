@@ -11,6 +11,11 @@ import java.util.List;
  * validation errors to provide comprehensive feedback to clients.
  */
 public class ValidationException extends RuntimeException {
+
+    private static final String ERRORS_COUNT_SUFFIX = " error(s): ";
+    private static final String FIELD_SEPARATOR = " - ";
+    private static final String ERROR_SEPARATOR = "; ";
+
     private final List<FieldError> errors;
     
     /**
@@ -43,12 +48,12 @@ public class ValidationException extends RuntimeException {
             return "Validation failed";
         }
         StringBuilder sb = new StringBuilder("Validation failed with ");
-        sb.append(errors.size()).append(" error(s): ");
+        sb.append(errors.size()).append(ERRORS_COUNT_SUFFIX);
         for (int i = 0; i < errors.size(); i++) {
             FieldError error = errors.get(i);
-            sb.append(error.getField()).append(" - ").append(error.getIssue());
+            sb.append(error.getField()).append(FIELD_SEPARATOR).append(error.getIssue());
             if (i < errors.size() - 1) {
-                sb.append("; ");
+                sb.append(ERROR_SEPARATOR);
             }
         }
         return sb.toString();

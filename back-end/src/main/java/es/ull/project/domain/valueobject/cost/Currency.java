@@ -12,7 +12,8 @@ import java.util.regex.Pattern;
 public final class Currency {
 
     private static final int ZERO = 0;
-    private static final Pattern CURRENCY_CODE_PATTERN = Pattern.compile("^[A-Z]{3}$");
+    private static final String CURRENCY_CODE_REGEX = "^[A-Z]{3}$";
+    private static final Pattern CURRENCY_CODE_PATTERN = Pattern.compile(CURRENCY_CODE_REGEX);
 
     private static final String ERROR_CURRENCY_NOT_DEFINED = "Currency is not defined";
     private static final String ERROR_CURRENCY_EMPTY = "Currency cannot be empty";

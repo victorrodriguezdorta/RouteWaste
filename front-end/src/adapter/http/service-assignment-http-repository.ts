@@ -7,10 +7,10 @@ import type { ListServiceAssignmentsCommand, ListServiceAssignmentsResult } from
 import type { RemoveServiceAssignmentCommand, RemoveServiceAssignmentResult } from '@/application/usecase/service-assignment-management/remove-service-assignment/remove-service-assignment-use-case';
 import type { UpdateServiceAssignmentCommand, UpdateServiceAssignmentResult } from '@/application/usecase/service-assignment-management/update-service-assignment/update-service-assignment-use-case';
 import {
-  Either,
-  http,
   type ApiError,
   type DataError,
+  Either,
+  http,
 } from '@ull-tfg/ull-tfg-typescript';
 
 /**

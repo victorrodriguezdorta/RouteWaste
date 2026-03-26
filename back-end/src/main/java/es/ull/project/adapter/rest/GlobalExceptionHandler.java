@@ -1,9 +1,10 @@
 package es.ull.project.adapter.rest;
 
+import es.ull.project.adapter.rest.exception.ValidationException;
+import es.ull.project.adapter.rest.response.ErrorResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -11,9 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import es.ull.project.adapter.rest.exception.ValidationException;
-import es.ull.project.adapter.rest.response.ErrorResponse;
 /**
  * GlobalExceptionHandler
  * 
@@ -34,6 +32,9 @@ import es.ull.project.adapter.rest.response.ErrorResponse;
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final String ERROR_KEY = "error";
+    private static final String MSG_RESOURCE_NOT_FOUND = "Resource not found";
+    private static final String MSG_INTERNAL_ERROR = "An internal error occurred. Please try again later.";
 
     /**
      * Handles deserialization errors when the request body cannot be parsed.
@@ -50,7 +51,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleDeserializationError(HttpMessageNotReadableException ex) {
         String message = extractRootCauseMessage(ex);
         Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", message);
+        errorResponse.put(ERROR_KEY, message);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -87,12 +88,9 @@ public class GlobalExceptionHandler {
         errorResponse.error = "ValidationError";
         errorResponse.message = ex.getMessage();
         errorResponse.details = new java.util.ArrayList<>();
-        
-        // Add the error as a general detail
         es.ull.project.adapter.rest.exception.FieldError fieldError = 
             new es.ull.project.adapter.rest.exception.FieldError("general", ex.getMessage());
         errorResponse.details.add(fieldError);
-        
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -109,7 +107,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, String>> handleIllegalStateError(IllegalStateException ex) {
         Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", ex.getMessage());
+        errorResponse.put(ERROR_KEY, ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -125,7 +123,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Map<String, String>> handleNotFoundError(NoSuchElementException ex) {
         Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", ex.getMessage() != null ? ex.getMessage() : "Resource not found");
+        errorResponse.put(ERROR_KEY, ex.getMessage() != null ? ex.getMessage() : MSG_RESOURCE_NOT_FOUND);
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
@@ -140,7 +138,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericError(Exception ex) {
         Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", "An internal error occurred. Please try again later.");
+        errorResponse.put(ERROR_KEY, MSG_INTERNAL_ERROR);
         logger.error("Unhandled exception: {} - {}", ex.getClass().getName(), ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }

@@ -1,10 +1,9 @@
-// Re-export types for convenience
-export type { UpdateServiceAssignmentCommand } from './update-service-assignment-command';
-export type { UpdateServiceAssignmentResult } from './update-service-assignment-result';
-
-import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { UpdateServiceAssignmentCommand } from './update-service-assignment-command';
 import type { UpdateServiceAssignmentResult } from './update-service-assignment-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { UpdateServiceAssignmentCommand } from './update-service-assignment-command';
+export type { UpdateServiceAssignmentResult } from './update-service-assignment-result';
 
 // Use case contract
 export interface UpdateServiceAssignmentUseCase {

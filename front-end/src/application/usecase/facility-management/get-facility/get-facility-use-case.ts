@@ -1,12 +1,12 @@
-// Re-export types for convenience
-export type { GetFacilityCommand } from './get-facility-command';
-export type { GetFacilityResult } from './get-facility-result';
-// GetFacilityUseCase.ts
-// Use case contract for getting a single facility by id
-
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { GetFacilityCommand } from './get-facility-command';
 import type { GetFacilityResult } from './get-facility-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { GetFacilityCommand } from './get-facility-command';
+export type { GetFacilityResult } from './get-facility-result';
+
+// GetFacilityUseCase.ts
+// Use case contract for getting a single facility by id
 
 
 /**

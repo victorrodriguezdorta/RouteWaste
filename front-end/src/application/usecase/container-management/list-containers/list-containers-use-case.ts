@@ -1,9 +1,12 @@
-// ListContainersUseCase.ts
-// Use case contract for listing all containers
-
-import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { ListContainersCommand } from './list-containers-command';
 import type { ListContainersResult } from './list-containers-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { ListContainersCommand } from './list-containers-command';
+export type { ListContainersResult } from './list-containers-result';
+
+// ListContainersUseCase.ts
+// Use case contract for listing all containers
 
 /**
  * Use case for listing all containers in the system.
@@ -23,7 +26,5 @@ export interface ListContainersUseCase {
     execute(command?: ListContainersCommand): Promise<Either<DataError, ListContainersResult>>;
 }
 
-// Re-export types for convenience
-export type { ListContainersCommand } from './list-containers-command';
-export type { ListContainersResult } from './list-containers-result';
+
 

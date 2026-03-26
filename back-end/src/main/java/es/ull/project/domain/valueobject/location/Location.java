@@ -18,7 +18,8 @@ public final class Location {
      * Postal address constraints.
      */
     private static final int POSTAL_ADDRESS_MAX_LENGTH = 150;
-    private static final Pattern POSTAL_ADDRESS_PATTERN = Pattern.compile("^[A-Za-z0-9\\s,.-]+$");
+    private static final String POSTAL_ADDRESS_REGEX = "^[A-Za-z0-9\\s,.-]+$";
+    private static final Pattern POSTAL_ADDRESS_PATTERN = Pattern.compile(POSTAL_ADDRESS_REGEX);
     private static final String ERROR_ADDRESS_NOT_DEFINED = "Postal address is not defined";
     private static final String ERROR_ADDRESS_EMPTY = "Postal address cannot be empty";
     private static final String ERROR_ADDRESS_MAX_LENGTH = "Postal address must be at most " + POSTAL_ADDRESS_MAX_LENGTH + " characters";

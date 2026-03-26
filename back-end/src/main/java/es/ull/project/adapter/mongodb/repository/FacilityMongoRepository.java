@@ -26,6 +26,7 @@ import org.springframework.stereotype.Repository;
 public class FacilityMongoRepository implements FacilityRepository {
 
     public static final String COLLECTION_NAME = "facilities";
+    private static final String FIELD_ID = "id";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -85,7 +86,7 @@ public class FacilityMongoRepository implements FacilityRepository {
      */
     @Override
     public Optional<Facility> findById(UUID id) {
-        Query query = new Query(Criteria.where("id").is(id));
+        Query query = new Query(Criteria.where(FIELD_ID).is(id));
         Facility facility = this.mongoTemplate.findOne(query, Facility.class, COLLECTION_NAME);
         return Optional.ofNullable(facility);
     }

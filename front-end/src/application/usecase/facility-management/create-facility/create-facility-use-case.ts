@@ -1,9 +1,12 @@
-// CreateFacilityUseCase.ts
-// Use case contract for creating a new facility
-
-import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { CreateFacilityCommand } from './create-facility-command';
 import type { CreateFacilityResult } from './create-facility-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { CreateFacilityCommand } from './create-facility-command';
+export type { CreateFacilityResult } from './create-facility-result';
+
+// CreateFacilityUseCase.ts
+// Use case contract for creating a new facility
 
 // Use case contract
 export interface CreateFacilityUseCase {
@@ -16,7 +19,5 @@ export interface CreateFacilityUseCase {
     execute(command: CreateFacilityCommand): Promise<Either<DataError, CreateFacilityResult>>;
 }
 
-// Re-export types for convenience
-export type { CreateFacilityCommand } from './create-facility-command';
-export type { CreateFacilityResult } from './create-facility-result';
+
 

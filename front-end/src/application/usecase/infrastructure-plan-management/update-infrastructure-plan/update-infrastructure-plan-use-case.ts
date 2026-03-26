@@ -1,8 +1,11 @@
 // Use case contract for updating an infrastructure plan
 
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { UpdateInfrastructurePlanCommand } from './update-infrastructure-plan-command';
 import type { UpdateInfrastructurePlanResult } from './update-infrastructure-plan-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { UpdateInfrastructurePlanCommand } from './update-infrastructure-plan-command';
+export type { UpdateInfrastructurePlanResult } from './update-infrastructure-plan-result';
 
 /**
  * Use case for updating an existing infrastructure plan in the system.
@@ -18,6 +21,3 @@ export interface UpdateInfrastructurePlanUseCase {
     execute(command: UpdateInfrastructurePlanCommand): Promise<Either<DataError, UpdateInfrastructurePlanResult>>;
 }
 
-// Re-export types for convenience
-export type { UpdateInfrastructurePlanCommand } from './update-infrastructure-plan-command';
-export type { UpdateInfrastructurePlanResult } from './update-infrastructure-plan-result';

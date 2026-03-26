@@ -9,10 +9,10 @@ import type { GetFacilityCommand, GetFacilityResult } from '@/application/usecas
 import type { ListFacilitiesCommand, ListFacilitiesResult } from '@/application/usecase/facility-management/list-facilities/list-facilities-use-case';
 import type { UpdateFacilityCommand, UpdateFacilityResult } from '@/application/usecase/facility-management/update-facility/update-facility-use-case';
 import {
-  Either,
-  http,
   type ApiError,
   type DataError,
+  Either,
+  http,
 } from '@ull-tfg/ull-tfg-typescript';
 
 /**

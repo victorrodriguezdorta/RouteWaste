@@ -1,9 +1,11 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -13,10 +15,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-
-import es.ull.project.application.repository.VehicleRepository;
-import es.ull.project.domain.entity.Vehicle;
-import es.ull.project.domain.enumerate.VehicleType;
 
 /**
  * MongoDB implementation of the VehicleRepository interface.
@@ -30,6 +28,8 @@ import es.ull.project.domain.enumerate.VehicleType;
 public class VehicleMongoRepository implements VehicleRepository {
 
     public static final String COLLECTION_NAME = "vehicles";
+    private static final String FIELD_VEHICLE_TYPE = "vehicleType";
+    private static final String FIELD_ID = "id";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -93,7 +93,7 @@ public class VehicleMongoRepository implements VehicleRepository {
         Query dataQuery = new Query();
         Query countQuery = new Query();
         if (vehicleType != null) {
-            Criteria criteria = Criteria.where("vehicleType").is(vehicleType);
+            Criteria criteria = Criteria.where(FIELD_VEHICLE_TYPE).is(vehicleType);
             dataQuery.addCriteria(criteria);
             countQuery.addCriteria(criteria);
         }
@@ -125,7 +125,7 @@ public class VehicleMongoRepository implements VehicleRepository {
      */
     @Override
     public Optional<Vehicle> findById(UUID id) {
-        Query query = new Query(Criteria.where("id").is(id));
+        Query query = new Query(Criteria.where(FIELD_ID).is(id));
         Vehicle vehicle = this.mongoTemplate.findOne(query, Vehicle.class, COLLECTION_NAME);
         return Optional.ofNullable(vehicle);
     }

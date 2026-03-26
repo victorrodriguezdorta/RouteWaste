@@ -33,6 +33,7 @@ public enum TimeUnit {
 
     private static final String ERROR_TIME_UNIT_NOT_DEFINED = "Time unit is not defined";
     private static final String ERROR_TIME_UNIT_INVALID = "Invalid time unit";
+    private static final String PLURAL_SUFFIX = "S";
 
     /**
      * Returns the TimeUnit that matches the given string.
@@ -47,8 +48,7 @@ public enum TimeUnit {
             throw new IllegalArgumentException(ERROR_TIME_UNIT_NOT_DEFINED);
         }
         stringToCheck = stringToCheck.trim().toUpperCase();
-        // Remove trailing 'S' for backwards compatibility with plural forms (DAYS, WEEKS, etc.)
-        if (stringToCheck.endsWith("S")) {
+        if (stringToCheck.endsWith(PLURAL_SUFFIX)) {
             stringToCheck = stringToCheck.substring(0, stringToCheck.length() - 1);
         }
         for (TimeUnit timeUnit : values()) {

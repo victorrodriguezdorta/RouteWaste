@@ -26,6 +26,7 @@ import org.springframework.stereotype.Repository;
 public class ServiceAssignmentMongoRepository implements ServiceAssignmentRepository {
 
     public static final String COLLECTION_NAME = "serviceassignments";
+    private static final String FIELD_ID = "id";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -85,7 +86,7 @@ public class ServiceAssignmentMongoRepository implements ServiceAssignmentReposi
      */
     @Override
     public Optional<ServiceAssignment> findById(UUID id) {
-        Query query = new Query(Criteria.where("id").is(id));
+        Query query = new Query(Criteria.where(FIELD_ID).is(id));
         ServiceAssignment serviceAssignment = this.mongoTemplate.findOne(query, ServiceAssignment.class, COLLECTION_NAME);
         return Optional.ofNullable(serviceAssignment);
     }

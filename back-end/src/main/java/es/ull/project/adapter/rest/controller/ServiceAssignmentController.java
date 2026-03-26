@@ -44,6 +44,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(ApiRoutes.SERVICE_ASSIGNMENTS)
 public class ServiceAssignmentController {
 
+    private static final String ERROR_KEY = "error";
+
     /**
      * Use case for reading service assignment data.
      * Autowired by Spring dependency injection.
@@ -145,7 +147,7 @@ public class ServiceAssignmentController {
             return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", e.getMessage());
+            errorResponse.put(ERROR_KEY, e.getMessage());
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
     }

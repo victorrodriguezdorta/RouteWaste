@@ -1,14 +1,12 @@
 package es.ull.project.application.repository;
 
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import es.ull.project.domain.entity.Vehicle;
-import es.ull.project.domain.enumerate.VehicleType;
 
 /**
  * Repository interface for Vehicle aggregate roots.

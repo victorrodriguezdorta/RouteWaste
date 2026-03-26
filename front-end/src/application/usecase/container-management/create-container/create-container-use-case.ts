@@ -1,13 +1,12 @@
-// CreateContainerUseCase.ts
-// Use case contract for creating a new container
-
-import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { CreateContainerCommand } from './create-container-command';
 import type { CreateContainerResult } from './create-container-result';
-
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 
 export type { CreateContainerCommand } from './create-container-command';
 export type { CreateContainerResult } from './create-container-result';
+
+// CreateContainerUseCase.ts
+// Use case contract for creating a new container
 
 /**
  * Use case for registering a new container in the system.

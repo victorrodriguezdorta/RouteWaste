@@ -17,6 +17,10 @@ import java.io.IOException;
  */
 public class InfrastructurePlanResponseBodySerializer extends StdSerializer<InfrastructurePlanResponseBody> {
 
+    private static final String FIELD_SELECTED_FACILITIES = "selectedFacilities";
+    private static final String FIELD_SERVICE_ASSIGNMENTS = "serviceAssignments";
+    private static final String FIELD_ESTIMATED_TOTAL_COST = "estimatedTotalCost";
+
     private final FacilityResponseBodySerializer facilitySerializer = new FacilityResponseBodySerializer();
 
     /**
@@ -41,12 +45,12 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
         gen.writeStartObject();
         gen.writeStringField(JsonFields.ID, value.id.toString());
         gen.writeStringField(JsonFields.PERIOD, value.period.getValue());
-        gen.writeArrayFieldStart("selectedFacilities");
+        gen.writeArrayFieldStart(FIELD_SELECTED_FACILITIES);
         for (var facility : value.selectedFacilities) {
             facilitySerializer.serialize(facility, gen, provider);
         }
         gen.writeEndArray();
-        gen.writeArrayFieldStart("serviceAssignments");
+        gen.writeArrayFieldStart(FIELD_SERVICE_ASSIGNMENTS);
         for (var assignment : value.serviceAssignments) {
             gen.writeObject(assignment);
         }
@@ -57,7 +61,7 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
             gen.writeStringField(JsonFields.CURRENCY, value.maxBudget.getCurrency().get().getCode());
         }
         gen.writeEndObject();
-        gen.writeObjectFieldStart("estimatedTotalCost");
+        gen.writeObjectFieldStart(FIELD_ESTIMATED_TOTAL_COST);
         gen.writeNumberField(JsonFields.AMOUNT, value.estimatedTotalCost.getAmount());
         if (value.estimatedTotalCost.getCurrency().isPresent()) {
             gen.writeStringField(JsonFields.CURRENCY, value.estimatedTotalCost.getCurrency().get().getCode());

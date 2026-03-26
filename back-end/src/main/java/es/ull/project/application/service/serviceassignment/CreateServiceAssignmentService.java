@@ -29,6 +29,10 @@ import java.util.UUID;
  */
 public class CreateServiceAssignmentService implements CreateServiceAssignmentUseCase {
 
+    private static final String ERROR_CONTAINER_NOT_FOUND = "Container with id %s not found";
+    private static final String ERROR_FACILITY_NOT_FOUND = "Facility with id %s not found";
+    private static final String ERROR_DELIMITER = "; ";
+
     private final ServiceAssignmentRepository serviceAssignmentRepository;
     private final ContainerRepository containerRepository;
     private final FacilityRepository facilityRepository;
@@ -72,14 +76,14 @@ public class CreateServiceAssignmentService implements CreateServiceAssignmentUs
         List<String> errors = new ArrayList<>();
         Optional<Container> containerOpt = containerRepository.findById(containerId);
         if (containerOpt.isEmpty()) {
-            errors.add("Container with id " + containerId + " not found");
+            errors.add(String.format(ERROR_CONTAINER_NOT_FOUND, containerId));
         }
         Optional<Facility> facilityOpt = facilityRepository.findById(facilityId);
         if (facilityOpt.isEmpty()) {
-            errors.add("Facility with id " + facilityId + " not found");
+            errors.add(String.format(ERROR_FACILITY_NOT_FOUND, facilityId));
         }
         if (!errors.isEmpty()) {
-            throw new IllegalArgumentException(String.join("; ", errors));
+            throw new IllegalArgumentException(String.join(ERROR_DELIMITER, errors));
         }
         Container container = containerOpt.get();
         Facility facility = facilityOpt.get();

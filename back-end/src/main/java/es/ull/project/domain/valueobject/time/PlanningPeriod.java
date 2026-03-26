@@ -12,7 +12,8 @@ import java.util.regex.Pattern;
  */
 public final class PlanningPeriod {
 
-    private static final Pattern PERIOD_PATTERN = Pattern.compile("^\\d{4}(-Q[1-4])?$");
+    private static final String PERIOD_REGEX = "^\\d{4}(-Q[1-4])?$";
+    private static final Pattern PERIOD_PATTERN = Pattern.compile(PERIOD_REGEX);
 
     private static final String ERROR_PERIOD_NOT_DEFINED = "Planning period is not defined";
     private static final String ERROR_PERIOD_FORMAT_INVALID =

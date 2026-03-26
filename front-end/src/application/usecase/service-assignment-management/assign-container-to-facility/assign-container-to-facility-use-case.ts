@@ -1,12 +1,12 @@
-// Re-export types for convenience
-export type { AssignContainerToFacilityCommand } from './assign-container-to-facility-command';
-export type { AssignContainerToFacilityResult } from './assign-container-to-facility-result';
-// AssignContainerToFacilityUseCase.ts
-// Use case contract for assigning a container to a facility
-
-import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { AssignContainerToFacilityCommand } from './assign-container-to-facility-command';
 import type { AssignContainerToFacilityResult } from './assign-container-to-facility-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { AssignContainerToFacilityCommand } from './assign-container-to-facility-command';
+export type { AssignContainerToFacilityResult } from './assign-container-to-facility-result';
+
+// AssignContainerToFacilityUseCase.ts
+// Use case contract for assigning a container to a facility
 
 
 // Use case contract

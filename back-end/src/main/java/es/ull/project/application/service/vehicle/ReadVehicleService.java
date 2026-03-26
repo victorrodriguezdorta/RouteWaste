@@ -1,16 +1,14 @@
 package es.ull.project.application.service.vehicle;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Service responsible for reading vehicle data from the system.

@@ -1,12 +1,12 @@
-// Re-export types for convenience
-export type { DeleteFacilityCommand } from './delete-facility-command';
-export type { DeleteFacilityResult } from './delete-facility-result';
-// DeleteFacilityUseCase.ts
-// Use case contract for deleting a facility
-
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { DeleteFacilityCommand } from './delete-facility-command';
 import type { DeleteFacilityResult } from './delete-facility-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { DeleteFacilityCommand } from './delete-facility-command';
+export type { DeleteFacilityResult } from './delete-facility-result';
+
+// DeleteFacilityUseCase.ts
+// Use case contract for deleting a facility
 
 
 /**

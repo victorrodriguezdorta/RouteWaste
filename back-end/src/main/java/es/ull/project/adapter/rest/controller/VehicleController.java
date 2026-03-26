@@ -1,9 +1,19 @@
 package es.ull.project.adapter.rest.controller;
 
+import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
+import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
+import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
+import es.ull.project.adapter.rest.response.vehicle.VehiclePageResponseBody;
+import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
+import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,18 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
-import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
-import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
-import es.ull.project.adapter.rest.response.vehicle.VehiclePageResponseBody;
-import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
-import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
-import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
-import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
-import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
-import es.ull.project.domain.entity.Vehicle;
-import es.ull.project.domain.enumerate.VehicleType;
-
 /**
  * VehicleController
  * 
@@ -48,6 +46,17 @@ import es.ull.project.domain.enumerate.VehicleType;
 @RestController
 @RequestMapping(ApiRoutes.VEHICLES)
 public class VehicleController {
+
+    private static final int ZERO = 0;
+
+    private static final String SORT_BY_CAPACITY = "capacity";
+    private static final String FIELD_CAPACITY = "transportCapacity.value";
+
+    private static final String SORT_BY_COST = "cost";
+    private static final String FIELD_COST = "costPerKilometer.amount";
+
+    private static final String SORT_BY_TYPE = "type";
+    private static final String FIELD_TYPE = "vehicleType";
 
     /**
      * Use case for reading vehicle data.
@@ -96,18 +105,15 @@ public class VehicleController {
             @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) String vehicleType) {
-        if (page < 0 || size <= 0) {
+        if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        // Map frontend column key to the actual MongoDB / domain field name
         String mongoSortField = switch (sortBy != null ? sortBy : "") {
-            case "capacity" -> "transportCapacity.value";
-            case "cost"     -> "costPerKilometer.amount";
-            case "type"     -> "vehicleType";
-            default         -> null;
+            case SORT_BY_CAPACITY -> FIELD_CAPACITY;
+            case SORT_BY_COST     -> FIELD_COST;
+            case SORT_BY_TYPE     -> FIELD_TYPE;
+            default               -> null;
         };
-
         Sort sort = Sort.unsorted();
         if (mongoSortField != null) {
             Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder)
@@ -115,7 +121,6 @@ public class VehicleController {
                     : Sort.Direction.ASC;
             sort = Sort.by(direction, mongoSortField);
         }
-
         VehicleType vehicleTypeFilter = null;
         if (vehicleType != null && !vehicleType.isBlank()) {
             try {
@@ -124,13 +129,11 @@ public class VehicleController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Vehicle> vehiclePage = this.readVehicleUseCase.fetchAll(pageable, vehicleTypeFilter);
         List<VehicleResponseBody> responseBodies = vehiclePage.getContent().stream()
                 .map(VehicleResponseMapper::toResponseBody)
                 .toList();
-
         VehiclePageResponseBody response = new VehiclePageResponseBody();
         response.content = responseBodies;
         response.totalElements = vehiclePage.getTotalElements();
@@ -140,7 +143,6 @@ public class VehicleController {
         response.numberOfElements = vehiclePage.getNumberOfElements();
         response.first = vehiclePage.isFirst();
         response.last = vehiclePage.isLast();
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -28,6 +28,7 @@ public enum FacilityType {
 
     private static final String ERROR_FACILITY_TYPE_NOT_DEFINED = "Facility type is not defined";
     private static final String ERROR_FACILITY_TYPE_INVALID = "Facility type is invalid. Allowed types: ";
+    private static final String SEPARATOR = ", ";
 
     /**
      * Returns the FacilityType that matches the given string.
@@ -99,7 +100,7 @@ public enum FacilityType {
     private static String allowedValues() {
         StringBuilder result = new StringBuilder();
         for (FacilityType facilityType : values()) {
-            result.append(facilityType.name()).append(", ");
+            result.append(facilityType.name()).append(SEPARATOR);
         }
         return result.substring(0, result.length() - 2);
     }

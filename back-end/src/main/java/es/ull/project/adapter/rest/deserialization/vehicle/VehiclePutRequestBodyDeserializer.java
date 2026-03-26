@@ -1,12 +1,9 @@
 package es.ull.project.adapter.rest.deserialization.vehicle;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
 import es.ull.project.domain.enumerate.TimeUnit;
@@ -15,6 +12,7 @@ import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.demand.QuantityUnit;
+import java.io.IOException;
 
 /**
  * VehiclePutRequestBodyDeserializer

@@ -1,8 +1,11 @@
 // Use case contract for validating an infrastructure plan
 
-import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { ValidateInfrastructurePlanCommand } from './validate-infrastructure-plan-command';
 import type { ValidateInfrastructurePlanResult } from './validate-infrastructure-plan-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { ValidateInfrastructurePlanCommand } from './validate-infrastructure-plan-command';
+export type { ValidateInfrastructurePlanResult } from './validate-infrastructure-plan-result';
 
 /**
  * Use case for validating an infrastructure plan.
@@ -19,7 +22,5 @@ export interface ValidateInfrastructurePlanUseCase {
     execute(command: ValidateInfrastructurePlanCommand): Promise<Either<DataError, ValidateInfrastructurePlanResult>>;
 }
 
-// Re-export types for convenience
-export type { ValidateInfrastructurePlanCommand } from './validate-infrastructure-plan-command';
-export type { ValidateInfrastructurePlanResult } from './validate-infrastructure-plan-result';
+
 

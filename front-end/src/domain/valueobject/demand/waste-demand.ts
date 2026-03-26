@@ -1,6 +1,6 @@
-import { TimeUnit } from '@/domain/enumerate/time-unit';
 import { Capacity } from './capacity';
 import { QuantityUnit } from './quantity-unit';
+import { TimeUnit } from '@/domain/enumerate/time-unit';
 
 /**
  * WasteDemand

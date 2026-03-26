@@ -1,8 +1,7 @@
-import type { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-
 import { VehicleType } from '@/domain/enumerate/vehicle-type';
 import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
 import { Capacity } from '@/domain/valueobject/demand/capacity';
+import type { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
  * Use case for updating an existing vehicle in the system.

@@ -1,21 +1,19 @@
+import { VehicleJsonResponse } from './dto/vehicle/vehicle-json-response';
+import type { VehiclePageJsonResponse } from './dto/vehicle/vehicle-page-json-response';
+import { VehiclePostJsonRequest } from './dto/vehicle/vehicle-post-json-request';
+import { VehiclePutJsonRequest } from './dto/vehicle/vehicle-put-json-request';
 import type { VehicleRepository } from '@/application/repository/vehicle-repository';
 import type { CreateVehicleCommand, CreateVehicleResult } from '@/application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
 import type { DeleteVehicleCommand, DeleteVehicleResult } from '@/application/usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';
 import type { GetVehicleCommand, GetVehicleResult } from '@/application/usecase/vehicle-management/get-vehicle/get-vehicle-use-case';
 import type { ListVehiclesCommand, ListVehiclesResult } from '@/application/usecase/vehicle-management/list-vehicles/list-vehicles-use-case';
 import type { UpdateVehicleCommand, UpdateVehicleResult } from '@/application/usecase/vehicle-management/update-vehicle/update-vehicle-use-case';
-import type {
-  ApiError,
-  DataError,
-} from '@ull-tfg/ull-tfg-typescript';
 import {
+  type ApiError,
+  type DataError,
   Either,
   http,
 } from '@ull-tfg/ull-tfg-typescript';
-import { VehicleJsonResponse } from './dto/vehicle/vehicle-json-response';
-import type { VehiclePageJsonResponse } from './dto/vehicle/vehicle-page-json-response';
-import { VehiclePostJsonRequest } from './dto/vehicle/vehicle-post-json-request';
-import { VehiclePutJsonRequest } from './dto/vehicle/vehicle-put-json-request';
 
 /**
  * HTTP repository implementation for Vehicle entity.

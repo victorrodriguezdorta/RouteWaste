@@ -1,13 +1,12 @@
-// Re-export types for convenience
-export type { ListVehiclesCommand } from './list-vehicles-command';
-export type { ListVehiclesResult } from './list-vehicles-result';
-// ListVehiclesUseCase.ts
-// Use case contract for listing all vehicles
-
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { ListVehiclesCommand } from './list-vehicles-command';
 import type { ListVehiclesResult } from './list-vehicles-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 
+export type { ListVehiclesCommand } from './list-vehicles-command';
+export type { ListVehiclesResult } from './list-vehicles-result';
+
+// ListVehiclesUseCase.ts
+// Use case contract for listing all vehicles
 
 /**
  * Use case for listing all vehicles in the system.

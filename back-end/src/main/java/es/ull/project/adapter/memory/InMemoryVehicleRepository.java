@@ -1,5 +1,8 @@
 package es.ull.project.adapter.memory;
 
+import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -9,20 +12,19 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import es.ull.project.application.repository.VehicleRepository;
-import es.ull.project.domain.entity.Vehicle;
-import es.ull.project.domain.enumerate.VehicleType;
-
 /**
  * In-memory VehicleRepository for tests and local runs.
  */
 public class InMemoryVehicleRepository implements VehicleRepository {
+
+    private static final String FIELD_CAPACITY = "transportCapacity.value";
+    private static final String FIELD_COST = "costPerKilometer.amount";
+    private static final String FIELD_TYPE = "vehicleType";
 
     private final Map<UUID, Vehicle> store = new LinkedHashMap<>();
 
@@ -72,7 +74,6 @@ public class InMemoryVehicleRepository implements VehicleRepository {
         if (start >= all.size()) {
             return new PageImpl<>(List.of(), pageable, all.size());
         }
-
         int end = Math.min(start + pageable.getPageSize(), all.size());
         List<Vehicle> content = all.subList(start, end);
         return new PageImpl<>(content, pageable, all.size());
@@ -88,20 +89,18 @@ public class InMemoryVehicleRepository implements VehicleRepository {
     @Override
     public Page<Vehicle> findAll(Pageable pageable, VehicleType vehicleType) {
         Stream<Vehicle> stream = fetchAll().stream();
-
         if (vehicleType != null) {
             stream = stream.filter(v -> vehicleType.equals(v.getVehicleType()));
         }
-        
         if (pageable.getSort().isSorted()) {
             Comparator<Vehicle> comparator = null;
             for (Sort.Order order : pageable.getSort()) {
                 Comparator<Vehicle> fieldComparator = switch (order.getProperty()) {
-                    case "transportCapacity.value" ->
+                    case FIELD_CAPACITY ->
                             Comparator.comparingDouble(v -> v.getTransportCapacity().getValue());
-                    case "costPerKilometer.amount" ->
+                    case FIELD_COST ->
                             Comparator.comparingDouble(v -> v.getCostPerKilometer().getAmount());
-                    case "vehicleType" ->
+                    case FIELD_TYPE ->
                             Comparator.comparing((Vehicle v) -> v.getVehicleType().name());
                     default -> Comparator.comparingInt(v -> 0);
                 };
@@ -114,7 +113,6 @@ public class InMemoryVehicleRepository implements VehicleRepository {
                 stream = stream.sorted(comparator);
             }
         }
-
         List<Vehicle> filtered = stream.collect(Collectors.toList());
         long total = filtered.size();
         int start = (int) pageable.getOffset();

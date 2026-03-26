@@ -1,8 +1,7 @@
 package es.ull.project.domain.valueobject.demand;
 
-import java.util.Objects;
-
 import es.ull.project.domain.enumerate.TimeUnit;
+import java.util.Objects;
 
 /**
  * WasteDemand

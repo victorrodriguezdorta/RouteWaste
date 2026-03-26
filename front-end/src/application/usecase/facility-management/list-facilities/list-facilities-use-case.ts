@@ -1,12 +1,12 @@
-// Re-export types for convenience
-export type { ListFacilitiesCommand } from './list-facilities-command';
-export type { ListFacilitiesResult } from './list-facilities-result';
-// ListFacilitiesUseCase.ts
-// Use case contract for listing all facilities
-
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { ListFacilitiesCommand } from './list-facilities-command';
 import type { ListFacilitiesResult } from './list-facilities-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { ListFacilitiesCommand } from './list-facilities-command';
+export type { ListFacilitiesResult } from './list-facilities-result';
+
+// ListFacilitiesUseCase.ts
+// Use case contract for listing all facilities
 
 
 /**

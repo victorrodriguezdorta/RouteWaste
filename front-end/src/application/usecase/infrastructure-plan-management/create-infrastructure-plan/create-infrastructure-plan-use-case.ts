@@ -1,8 +1,12 @@
-// Use case contract for creating a new infrastructure plan
-
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { CreateInfrastructurePlanCommand } from './create-infrastructure-plan-command';
 import type { CreateInfrastructurePlanResult } from './create-infrastructure-plan-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { CreateInfrastructurePlanCommand } from './create-infrastructure-plan-command';
+export type { CreateInfrastructurePlanResult } from './create-infrastructure-plan-result';
+
+// CreateInfrastructurePlanUseCase.ts
+// Use case contract for creating a new infrastructure plan
 
 /**
  * Use case for creating a new infrastructure plan in the system.
@@ -18,6 +22,3 @@ export interface CreateInfrastructurePlanUseCase {
     execute(command: CreateInfrastructurePlanCommand): Promise<Either<DataError, CreateInfrastructurePlanResult>>;
 }
 
-// Re-export types for convenience
-export type { CreateInfrastructurePlanCommand } from './create-infrastructure-plan-command';
-export type { CreateInfrastructurePlanResult } from './create-infrastructure-plan-result';

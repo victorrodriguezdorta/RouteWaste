@@ -1,9 +1,12 @@
-// UpdateContainerUseCase.ts
-// Use case contract for updating a container
-
-import type { Either, DataError } from '@ull-tfg/ull-tfg-typescript';
 import type { UpdateContainerCommand } from './update-container-command';
 import type { UpdateContainerResult } from './update-container-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { UpdateContainerCommand } from './update-container-command';
+export type { UpdateContainerResult } from './update-container-result';
+
+// UpdateContainerUseCase.ts
+// Use case contract for updating a container
 
 /**
  * Use case for updating an existing container in the system.
@@ -23,6 +26,4 @@ export interface UpdateContainerUseCase {
     execute(command: UpdateContainerCommand): Promise<Either<DataError, UpdateContainerResult>>;
 }
 
-// Re-export types for convenience
-export type { UpdateContainerCommand } from './update-container-command';
-export type { UpdateContainerResult } from './update-container-result';
+

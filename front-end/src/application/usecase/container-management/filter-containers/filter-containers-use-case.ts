@@ -1,9 +1,12 @@
-// FilterContainersUseCase.ts
-// Use case contract for filtering containers
-
-import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { FilterContainersCommand } from './filter-containers-command';
 import type { FilterContainersResult } from './filter-containers-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { FilterContainersCommand } from './filter-containers-command';
+export type { FilterContainersResult } from './filter-containers-result';
+
+// FilterContainersUseCase.ts
+// Use case contract for filtering containers
 
 /**
  * Use case for filtering containers based on criteria.
@@ -23,7 +26,5 @@ export interface FilterContainersUseCase {
     execute(command: FilterContainersCommand): Promise<Either<DataError, FilterContainersResult>>;
 }
 
-// Re-export types for convenience
-export type { FilterContainersCommand } from './filter-containers-command';
-export type { FilterContainersResult } from './filter-containers-result';
+
 

@@ -29,6 +29,7 @@ public enum ServiceZone {
 
     private static final String ERROR_SERVICE_ZONE_NOT_DEFINED = "Service zone is not defined";
     private static final String ERROR_SERVICE_ZONE_INVALID = "Service zone is invalid. Allowed zones: ";
+    private static final String SEPARATOR = ", ";
 
     /**
      * Returns the ServiceZone that matches the given string.
@@ -100,7 +101,7 @@ public enum ServiceZone {
     private static String allowedValues() {
         StringBuilder result = new StringBuilder();
         for (ServiceZone serviceZone : values()) {
-            result.append(serviceZone.name()).append(", ");
+            result.append(serviceZone.name()).append(SEPARATOR);
         }
         return result.substring(0, result.length() - 2);
     }

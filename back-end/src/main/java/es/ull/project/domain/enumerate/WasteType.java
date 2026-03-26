@@ -38,6 +38,7 @@ public enum WasteType {
 
     private static final String ERROR_WASTE_TYPE_NOT_DEFINED = "Waste type is not defined";
     private static final String ERROR_WASTE_TYPE_INVALID = "Waste type is invalid. Allowed types: ";
+    private static final String SEPARATOR = ", ";
 
     /**
      * Returns the WasteType that matches the given string.
@@ -108,7 +109,7 @@ public enum WasteType {
     private static String allowedValues() {
         StringBuilder result = new StringBuilder();
         for (WasteType wasteType : values()) {
-            result.append(wasteType.name()).append(", ");
+            result.append(wasteType.name()).append(SEPARATOR);
         }
         return result.substring(0, result.length() - 2);
     }

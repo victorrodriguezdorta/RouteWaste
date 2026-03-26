@@ -15,7 +15,8 @@ public final class QuantityUnit {
     /**
      * Pattern to validate unit format (only alphabetic characters).
      */
-    private static final Pattern UNIT_PATTERN = Pattern.compile("^[a-zA-Z]+$");
+    private static final String UNIT_REGEX = "^[a-zA-Z]+$";
+    private static final Pattern UNIT_PATTERN = Pattern.compile(UNIT_REGEX);
 
     private static final String ERROR_UNIT_NOT_DEFINED = "Quantity unit is not defined";
     private static final String ERROR_UNIT_EMPTY = "Quantity unit cannot be empty";

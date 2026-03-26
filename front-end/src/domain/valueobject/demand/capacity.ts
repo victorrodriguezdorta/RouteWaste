@@ -1,5 +1,5 @@
-import { TimeUnit } from '@/domain/enumerate/time-unit';
 import { QuantityUnit } from './quantity-unit';
+import { TimeUnit } from '@/domain/enumerate/time-unit';
 
 /**
  * Capacity

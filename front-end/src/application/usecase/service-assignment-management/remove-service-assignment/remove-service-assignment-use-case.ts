@@ -1,12 +1,12 @@
-// Re-export types for convenience
-export type { RemoveServiceAssignmentCommand } from './remove-service-assignment-command';
-export type { RemoveServiceAssignmentResult } from './remove-service-assignment-result';
-// RemoveServiceAssignmentUseCase.ts
-// Use case contract for removing a service assignment
-
-import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 import type { RemoveServiceAssignmentCommand } from './remove-service-assignment-command';
 import type { RemoveServiceAssignmentResult } from './remove-service-assignment-result';
+import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
+
+export type { RemoveServiceAssignmentCommand } from './remove-service-assignment-command';
+export type { RemoveServiceAssignmentResult } from './remove-service-assignment-result';
+
+// RemoveServiceAssignmentUseCase.ts
+// Use case contract for removing a service assignment
 
 /**
  * Use case for removing a service assignment from the system.

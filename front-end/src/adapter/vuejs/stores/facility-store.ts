@@ -1,6 +1,3 @@
-import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import { defineStore } from 'pinia';
-
 import { FacilityHttpRepository } from '@/adapter/http/facility-http-repository';
 import {
   CreateFacilityService,
@@ -11,6 +8,8 @@ import {
   UpdateFacilityService
 } from '@/application/service/facility';
 import type { Facility } from '@/domain/entity/facility';
+import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
+import { defineStore } from 'pinia';
 
 /**
  * Facility Store
