@@ -7,6 +7,37 @@
 -->
 <template>
   <div>
+    <!-- Vehicle type selector (editable) or text field (read-only) -->
+    <v-row>
+      <v-col cols="12">
+        <v-select
+          v-if="!readonly"
+          :model-value="vehicle.vehicleType"
+          :items="vehicleTypeOptions"
+          item-title="title"
+          item-value="value"
+          :rules="[
+            (value: string) =>
+              VehicleAdd.externalValidateVehicleType(value),
+          ]"
+          :label="t('vehicle.add.fields.vehicleType')"
+          color="primary"
+          prepend-icon="mdi-truck-cargo-container"
+          required
+          @update:model-value="updateVehicleType"
+        ></v-select>
+        <v-text-field
+          v-else
+          :model-value="translatedVehicleType"
+          :label="t('vehicle.add.fields.vehicleType')"
+          color="primary"
+          prepend-icon="mdi-truck-cargo-container"
+          readonly
+          disabled
+        ></v-text-field>
+      </v-col>
+    </v-row>
+
     <!-- Transport capacity (value and quantity unit) -->
     <v-row>
       <v-col cols="12" sm="6">
@@ -49,21 +80,31 @@
     <!-- Capacity time unit and cost per kilometer -->
     <v-row>
       <v-col cols="12" sm="6">
-        <InputTooltip
-          :data="vehicle.capacityTimeUnit"
-          input-type="text"
-          :text="t('vehicle.add.fields.timeUnit')"
-          :tooltip="t('vehicle.add.fields.timeUnit')"
-          counter="20"
+        <v-select
+          v-if="!readonly"
+          :model-value="vehicle.capacityTimeUnit"
+          :items="timeUnitOptions"
+          item-title="title"
+          item-value="value"
           :rules="[
             (value: string) =>
               VehicleAdd.externalValidateCapacityTimeUnit(value),
           ]"
-          :required="!readonly"
-          :readonly="readonly"
-          :disabled="readonly"
-          @updateData="updateCapacityTimeUnit"
-        />
+          :label="t('vehicle.add.fields.timeUnit')"
+          color="primary"
+          prepend-icon="mdi-clock-outline"
+          required
+          @update:model-value="updateCapacityTimeUnit"
+        ></v-select>
+        <v-text-field
+          v-else
+          :model-value="translatedTimeUnit"
+          :label="t('vehicle.add.fields.timeUnit')"
+          color="primary"
+          prepend-icon="mdi-clock-outline"
+          readonly
+          disabled
+        ></v-text-field>
       </v-col>
       <v-col cols="12" sm="6">
         <InputTooltip
@@ -74,8 +115,7 @@
           counter="100"
           :rules="[
             (value: string) => validateMaxDecimals(value, 2),
-            (value: any) =>
-              VehicleAdd.externalValidateCostPerKilometer(Number(value)),
+            (value: string) => validateCostPerKilometer(value),
           ]"
           :required="!readonly"
           :readonly="readonly"
@@ -121,7 +161,10 @@
  */
 
 import { InputTooltip } from '@ull-tfg/ull-tfg-vue';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { timeUnitToOptions } from '../../../../domain/enumerate/time-unit';
+import { VehicleType, vehicleTypeToOptions } from '../../../../domain/enumerate/vehicle-type';
 import { VehicleAdd } from '../../dto/vehicle/vehicle-add';
 
 // Vue I18n composable for translations
@@ -143,6 +186,41 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:vehicle', value: any): void;
 }>();
+
+/**
+ * Options for the vehicle type selector (derived from domain)
+ */
+const vehicleTypeOptions = computed(() => vehicleTypeToOptions(t));
+
+/**
+ * Options for the time unit selector (derived from domain)
+ */
+const timeUnitOptions = computed(() => timeUnitToOptions(t));
+
+/**
+ * Translated vehicle type for read-only display
+ */
+const translatedVehicleType = computed(() => {
+  if (!props.vehicle.vehicleType) return '';
+  return t(`vehicle.add.vehicleTypes.${props.vehicle.vehicleType}`);
+});
+
+/**
+ * Translated time unit for read-only display
+ */
+const translatedTimeUnit = computed(() => {
+  if (!props.vehicle.capacityTimeUnit) return '';
+  return t(`common.timeUnits.${props.vehicle.capacityTimeUnit}`);
+});
+
+/**
+ * Update vehicle type and emit change event
+ * @param value - New vehicle type
+ */
+const updateVehicleType = (value: VehicleType) => {
+  const updated = { ...props.vehicle, vehicleType: value };
+  emit('update:vehicle', updated);
+};
 
 /**
  * Update capacity value and emit change event
@@ -207,6 +285,21 @@ const validateMaxDecimals = (value: string, maxDecimals: number): boolean | stri
   }
   
   return true;
+};
+
+/**
+ * Validate cost per kilometer with translated messages.
+ * Business rule for the form requires a value greater than 0.
+ */
+const validateCostPerKilometer = (value: string): boolean | string => {
+  if (!value || value === '') return true;
+
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue) || numericValue <= 0) {
+    return t('common.validationMessages.costPerKilometerNotZero');
+  }
+
+  return VehicleAdd.externalValidateCostPerKilometer(numericValue);
 };
 </script>
 

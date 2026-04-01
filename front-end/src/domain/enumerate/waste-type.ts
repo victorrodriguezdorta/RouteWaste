@@ -85,3 +85,32 @@ export function wasteTypeRandom(): WasteType {
 export function wasteTypeAllowedValues(): string {
   return wasteTypeValues().join(', ');
 }
+
+/**
+ * Returns the UI color for a given waste type.
+ * @param {WasteType} type - Waste type.
+ * @returns {string} Color name suitable for Vuetify components.
+ */
+export function wasteTypeColor(type: WasteType | string): string {
+  const t = typeof type === 'string' ? wasteTypeFromString(type) : type;
+  switch (t) {
+    case WasteType.ORGANIC: return 'brown';
+    case WasteType.PACKAGING: return 'amber';
+    case WasteType.PAPER_CARDBOARD: return 'blue';
+    case WasteType.GLASS: return 'green';
+    case WasteType.RESIDUAL: return 'grey';
+    default: return 'grey';
+  }
+}
+
+/**
+ * Returns the options for a waste type selector.
+ * @param {Function} t Translation function.
+ * @returns {{ title: string; value: WasteType }[]} array of options.
+ */
+export function wasteTypeToOptions(t: (key: string) => string): { title: string; value: WasteType }[] {
+  return wasteTypeValues().map((type) => ({
+    title: t(`container.add.wasteTypes.${type}`),
+    value: type,
+  }));
+}

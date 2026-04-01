@@ -1,9 +1,12 @@
 package es.ull.project.application.repository;
 
 import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Repository interface for the Container aggregate.
@@ -34,6 +37,23 @@ public interface ContainerRepository {
      * @return list of all containers
      */
     public abstract List<Container> findAll();
+
+    /**
+     * Find containers using pagination.
+     *
+     * @param pageable pagination configuration
+     * @return page of containers
+     */
+    public abstract Page<Container> findAll(Pageable pageable);
+
+    /**
+     * Find containers using pagination and an optional waste type filter.
+     *
+     * @param pageable pagination and sort configuration
+     * @param wasteType optional waste type to filter by (null means no filter)
+     * @return page of matching containers
+     */
+    public abstract Page<Container> findAll(Pageable pageable, WasteType wasteType);
 
     /**
      * Save or update a container.

@@ -2,7 +2,6 @@ import { ContainerHttpRepository } from '@/adapter/http/container-http-repositor
 import {
   CreateContainerService,
   DeleteContainerService,
-  FilterContainersService,
   GetContainerService,
   ListContainersService,
   UpdateContainerService
@@ -33,6 +32,15 @@ export const useContainerStore = defineStore('Container', {
   state: () => ({
     /** Array of all containers retrieved from the backend */
     containers: [] as Container[],
+
+    /** Total amount of containers available in backend */
+    totalContainers: 0,
+
+    /** Current zero-based page index loaded from backend */
+    currentPage: 0,
+
+    /** Current requested page size */
+    rowsPerPage: 10,
     
     /** Currently selected container (if any) */
     container: undefined as Container | undefined,
@@ -83,20 +91,31 @@ export const useContainerStore = defineStore('Container', {
    */
   actions: {
     /**
-     * Retrieve all containers from the backend with optional pagination
+     * Retrieve all containers from the backend with optional pagination, sort and filter
      * 
      * @param page Optional page number for pagination
      * @param rowsPerPage Optional number of items per page
+     * @param sortBy Optional sort column key
+     * @param sortOrder Optional sort direction
+     * @param wasteType Optional waste type filter
      */
-    async getContainers(page?: number, rowsPerPage?: number) {
+    async getContainers(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', wasteType?: string) {
       this.loading = true;
       this.containers = [];
+      const requestedPage = page ?? this.currentPage;
+      const requestedRowsPerPage = rowsPerPage ?? this.rowsPerPage;
       
       // Create service instance with repository
       const listService = new ListContainersService(this.containerRepository);
       
       // Execute the list operation
-      const result = await listService.execute({ page, pageSize: rowsPerPage });
+      const result = await listService.execute({
+        page: requestedPage,
+        pageSize: requestedRowsPerPage,
+        sortBy,
+        sortOrder,
+        wasteType
+      });
       
       // Handle the result using Either pattern
       result.fold(
@@ -107,7 +126,10 @@ export const useContainerStore = defineStore('Container', {
         },
         data => {
           // Success case: update state with containers
-          this.containers = data;
+          this.containers = data.items;
+          this.totalContainers = data.totalElements;
+          this.currentPage = data.page;
+          this.rowsPerPage = data.size;
           this.loading = false;
         }
       );
@@ -258,36 +280,6 @@ export const useContainerStore = defineStore('Container', {
               'success'
             );
           }
-        }
-      );
-    },
-
-    /**
-     * Filter containers based on specified criteria
-     * 
-     * @param filterCriteria Object containing filter parameters
-     */
-    async filterContainers(filterCriteria: any) {
-      this.loading = true;
-      this.containers = [];
-      
-      // Create service instance with repository
-      const filterService = new FilterContainersService(this.containerRepository);
-      
-      // Execute the filter operation
-      const result = await filterService.execute(filterCriteria);
-      
-      // Handle the result
-      result.fold(
-        error => {
-          // Error case: handle and notify user
-          this.handleError(error);
-          this.loading = false;
-        },
-        data => {
-          // Success case: update state with filtered containers
-          this.containers = data;
-          this.loading = false;
         }
       );
     },

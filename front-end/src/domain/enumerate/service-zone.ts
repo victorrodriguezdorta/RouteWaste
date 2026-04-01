@@ -79,3 +79,30 @@ export function serviceZoneRandom(): ServiceZone {
 export function serviceZoneAllowedValues(): string {
   return serviceZoneValues().join(', ');
 }
+
+/**
+ * Returns the UI color for a given service zone.
+ * @param {ServiceZone} zone - Service zone.
+ * @returns {string} Color name suitable for Vuetify components.
+ */
+export function serviceZoneColor(zone: ServiceZone | string): string {
+  const z = typeof zone === 'string' ? serviceZoneFromString(zone) : zone;
+  switch (z) {
+    case ServiceZone.NEIGHBORHOOD: return 'teal';
+    case ServiceZone.DISTRICT: return 'indigo';
+    case ServiceZone.GEOGRAPHICAL_AREA: return 'purple';
+    default: return 'grey';
+  }
+}
+
+/**
+ * Returns the options for a service zone selector.
+ * @param {Function} t Translation function.
+ * @returns {{ title: string; value: ServiceZone }[]} array of options.
+ */
+export function serviceZoneToOptions(t: (key: string) => string): { title: string; value: ServiceZone }[] {
+  return serviceZoneValues().map((zone) => ({
+    title: t(`container.add.serviceZones.${zone}`),
+    value: zone,
+  }));
+}

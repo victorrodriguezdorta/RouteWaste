@@ -1,4 +1,11 @@
 {
+  "nav": {
+    "navigation": "Navegación",
+    "openMenu": "Abrir menú de navegación",
+    "vehicles": "Vehículos",
+    "language": "Idioma",
+    "menu": "Menú"
+  },
   "common": {
     "buttons": {
       "cancel": "Cancelar",
@@ -20,11 +27,15 @@
       "MONTH": "mes",
       "YEAR": "año"
     },
+    "loading": "Cargando...",
     "alerts": {
       "requiredFields": "Los campos marcados con * son obligatorios"
     },
     "validationMessages": {
-      "maxDecimals": "Máximo {maxDecimals} decimales permitidos"
+      "maxDecimals": "Máximo {maxDecimals} decimales permitidos",
+      "costPerKilometerNotZero": "El costo por kilómetro debe ser mayor que 0",
+      "validationError": "Error de Validación",
+      "checkFormFields": "Por favor revisa los campos del formulario"
     }
   },
   "vehicle": {
@@ -111,8 +122,8 @@
         "postalAddress": "Dirección Postal",
         "gisReference": "Referencia GIS",
         "wasteType": "Tipo de Residuo",
-        "wasteDemandValue": "Demanda de Residuo",
-        "wasteDemandQuantityUnit": "Unidad de Demanda (ej: kg, tons)",
+        "wasteDemandValue": "Valor de Demanda",
+        "wasteDemandQuantityUnit": "Unidad de Demanda (ej: tons, kg)",
         "wasteDemandTimeUnit": "Unidad de Tiempo",
         "serviceZone": "Zona de Servicio"
       },
@@ -129,28 +140,81 @@
         "GEOGRAPHICAL_AREA": "Área Geográfica"
       }
     },
+    "edit": {
+      "title": "Editar Contenedor",
+      "cardTitle": "InformaciÃ³n del Contenedor",
+      "loading": "Cargando contenedor...",
+      "fields": {
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "postalAddress": "DirecciÃ³n Postal",
+        "gisReference": "Referencia GIS",
+        "wasteType": "Tipo de Residuo",
+        "wasteDemandValue": "Valor de Demanda",
+        "wasteDemandQuantityUnit": "Unidad de Demanda (ej: tons, kg)",
+        "wasteDemandTimeUnit": "Unidad de Tiempo",
+        "serviceZone": "Zona de Servicio"
+      }
+    },
+    "show": {
+      "title": "Detalles del Contenedor",
+      "cardTitle": "InformaciÃ³n del Contenedor",
+      "loading": "Cargando contenedor...",
+      "fields": {
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "postalAddress": "DirecciÃ³n Postal",
+        "gisReference": "Referencia GIS",
+        "wasteType": "Tipo de Residuo",
+        "wasteDemandValue": "Valor de Demanda",
+        "wasteDemandQuantityUnit": "Unidad de Demanda",
+        "wasteDemandTimeUnit": "Unidad de Tiempo",
+        "serviceZone": "Zona de Servicio",
+        "containerId": "ID del Contenedor"
+      }
+    },
     "list": {
       "title": "Contenedores",
       "addButton": "Agregar Contenedor",
       "filterByWasteType": "Filtrar por tipo de residuo",
+      "notAssigned": "No asignada",
       "table": {
         "headers": {
           "wasteType": "Tipo de Residuo",
-          "wasteDemand": "Demanda",
+          "location": "UbicaciÃ³n",
+          "demand": "Demanda",
           "serviceZone": "Zona de Servicio",
-          "location": "Ubicación",
           "actions": "Acciones"
         },
         "tooltips": {
+          "view": "Ver detalles",
+          "edit": "Editar",
           "delete": "Eliminar"
         },
-        "notAssigned": "Sin asignar",
         "noData": "No hay contenedores registrados.",
         "addFirst": "Agregar el primero"
       },
       "deleteDialog": {
-        "title": "Confirmar Eliminación",
-        "message": "¿Está seguro que desea eliminar este contenedor? Esta acción no se puede deshacer."
+        "title": "Confirmar EliminaciÃ³n",
+        "message": "Â¿EstÃ¡ seguro que desea eliminar este contenedor? Esta acciÃ³n no se puede deshacer."
+      }
+    }
+  },
+  "selection": {
+    "title": "Gestión de Entidades",
+    "subtitle": "Selecciona el módulo que deseas gestionar",
+    "types": {
+      "vehicles": {
+        "title": "Vehículos",
+        "description": "Gestiona la flota de vehículos, tipos de transporte y sus capacidades."
+      },
+      "containers": {
+        "title": "Contenedores",
+        "description": "Administra los contenedores de residuos, tipos y zonas de servicio."
+      },
+      "facilities": {
+        "title": "Instalaciones",
+        "description": "Configura las instalaciones de procesamiento, almacenes y puntos de transferencia."
       }
     }
   }

@@ -1,4 +1,11 @@
 {
+  "nav": {
+    "navigation": "Navigation",
+    "openMenu": "Open navigation menu",
+    "vehicles": "Vehicles",
+    "language": "Language",
+    "menu": "Menu"
+  },
   "common": {
     "buttons": {
       "cancel": "Cancel",
@@ -20,11 +27,15 @@
       "MONTH": "month",
       "YEAR": "year"
     },
+    "loading": "Loading...",
     "alerts": {
       "requiredFields": "Fields marked with * are required"
     },
     "validationMessages": {
-      "maxDecimals": "Maximum {maxDecimals} decimal places allowed"
+      "maxDecimals": "Maximum {maxDecimals} decimal places allowed",
+      "costPerKilometerNotZero": "Cost per kilometer must be greater than 0",
+      "validationError": "Validation Error",
+      "checkFormFields": "Please review the form fields"
     }
   },
   "vehicle": {
@@ -111,8 +122,8 @@
         "postalAddress": "Postal Address",
         "gisReference": "GIS Reference",
         "wasteType": "Waste Type",
-        "wasteDemandValue": "Waste Demand",
-        "wasteDemandQuantityUnit": "Demand Unit (e.g., kg, tons)",
+        "wasteDemandValue": "Demand Value",
+        "wasteDemandQuantityUnit": "Demand Unit (e.g., tons, kg)",
         "wasteDemandTimeUnit": "Time Unit",
         "serviceZone": "Service Zone"
       },
@@ -129,28 +140,81 @@
         "GEOGRAPHICAL_AREA": "Geographical Area"
       }
     },
+    "edit": {
+      "title": "Edit Container",
+      "cardTitle": "Container Information",
+      "loading": "Loading container...",
+      "fields": {
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "postalAddress": "Postal Address",
+        "gisReference": "GIS Reference",
+        "wasteType": "Waste Type",
+        "wasteDemandValue": "Demand Value",
+        "wasteDemandQuantityUnit": "Demand Unit (e.g., tons, kg)",
+        "wasteDemandTimeUnit": "Time Unit",
+        "serviceZone": "Service Zone"
+      }
+    },
+    "show": {
+      "title": "Container Details",
+      "cardTitle": "Container Information",
+      "loading": "Loading container...",
+      "fields": {
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "postalAddress": "Postal Address",
+        "gisReference": "GIS Reference",
+        "wasteType": "Waste Type",
+        "wasteDemandValue": "Demand Value",
+        "wasteDemandQuantityUnit": "Demand Unit",
+        "wasteDemandTimeUnit": "Time Unit",
+        "serviceZone": "Service Zone",
+        "containerId": "Container ID"
+      }
+    },
     "list": {
       "title": "Containers",
       "addButton": "Add Container",
       "filterByWasteType": "Filter by waste type",
+      "notAssigned": "Not assigned",
       "table": {
         "headers": {
           "wasteType": "Waste Type",
-          "wasteDemand": "Demand",
-          "serviceZone": "Service Zone",
           "location": "Location",
+          "demand": "Demand",
+          "serviceZone": "Service Zone",
           "actions": "Actions"
         },
         "tooltips": {
+          "view": "View details",
+          "edit": "Edit",
           "delete": "Delete"
         },
-        "notAssigned": "Not assigned",
         "noData": "No containers registered.",
         "addFirst": "Add the first one"
       },
       "deleteDialog": {
         "title": "Confirm Deletion",
         "message": "Are you sure you want to delete this container? This action cannot be undone."
+      }
+    }
+  },
+  "selection": {
+    "title": "Entity Management",
+    "subtitle": "Select the module you want to manage",
+    "types": {
+      "vehicles": {
+        "title": "Vehicles",
+        "description": "Manage the fleet of vehicles, transport types and their capacities."
+      },
+      "containers": {
+        "title": "Containers",
+        "description": "Administer waste containers, types and service zones."
+      },
+      "facilities": {
+        "title": "Facilities",
+        "description": "Configure processing facilities, warehouses and transfer points."
       }
     }
   }

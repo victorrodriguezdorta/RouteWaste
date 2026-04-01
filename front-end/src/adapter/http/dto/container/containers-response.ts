@@ -1,4 +1,5 @@
 import { ContainerJsonResponse } from './container-json-response';
+import type { ContainerPageJsonResponse } from './container-page-json-response';
 
 /**
  * ContainersResponse
@@ -8,3 +9,8 @@ import { ContainerJsonResponse } from './container-json-response';
  * (e.g. adding pagination metadata) later without changing call sites.
  */
 export type ContainersResponse = ContainerJsonResponse[];
+
+/**
+ * Union response type kept for compatibility with non-paginated backends.
+ */
+export type ContainersListResponse = ContainersResponse | ContainerPageJsonResponse;

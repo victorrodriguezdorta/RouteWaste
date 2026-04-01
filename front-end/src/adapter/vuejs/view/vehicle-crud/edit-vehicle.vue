@@ -9,7 +9,7 @@
     <LoaderDialog
       v-if="loading"
       :dialog="loading"
-      title="Loading..."
+      :title="t('common.loading')"
       :message="t('vehicle.edit.loading')"
       color="primary"
       persistent
@@ -36,23 +36,7 @@
         :go-back="goBack"
       >
         <v-form ref="vehicleForm">
-          <!-- Vehicle type selector -->
-          <v-select
-            v-model="editVehicle!.vehicleType"
-            :items="vehicleTypeOptions"
-            item-title="title"
-            item-value="value"
-            :rules="[
-              (value: string) =>
-                VehicleEdit.externalValidateVehicleType(value),
-            ]"
-            :label="t('vehicle.edit.fields.vehicleType')"
-            color="primary"
-            prepend-icon="mdi-truck-cargo-container"
-            required
-          ></v-select>
-
-          <!-- Transport capacity (value, quantity unit, time unit) and Cost fields -->
+          <!-- Transport capacity (value, quantity unit, time unit), Cost and Type fields -->
           <VehicleFormFields 
             v-if="editVehicle"
             :vehicle="editVehicle"
@@ -66,7 +50,7 @@
 
         <template #toolbar-append>
           <ButtonTooltip
-            @click="validate"
+            :eventclick="validate"
             icon="mdi-content-save"
             variant="elevated"
             color="success"
@@ -95,7 +79,6 @@ import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { VehicleType, vehicleTypeValues } from '../../../../domain/enumerate/vehicle-type';
 import VehicleFormFields from '../../components/vehicle/vehicle-form-fields.vue';
 import { VehicleEdit } from '../../dto/vehicle/vehicle-edit';
 import router from '../../router/router';
@@ -116,16 +99,12 @@ const vehicleId = ref(route.params.id.toString());
 const vehicleForm = ref();
 const editVehicle = ref<VehicleEdit>();
 
-// Options for dropdown selectors
-const vehicleTypeOptions = ref<{ title: string; value: string }[]>([]);
-
 /**
  * Initialize view when component mounts
  * Fetches vehicle data from the server and populates form
  */
 onMounted(async () => {
   loading.value = true;
-  setVehicleTypeOptions();
   await vehicleStore.getVehicleById(vehicleId.value);
   setVehicle();
   loading.value = false;
@@ -133,7 +112,6 @@ onMounted(async () => {
 
 // Re-apply translations when locale changes
 watch(locale, () => {
-  setVehicleTypeOptions();
   if (vehicle.value) {
     setVehicle();
   } else {
@@ -158,31 +136,11 @@ const setVehicle = () => {
       vehicle.value.getCostPerKilometer().getCurrency().getCode()
     );
 
-    // Update title with vehicle type
-    title.value = t('vehicle.edit.titleWithType', { type: formatVehicleType(vehicle.value.getVehicleType()) });
+    // Update title
+    title.value = t('vehicle.edit.title');
   }
 };
 
-/**
- * Set up vehicle type options for the dropdown
- * Maps enum values to human-readable labels
- */
-const setVehicleTypeOptions = () => {
-  const types = vehicleTypeValues();
-  vehicleTypeOptions.value = types.map((type) => ({
-    title: formatVehicleType(type),
-    value: type,
-  }));
-};
-
-/**
- * Format vehicle type enum to display string using i18n
- * @param type - VehicleType enum value
- * @returns Formatted vehicle type label
- */
-const formatVehicleType = (type: VehicleType): string => {
-  return t(`vehicle.add.vehicleTypes.${type}`);
-};
 
 /**
  * Update vehicle in the system
@@ -208,8 +166,8 @@ const validate = async () => {
     await updateVehicle();
   } else {
     vehicleStore.setNotification(
-      'Error de Validación',
-      'Por favor revisa los campos del formulario',
+      t('common.validationMessages.validationError'),
+      t('common.validationMessages.checkFormFields'),
       'mdi-alert-circle',
       'error'
     );

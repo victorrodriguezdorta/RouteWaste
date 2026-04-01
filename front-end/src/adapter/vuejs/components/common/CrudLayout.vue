@@ -2,35 +2,39 @@
   <v-container fluid>
     <v-row justify="center">
       <v-col cols="12" :md="contentMd" :lg="contentLg">
-        <v-card class="elevation-2 rounded-lg">
-          
-          <v-toolbar color="primary" dark>
-            <v-icon v-if="icon" class="ml-4 mr-2">{{ icon }}</v-icon>
-            <v-toolbar-title class="text-white font-weight-medium">
-              {{ title }}
-            </v-toolbar-title>
+        <!-- Header Section -->
+        <v-row align="center" class="mb-8 px-4 mt-2">
+          <v-col class="d-flex align-center">
+            <v-icon v-if="icon" size="48" class="mr-4" color="primary">{{ icon }}</v-icon>
+            <h1 class="text-h4 font-weight-bold text-primary">{{ title }}</h1>
             
-            <v-spacer />
+            <div class="ml-6">
+              <slot name="title-actions" />
+            </div>
+          </v-col>
+          
+          <v-spacer />
+          
+          <v-col cols="auto" class="d-flex align-center">
+            <slot name="toolbar-append" />
             
             <v-btn
               v-if="showGoBack"
-              class="ma-2"
-              color="white"
+              class="ml-2"
+              color="primary"
               variant="outlined"
               @click="goBack"
             >
               <v-icon start icon="mdi-arrow-left" />
               {{ t('common.buttons.cancel') }}
             </v-btn>
-            
-            <slot name="toolbar-append" />
-          </v-toolbar>
+          </v-col>
+        </v-row>
 
-          <v-card-text class="pt-6 pb-6">
-            <slot />
-          </v-card-text>
-          
-        </v-card>
+        <!-- Content Section -->
+        <div class="px-2">
+          <slot />
+        </div>
       </v-col>
     </v-row>
   </v-container>

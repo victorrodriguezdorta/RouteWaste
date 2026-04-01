@@ -14,6 +14,7 @@
     hide-details
     prepend-inner-icon="mdi-translate"
     style="max-width: 150px;"
+    class="white-select"
     @update:model-value="changeLanguage"
   ></v-select>
 </template>
@@ -58,5 +59,24 @@ watch(locale, (newLocale) => {
 </script>
 
 <style scoped>
-/* Custom styles can be added here if needed */
+/* Make all select elements white when used inside the primary app bar */
+.white-select :deep(.v-field__input),
+.white-select :deep(.v-select__selection-text),
+.white-select :deep(.v-field-label),
+.white-select :deep(input),
+.white-select :deep(.v-icon) {
+  color: white !important;
+  caret-color: white !important;
+}
+
+.white-select :deep(.v-field__outline__start),
+.white-select :deep(.v-field__outline__end),
+.white-select :deep(.v-field__outline__notch) {
+  border-color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.white-select :deep(.v-field--focused .v-field__outline__start),
+.white-select :deep(.v-field--focused .v-field__outline__end) {
+  border-color: white !important;
+}
 </style>

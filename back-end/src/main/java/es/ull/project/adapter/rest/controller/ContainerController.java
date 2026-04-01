@@ -3,16 +3,22 @@ package es.ull.project.adapter.rest.controller;
 import es.ull.project.adapter.rest.mapper.ContainerResponseMapper;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
+import es.ull.project.adapter.rest.response.container.ContainerPageResponseBody;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
 import es.ull.project.application.usecase.container.CreateContainerUseCase;
 import es.ull.project.application.usecase.container.DeleteContainerUseCase;
 import es.ull.project.application.usecase.container.ReadContainerUseCase;
 import es.ull.project.application.usecase.container.UpdateContainerUseCase;
 import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -39,6 +46,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(ApiRoutes.CONTAINERS)
 public class ContainerController {
+
+    private static final int ZERO = 0;
+
+    private static final String SORT_BY_WASTE_TYPE = "wasteType";
+    private static final String FIELD_WASTE_TYPE = "wasteType";
+
+    private static final String SORT_BY_LOCATION = "location";
+    private static final String FIELD_LOCATION = "location.postalAddress";
+
+    private static final String SORT_BY_DEMAND = "demand";
+    private static final String FIELD_DEMAND = "wasteDemand.value";
+
+    private static final String SORT_BY_SERVICE_ZONE = "serviceZone";
+    private static final String FIELD_SERVICE_ZONE = "serviceZone";
 
     /**
      * Use case for reading container data.
@@ -79,12 +100,52 @@ public class ContainerController {
      * @return ResponseEntity containing a list of all containers and HTTP 200 (OK) status
      */
     @GetMapping("/")
-    public ResponseEntity<List<ContainerResponseBody>> getContainers() {
-        List<Container> containers = this.readContainerUseCase.fetchAll();
-        List<ContainerResponseBody> responseBodies = containers.stream()
+    public ResponseEntity<ContainerPageResponseBody> getContainers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) String wasteType) {
+        if (page < ZERO || size <= ZERO) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        String mongoSortField = switch (sortBy != null ? sortBy : "") {
+            case SORT_BY_WASTE_TYPE -> FIELD_WASTE_TYPE;
+            case SORT_BY_LOCATION -> FIELD_LOCATION;
+            case SORT_BY_DEMAND -> FIELD_DEMAND;
+            case SORT_BY_SERVICE_ZONE -> FIELD_SERVICE_ZONE;
+            default -> null;
+        };
+        Sort sort = Sort.unsorted();
+        if (mongoSortField != null) {
+            Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder)
+                    ? Sort.Direction.DESC
+                    : Sort.Direction.ASC;
+            sort = Sort.by(direction, mongoSortField);
+        }
+        WasteType wasteTypeFilter = null;
+        if (wasteType != null && !wasteType.isBlank()) {
+            try {
+                wasteTypeFilter = WasteType.valueOf(wasteType);
+            } catch (IllegalArgumentException e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Container> containerPage = this.readContainerUseCase.fetchAll(pageable, wasteTypeFilter);
+        List<ContainerResponseBody> responseBodies = containerPage.getContent().stream()
                 .map(ContainerResponseMapper::toResponseBody)
                 .toList();
-        return new ResponseEntity<>(responseBodies, HttpStatus.OK);
+        ContainerPageResponseBody response = new ContainerPageResponseBody();
+        response.content = responseBodies;
+        response.totalElements = containerPage.getTotalElements();
+        response.totalPages = containerPage.getTotalPages();
+        response.page = containerPage.getNumber();
+        response.size = containerPage.getSize();
+        response.numberOfElements = containerPage.getNumberOfElements();
+        response.first = containerPage.isFirst();
+        response.last = containerPage.isLast();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**

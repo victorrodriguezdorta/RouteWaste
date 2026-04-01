@@ -6,8 +6,8 @@ import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 /**
  * @brief Service implementing the ListContainers use case.
  *
- * Delegates listing to `ContainerRepository`. Pagination parameters are forwarded
- * directly to the repository; repository must return an `Either<DataError, Container[]>`.
+ * Delegates listing to `ContainerRepository`. Pagination, sorting and filtering
+ * parameters are forwarded directly to the repository.
  */
 export class ListContainersService implements ListContainersUseCase {
     /**
@@ -28,11 +28,9 @@ export class ListContainersService implements ListContainersUseCase {
     /**
      * @brief Execute the list containers use case.
      * @param command Optional pagination parameters.
-     * @returns Either a `DataError` or an array of `Container` entities.
+     * @returns Either a `DataError` or a paginated set of `Container` entities.
      */
     async execute(command?: ListContainersCommand): Promise<Either<DataError, ListContainersResult>> {
-        const page = command?.page;
-        const pageSize = command?.pageSize;
-        return this.containerRepository.list({ page, pageSize });
+        return this.containerRepository.list(command);
     }
 }

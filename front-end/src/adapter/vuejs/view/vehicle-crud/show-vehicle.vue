@@ -9,7 +9,7 @@
     <LoaderDialog
       v-if="loading"
       :dialog="loading"
-      title="Loading..."
+      :title="t('common.loading')"
       :message="t('vehicle.show.loading')"
       color="primary"
       persistent
@@ -24,32 +24,12 @@
         :go-back="goBack"
       >
         <v-form>
-          <!-- Vehicle type (read-only) -->
-          <v-text-field
-            :model-value="formatVehicleType(vehicleInfo.vehicleType as VehicleType)"
-            :label="t('vehicle.show.fields.vehicleType')"
-            color="primary"
-            prepend-icon="mdi-truck-cargo-container"
-            disabled
-            readonly
-          ></v-text-field>
-
-          <!-- Transport capacity (read-only) and Cost fields (read-only) -->
+          <!-- All vehicle fields (read-only) -->
           <VehicleFormFields 
             v-if="vehicleInfo"
             :vehicle="vehicleInfo"
             :readonly="true"
           />
-
-          <!-- Time unit (read-only) -->
-          <v-text-field
-            :model-value="formatTimeUnit(vehicleInfo.capacityTimeUnit as TimeUnit)"
-            :label="t('vehicle.show.fields.timeUnit')"
-            color="primary"
-            prepend-icon="mdi-clock-outline"
-            disabled
-            readonly
-          ></v-text-field>
 
           <!-- Vehicle UUID (read-only) -->
           <v-text-field
@@ -66,13 +46,13 @@
 
         <template #toolbar-append>
           <ButtonTooltip
-            @click="goToEdit"
+            :eventclick="goToEdit"
             icon="mdi-pencil"
             variant="elevated"
-            color="white"
+            color="primary"
             :text="t('common.buttons.edit')"
             :tooltip="t('common.buttons.edit')"
-            class="ml-2 mr-4"
+            class="ml-2"
           />
         </template>
       </CrudLayout>
@@ -95,8 +75,6 @@ import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { TimeUnit } from '../../../../domain/enumerate/time-unit';
-import { VehicleType } from '../../../../domain/enumerate/vehicle-type';
 import VehicleFormFields from '../../components/vehicle/vehicle-form-fields.vue';
 import { VehicleInfo } from '../../dto/vehicle/vehicle-info';
 import router from '../../router/router';
@@ -153,28 +131,11 @@ const setVehicle = () => {
       vehicle.value.getCostPerKilometer().getCurrency().getCode()
     );
 
-    // Update title with vehicle type
-    title.value = t('vehicle.show.titleWithType', { type: formatVehicleType(vehicle.value.getVehicleType()) });
+    // Update title
+    title.value = t('vehicle.show.title');
   }
 };
 
-/**
- * Format vehicle type enum to display string using i18n
- * @param type - VehicleType enum value
- * @returns Formatted vehicle type label
- */
-const formatVehicleType = (type: VehicleType): string => {
-  return t(`vehicle.add.vehicleTypes.${type}`);
-};
-
-/**
- * Format time unit enum to display string using i18n
- * @param unit - TimeUnit enum value
- * @returns Formatted time unit label
- */
-const formatTimeUnit = (unit: TimeUnit): string => {
-  return t(`common.timeUnits.${unit}`);
-};
 
 /**
  * Navigate to edit view for this vehicle

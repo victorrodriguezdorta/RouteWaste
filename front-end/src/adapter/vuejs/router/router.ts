@@ -15,8 +15,8 @@ import {
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
-        name: 'Home',
-        redirect: '/vehicles',
+        name: 'Selection',
+        component: () => import('../view/selection/selection-view.vue'),
     },
     {
         path: '/vehicles',
@@ -24,9 +24,36 @@ const routes: RouteRecordRaw[] = [
         component: () => import('../view/vehicle-crud/vehicles-view.vue'),
     },
     {
+        path: '/containers',
+        name: 'Containers',
+        component: () => import('../view/container-crud/containers-view.vue'),
+    },
+    {
+        path: '/facilities',
+        name: 'Facilities',
+        component: () => import('../view/vehicle-crud/vehicles-view.vue'), // Placeholder
+    },
+    {
         path: '/vehicles/add',
         name: 'AddVehicle',
         component: () => import('../view/vehicle-crud/add-vehicle.vue'),
+    },
+    {
+        path: '/containers/add',
+        name: 'AddContainer',
+        component: () => import('../view/container-crud/add-container.vue'),
+    },
+    {
+        path: '/containers/:id/edit',
+        name: 'EditContainer',
+        component: () => import('../view/container-crud/edit-container.vue'),
+        props: true,
+    },
+    {
+        path: '/containers/:id',
+        name: 'ShowContainer',
+        component: () => import('../view/container-crud/show-container.vue'),
+        props: true,
     },
     {
         path: '/vehicles/:id/edit',

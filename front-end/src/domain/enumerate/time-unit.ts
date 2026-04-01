@@ -65,3 +65,15 @@ export function timeUnitRandom(): TimeUnit {
   const values = timeUnitValues();
   return values[Math.floor(Math.random() * values.length)]!;
 }
+
+/**
+ * Returns the options for a time unit selector.
+ * @param {Function} t Translation function.
+ * @returns {{ title: string; value: TimeUnit }[]} array of options.
+ */
+export function timeUnitToOptions(t: (key: string) => string): { title: string; value: TimeUnit }[] {
+  return timeUnitValues().map((unit) => ({
+    title: t(`common.timeUnits.${unit}`),
+    value: unit,
+  }));
+}

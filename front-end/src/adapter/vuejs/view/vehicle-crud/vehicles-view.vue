@@ -19,25 +19,20 @@
 
     <CrudLayout
       :title="t('vehicle.list.title')"
-      icon="mdi-truck-multiple"
+      icon="mdi-truck"
     >
-      <!-- Add vehicle button and type filter -->
-      <v-row class="mb-4" align="center">
-        <v-spacer />
-        <v-col cols="12" sm="4" md="3">
-          <v-select
-            v-model="selectedVehicleTypeFilter"
-            :items="vehicleTypeFilterOptions"
-            :label="t('vehicle.list.filterByType')"
-            item-title="title"
-            item-value="value"
-            clearable
-            density="compact"
-            hide-details
-            @update:model-value="onVehicleTypeFilterChange"
-          />
-        </v-col>
-      </v-row>
+      <template #title-actions>
+        <ButtonTooltip
+          color="primary"
+          icon="mdi-plus"
+          size="default"
+          variant="elevated"
+          :eventclick="addVehicle"
+          :text="t('vehicle.list.addButton')"
+          :tooltip="t('vehicle.list.addButton')"
+          class="ml-2"
+        />
+      </template>
 
       <!-- Vehicles data table -->
       <v-data-table-server
@@ -60,7 +55,7 @@
       >
         <!-- Vehicle type column (with colored chip) -->
         <template v-slot:item.type="{ item }">
-          <v-chip :color="getVehicleTypeColor(item.type)" size="small">
+          <v-chip :color="vehicleTypeColor(item.rawType)" size="small">
             {{ item.type }}
           </v-chip>
         </template>
@@ -84,7 +79,7 @@
             color="info"
             size="small"
             variant="text"
-            @click="showItem(item.id)"
+            :eventclick="() => showItem(item.id)"
           />
           <ButtonTooltip
             text=""
@@ -93,7 +88,7 @@
             color="success"
             size="small"
             variant="text"
-            @click="editItem(item.id)"
+            :eventclick="() => editItem(item.id)"
           />
           <ButtonTooltip
             text=""
@@ -102,7 +97,7 @@
             color="error"
             size="small"
             variant="text"
-            @click="deleteItem(item.id)"
+            :eventclick="() => deleteItem(item.id)"
           />
         </template>
 
@@ -114,7 +109,7 @@
               color="primary" 
               variant="text" 
               icon="mdi-plus"
-              @click="addVehicle"
+              :eventclick="addVehicle"
               class="ml-2"
               :text="t('vehicle.list.table.addFirst')"
               :tooltip="t('vehicle.list.table.addFirst')"
@@ -124,16 +119,20 @@
       </v-data-table-server>
 
       <template #toolbar-append>
-        <ButtonTooltip
-          color="white"
-          icon="mdi-plus"
-          size="small"
-          variant="outlined"
-          @click="addVehicle"
-          :text="t('vehicle.list.addButton')"
-          :tooltip="t('vehicle.list.addButton')"
-          class="ml-2 mr-4"
-        />
+        <div style="width: 250px;">
+          <v-select
+            v-model="selectedVehicleTypeFilter"
+            :items="vehicleTypeFilterOptions"
+            :placeholder="t('vehicle.list.filterByType')"
+            item-title="title"
+            item-value="value"
+            clearable
+            density="compact"
+            hide-details
+            variant="outlined"
+            @update:model-value="onVehicleTypeFilterChange"
+          />
+        </div>
       </template>
     </CrudLayout>
 
@@ -166,7 +165,7 @@ import CrudLayout from '../../components/common/CrudLayout.vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { VehicleType } from '../../../../domain/enumerate/vehicle-type';
+import { VehicleType, vehicleTypeColor, vehicleTypeToOptions } from '../../../../domain/enumerate/vehicle-type';
 import router from '../../router/router';
 import { useVehicleStore } from '../../stores/vehicle-store';
 
@@ -187,7 +186,7 @@ const currentSortBy = ref<string | undefined>(undefined);
 const currentSortOrder = ref<'asc' | 'desc'>('asc');
 
 // Table column headers configuration
-const headers = [
+const headers = computed(() => [
   {
     title: t('vehicle.list.table.headers.type'),
     align: 'start' as const,
@@ -212,17 +211,12 @@ const headers = [
     sortable: false,
     key: 'actions',
   },
-];
+]);
 
 /**
- * Options for the vehicle type filter select
+ * Options for the vehicle type filter select (derived from domain)
  */
-const vehicleTypeFilterOptions = computed(() =>
-  Object.values(VehicleType).map(type => ({
-    value: type as string,
-    title: t(`vehicle.add.vehicleTypes.${type}`),
-  }))
-);
+const vehicleTypeFilterOptions = computed(() => vehicleTypeToOptions(t));
 
 /**
  * Computed table items with formatted vehicle data
@@ -232,6 +226,7 @@ const vehicleTypeFilterOptions = computed(() =>
 const vehicleItems = computed(() => {
   return vehicles.value.map((vehicle) => ({
     id: vehicle.getId().toString(),
+    rawType: vehicle.getVehicleType(),
     type: formatVehicleType(vehicle.getVehicleType()),
     capacity: `${vehicle.getTransportCapacity().getValue()} ${vehicle.getTransportCapacity().getQuantityUnit().getValue()}/${formatTimeUnitShort(vehicle.getTransportCapacity().getTimeUnit())}`,
     cost: `${vehicle.getCostPerKilometer().getAmount().toFixed(2)} ${vehicle.getCostPerKilometer().getCurrency().getCode()}`,
@@ -300,20 +295,6 @@ const formatVehicleType = (type: VehicleType): string => {
  */
 const formatTimeUnitShort = (unit: string): string => {
   return t(`common.timeUnitsLowercase.${unit}`);
-};
-
-/**
- * Get color for vehicle type chip based on type
- * @param type - Formatted vehicle type string
- * @returns Color name for the chip
- */
-const getVehicleTypeColor = (type: string): string => {
-  // Match by checking if the translated string contains key words
-  const lowerType = type.toLowerCase();
-  if (lowerType.includes('collection') || lowerType.includes('recolección')) return 'blue';
-  if (lowerType.includes('transfer') || lowerType.includes('transferencia')) return 'green';
-  if (lowerType.includes('support') || lowerType.includes('soporte')) return 'orange';
-  return 'grey';
 };
 
 /**

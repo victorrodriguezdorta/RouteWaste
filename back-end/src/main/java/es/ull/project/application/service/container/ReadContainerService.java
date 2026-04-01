@@ -3,9 +3,12 @@ package es.ull.project.application.service.container;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.usecase.container.ReadContainerUseCase;
 import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Service implementation for reading containers.
@@ -41,5 +44,28 @@ public class ReadContainerService implements ReadContainerUseCase {
     @Override
     public List<Container> fetchAll() {
         return this.repository.findAll();
+    }
+
+    /**
+     * Fetches containers from the repository using pagination.
+     *
+     * @param pageable pagination information
+     * @return a page of containers
+     */
+    @Override
+    public Page<Container> fetchAll(Pageable pageable) {
+        return this.repository.findAll(pageable);
+    }
+
+    /**
+     * Fetches containers from the repository using pagination and an optional waste type filter.
+     *
+     * @param pageable pagination and sort information
+     * @param wasteType optional waste type filter
+     * @return a page of matching containers
+     */
+    @Override
+    public Page<Container> fetchAll(Pageable pageable, WasteType wasteType) {
+        return this.repository.findAll(pageable, wasteType);
     }
 }

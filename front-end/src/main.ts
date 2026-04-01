@@ -19,9 +19,13 @@ import {
   VCol,
   VContainer,
   VDataTableServer,
+  VDivider,
   VForm,
   VIcon,
+  VList,
+  VListItem,
   VMain,
+  VNavigationDrawer,
   VRow,
   VSelect,
   VSnackbar,
@@ -45,9 +49,13 @@ const vuetify = createVuetify({
     VCol,
     VContainer,
     VDataTableServer,
+    VDivider,
     VForm,
     VIcon,
+    VList,
+    VListItem,
     VMain,
+    VNavigationDrawer,
     VRow,
     VSelect,
     VSnackbar,
@@ -62,6 +70,25 @@ const vuetify = createVuetify({
   icons: {
     defaultSet: 'mdi',
   },
+  theme: {
+    defaultTheme: 'professionalLight',
+    themes: {
+      professionalLight: {
+        dark: false,
+        colors: {
+          primary: '#31572c',      // Slate oscuro elegante
+          secondary: '#4f772d',    // Slate oscuro medio
+          accent: '#90a955',       // Azul moderno para resaltar
+          error: '#880d1e',        // Rojo claro
+          info: '#4f772d',         // Azul claro
+          success: '#90a955',      // Verde esmeralda
+          warning: '#ffca3a',      // Ámbar 
+          background: '#ffffffef',   // Gris muy claro con tono frío
+          surface: '#FFFFFF',      // Color de las tarjetas (blanco)
+        }
+      }
+    }
+  }
 })
 
 // Configure vue-i18n

@@ -24,23 +24,7 @@
       :go-back="goBack"
     >
       <v-form ref="vehicleForm">
-        <!-- Vehicle type selector -->
-        <v-select
-          v-model="newVehicle.vehicleType"
-          :items="vehicleTypeOptions"
-          item-title="title"
-          item-value="value"
-          :rules="[
-            (value: string) =>
-              VehicleAdd.externalValidateVehicleType(value),
-          ]"
-          :label="t('vehicle.add.fields.vehicleType')"
-          color="primary"
-          prepend-icon="mdi-truck-cargo-container"
-          required
-        ></v-select>
-
-        <!-- Transport capacity (value, quantity unit, time unit) and Cost fields -->
+        <!-- Transport capacity (value, quantity unit, time unit), Cost and Type fields -->
         <VehicleFormFields 
           :vehicle="newVehicle"
           @update:vehicle="newVehicle = $event"
@@ -53,7 +37,7 @@
 
       <template #toolbar-append>
         <ButtonTooltip
-          @click="validate"
+          :eventclick="validate"
           icon="mdi-content-save"
           variant="elevated"
           color="success"
@@ -81,8 +65,8 @@ import CrudLayout from '../../components/common/CrudLayout.vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { TimeUnit, timeUnitValues } from '../../../../domain/enumerate/time-unit';
-import { VehicleType, vehicleTypeValues } from '../../../../domain/enumerate/vehicle-type';
+import { TimeUnit } from '../../../../domain/enumerate/time-unit';
+import { VehicleType } from '../../../../domain/enumerate/vehicle-type';
 import VehicleFormFields from '../../components/vehicle/vehicle-form-fields.vue';
 import { VehicleAdd } from '../../dto/vehicle/vehicle-add';
 import router from '../../router/router';
@@ -110,65 +94,19 @@ const newVehicle = ref<VehicleAdd>(
 // Form reference for validation
 const vehicleForm = ref();
 
-// Options for dropdown selectors
-const vehicleTypeOptions = ref<{ title: string; value: string }[]>([]);
-const timeUnitOptions = ref<{ title: string; value: string }[]>([]);
-
 /**
  * Initialize selector options when component mounts
  */
 onMounted(() => {
-  setVehicleTypeOptions();
-  setTimeUnitOptions();
 });
 
 // Re-apply translations when locale changes
 watch(locale, () => {
-  setVehicleTypeOptions();
-  setTimeUnitOptions();
 });
 
-/**
- * Set up vehicle type options for the dropdown
- * Maps enum values to human-readable labels
- */
-const setVehicleTypeOptions = () => {
-  const types = vehicleTypeValues();
-  vehicleTypeOptions.value = types.map((type) => ({
-    title: formatVehicleType(type),
-    value: type,
-  }));
-};
 
-/**
- * Set up time unit options for the dropdown
- * Maps enum values to human-readable labels
- */
-const setTimeUnitOptions = () => {
-  const units = timeUnitValues();
-  timeUnitOptions.value = units.map((unit) => ({
-    title: formatTimeUnit(unit),
-    value: unit,
-  }));
-};
 
-/**
- * Format vehicle type enum to display string using i18n
- * @param type - VehicleType enum value
- * @returns Formatted vehicle type label
- */
-const formatVehicleType = (type: VehicleType): string => {
-  return t(`vehicle.add.vehicleTypes.${type}`);
-};
 
-/**
- * Format time unit enum to display string using i18n
- * @param unit - TimeUnit enum value
- * @returns Formatted time unit label
- */
-const formatTimeUnit = (unit: TimeUnit): string => {
-  return t(`common.timeUnits.${unit}`);
-};
 
 /**
  * Register the new vehicle in the system
@@ -191,8 +129,8 @@ const validate = async () => {
     await registerVehicle();
   } else {
     vehicleStore.setNotification(
-      'Error de Validación',
-      'Por favor revisa los campos del formulario',
+      t('common.validationMessages.validationError'),
+      t('common.validationMessages.checkFormFields'),
       'mdi-alert-circle',
       'error'
     );

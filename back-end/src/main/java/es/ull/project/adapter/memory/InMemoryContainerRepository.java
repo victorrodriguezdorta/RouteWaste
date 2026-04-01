@@ -2,12 +2,16 @@ package es.ull.project.adapter.memory;
 
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Simple in-memory implementation of {@link ContainerRepository} used for tests
@@ -48,6 +52,35 @@ public class InMemoryContainerRepository implements ContainerRepository {
     @Override
     public List<Container> findAll() {
         return fetchAll();
+    }
+
+    /**
+     * Finds containers using pagination.
+     *
+     * @param pageable pagination information
+     * @return a page of containers
+     */
+    @Override
+    public Page<Container> findAll(Pageable pageable) {
+        return this.findAll(pageable, null);
+    }
+
+    /**
+     * Finds containers using pagination and an optional waste type filter.
+     *
+     * @param pageable pagination information
+     * @param wasteType optional waste type filter
+     * @return a page of matching containers
+     */
+    @Override
+    public Page<Container> findAll(Pageable pageable, WasteType wasteType) {
+        List<Container> filtered = store.values().stream()
+                .filter(container -> wasteType == null || container.getWasteType() == wasteType)
+                .toList();
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filtered.size());
+        List<Container> pageContent = start >= filtered.size() ? List.of() : filtered.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, filtered.size());
     }
 
     /**

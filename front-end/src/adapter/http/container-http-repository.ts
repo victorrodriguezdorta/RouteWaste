@@ -1,4 +1,5 @@
 import { ContainerJsonResponse } from '@/adapter/http/dto/container/container-json-response';
+import type { ContainerPageJsonResponse } from '@/adapter/http/dto/container/container-page-json-response';
 import { ContainerPostJsonRequest } from '@/adapter/http/dto/container/container-post-json-request';
 import { ContainerPutJsonRequest } from '@/adapter/http/dto/container/container-put-json-request';
 import type { ContainerRepository } from '@/application/repository/container-repository';
@@ -48,19 +49,24 @@ export class ContainerHttpRepository implements ContainerRepository {
   }
   
   /**
-   * Retrieve a list of containers with optional pagination.
+   * Retrieve a list of containers with optional pagination, sort and waste type filter.
    * 
-   * @param command Optional pagination parameters (page, pageSize).
-   * @returns Either a DataError or a list of Container entities.
+   * @param command Optional pagination, sort and filter parameters.
+   * @returns Either a DataError or a paginated list of Container entities.
    */
   public async list(
     command?: ListContainersCommand
   ): Promise<Either<DataError, ListContainersResult>> {
     let url = this.API_URL;
-    
-    // Build query parameters for pagination
-    if (command?.page !== undefined && command?.pageSize !== undefined) {
-      url += `?page=${command.page}&size=${command.pageSize}`;
+    const requestedPage = command?.page ?? 0;
+    const requestedSize = command?.pageSize ?? 10;
+
+    url += `?page=${requestedPage}&size=${requestedSize}`;
+    if (command?.sortBy) {
+      url += `&sortBy=${encodeURIComponent(command.sortBy)}&sortOrder=${command.sortOrder ?? 'asc'}`;
+    }
+    if (command?.wasteType) {
+      url += `&wasteType=${encodeURIComponent(command.wasteType)}`;
     }
 
     return new Promise((resolve, reject) => {
@@ -68,14 +74,29 @@ export class ContainerHttpRepository implements ContainerRepository {
         .get(url, this.headers)
         .then(response => {
           if (response.ok) {
-            response.json().then((data: ContainerJsonResponse[]) => {
-              const convertedData: ListContainersResult = [];
-              
-              // Transform each JSON response to domain entity
-              data.forEach(container => {
-                convertedData.push(ContainerJsonResponse.toContainer(container));
-              });
-              
+            response.json().then((data: ContainerPageJsonResponse | ContainerJsonResponse[]) => {
+              let convertedData: ListContainersResult;
+
+              if (Array.isArray(data)) {
+                const items = data.map((container: ContainerJsonResponse) => ContainerJsonResponse.toContainer(container));
+                convertedData = {
+                  items,
+                  totalElements: items.length,
+                  totalPages: items.length > 0 ? 1 : 0,
+                  page: requestedPage,
+                  size: requestedSize,
+                };
+              } else {
+                const items = data.content.map((container: ContainerJsonResponse) => ContainerJsonResponse.toContainer(container));
+                convertedData = {
+                  items,
+                  totalElements: data.totalElements,
+                  totalPages: data.totalPages,
+                  page: data.page,
+                  size: data.size,
+                };
+              }
+
               resolve(Either.right(convertedData));
             });
           } else {

@@ -11,7 +11,7 @@ export type { ListContainersResult } from './list-containers-result';
 /**
  * Use case for listing all containers in the system.
  * Input: none (optionally pagination params)
- * Output: Container[] (entity array)
+ * Output: paginated container result
  */
 
 /**
@@ -21,7 +21,7 @@ export interface ListContainersUseCase {
     /**
      * Handles listing all containers
      * @param command Optional pagination parameters
-     * @returns Either a DataError or a list of Container entities
+     * @returns Either a DataError or a paginated list of Container entities
      */
     execute(command?: ListContainersCommand): Promise<Either<DataError, ListContainersResult>>;
 }
