@@ -5,7 +5,7 @@
     </div>
     <v-divider class="w-100" />
     <div class="px-4 py-3">
-      {{ new Date().getFullYear() }} - <strong>Sensor App</strong>
+      {{ new Date().getFullYear() }} - <strong>RouteWaste</strong>
     </div>
   </v-footer>
 </template>

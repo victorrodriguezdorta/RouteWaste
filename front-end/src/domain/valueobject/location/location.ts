@@ -1,55 +1,36 @@
+import { UllGeolocationPoint } from '@ull-tfg/ull-tfg-typescript';
+
 /**
  * Location
  *
  * Represents a physical location with latitude, longitude, postal address, and GIS reference.
  */
-
 export class Location {
   /**
-   * Mínima latitud permitida (-90.0).
-   */
-  private static readonly MIN_LAT = -90.0;
-  /**
-   * Máxima latitud permitida (90.0).
-   */
-  private static readonly MAX_LAT = 90.0;
-  /**
-   * Mínima longitud permitida (-180.0).
-   */
-  private static readonly MIN_LON = -180.0;
-  /**
-   * Máxima longitud permitida (180.0).
-   */
-  private static readonly MAX_LON = 180.0;
-  /**
-   * Longitud máxima permitida para la dirección postal.
+   * Maximum allowed length for the postal address.
    */
   private static readonly POSTAL_MAX = 150;
   /**
-   * Longitud máxima permitida para la referencia GIS.
+   * Maximum allowed length for the GIS reference.
    */
   private static readonly GIS_MAX = 100;
   /**
-   * Expresión regular para validar la dirección postal.
+   * Regular expression used to validate the postal address.
    */
   private static readonly POSTAL_REGEX = /^[A-Za-z0-9\s,.-]+$/;
 
   /**
-   * Latitud en grados (-90..90).
-   */
-  readonly latitude: number;
-  /**
-   * Longitud en grados (-180..180).
-   */
-  readonly longitude: number;
-  /**
-   * Dirección postal validada.
+   * Validated postal address.
    */
   readonly postalAddress: string;
   /**
-   * Referencia GIS validada.
+   * Validated GIS reference.
    */
   readonly gisReference: string;
+  /**
+   * Geolocation point used internally for validation and comparison.
+   */
+  private readonly point: UllGeolocationPoint;
 
   /**
    * Create a Location.
@@ -59,28 +40,30 @@ export class Location {
    * @param gisReference GIS reference string (validated)
    */
   constructor(latitude: number, longitude: number, postalAddress: string, gisReference: string) {
-    this.validateCoordinates(latitude, longitude);
+    this.point = new UllGeolocationPoint(longitude, latitude);
     this.validatePostalAddress(postalAddress);
     this.validateGISReference(gisReference);
-    this.latitude = latitude;
-    this.longitude = longitude;
     this.postalAddress = postalAddress;
     this.gisReference = gisReference;
   }
 
   /**
-   * Valida que la latitud y longitud estén dentro de los rangos permitidos.
-   * @param lat Latitud a validar.
-   * @param lon Longitud a validar.
+   * Latitude in degrees (-90..90).
    */
-  private validateCoordinates(lat: number, lon: number) {
-    if (lat < Location.MIN_LAT || lat > Location.MAX_LAT) throw new Error('Latitude must be between -90 and 90');
-    if (lon < Location.MIN_LON || lon > Location.MAX_LON) throw new Error('Longitude must be between -180 and 180');
+  get latitude(): number {
+    return this.point.getLatitude();
   }
 
   /**
-   * Valida que la dirección postal cumpla con el formato y longitud permitidos.
-   * @param addr Dirección postal a validar.
+   * Longitude in degrees (-180..180).
+   */
+  get longitude(): number {
+    return this.point.getLongitude();
+  }
+
+  /**
+   * Validates that the postal address matches the allowed format and length.
+   * @param addr Postal address to validate.
    */
   private validatePostalAddress(addr: string) {
     if (addr == null) throw new Error('Postal address is not defined');
@@ -91,8 +74,8 @@ export class Location {
   }
 
   /**
-   * Valida que la referencia GIS no esté vacía y cumpla la longitud máxima.
-   * @param gis Referencia GIS a validar.
+   * Validates that the GIS reference is not empty and does not exceed the maximum length.
+   * @param gis GIS reference to validate.
    */
   private validateGISReference(gis: string) {
     if (gis == null) throw new Error('GIS reference is not defined');
@@ -102,19 +85,19 @@ export class Location {
   }
 
   /**
-   * Compara si dos ubicaciones son iguales.
-   * @param other Otro objeto a comparar.
-   * @returns True si todas las propiedades coinciden, false en caso contrario.
+   * Compares whether two locations are equal.
+   * @param other Other object to compare.
+   * @returns True if all properties match, false otherwise.
    */
   equals(other: unknown): boolean {
     if (this === other) return true;
     if (!(other instanceof Location)) return false;
-    return this.latitude === other.latitude && this.longitude === other.longitude && this.postalAddress === other.postalAddress && this.gisReference === other.gisReference;
+    return this.point.equals(other.point) && this.postalAddress === other.postalAddress && this.gisReference === other.gisReference;
   }
 
   /**
-   * Devuelve una representación legible de la ubicación.
-   * @returns Cadena con los valores de la ubicación.
+   * Returns a readable representation of the location.
+   * @returns String containing the location values.
    */
   toString(): string {
     return `Location={latitude=${this.latitude}, longitude=${this.longitude}, postalAddress='${this.postalAddress}', gisReference='${this.gisReference}'}`;

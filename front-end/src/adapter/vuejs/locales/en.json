@@ -28,6 +28,21 @@
       "YEAR": "year"
     },
     "loading": "Loading...",
+    "map": {
+      "title": "Location",
+      "eyebrow": "Map",
+      "openMap": "Open map",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "selector": {
+        "badge": "Location picker",
+        "title": "Choose point on map",
+        "description": "Click on the map to set the exact container position and automatically fill latitude and longitude.",
+        "centerButton": "Center point",
+        "showButton": "Select on map",
+        "hideButton": "Hide map"
+      }
+    },
     "alerts": {
       "requiredFields": "Fields marked with * are required"
     },
@@ -35,7 +50,12 @@
       "maxDecimals": "Maximum {maxDecimals} decimal places allowed",
       "costPerKilometerNotZero": "Cost per kilometer must be greater than 0",
       "validationError": "Validation Error",
-      "checkFormFields": "Please review the form fields"
+      "checkFormFields": "Please review the form fields",
+      "postalAddressEmpty": "Postal address cannot be empty",
+      "gisReferenceEmpty": "GIS reference cannot be empty",
+      "wasteDemandNegative": "Waste demand cannot be negative",
+      "latitudeRange": "Latitude must be between -90 and 90",
+      "longitudeRange": "Longitude must be between -180 and 180"
     }
   },
   "vehicle": {
@@ -160,6 +180,9 @@
       "title": "Container Details",
       "cardTitle": "Container Information",
       "loading": "Loading container...",
+      "map": {
+        "eyebrow": "Container location"
+      },
       "fields": {
         "latitude": "Latitude",
         "longitude": "Longitude",

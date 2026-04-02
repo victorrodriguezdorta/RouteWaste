@@ -34,6 +34,15 @@
           />
         </v-form>
 
+        <LocationMap
+          class="mt-6"
+          :latitude="containerInfo.latitude"
+          :longitude="containerInfo.longitude"
+          :title="containerInfo.postalAddress"
+          :subtitle="`GIS: ${containerInfo.gisReference}`"
+          :eyebrow="t('container.show.map.eyebrow')"
+        />
+
         <template #toolbar-append>
           <ButtonTooltip
             :eventclick="goToEdit"
@@ -56,6 +65,7 @@ import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import LocationMap from '../../components/common/LocationMap.vue';
 import ContainerFormFields from '../../components/container/container-form-fields.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
 import { ContainerInfo } from '../../dto/container/container-info';

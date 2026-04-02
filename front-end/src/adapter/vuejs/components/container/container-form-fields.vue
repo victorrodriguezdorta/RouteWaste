@@ -1,5 +1,27 @@
 <template>
   <div>
+    <v-row v-if="!readonly">
+      <v-col cols="12">
+        <v-btn
+          color="primary"
+          variant="tonal"
+          prepend-icon="mdi-map-marker-plus"
+          class="mb-4"
+          @click="showMapSelector = !showMapSelector"
+        >
+          {{ showMapSelector ? t('common.map.selector.hideButton') : t('common.map.selector.showButton') }}
+        </v-btn>
+
+        <LocationPickerMap
+          v-if="showMapSelector"
+          class="mb-4"
+          :latitude="container.latitude"
+          :longitude="container.longitude"
+          @update:location="updateCoordinates"
+        />
+      </v-col>
+    </v-row>
+
     <v-row>
       <v-col cols="12" sm="6">
         <InputTooltip
@@ -10,7 +32,7 @@
           counter="15"
           :rules="[
             (value: string) => validateMaxDecimals(value, 6),
-            (value: string) => ContainerAdd.externalValidateLatitude(Number(value)),
+            (value: string) => validateLatitude(value),
           ]"
           :required="!readonly"
           :readonly="readonly"
@@ -27,7 +49,7 @@
           counter="15"
           :rules="[
             (value: string) => validateMaxDecimals(value, 6),
-            (value: string) => ContainerAdd.externalValidateLongitude(Number(value)),
+            (value: string) => validateLongitude(value),
           ]"
           :required="!readonly"
           :readonly="readonly"
@@ -46,7 +68,7 @@
           :tooltip="t('container.add.fields.postalAddress')"
           counter="150"
           :rules="[
-            (value: string) => ContainerAdd.externalValidatePostalAddress(value),
+            (value: string) => validatePostalAddress(value),
           ]"
           :required="!readonly"
           :readonly="readonly"
@@ -62,7 +84,7 @@
           :tooltip="t('container.add.fields.gisReference')"
           counter="100"
           :rules="[
-            (value: string) => ContainerAdd.externalValidateGISReference(value),
+            (value: string) => validateGISReference(value),
           ]"
           :required="!readonly"
           :readonly="readonly"
@@ -108,7 +130,7 @@
           counter="10"
           :rules="[
             (value: string) => validateMaxDecimals(value, 2),
-            (value: string) => ContainerAdd.externalValidateWasteDemandValue(Number(value)),
+            (value: string) => validateWasteDemandValue(value),
           ]"
           :required="!readonly"
           :readonly="readonly"
@@ -196,11 +218,12 @@
 
 <script lang="ts" setup>
 import { InputTooltip } from '@ull-tfg/ull-tfg-vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { serviceZoneToOptions } from '../../../../domain/enumerate/service-zone';
 import { timeUnitToOptions } from '../../../../domain/enumerate/time-unit';
 import { wasteTypeToOptions } from '../../../../domain/enumerate/waste-type';
+import LocationPickerMap from '../common/LocationPickerMap.vue';
 import { ContainerAdd } from '../../dto/container/container-add';
 
 const { t } = useI18n();
@@ -217,6 +240,7 @@ const emit = defineEmits<{
 const wasteTypeOptions = computed(() => wasteTypeToOptions(t));
 const timeUnitOptions = computed(() => timeUnitToOptions(t));
 const serviceZoneOptions = computed(() => serviceZoneToOptions(t));
+const showMapSelector = ref(false);
 
 const translatedWasteType = computed(() => {
   if (!props.container.wasteType) return '';
@@ -239,6 +263,14 @@ const updateLatitude = (value: number) => {
 
 const updateLongitude = (value: number) => {
   emit('update:container', { ...props.container, longitude: value });
+};
+
+const updateCoordinates = (value: { latitude: number; longitude: number }) => {
+  emit('update:container', {
+    ...props.container,
+    latitude: value.latitude,
+    longitude: value.longitude,
+  });
 };
 
 const updatePostalAddress = (value: string) => {
@@ -280,5 +312,54 @@ const validateMaxDecimals = (value: string, maxDecimals: number): boolean | stri
   }
 
   return true;
+};
+
+const validateLatitude = (value: string): boolean | string => {
+  if (!value || value === '') return true;
+
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue) || numericValue < -90 || numericValue > 90) {
+    return t('common.validationMessages.latitudeRange');
+  }
+
+  return ContainerAdd.externalValidateLatitude(numericValue);
+};
+
+const validateLongitude = (value: string): boolean | string => {
+  if (!value || value === '') return true;
+
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue) || numericValue < -180 || numericValue > 180) {
+    return t('common.validationMessages.longitudeRange');
+  }
+
+  return ContainerAdd.externalValidateLongitude(numericValue);
+};
+
+const validatePostalAddress = (value: string): boolean | string => {
+  if (!value || value === '') {
+    return t('common.validationMessages.postalAddressEmpty');
+  }
+
+  return ContainerAdd.externalValidatePostalAddress(value);
+};
+
+const validateGISReference = (value: string): boolean | string => {
+  if (!value || value === '') {
+    return t('common.validationMessages.gisReferenceEmpty');
+  }
+
+  return ContainerAdd.externalValidateGISReference(value);
+};
+
+const validateWasteDemandValue = (value: string): boolean | string => {
+  if (!value || value === '') return true;
+
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue) || numericValue < 0) {
+    return t('common.validationMessages.wasteDemandNegative');
+  }
+
+  return ContainerAdd.externalValidateWasteDemandValue(numericValue);
 };
 </script>

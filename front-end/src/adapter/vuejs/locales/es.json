@@ -28,6 +28,21 @@
       "YEAR": "año"
     },
     "loading": "Cargando...",
+    "map": {
+      "title": "Ubicacion",
+      "eyebrow": "Mapa",
+      "openMap": "Abrir mapa",
+      "latitude": "Latitud",
+      "longitude": "Longitud",
+      "selector": {
+        "badge": "Selector de ubicacion",
+        "title": "Elegir punto en el mapa",
+        "description": "Haz clic sobre el mapa para fijar el punto exacto del contenedor y rellenar latitud y longitud automaticamente.",
+        "centerButton": "Centrar punto",
+        "showButton": "Seleccionar en mapa",
+        "hideButton": "Ocultar mapa"
+      }
+    },
     "alerts": {
       "requiredFields": "Los campos marcados con * son obligatorios"
     },
@@ -35,7 +50,12 @@
       "maxDecimals": "Máximo {maxDecimals} decimales permitidos",
       "costPerKilometerNotZero": "El costo por kilómetro debe ser mayor que 0",
       "validationError": "Error de Validación",
-      "checkFormFields": "Por favor revisa los campos del formulario"
+      "checkFormFields": "Por favor revisa los campos del formulario",
+      "postalAddressEmpty": "La dirección postal no puede estar vacía",
+      "gisReferenceEmpty": "La referencia GIS no puede estar vacía",
+      "wasteDemandNegative": "La demanda de residuos no puede ser negativa",
+      "latitudeRange": "La latitud debe estar entre -90 y 90",
+      "longitudeRange": "La longitud debe estar entre -180 y 180"
     }
   },
   "vehicle": {
@@ -142,12 +162,12 @@
     },
     "edit": {
       "title": "Editar Contenedor",
-      "cardTitle": "InformaciÃ³n del Contenedor",
+      "cardTitle": "Información del Contenedor",
       "loading": "Cargando contenedor...",
       "fields": {
         "latitude": "Latitud",
         "longitude": "Longitud",
-        "postalAddress": "DirecciÃ³n Postal",
+        "postalAddress": "Dirección Postal",
         "gisReference": "Referencia GIS",
         "wasteType": "Tipo de Residuo",
         "wasteDemandValue": "Valor de Demanda",
@@ -158,12 +178,15 @@
     },
     "show": {
       "title": "Detalles del Contenedor",
-      "cardTitle": "InformaciÃ³n del Contenedor",
+      "cardTitle": "Información del Contenedor",
       "loading": "Cargando contenedor...",
+      "map": {
+        "eyebrow": "Ubicacion del contenedor"
+      },
       "fields": {
         "latitude": "Latitud",
         "longitude": "Longitud",
-        "postalAddress": "DirecciÃ³n Postal",
+        "postalAddress": "Dirección Postal",
         "gisReference": "Referencia GIS",
         "wasteType": "Tipo de Residuo",
         "wasteDemandValue": "Valor de Demanda",
@@ -181,7 +204,7 @@
       "table": {
         "headers": {
           "wasteType": "Tipo de Residuo",
-          "location": "UbicaciÃ³n",
+          "location": "Ubicación",
           "demand": "Demanda",
           "serviceZone": "Zona de Servicio",
           "actions": "Acciones"
@@ -195,8 +218,8 @@
         "addFirst": "Agregar el primero"
       },
       "deleteDialog": {
-        "title": "Confirmar EliminaciÃ³n",
-        "message": "Â¿EstÃ¡ seguro que desea eliminar este contenedor? Esta acciÃ³n no se puede deshacer."
+        "title": "Confirmar Eliminación",
+        "message": "Â¿EstÃ¡ seguro que desea eliminar este contenedor? Esta acción no se puede deshacer."
       }
     }
   },
