@@ -1,18 +1,23 @@
 package es.ull.project.adapter.mongodb.repository;
 
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.domain.entity.Facility;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
 
 /**
  * MongoDB implementation of the FacilityRepository interface.
@@ -89,5 +94,53 @@ public class FacilityMongoRepository implements FacilityRepository {
         Query query = new Query(Criteria.where(FIELD_ID).is(id));
         Facility facility = this.mongoTemplate.findOne(query, Facility.class, COLLECTION_NAME);
         return Optional.ofNullable(facility);
+    }
+
+    /**
+     * Finds all facilities with pagination support.
+     *
+     * @param pageable the pagination information
+     * @return a Page containing the paginated facilities
+     */
+    @Override
+    public Page<Facility> findAll(Pageable pageable) {
+        return this.findAll(pageable, null, null);
+    }
+
+    /**
+     * Finds all facilities with pagination, type filter, and status filter support.
+     *
+     * @param pageable the pagination information
+     * @param type optional facility type filter
+     * @param status optional facility status filter
+     * @return a Page containing the paginated and filtered facilities
+     */
+    @Override
+    public Page<Facility> findAll(Pageable pageable, FacilityType type, FacilityStatus status) {
+        Query dataQuery = new Query();
+        Query countQuery = new Query();
+
+        // Add filter criteria
+        if (type != null) {
+            Criteria criteria = Criteria.where("facilityType").is(type);
+            dataQuery.addCriteria(criteria);
+            countQuery.addCriteria(criteria);
+        }
+        if (status != null) {
+            Criteria criteria = Criteria.where("status").is(status);
+            dataQuery.addCriteria(criteria);
+            countQuery.addCriteria(criteria);
+        }
+
+        // Apply pagination and sorting
+        dataQuery.with(pageable);
+
+        // Execute query
+        List<Facility> content = this.mongoTemplate.find(dataQuery, Facility.class, COLLECTION_NAME);
+        
+        // Count total
+        long total = this.mongoTemplate.count(countQuery, COLLECTION_NAME);
+
+        return new PageImpl<>(content, pageable, total);
     }
 }

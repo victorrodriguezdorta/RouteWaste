@@ -1,11 +1,11 @@
 import { FacilityHttpRepository } from '@/adapter/http/facility-http-repository';
 import {
-  CreateFacilityService,
-  DeleteFacilityService,
-  FilterFacilitiesService,
-  GetFacilityService,
-  ListFacilitiesService,
-  UpdateFacilityService
+    CreateFacilityService,
+    DeleteFacilityService,
+    FilterFacilitiesService,
+    GetFacilityService,
+    ListFacilitiesService,
+    UpdateFacilityService
 } from '@/application/service/facility';
 import type { Facility } from '@/domain/entity/facility';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
@@ -33,6 +33,15 @@ export const useFacilityStore = defineStore('Facility', {
   state: () => ({
     /** Array of all facilities retrieved from the backend */
     facilities: [] as Facility[],
+    
+    /** Total amount of facilities available in backend */
+    totalFacilities: 0,
+
+    /** Current zero-based page index loaded from backend */
+    currentPage: 0,
+
+    /** Current requested page size */
+    rowsPerPage: 10,
     
     /** Currently selected facility (if any) */
     facility: undefined as Facility | undefined,
@@ -83,20 +92,33 @@ export const useFacilityStore = defineStore('Facility', {
    */
   actions: {
     /**
-     * Retrieve all facilities from the backend with optional pagination
+     * Retrieve all facilities from the backend with optional pagination, sort and filter
      * 
      * @param page Optional page number for pagination
      * @param rowsPerPage Optional number of items per page
+     * @param sortBy Optional sort column key
+     * @param sortOrder Optional sort direction
+     * @param facilityType Optional facility type filter
+     * @param status Optional facility status filter
      */
-    async getFacilities(page?: number, rowsPerPage?: number) {
+    async getFacilities(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', facilityType?: string, status?: string) {
       this.loading = true;
       this.facilities = [];
+      const requestedPage = page ?? this.currentPage;
+      const requestedRowsPerPage = rowsPerPage ?? this.rowsPerPage;
       
       // Create service instance with repository
       const listService = new ListFacilitiesService(this.facilityRepository);
       
       // Execute the list operation
-      const result = await listService.execute({ page, pageSize: rowsPerPage });
+      const result = await listService.execute({
+        page: requestedPage,
+        pageSize: requestedRowsPerPage,
+        sortBy,
+        sortOrder,
+        facilityType,
+        status
+      });
       
       // Handle the result using Either pattern
       result.fold(
@@ -107,7 +129,10 @@ export const useFacilityStore = defineStore('Facility', {
         },
         data => {
           // Success case: update state with facilities
-          this.facilities = data;
+          this.facilities = data.items;
+          this.totalFacilities = data.totalElements;
+          this.currentPage = data.page;
+          this.rowsPerPage = data.size;
           this.loading = false;
         }
       );

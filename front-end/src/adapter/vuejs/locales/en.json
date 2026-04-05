@@ -55,7 +55,9 @@
       "gisReferenceEmpty": "GIS reference cannot be empty",
       "wasteDemandNegative": "Waste demand cannot be negative",
       "latitudeRange": "Latitude must be between -90 and 90",
-      "longitudeRange": "Longitude must be between -180 and 180"
+      "longitudeRange": "Longitude must be between -180 and 180",
+      "capacityNegative": "Capacity cannot be negative",
+      "openingFixedCostNegative": "Opening fixed cost cannot be negative"
     }
   },
   "vehicle": {
@@ -220,6 +222,101 @@
       "deleteDialog": {
         "title": "Confirm Deletion",
         "message": "Are you sure you want to delete this container? This action cannot be undone."
+      }
+    }
+  },
+  "facility": {
+    "add": {
+      "title": "Add Facility",
+      "cardTitle": "Facility Information",
+      "fields": {
+        "facilityType": "Facility Type",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "postalAddress": "Postal Address",
+        "gisReference": "GIS Reference",
+        "capacityValue": "Capacity Value",
+        "capacityQuantityUnit": "Quantity Unit (e.g., tons, kg)",
+        "capacityTimeUnit": "Time Unit",
+        "openingFixedCost": "Opening Fixed Cost",
+        "currencyCode": "Currency Code (e.g., EUR, USD)",
+        "status": "Status"
+      },
+      "facilityTypes": {
+        "OPERATIONAL_BASE": "Operational Base",
+        "TRANSFER_STATION": "Transfer Station",
+        "TREATMENT_PLANT": "Treatment Plant"
+      },
+      "statuses": {
+        "CANDIDATE": "Candidate",
+        "PLANNED": "Planned",
+        "OPEN": "Open",
+        "DISCARDED": "Discarded"
+      }
+    },
+    "edit": {
+      "title": "Edit Facility",
+      "cardTitle": "Facility Information",
+      "loading": "Loading facility...",
+      "fields": {
+        "facilityType": "Facility Type",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "postalAddress": "Postal Address",
+        "gisReference": "GIS Reference",
+        "capacityValue": "Capacity Value",
+        "capacityQuantityUnit": "Quantity Unit (e.g., tons, kg)",
+        "capacityTimeUnit": "Time Unit",
+        "openingFixedCost": "Opening Fixed Cost",
+        "currencyCode": "Currency Code (e.g., EUR, USD)",
+        "status": "Status"
+      }
+    },
+    "show": {
+      "title": "Facility Details",
+      "cardTitle": "Facility Information",
+      "loading": "Loading facility...",
+      "map": {
+        "eyebrow": "Facility location"
+      },
+      "fields": {
+        "facilityType": "Facility Type",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "postalAddress": "Postal Address",
+        "gisReference": "GIS Reference",
+        "capacityValue": "Capacity Value",
+        "capacityQuantityUnit": "Quantity Unit",
+        "capacityTimeUnit": "Time Unit",
+        "openingFixedCost": "Opening Fixed Cost",
+        "currencyCode": "Currency Code",
+        "status": "Status",
+        "facilityId": "Facility ID"
+      }
+    },
+    "list": {
+      "title": "Facilities",
+      "addButton": "Add Facility",
+      "filterByType": "Filter by type",
+      "table": {
+        "headers": {
+          "type": "Facility Type",
+          "location": "Location",
+          "capacity": "Capacity",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "tooltips": {
+          "view": "View details",
+          "edit": "Edit",
+          "delete": "Delete"
+        },
+        "noData": "No facilities registered.",
+        "addFirst": "Add the first one"
+      },
+      "deleteDialog": {
+        "title": "Confirm Deletion",
+        "message": "Are you sure you want to delete this facility? This action cannot be undone."
       }
     }
   },

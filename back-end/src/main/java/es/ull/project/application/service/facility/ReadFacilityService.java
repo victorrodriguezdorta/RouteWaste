@@ -1,12 +1,16 @@
 package es.ull.project.application.service.facility;
 
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
-import es.ull.project.domain.entity.Facility;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityType;
 
 /**
  * Service implementation for reading facilities.
@@ -42,5 +46,28 @@ public class ReadFacilityService implements ReadFacilityUseCase {
     @Override
     public List<Facility> fetchAll() {
         return this.repository.findAll();
+    }
+
+    /**
+     * Fetches facilities from the repository using pagination.
+     *
+     * @param pageable pagination information
+     * @return a page of facilities
+     */
+    @Override
+    public Page<Facility> fetchAll(Pageable pageable) {
+        return this.repository.findAll(pageable);
+    }
+
+    /**
+     * Fetches facilities from the repository using pagination and an optional facility type filter.
+     *
+     * @param pageable pagination and sort information
+     * @param facilityType optional facility type filter
+     * @return a page of matching facilities
+     */
+    @Override
+    public Page<Facility> fetchAll(Pageable pageable, FacilityType facilityType) {
+        return this.repository.findAll(pageable, facilityType, null);
     }
 }

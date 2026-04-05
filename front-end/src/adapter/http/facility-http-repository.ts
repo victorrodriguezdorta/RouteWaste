@@ -1,4 +1,5 @@
 import { FacilityJsonResponse } from '@/adapter/http/dto/facility/facility-json-response';
+import type { FacilityPageJsonResponse } from '@/adapter/http/dto/facility/facility-page-json-response';
 import { FacilityPostJsonRequest } from '@/adapter/http/dto/facility/facility-post-json-request';
 import { FacilityPutJsonRequest } from '@/adapter/http/dto/facility/facility-put-json-request';
 import type { FacilityRepository } from '@/application/repository/facility-repository';
@@ -26,7 +27,7 @@ export class FacilityHttpRepository implements FacilityRepository {
   /**
    * Base URL for facility API endpoints.
    */
-  private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'facilities';
+  private readonly API_URL = import.meta.env.VITE_APP_API_URL + 'facilities/';
 
   /**
    * HTTP headers for API requests including authorization and content type.
@@ -46,19 +47,27 @@ export class FacilityHttpRepository implements FacilityRepository {
   }
   
   /**
-   * Retrieve a list of facilities with optional pagination.
+   * Retrieve a list of facilities with optional pagination, sort and filters.
    * 
-   * @param command Optional pagination parameters (page, pageSize).
-   * @returns Either a DataError or a list of Facility entities.
+   * @param command Optional pagination, sort and filter parameters.
+   * @returns Either a DataError or a paginated list of Facility entities.
    */
   public async list(
     command?: ListFacilitiesCommand
   ): Promise<Either<DataError, ListFacilitiesResult>> {
     let url = this.API_URL;
-    
-    // Build query parameters for pagination
-    if (command?.page !== undefined && command?.pageSize !== undefined) {
-      url += `?page=${command.page}&size=${command.pageSize}`;
+    const requestedPage = command?.page ?? 0;
+    const requestedSize = command?.pageSize ?? 10;
+
+    url += `?page=${requestedPage}&size=${requestedSize}`;
+    if (command?.sortBy) {
+      url += `&sortBy=${encodeURIComponent(command.sortBy)}&sortOrder=${command.sortOrder ?? 'asc'}`;
+    }
+    if (command?.facilityType) {
+      url += `&facilityType=${encodeURIComponent(command.facilityType)}`;
+    }
+    if (command?.status) {
+      url += `&status=${encodeURIComponent(command.status)}`;
     }
 
     return new Promise((resolve, reject) => {
@@ -66,14 +75,29 @@ export class FacilityHttpRepository implements FacilityRepository {
         .get(url, this.headers)
         .then(response => {
           if (response.ok) {
-            response.json().then((data: FacilityJsonResponse[]) => {
-              const convertedData: ListFacilitiesResult = [];
-              
-              // Transform each JSON response to domain entity
-              data.forEach(facility => {
-                convertedData.push(FacilityJsonResponse.toFacility(facility));
-              });
-              
+            response.json().then((data: FacilityPageJsonResponse | FacilityJsonResponse[]) => {
+              let convertedData: ListFacilitiesResult;
+
+              if (Array.isArray(data)) {
+                const items = data.map((facility: FacilityJsonResponse) => FacilityJsonResponse.toFacility(facility));
+                convertedData = {
+                  items,
+                  totalElements: items.length,
+                  totalPages: items.length > 0 ? 1 : 0,
+                  page: requestedPage,
+                  size: requestedSize,
+                };
+              } else {
+                const items = data.content.map((facility: FacilityJsonResponse) => FacilityJsonResponse.toFacility(facility));
+                convertedData = {
+                  items,
+                  totalElements: data.totalElements,
+                  totalPages: data.totalPages,
+                  page: data.page,
+                  size: data.size,
+                };
+              }
+
               resolve(Either.right(convertedData));
             });
           } else {
@@ -97,7 +121,7 @@ export class FacilityHttpRepository implements FacilityRepository {
   public async getById(
     command: GetFacilityCommand
   ): Promise<Either<DataError, GetFacilityResult>> {
-    const url = `${this.API_URL}/${command.facilityId.toString()}`;
+    const url = `${this.API_URL}${command.facilityId.toString()}`;
 
     return new Promise((resolve, reject) => {
       http
@@ -159,7 +183,7 @@ export class FacilityHttpRepository implements FacilityRepository {
   public async update(
     command: UpdateFacilityCommand
   ): Promise<Either<DataError, UpdateFacilityResult>> {
-    const url = `${this.API_URL}/${command.facilityId.toString()}`;
+    const url = `${this.API_URL}${command.facilityId.toString()}`;
     const body = FacilityPutJsonRequest.toRequest(command);
 
     return new Promise((resolve) => {
@@ -192,7 +216,7 @@ export class FacilityHttpRepository implements FacilityRepository {
   public async delete(
     command: DeleteFacilityCommand
   ): Promise<Either<DataError, DeleteFacilityResult>> {
-    const url = `${this.API_URL}/${command.facilityId.toString()}`;
+    const url = `${this.API_URL}${command.facilityId.toString()}`;
 
     return new Promise((resolve) => {
       http
@@ -222,7 +246,7 @@ export class FacilityHttpRepository implements FacilityRepository {
   public async filter(
     command: FilterFacilitiesCommand
   ): Promise<Either<DataError, FilterFacilitiesResult>> {
-    let url = this.API_URL + '/filter?';
+    let url = this.API_URL + 'filter?';
     const params: string[] = [];
 
     // Build query parameters for filtering

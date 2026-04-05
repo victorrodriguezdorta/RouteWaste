@@ -1,10 +1,15 @@
 package es.ull.project.application.repository;
 
-import es.ull.project.domain.entity.Facility;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
 
 /**
  * Repository interface for the Facility aggregate.
@@ -51,4 +56,22 @@ public interface FacilityRepository {
      * @return optional containing the facility when present
      */
     public abstract Optional<Facility> findById(UUID id);
+
+    /**
+     * Finds all facilities with pagination support.
+     *
+     * @param pageable the pagination information
+     * @return a Page containing the paginated facilities
+     */
+    public abstract Page<Facility> findAll(Pageable pageable);
+
+    /**
+     * Finds all facilities with pagination, type filter, and status filter support.
+     *
+     * @param pageable the pagination information
+     * @param type optional facility type filter
+     * @param status optional facility status filter
+     * @return a Page containing the paginated and filtered facilities
+     */
+    public abstract Page<Facility> findAll(Pageable pageable, FacilityType type, FacilityStatus status);
 }

@@ -25,12 +25,10 @@ export class ListFacilitiesService implements ListFacilitiesUseCase {
 
     /**
      * @brief Execute the list facilities use case.
-     * @param command Optional pagination parameters.
-     * @returns Either a `DataError` or an array of `Facility` entities.
+     * @param command Optional pagination, sort and filter parameters.
+     * @returns Either a `DataError` or a paginated set of `Facility` entities.
      */
     async execute(command?: ListFacilitiesCommand): Promise<Either<DataError, ListFacilitiesResult>> {
-        const page = command?.page;
-        const pageSize = command?.pageSize;
-        return this.facilityRepository.list({ page, pageSize });
+        return this.facilityRepository.list(command);
     }
 }

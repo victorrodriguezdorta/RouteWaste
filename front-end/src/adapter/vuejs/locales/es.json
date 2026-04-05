@@ -55,7 +55,9 @@
       "gisReferenceEmpty": "La referencia GIS no puede estar vacía",
       "wasteDemandNegative": "La demanda de residuos no puede ser negativa",
       "latitudeRange": "La latitud debe estar entre -90 y 90",
-      "longitudeRange": "La longitud debe estar entre -180 y 180"
+      "longitudeRange": "La longitud debe estar entre -180 y 180",
+      "capacityNegative": "La capacidad no puede ser negativa",
+      "openingFixedCostNegative": "El costo fijo de apertura no puede ser negativo"
     }
   },
   "vehicle": {
@@ -220,6 +222,101 @@
       "deleteDialog": {
         "title": "Confirmar Eliminación",
         "message": "Â¿EstÃ¡ seguro que desea eliminar este contenedor? Esta acción no se puede deshacer."
+      }
+    }
+  },
+  "facility": {
+    "add": {
+      "title": "Agregar Instalación",
+      "cardTitle": "Información de la Instalación",
+      "fields": {
+        "facilityType": "Tipo de Instalación",
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "postalAddress": "Dirección Postal",
+        "gisReference": "Referencia GIS",
+        "capacityValue": "Valor de Capacidad",
+        "capacityQuantityUnit": "Unidad de Cantidad (ej: tons, kg)",
+        "capacityTimeUnit": "Unidad de Tiempo",
+        "openingFixedCost": "Costo Fijo de Apertura",
+        "currencyCode": "Código de Moneda (ej: EUR, USD)",
+        "status": "Estado"
+      },
+      "facilityTypes": {
+        "OPERATIONAL_BASE": "Base Operacional",
+        "TRANSFER_STATION": "Estación de Transferencia",
+        "TREATMENT_PLANT": "Planta de Tratamiento"
+      },
+      "statuses": {
+        "CANDIDATE": "Candidato",
+        "PLANNED": "Planeada",
+        "OPEN": "Abierta",
+        "DISCARDED": "Descartada"
+      }
+    },
+    "edit": {
+      "title": "Editar Instalación",
+      "cardTitle": "Información de la Instalación",
+      "loading": "Cargando instalación...",
+      "fields": {
+        "facilityType": "Tipo de Instalación",
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "postalAddress": "Dirección Postal",
+        "gisReference": "Referencia GIS",
+        "capacityValue": "Valor de Capacidad",
+        "capacityQuantityUnit": "Unidad de Cantidad (ej: tons, kg)",
+        "capacityTimeUnit": "Unidad de Tiempo",
+        "openingFixedCost": "Costo Fijo de Apertura",
+        "currencyCode": "Código de Moneda (ej: EUR, USD)",
+        "status": "Estado"
+      }
+    },
+    "show": {
+      "title": "Detalles de la Instalación",
+      "cardTitle": "Información de la Instalación",
+      "loading": "Cargando instalación...",
+      "map": {
+        "eyebrow": "Ubicación de la instalación"
+      },
+      "fields": {
+        "facilityType": "Tipo de Instalación",
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "postalAddress": "Dirección Postal",
+        "gisReference": "Referencia GIS",
+        "capacityValue": "Valor de Capacidad",
+        "capacityQuantityUnit": "Unidad de Cantidad",
+        "capacityTimeUnit": "Unidad de Tiempo",
+        "openingFixedCost": "Costo Fijo de Apertura",
+        "currencyCode": "Código de Moneda",
+        "status": "Estado",
+        "facilityId": "ID de la Instalación"
+      }
+    },
+    "list": {
+      "title": "Instalaciones",
+      "addButton": "Agregar Instalación",
+      "filterByType": "Filtrar por tipo",
+      "table": {
+        "headers": {
+          "type": "Tipo de Instalación",
+          "location": "Ubicación",
+          "capacity": "Capacidad",
+          "status": "Estado",
+          "actions": "Acciones"
+        },
+        "tooltips": {
+          "view": "Ver detalles",
+          "edit": "Editar",
+          "delete": "Eliminar"
+        },
+        "noData": "No hay instalaciones registradas.",
+        "addFirst": "Agregar la primera"
+      },
+      "deleteDialog": {
+        "title": "Confirmar Eliminación",
+        "message": "¿Está seguro que desea eliminar esta instalación? Esta acción no se puede deshacer."
       }
     }
   },

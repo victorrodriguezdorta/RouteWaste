@@ -1,10 +1,10 @@
 import {
-  createRouter,
-  createWebHistory,
-  type Router,
-  //type NavigationGuardNext,
-  //type RouteLocationNormalized,
-  type RouteRecordRaw,
+    createRouter,
+    createWebHistory,
+    type Router,
+    //type NavigationGuardNext,
+    //type RouteLocationNormalized,
+    type RouteRecordRaw,
 } from 'vue-router';
 
 /**
@@ -31,7 +31,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/facilities',
         name: 'Facilities',
-        component: () => import('../view/vehicle-crud/vehicles-view.vue'), // Placeholder
+        component: () => import('../view/facility-crud/facilities-view.vue'),
     },
     {
         path: '/vehicles/add',
@@ -42,6 +42,11 @@ const routes: RouteRecordRaw[] = [
         path: '/containers/add',
         name: 'AddContainer',
         component: () => import('../view/container-crud/add-container.vue'),
+    },
+    {
+        path: '/facilities/add',
+        name: 'AddFacility',
+        component: () => import('../view/facility-crud/add-facility.vue'),
     },
     {
         path: '/containers/:id/edit',
@@ -65,6 +70,18 @@ const routes: RouteRecordRaw[] = [
         path: '/vehicles/:id',
         name: 'ShowVehicle',
         component: () => import('../view/vehicle-crud/show-vehicle.vue'),
+        props: true,
+    },
+    {
+        path: '/facilities/:id/edit',
+        name: 'EditFacility',
+        component: () => import('../view/facility-crud/edit-facility.vue'),
+        props: true,
+    },
+    {
+        path: '/facilities/:id',
+        name: 'ShowFacility',
+        component: () => import('../view/facility-crud/show-facility.vue'),
         props: true,
     },
 ];

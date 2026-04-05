@@ -71,3 +71,29 @@ export function facilityTypeRandom(): FacilityType {
   const values = facilityTypeValues();
   return values[Math.floor(Math.random() * values.length)]!;
 }
+/**
+ * Returns the UI color for a given facility type.
+ * @param {FacilityType} type - Facility type.
+ * @returns {string} Color name suitable for Vuetify components.
+ */
+export function facilityTypeColor(type: FacilityType | string): string {
+  const t = typeof type === 'string' ? facilityTypeFromString(type) : type;
+  switch (t) {
+    case FacilityType.OPERATIONAL_BASE: return 'blue';
+    case FacilityType.TRANSFER_STATION: return 'orange';
+    case FacilityType.TREATMENT_PLANT: return 'green';
+    default: return 'grey';
+  }
+}
+
+/**
+ * Returns the options for a facility type selector.
+ * @param {Function} t Translation function.
+ * @returns {{ title: string; value: FacilityType }[]} array of options.
+ */
+export function facilityTypeToOptions(t: (key: string) => string): { title: string; value: FacilityType }[] {
+  return facilityTypeValues().map((type) => ({
+    title: t(`facility.add.facilityTypes.${type}`),
+    value: type,
+  }));
+}

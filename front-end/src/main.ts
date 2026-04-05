@@ -1,41 +1,41 @@
-import en from './adapter/vuejs/locales/en.json';
-import es from './adapter/vuejs/locales/es.json';
-import router from './adapter/vuejs/router/router';
-import App from './App.vue';
-import './style.css';
 import '@mdi/font/css/materialdesignicons.css';
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import { createI18n } from 'vue-i18n';
 import { createVuetify } from 'vuetify';
 import {
-  VAlert,
-  VApp,
-  VAppBar,
-  VAppBarTitle,
-  VBtn,
-  VCard,
-  VChip,
-  VCol,
-  VContainer,
-  VDataTableServer,
-  VDivider,
-  VForm,
-  VIcon,
-  VList,
-  VListItem,
-  VMain,
-  VNavigationDrawer,
-  VRow,
-  VSelect,
-  VSnackbar,
-  VSpacer,
-  VTextField,
-  VToolbar,
-  VToolbarTitle,
+    VAlert,
+    VApp,
+    VAppBar,
+    VAppBarTitle,
+    VBtn,
+    VCard,
+    VChip,
+    VCol,
+    VContainer,
+    VDataTableServer,
+    VDivider,
+    VForm,
+    VIcon,
+    VList,
+    VListItem,
+    VMain,
+    VNavigationDrawer,
+    VRow,
+    VSelect,
+    VSnackbar,
+    VSpacer,
+    VTextField,
+    VToolbar,
+    VToolbarTitle,
 } from 'vuetify/components';
 import { Ripple } from 'vuetify/directives';
 import 'vuetify/styles';
+import en from './adapter/vuejs/locales/en.json';
+import es from './adapter/vuejs/locales/es.json';
+import router from './adapter/vuejs/router/router';
+import App from './App.vue';
+import './style.css';
 
 const vuetify = createVuetify({
   components: {
