@@ -40,6 +40,32 @@
         <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <profiles>
+        <profile>
+            <id>github</id>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo1.maven.org/maven2</url>
+                </repository>
+                <repository>
+                    <id>github</id>
+                    <url>https://maven.pkg.github.com/ull-tfg/*</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub Packages</name>
+                    <url>https://maven.pkg.github.com/ull-tfg/sensor-app-algorithm</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 
   <build>
         <plugins>
