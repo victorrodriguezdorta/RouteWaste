@@ -26,6 +26,11 @@ public class ContainerWritingConverter implements Converter<Container, Document>
     @SuppressWarnings("unused")
     private final MongoConfiguration mongoConfiguration;
 
+    /**
+     * Constructs a new ContainerWritingConverter.
+     *
+     * @param mongoConfiguration the MongoDB configuration for converter registration
+     */
     public ContainerWritingConverter(MongoConfiguration mongoConfiguration) {
         this.mongoConfiguration = mongoConfiguration;
     }

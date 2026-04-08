@@ -31,6 +31,11 @@ public class VehicleReadingConverter implements Converter<Document, Vehicle> {
     @SuppressWarnings("unused")
     private final MongoConfiguration mongoConfiguration;
 
+    /**
+     * Constructs a new VehicleReadingConverter.
+     *
+     * @param mongoConfiguration the MongoDB configuration for converter registration
+     */
     public VehicleReadingConverter(MongoConfiguration mongoConfiguration) {
         this.mongoConfiguration = mongoConfiguration;
     }

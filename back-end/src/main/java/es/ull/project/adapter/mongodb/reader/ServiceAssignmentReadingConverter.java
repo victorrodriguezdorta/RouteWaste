@@ -12,7 +12,6 @@ import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.ServiceTime;
-import java.util.Optional;
 import java.util.UUID;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -56,24 +55,14 @@ public class ServiceAssignmentReadingConverter implements Converter<Document, Se
     public ServiceAssignment convert(Document document) {
         logger.info("ServiceAssignment to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
-        Container container = null;
         UUID containerId = (UUID) document.get(MongoFields.CONTAINER_ID);
-        Optional<Container> optionalContainer = this.mongoConfiguration.containerRepository()
-                .findById(containerId);
-        if (optionalContainer.isPresent()) {
-            container = optionalContainer.get();
-        } else {
-            throw new IllegalStateException("Container with id " + containerId + " not found");
-        }
-        Facility facility = null;
+        Container container = this.mongoConfiguration.containerRepository()
+                .findById(containerId)
+                .orElseThrow(() -> new IllegalStateException("Container with id " + containerId + " not found"));
         UUID facilityId = (UUID) document.get(MongoFields.FACILITY_ID);
-        Optional<Facility> optionalFacility = this.mongoConfiguration.facilityRepository()
-                .findById(facilityId);
-        if (optionalFacility.isPresent()) {
-            facility = optionalFacility.get();
-        } else {
-            throw new IllegalStateException("Facility with id " + facilityId + " not found");
-        }
+        Facility facility = this.mongoConfiguration.facilityRepository()
+                .findById(facilityId)
+                .orElseThrow(() -> new IllegalStateException("Facility with id " + facilityId + " not found"));
         Document wasteDemandDocument = (Document) document.get(MongoFields.WASTE_DEMAND);
         double wasteDemandValue = wasteDemandDocument.getDouble(MongoFields.WASTE_DEMAND_VALUE);
         String wasteDemandQuantityUnitValue = wasteDemandDocument.getString(MongoFields.WASTE_DEMAND_QUANTITY_UNIT);

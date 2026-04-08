@@ -30,6 +30,11 @@ public class InfrastructurePlanWritingConverter implements Converter<Infrastruct
     @SuppressWarnings("unused")
     private final MongoConfiguration mongoConfiguration;
 
+    /**
+     * Constructs a new InfrastructurePlanWritingConverter.
+     *
+     * @param mongoConfiguration the MongoDB configuration for converter registration
+     */
     public InfrastructurePlanWritingConverter(MongoConfiguration mongoConfiguration) {
         this.mongoConfiguration = mongoConfiguration;
     }

@@ -1,15 +1,13 @@
 package es.ull.project.application.repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Repository interface for the Facility aggregate.

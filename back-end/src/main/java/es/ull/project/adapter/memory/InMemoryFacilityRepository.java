@@ -1,24 +1,30 @@
 package es.ull.project.adapter.memory;
 
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
 /**
  * In-memory FacilityRepository for tests and local runs.
  */
 public class InMemoryFacilityRepository implements FacilityRepository {
+
+    private static final int ZERO = 0;
+
+    private static final String FIELD_FACILITY_TYPE = "facilityType";
+    private static final String FIELD_STATUS = "status";
+    private static final String FIELD_LOCATION_POSTAL_ADDRESS = "location.postalAddress";
+    private static final String FIELD_CAPACITY_VALUE = "capacity.value";
 
     private final Map<UUID, Facility> store = new LinkedHashMap<>();
 
@@ -103,45 +109,39 @@ public class InMemoryFacilityRepository implements FacilityRepository {
     @Override
     public Page<Facility> findAll(Pageable pageable, FacilityType type, FacilityStatus status) {
         List<Facility> allFacilities = new ArrayList<>(store.values());
-
-        // Filter by type and status
         if (type != null || status != null) {
             allFacilities = allFacilities.stream()
                     .filter(f -> type == null || f.getFacilityType() == type)
                     .filter(f -> status == null || f.getStatus() == status)
                     .toList();
         }
-
-        // Sort
         if (!pageable.getSort().isEmpty()) {
             allFacilities = new ArrayList<>(allFacilities);
             allFacilities.sort((f1, f2) -> {
                 for (var order : pageable.getSort()) {
-                    int cmp = 0;
+                    int cmp = ZERO;
                     String property = order.getProperty();
                     switch (property) {
-                        case "facilityType" -> cmp = f1.getFacilityType().compareTo(f2.getFacilityType());
-                        case "status" -> cmp = f1.getStatus().compareTo(f2.getStatus());
-                        case "location.postalAddress" -> {
+                        case FIELD_FACILITY_TYPE -> cmp = f1.getFacilityType().compareTo(f2.getFacilityType());
+                        case FIELD_STATUS -> cmp = f1.getStatus().compareTo(f2.getStatus());
+                        case FIELD_LOCATION_POSTAL_ADDRESS -> {
                             String loc1 = f1.getLocation() != null ? f1.getLocation().getPostalAddress() : "";
                             String loc2 = f2.getLocation() != null ? f2.getLocation().getPostalAddress() : "";
                             cmp = loc1.compareTo(loc2);
                         }
-                        case "capacity.value" -> {
+                        case FIELD_CAPACITY_VALUE -> {
                             double cap1 = f1.getCapacity() != null ? f1.getCapacity().getValue() : 0.0;
                             double cap2 = f2.getCapacity() != null ? f2.getCapacity().getValue() : 0.0;
                             cmp = Double.compare(cap1, cap2);
                         }
                     }
-                    if (cmp != 0) {
+                    if (cmp != ZERO) {
                         return order.isAscending() ? cmp : -cmp;
                     }
                 }
-                return 0;
+                return ZERO;
             });
         }
-
-        // Paginate
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), allFacilities.size());
         List<Facility> pageContent;
@@ -150,7 +150,6 @@ public class InMemoryFacilityRepository implements FacilityRepository {
         } else {
             pageContent = allFacilities.subList(start, end);
         }
-
         return new PageImpl<>(pageContent, pageable, allFacilities.size());
     }
 }

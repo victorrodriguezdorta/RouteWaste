@@ -9,7 +9,7 @@ import java.util.Objects;
  * Represents an amount per time unit (for example, tons per day).
  * Immutable value object that encapsulates the value, the quantity unit, and the time unit.
  */
-public final class Capacity {
+public final class Capacity { 
 
     /**
      * Error messages.

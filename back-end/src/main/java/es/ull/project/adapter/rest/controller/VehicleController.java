@@ -11,6 +11,10 @@ import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -98,13 +102,18 @@ public class VehicleController {
      * @param vehicleType optional vehicle type filter (enum name, e.g. "COLLECTION_TRUCK")
      * @return paginated list of vehicles or 400 if parameters are invalid
      */
+    @Operation(summary = "Get all vehicles", description = "Retrieves a paginated list of vehicles with optional sorting and filtering")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Vehicles retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+    })
     @GetMapping("/")
     public ResponseEntity<VehiclePageResponseBody> getVehicles(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(defaultValue = "asc") String sortOrder,
-            @RequestParam(required = false) String vehicleType) {
+            @Parameter(description = "Zero-based page index") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Number of elements per page") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Field to sort by: capacity, cost, type") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder,
+            @Parameter(description = "Filter by vehicle type") @RequestParam(required = false) String vehicleType) {
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -156,8 +165,15 @@ public class VehicleController {
      *         or HTTP 404 (NOT_FOUND) if the vehicle does not exist,
      *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
+    @Operation(summary = "Get vehicle by ID", description = "Retrieves a specific vehicle by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Vehicle found"),
+            @ApiResponse(responseCode = "404", description = "Vehicle not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID format")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<VehicleResponseBody> getVehicleById(@PathVariable String id) {
+    public ResponseEntity<VehicleResponseBody> getVehicleById(
+            @Parameter(description = "Vehicle UUID") @PathVariable String id) {
         try {
             UUID vehicleId = UUID.fromString(id);
             Vehicle vehicle = this.readVehicleUseCase.fetch(vehicleId);
@@ -183,8 +199,14 @@ public class VehicleController {
      * @return ResponseEntity containing the created vehicle and HTTP 201 (CREATED),
      *         or HTTP 400 (BAD_REQUEST) if validation fails
      */
+    @Operation(summary = "Create a vehicle", description = "Creates a new vehicle with the provided data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Vehicle created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PostMapping("/")
-    public ResponseEntity<VehicleResponseBody> createVehicle(@RequestBody VehiclePostRequestBody requestBody) {
+    public ResponseEntity<VehicleResponseBody> createVehicle(
+            @Parameter(description = "Vehicle data") @RequestBody VehiclePostRequestBody requestBody) {
         Vehicle createdVehicle = this.createVehicleUseCase.create(
                 requestBody.vehicleType,
                 requestBody.transportCapacity,
@@ -209,10 +231,16 @@ public class VehicleController {
      *         or HTTP 404 (NOT_FOUND) if the vehicle does not exist,
      *         or HTTP 400 (BAD_REQUEST) if validation fails
      */
+    @Operation(summary = "Update a vehicle", description = "Updates an existing vehicle with the provided data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Vehicle updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Vehicle not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<VehicleResponseBody> updateVehicle(
-            @PathVariable String id,
-            @RequestBody VehiclePutRequestBody requestBody) {
+            @Parameter(description = "Vehicle UUID") @PathVariable String id,
+            @Parameter(description = "Updated vehicle data") @RequestBody VehiclePutRequestBody requestBody) {
         try {
             UUID vehicleId = UUID.fromString(id);
             Vehicle updatedVehicle = this.updateVehicleUseCase.update(
@@ -241,8 +269,15 @@ public class VehicleController {
      *         or HTTP 404 (NOT_FOUND) if the vehicle does not exist,
      *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
+    @Operation(summary = "Delete a vehicle", description = "Deletes a vehicle by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Vehicle deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Vehicle not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID format")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<VehicleResponseBody> deleteVehicle(@PathVariable String id) {
+    public ResponseEntity<VehicleResponseBody> deleteVehicle(
+            @Parameter(description = "Vehicle UUID") @PathVariable String id) {
         try {
             UUID vehicleId = UUID.fromString(id);
             Vehicle deletedVehicle = this.deleteVehicleUseCase.delete(vehicleId);

@@ -11,6 +11,10 @@ import es.ull.project.application.usecase.container.ReadContainerUseCase;
 import es.ull.project.application.usecase.container.UpdateContainerUseCase;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.WasteType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -97,15 +101,25 @@ public class ContainerController {
      * This endpoint returns a list of all available containers without pagination.
      * The containers are returned as ContainerResponseBody DTOs serialized to JSON.
      * 
+     * @param page the zero-based page index (defaults to 0)
+     * @param size the number of elements per page (defaults to 10)
+     * @param sortBy the field to sort by (e.g. wasteType, location, demand, serviceZone)
+     * @param sortOrder the sort direction, "asc" or "desc" (defaults to "asc")
+     * @param wasteType optional filter by waste type enum value
      * @return ResponseEntity containing a list of all containers and HTTP 200 (OK) status
      */
+    @Operation(summary = "Get all containers", description = "Retrieves a paginated list of containers with optional sorting and filtering")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Containers retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+    })
     @GetMapping("/")
     public ResponseEntity<ContainerPageResponseBody> getContainers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(defaultValue = "asc") String sortOrder,
-            @RequestParam(required = false) String wasteType) {
+            @Parameter(description = "Zero-based page index") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Number of elements per page") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Field to sort by: wasteType, location, demand, serviceZone") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder,
+            @Parameter(description = "Filter by waste type") @RequestParam(required = false) String wasteType) {
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -158,8 +172,15 @@ public class ContainerController {
      *         or HTTP 404 (NOT_FOUND) if the container does not exist,
      *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
+    @Operation(summary = "Get container by ID", description = "Retrieves a specific container by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Container found"),
+            @ApiResponse(responseCode = "404", description = "Container not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID format")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<ContainerResponseBody> getContainerById(@PathVariable String id) {
+    public ResponseEntity<ContainerResponseBody> getContainerById(
+            @Parameter(description = "Container UUID") @PathVariable String id) {
         try {
             UUID containerId = UUID.fromString(id);
             Container container = this.readContainerUseCase.fetch(containerId);
@@ -185,8 +206,14 @@ public class ContainerController {
      * @return ResponseEntity containing the created container and HTTP 201 (CREATED),
      *         or HTTP 400 (BAD_REQUEST) if validation fails
      */
+    @Operation(summary = "Create a container", description = "Creates a new container with the provided data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Container created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PostMapping("/")
-    public ResponseEntity<ContainerResponseBody> createContainer(@RequestBody ContainerPostRequestBody requestBody) {
+    public ResponseEntity<ContainerResponseBody> createContainer(
+            @Parameter(description = "Container data") @RequestBody ContainerPostRequestBody requestBody) {
         try {
             Container createdContainer = this.createContainerUseCase.create(
                     requestBody.location,
@@ -216,10 +243,16 @@ public class ContainerController {
      *         or HTTP 404 (NOT_FOUND) if the container does not exist,
      *         or HTTP 400 (BAD_REQUEST) if validation fails
      */
+    @Operation(summary = "Update a container", description = "Updates an existing container with the provided data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Container updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Container not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ContainerResponseBody> updateContainer(
-            @PathVariable String id,
-            @RequestBody ContainerPutRequestBody requestBody) {
+            @Parameter(description = "Container UUID") @PathVariable String id,
+            @Parameter(description = "Updated container data") @RequestBody ContainerPutRequestBody requestBody) {
         try {
             UUID containerId = UUID.fromString(id);
             Container updatedContainer = this.updateContainerUseCase.update(
@@ -251,8 +284,15 @@ public class ContainerController {
      *         or HTTP 404 (NOT_FOUND) if the container does not exist,
      *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
+    @Operation(summary = "Delete a container", description = "Deletes a container by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Container deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Container not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID format")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<ContainerResponseBody> deleteContainer(@PathVariable String id) {
+    public ResponseEntity<ContainerResponseBody> deleteContainer(
+            @Parameter(description = "Container UUID") @PathVariable String id) {
         try {
             UUID containerId = UUID.fromString(id);
             Container deletedContainer = this.deleteContainerUseCase.delete(containerId);

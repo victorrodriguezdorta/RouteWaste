@@ -24,6 +24,11 @@ public class VehicleWritingConverter implements Converter<Vehicle, Document> {
     @SuppressWarnings("unused")
     private final MongoConfiguration mongoConfiguration;
 
+    /**
+     * Constructs a new VehicleWritingConverter.
+     *
+     * @param mongoConfiguration the MongoDB configuration for converter registration
+     */
     public VehicleWritingConverter(MongoConfiguration mongoConfiguration) {
         this.mongoConfiguration = mongoConfiguration;
     }

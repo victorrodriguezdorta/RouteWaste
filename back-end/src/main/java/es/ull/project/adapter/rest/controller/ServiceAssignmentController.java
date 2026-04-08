@@ -1,18 +1,6 @@
 package es.ull.project.adapter.rest.controller;
 
-import es.ull.project.adapter.rest.mapper.ServiceAssignmentResponseMapper;
-import es.ull.project.adapter.rest.request.serviceassignment.ServiceAssignmentPostRequestBody;
-import es.ull.project.adapter.rest.request.serviceassignment.ServiceAssignmentPutRequestBody;
-import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
-import es.ull.project.application.usecase.serviceassignment.CreateServiceAssignmentUseCase;
-import es.ull.project.application.usecase.serviceassignment.DeleteServiceAssignmentUseCase;
-import es.ull.project.application.usecase.serviceassignment.ReadServiceAssignmentUseCase;
-import es.ull.project.application.usecase.serviceassignment.UpdateServiceAssignmentUseCase;
-import es.ull.project.domain.entity.ServiceAssignment;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -27,6 +15,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import es.ull.project.adapter.rest.mapper.ServiceAssignmentResponseMapper;
+import es.ull.project.adapter.rest.request.serviceassignment.ServiceAssignmentPostRequestBody;
+import es.ull.project.adapter.rest.request.serviceassignment.ServiceAssignmentPutRequestBody;
+import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
+import es.ull.project.application.usecase.serviceassignment.CreateServiceAssignmentUseCase;
+import es.ull.project.application.usecase.serviceassignment.DeleteServiceAssignmentUseCase;
+import es.ull.project.application.usecase.serviceassignment.ReadServiceAssignmentUseCase;
+import es.ull.project.application.usecase.serviceassignment.UpdateServiceAssignmentUseCase;
+import es.ull.project.domain.entity.ServiceAssignment;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 /**
  * ServiceAssignmentController
@@ -43,8 +45,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(ApiRoutes.SERVICE_ASSIGNMENTS)
 public class ServiceAssignmentController {
-
-    private static final String ERROR_KEY = "error";
 
     /**
      * Use case for reading service assignment data.
@@ -84,6 +84,12 @@ public class ServiceAssignmentController {
      * 
      * @return ResponseEntity containing a list of all service assignments and HTTP 200 (OK) status
      */
+    @Operation(summary = "Get all service assignments", description = "Retrieves a list of all service assignments")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Service assignments retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @GetMapping("/")
     public ResponseEntity<List<ServiceAssignmentResponseBody>> getServiceAssignments() {
         List<ServiceAssignment> assignments = this.readServiceAssignmentUseCase.fetchAll();
@@ -103,8 +109,15 @@ public class ServiceAssignmentController {
      *         or HTTP 404 (NOT_FOUND) if the assignment does not exist,
      *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
+    @Operation(summary = "Get service assignment by ID", description = "Retrieves a specific service assignment by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Service assignment found"),
+            @ApiResponse(responseCode = "404", description = "Service assignment not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID format")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<ServiceAssignmentResponseBody> getServiceAssignmentById(@PathVariable String id) {
+    public ResponseEntity<ServiceAssignmentResponseBody> getServiceAssignmentById(
+            @Parameter(description = "Service assignment UUID") @PathVariable String id) {
         try {
             UUID assignmentId = UUID.fromString(id);
             ServiceAssignment assignment = this.readServiceAssignmentUseCase.fetch(assignmentId);
@@ -132,8 +145,14 @@ public class ServiceAssignmentController {
      * @return ResponseEntity containing the created service assignment and HTTP 201 (CREATED),
      *         or HTTP 400 (BAD_REQUEST) with error message if validation fails or entities are not found
      */
+    @Operation(summary = "Create a service assignment", description = "Creates a new service assignment with the provided data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Service assignment created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PostMapping("/")
-    public ResponseEntity<Object> createServiceAssignment(@RequestBody ServiceAssignmentPostRequestBody requestBody) {
+    public ResponseEntity<ServiceAssignmentResponseBody> createServiceAssignment(
+            @Parameter(description = "Service assignment data") @RequestBody ServiceAssignmentPostRequestBody requestBody) {
         try {
             ServiceAssignment createdAssignment = this.createServiceAssignmentUseCase.create(
                     requestBody.containerId,
@@ -146,9 +165,7 @@ public class ServiceAssignmentController {
             ServiceAssignmentResponseBody responseBody = ServiceAssignmentResponseMapper.toResponseBody(createdAssignment);
             return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put(ERROR_KEY, e.getMessage());
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -167,10 +184,16 @@ public class ServiceAssignmentController {
      *         or HTTP 404 (NOT_FOUND) if the assignment does not exist,
      *         or HTTP 400 (BAD_REQUEST) if validation fails
      */
+    @Operation(summary = "Update a service assignment", description = "Updates an existing service assignment with the provided data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Service assignment updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Service assignment not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ServiceAssignmentResponseBody> updateServiceAssignment(
-            @PathVariable String id,
-            @RequestBody ServiceAssignmentPutRequestBody requestBody) {
+            @Parameter(description = "Service assignment UUID") @PathVariable String id,
+            @Parameter(description = "Updated service assignment data") @RequestBody ServiceAssignmentPutRequestBody requestBody) {
         try {
             UUID assignmentId = UUID.fromString(id);
             UUID containerId = requestBody.container != null ? requestBody.container.getId() : null;
@@ -206,8 +229,15 @@ public class ServiceAssignmentController {
      *         or HTTP 404 (NOT_FOUND) if the assignment does not exist,
      *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
+    @Operation(summary = "Delete a service assignment", description = "Deletes a service assignment by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Service assignment deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Service assignment not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID format")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<ServiceAssignmentResponseBody> deleteServiceAssignment(@PathVariable String id) {
+    public ResponseEntity<ServiceAssignmentResponseBody> deleteServiceAssignment(
+            @Parameter(description = "Service assignment UUID") @PathVariable String id) {
         try {
             UUID assignmentId = UUID.fromString(id);
             ServiceAssignment deletedAssignment = this.deleteServiceAssignmentUseCase.delete(assignmentId);

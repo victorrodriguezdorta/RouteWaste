@@ -1,13 +1,11 @@
 package es.ull.project.application.usecase.facility;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityType;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Use case for reading facilities.

@@ -1,9 +1,13 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -13,11 +17,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
 
 /**
  * MongoDB implementation of the FacilityRepository interface.
@@ -119,28 +118,19 @@ public class FacilityMongoRepository implements FacilityRepository {
     public Page<Facility> findAll(Pageable pageable, FacilityType type, FacilityStatus status) {
         Query dataQuery = new Query();
         Query countQuery = new Query();
-
-        // Add filter criteria
         if (type != null) {
-            Criteria criteria = Criteria.where("facilityType").is(type);
+            Criteria criteria = Criteria.where(MongoFields.FACILITY_TYPE).is(type);
             dataQuery.addCriteria(criteria);
             countQuery.addCriteria(criteria);
         }
         if (status != null) {
-            Criteria criteria = Criteria.where("status").is(status);
+            Criteria criteria = Criteria.where(MongoFields.STATUS).is(status);
             dataQuery.addCriteria(criteria);
             countQuery.addCriteria(criteria);
         }
-
-        // Apply pagination and sorting
         dataQuery.with(pageable);
-
-        // Execute query
         List<Facility> content = this.mongoTemplate.find(dataQuery, Facility.class, COLLECTION_NAME);
-        
-        // Count total
         long total = this.mongoTemplate.count(countQuery, COLLECTION_NAME);
-
         return new PageImpl<>(content, pageable, total);
     }
 }

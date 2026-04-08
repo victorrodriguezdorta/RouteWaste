@@ -24,6 +24,11 @@ public class FacilityWritingConverter implements Converter<Facility, Document> {
     @SuppressWarnings("unused")
     private final MongoConfiguration mongoConfiguration;
 
+    /**
+     * Constructs a new FacilityWritingConverter.
+     *
+     * @param mongoConfiguration the MongoDB configuration for converter registration
+     */
     public FacilityWritingConverter(MongoConfiguration mongoConfiguration) {
         this.mongoConfiguration = mongoConfiguration;
     }

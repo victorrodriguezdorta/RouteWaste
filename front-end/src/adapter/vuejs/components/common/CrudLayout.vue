@@ -1,9 +1,9 @@
 <template>
-  <v-container fluid>
-    <v-row justify="center">
-      <v-col cols="12" :md="contentMd" :lg="contentLg">
+  <v-container fluid class="pa-0">
+    <v-row justify="center" class="ma-0">
+      <v-col cols="12" :md="contentMd" :lg="contentLg" class="pa-4">
         <!-- Header Section -->
-        <v-row align="center" class="mb-8 px-4 mt-2">
+        <v-row align="center" class="mb-6 mt-2">
           <v-col class="d-flex align-center">
             <v-icon v-if="icon" size="48" class="mr-4" color="primary">{{ icon }}</v-icon>
             <h1 class="text-h4 font-weight-bold text-primary">{{ title }}</h1>
@@ -32,7 +32,7 @@
         </v-row>
 
         <!-- Content Section -->
-        <div class="px-2">
+        <div>
           <slot />
         </div>
       </v-col>
@@ -54,8 +54,8 @@ withDefaults(defineProps<{
   contentLg?: number | string;
 }>(), {
   showGoBack: false,
-  contentMd: 10,
-  contentLg: 10
+  contentMd: 12,
+  contentLg: 12
 });
 </script>
 

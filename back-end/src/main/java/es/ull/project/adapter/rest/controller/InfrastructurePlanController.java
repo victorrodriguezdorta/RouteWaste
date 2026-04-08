@@ -1,15 +1,5 @@
 package es.ull.project.adapter.rest.controller;
 
-import es.ull.project.adapter.rest.mapper.InfrastructurePlanResponseMapper;
-import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPostRequestBody;
-import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPutRequestBody;
-import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
-import es.ull.project.application.usecase.infrastructureplan.CreateInfrastructurePlanUseCase;
-import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
-import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
-import es.ull.project.application.usecase.infrastructureplan.UpdateInfrastructurePlanUseCase;
-import es.ull.project.domain.entity.InfrastructurePlan;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -25,6 +15,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import es.ull.project.adapter.rest.mapper.InfrastructurePlanResponseMapper;
+import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPostRequestBody;
+import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPutRequestBody;
+import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
+import es.ull.project.application.usecase.infrastructureplan.CreateInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.infrastructureplan.UpdateInfrastructurePlanUseCase;
+import es.ull.project.domain.entity.InfrastructurePlan;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 /**
  * InfrastructurePlanController
@@ -80,6 +84,12 @@ public class InfrastructurePlanController {
      * 
      * @return ResponseEntity containing a list of all infrastructure plans and HTTP 200 (OK) status
      */
+    @Operation(summary = "Get all infrastructure plans", description = "Retrieves a list of all infrastructure plans")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Infrastructure plans retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     @GetMapping("/")
     public ResponseEntity<List<InfrastructurePlanResponseBody>> getInfrastructurePlans() {
         List<InfrastructurePlan> plans = this.readInfrastructurePlanUseCase.fetchAll();
@@ -99,8 +109,15 @@ public class InfrastructurePlanController {
      *         or HTTP 404 (NOT_FOUND) if the plan does not exist,
      *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
+    @Operation(summary = "Get infrastructure plan by ID", description = "Retrieves a specific infrastructure plan by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Infrastructure plan found"),
+            @ApiResponse(responseCode = "404", description = "Infrastructure plan not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID format")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<InfrastructurePlanResponseBody> getInfrastructurePlanById(@PathVariable String id) {
+    public ResponseEntity<InfrastructurePlanResponseBody> getInfrastructurePlanById(
+            @Parameter(description = "Infrastructure plan UUID") @PathVariable String id) {
         try {
             UUID planId = UUID.fromString(id);
             InfrastructurePlan plan = this.readInfrastructurePlanUseCase.fetch(planId);
@@ -126,8 +143,14 @@ public class InfrastructurePlanController {
      * @return ResponseEntity containing the created infrastructure plan and HTTP 201 (CREATED),
      *         or HTTP 400 (BAD_REQUEST) if validation fails
      */
+    @Operation(summary = "Create an infrastructure plan", description = "Creates a new infrastructure plan with the provided data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Infrastructure plan created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PostMapping("/")
-    public ResponseEntity<InfrastructurePlanResponseBody> createInfrastructurePlan(@RequestBody InfrastructurePlanPostRequestBody requestBody) {
+    public ResponseEntity<InfrastructurePlanResponseBody> createInfrastructurePlan(
+            @Parameter(description = "Infrastructure plan data") @RequestBody InfrastructurePlanPostRequestBody requestBody) {
         InfrastructurePlan createdPlan = this.createInfrastructurePlanUseCase.create(
                 requestBody.period,
                 requestBody.maxBudget,
@@ -154,10 +177,16 @@ public class InfrastructurePlanController {
      *         or HTTP 404 (NOT_FOUND) if the plan does not exist,
      *         or HTTP 400 (BAD_REQUEST) if validation fails
      */
+    @Operation(summary = "Update an infrastructure plan", description = "Updates an existing infrastructure plan with the provided data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Infrastructure plan updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Infrastructure plan not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<InfrastructurePlanResponseBody> updateInfrastructurePlan(
-            @PathVariable String id,
-            @RequestBody InfrastructurePlanPutRequestBody requestBody) {
+            @Parameter(description = "Infrastructure plan UUID") @PathVariable String id,
+            @Parameter(description = "Updated infrastructure plan data") @RequestBody InfrastructurePlanPutRequestBody requestBody) {
         UUID planId = UUID.fromString(id);
         InfrastructurePlan updatedPlan = this.updateInfrastructurePlanUseCase.update(
                 planId,
@@ -184,8 +213,15 @@ public class InfrastructurePlanController {
      *         or HTTP 404 (NOT_FOUND) if the plan does not exist,
      *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
+    @Operation(summary = "Delete an infrastructure plan", description = "Deletes an infrastructure plan by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Infrastructure plan deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Infrastructure plan not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID format")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<InfrastructurePlanResponseBody> deleteInfrastructurePlan(@PathVariable String id) {
+    public ResponseEntity<InfrastructurePlanResponseBody> deleteInfrastructurePlan(
+            @Parameter(description = "Infrastructure plan UUID") @PathVariable String id) {
         UUID planId = UUID.fromString(id);
         InfrastructurePlan deletedPlan = this.deleteInfrastructurePlanUseCase.delete(planId);
         InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(deletedPlan);

@@ -24,6 +24,11 @@ public class ServiceAssignmentWritingConverter implements Converter<ServiceAssig
     @SuppressWarnings("unused")
     private final MongoConfiguration mongoConfiguration;
 
+    /**
+     * Constructs a new ServiceAssignmentWritingConverter.
+     *
+     * @param mongoConfiguration the MongoDB configuration for converter registration
+     */
     public ServiceAssignmentWritingConverter(MongoConfiguration mongoConfiguration) {
         this.mongoConfiguration = mongoConfiguration;
     }

@@ -1,9 +1,23 @@
 package es.ull.project.adapter.rest.controller;
 
+import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
+import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
+import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
+import es.ull.project.adapter.rest.response.facility.FacilityPageResponseBody;
+import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
+import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
+import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
+import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
+import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,18 +34,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
-import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
-import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
-import es.ull.project.adapter.rest.response.facility.FacilityPageResponseBody;
-import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
-import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
-import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
-import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
-import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityType;
 
 /**
  * FacilityController
@@ -107,17 +109,21 @@ public class FacilityController {
      * @param facilityType optional facility type filter
      * @return ResponseEntity containing paginated facilities and HTTP 200 (OK) status
      */
+    @Operation(summary = "Get all facilities", description = "Retrieves a paginated list of facilities with optional sorting and filtering")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Facilities retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+    })
     @GetMapping("/")
     public ResponseEntity<FacilityPageResponseBody> getFacilities(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(defaultValue = "asc") String sortOrder,
-            @RequestParam(required = false) String facilityType) {
+            @Parameter(description = "Zero-based page index") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Number of elements per page") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Field to sort by: type, location, capacity, status") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder,
+            @Parameter(description = "Filter by facility type") @RequestParam(required = false) String facilityType) {
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        
         String mongoSortField = switch (sortBy != null ? sortBy : "") {
             case SORT_BY_TYPE -> FIELD_TYPE;
             case SORT_BY_LOCATION -> FIELD_LOCATION;
@@ -125,7 +131,6 @@ public class FacilityController {
             case SORT_BY_STATUS -> FIELD_STATUS;
             default -> null;
         };
-        
         Sort sort = Sort.unsorted();
         if (mongoSortField != null) {
             Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder)
@@ -133,7 +138,6 @@ public class FacilityController {
                     : Sort.Direction.ASC;
             sort = Sort.by(direction, mongoSortField);
         }
-        
         FacilityType facilityTypeFilter = null;
         if (facilityType != null && !facilityType.isBlank()) {
             try {
@@ -142,13 +146,11 @@ public class FacilityController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-        
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Facility> facilityPage = this.readFacilityUseCase.fetchAll(pageable, facilityTypeFilter);
         List<FacilityResponseBody> responseBodies = facilityPage.getContent().stream()
                 .map(FacilityResponseMapper::toResponseBody)
                 .toList();
-        
         FacilityPageResponseBody response = new FacilityPageResponseBody();
         response.content = responseBodies;
         response.totalElements = facilityPage.getTotalElements();
@@ -158,7 +160,6 @@ public class FacilityController {
         response.numberOfElements = facilityPage.getNumberOfElements();
         response.first = facilityPage.isFirst();
         response.last = facilityPage.isLast();
-        
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -172,8 +173,15 @@ public class FacilityController {
      *         or HTTP 404 (NOT_FOUND) if the facility does not exist,
      *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
+    @Operation(summary = "Get facility by ID", description = "Retrieves a specific facility by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Facility found"),
+            @ApiResponse(responseCode = "404", description = "Facility not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID format")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<FacilityResponseBody> getFacilityById(@PathVariable String id) {
+    public ResponseEntity<FacilityResponseBody> getFacilityById(
+            @Parameter(description = "Facility UUID") @PathVariable String id) {
         try {
             UUID facilityId = UUID.fromString(id);
             Facility facility = this.readFacilityUseCase.fetch(facilityId);
@@ -199,8 +207,14 @@ public class FacilityController {
      * @return ResponseEntity containing the created facility and HTTP 201 (CREATED),
      *         or HTTP 400 (BAD_REQUEST) if validation fails
      */
+    @Operation(summary = "Create a facility", description = "Creates a new facility with the provided data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Facility created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PostMapping("/")
-    public ResponseEntity<FacilityResponseBody> createFacility(@RequestBody FacilityPostRequestBody requestBody) {
+    public ResponseEntity<FacilityResponseBody> createFacility(
+            @Parameter(description = "Facility data") @RequestBody FacilityPostRequestBody requestBody) {
         try {
             Facility createdFacility = this.createFacilityUseCase.create(
                     requestBody.facilityType,
@@ -231,10 +245,16 @@ public class FacilityController {
      *         or HTTP 404 (NOT_FOUND) if the facility does not exist,
      *         or HTTP 400 (BAD_REQUEST) if validation fails
      */
+    @Operation(summary = "Update a facility", description = "Updates an existing facility with the provided data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Facility updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Facility not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<FacilityResponseBody> updateFacility(
-            @PathVariable String id,
-            @RequestBody FacilityPutRequestBody requestBody) {
+            @Parameter(description = "Facility UUID") @PathVariable String id,
+            @Parameter(description = "Updated facility data") @RequestBody FacilityPutRequestBody requestBody) {
         try {
             UUID facilityId = UUID.fromString(id);
             Facility updatedFacility = this.updateFacilityUseCase.update(
@@ -267,8 +287,15 @@ public class FacilityController {
      *         or HTTP 404 (NOT_FOUND) if the facility does not exist,
      *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
+    @Operation(summary = "Delete a facility", description = "Deletes a facility by its unique identifier")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Facility deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Facility not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid ID format")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<FacilityResponseBody> deleteFacility(@PathVariable String id) {
+    public ResponseEntity<FacilityResponseBody> deleteFacility(
+            @Parameter(description = "Facility UUID") @PathVariable String id) {
         try {
             UUID facilityId = UUID.fromString(id);
             Facility deletedFacility = this.deleteFacilityUseCase.delete(facilityId);

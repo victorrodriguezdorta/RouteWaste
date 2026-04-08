@@ -35,6 +35,11 @@ public class FacilityReadingConverter implements Converter<Document, Facility> {
     @SuppressWarnings("unused")
     private final MongoConfiguration mongoConfiguration;
 
+    /**
+     * Constructs a new FacilityReadingConverter.
+     *
+     * @param mongoConfiguration the MongoDB configuration for converter registration
+     */
     public FacilityReadingConverter(MongoConfiguration mongoConfiguration) {
         this.mongoConfiguration = mongoConfiguration;
     }

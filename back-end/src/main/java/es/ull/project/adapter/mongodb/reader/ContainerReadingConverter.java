@@ -31,9 +31,15 @@ public class ContainerReadingConverter implements Converter<Document, Container>
     @SuppressWarnings("unused")
     private final MongoConfiguration mongoConfiguration;
 
+    /**
+     * Constructs a new ContainerReadingConverter.
+     *
+     * @param mongoConfiguration the MongoDB configuration for converter registration
+     */
     public ContainerReadingConverter(MongoConfiguration mongoConfiguration) {
         this.mongoConfiguration = mongoConfiguration;
     }
+
     /**
      * Converts a MongoDB Document into a Container entity.
      *
