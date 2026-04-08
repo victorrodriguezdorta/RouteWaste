@@ -1,0 +1,74 @@
+# GitHub action aimed at creating a Docker image of a Java project. 
+# The Docker image is pushed on DockerHub when created.
+#
+# Requirements:
+# - Secrets. In order to execute the GitHub action the following secrets must be set in the project
+# (Settings / Secrets / Actions):
+#   - ULLSOFTWARE_USERNAME. Username of account ullsoftware.
+#   - ULLSOFTWARE_PASSWORD. Password of account ullsoftware.
+#   - DOCKERHUB_USERNAME. Username of the user in DockerHub.
+#   - DOCKERHUB_PASSWORD. Password of the user in DockerHub.
+#
+
+name: Algorithm. Publish Docker image
+
+# Events that trigger the workflow
+on:
+  push:
+    branches:
+      - main
+    paths: 
+      - algorithm/**
+      - '!**.md'
+  workflow_dispatch:      
+
+# Working directory
+defaults:
+  run:
+    working-directory: algorithm
+
+# Environment variables
+env:
+  JAVA_VERSION: 17
+  WORKING_DIRECTORY: algorithm
+  DOCKER_IMAGE_NAME: ull-tfg/algorithm
+
+jobs:
+  publish-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout of the repository
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Usage of Java Development Kit
+      - name: Set up Java Development Kit
+        uses: actions/setup-java@v3
+        with:       
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          server-id: github
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+      # Compile the Java project
+      - name: Build with Maven
+        run: mvn -B -Pgithub compile assembly:single
+        env:
+          MAVEN_USERNAME: ${{ secrets.ULLSOFTWARE_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.ULLSOFTWARE_PASSWORD }}
+      # Publish the artifact to GitHub Packages
+      - name: Publish package
+        run: mvn -Pgithub deploy
+        env:
+          MAVEN_USERNAME: ${{ github.actor }}
+          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}          
+      # Build and publish Docker image in DockerHub
+      - name: Build and push Docker image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: ${{ env.DOCKER_IMAGE_NAME }}
+          tags: latest
+          registry: docker.io
+          directory: ${{ env.WORKING_DIRECTORY }}
+          dockerfile: ${{ env.WORKING_DIRECTORY }}/Dockerfile          
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
