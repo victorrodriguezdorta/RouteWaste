@@ -61,7 +61,7 @@
                 <repository>
                     <id>github</id>
                     <name>GitHub Packages</name>
-                    <url>https://maven.pkg.github.com/ull-tfg/sensor-app-algorithm</url>
+                    <url>https://maven.pkg.github.com/ull-tfg/sensor-app</url>
                 </repository>
             </distributionManagement>
         </profile>
