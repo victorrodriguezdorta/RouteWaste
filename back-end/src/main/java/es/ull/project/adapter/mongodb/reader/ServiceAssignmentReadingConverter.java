@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * ServiceAssignmentReadingConverter
@@ -52,7 +53,7 @@ public class ServiceAssignmentReadingConverter implements Converter<Document, Se
      * @return ServiceAssignment entity reconstructed from the document
      */
     @Override
-    public ServiceAssignment convert(Document document) {
+    public ServiceAssignment convert(@NonNull Document document) {
         logger.info("ServiceAssignment to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         UUID containerId = (UUID) document.get(MongoFields.CONTAINER_ID);

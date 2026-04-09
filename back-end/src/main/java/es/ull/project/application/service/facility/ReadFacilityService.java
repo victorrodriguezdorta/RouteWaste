@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 /**
  * Service implementation for reading facilities.
@@ -53,7 +54,7 @@ public class ReadFacilityService implements ReadFacilityUseCase {
      * @return a page of facilities
      */
     @Override
-    public Page<Facility> fetchAll(Pageable pageable) {
+    public Page<Facility> fetchAll(@NonNull Pageable pageable) {
         return this.repository.findAll(pageable);
     }
 
@@ -65,7 +66,7 @@ public class ReadFacilityService implements ReadFacilityUseCase {
      * @return a page of matching facilities
      */
     @Override
-    public Page<Facility> fetchAll(Pageable pageable, FacilityType facilityType) {
+    public Page<Facility> fetchAll(@NonNull Pageable pageable, FacilityType facilityType) {
         return this.repository.findAll(pageable, facilityType, null);
     }
 }

@@ -3,12 +3,12 @@ package es.ull.project.adapter.mongodb.writer;
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.ServiceAssignment;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * ServiceAssignmentWritingConverter
@@ -40,7 +40,7 @@ public class ServiceAssignmentWritingConverter implements Converter<ServiceAssig
      * @return The MongoDB Document representation of the ServiceAssignment.
      */
     @Override
-    public Document convert(ServiceAssignment serviceAssignment) {
+    public Document convert(@NonNull ServiceAssignment serviceAssignment) {
         logger.info("ServiceAssignment with id '{}' to be written", serviceAssignment.getId());
         Document document = new Document();
         document.put(MongoFields.ID, serviceAssignment.getId());

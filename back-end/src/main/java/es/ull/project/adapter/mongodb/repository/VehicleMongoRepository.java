@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -74,7 +75,7 @@ public class VehicleMongoRepository implements VehicleRepository {
      * @return page of vehicles
      */
     @Override
-    public Page<Vehicle> findAll(Pageable pageable) {
+    public Page<Vehicle> findAll(@NonNull Pageable pageable) {
         Query query = new Query().with(pageable);
         List<Vehicle> vehicles = this.mongoTemplate.find(query, Vehicle.class, COLLECTION_NAME);
         long total = this.mongoTemplate.count(new Query(), Vehicle.class, COLLECTION_NAME);
@@ -89,7 +90,7 @@ public class VehicleMongoRepository implements VehicleRepository {
      * @return page of matching vehicles
      */
     @Override
-    public Page<Vehicle> findAll(Pageable pageable, VehicleType vehicleType) {
+    public Page<Vehicle> findAll(@NonNull Pageable pageable, VehicleType vehicleType) {
         Query dataQuery = new Query();
         Query countQuery = new Query();
         if (vehicleType != null) {

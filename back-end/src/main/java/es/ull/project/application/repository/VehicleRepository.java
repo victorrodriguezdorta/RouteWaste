@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 /**
  * Repository interface for Vehicle aggregate roots.
@@ -43,7 +44,7 @@ public interface VehicleRepository {
      * @param pageable pagination configuration
      * @return page of vehicles
      */
-    public abstract Page<Vehicle> findAll(Pageable pageable);
+    public abstract Page<Vehicle> findAll(@NonNull Pageable pageable);
 
     /**
      * Find vehicles using pagination and an optional type filter.
@@ -52,7 +53,7 @@ public interface VehicleRepository {
      * @param vehicleType optional vehicle type to filter by (null means no filter)
      * @return page of matching vehicles
      */
-    public abstract Page<Vehicle> findAll(Pageable pageable, VehicleType vehicleType);
+    public abstract Page<Vehicle> findAll(@NonNull Pageable pageable, VehicleType vehicleType);
 
     /**
      * Save or update a vehicle.

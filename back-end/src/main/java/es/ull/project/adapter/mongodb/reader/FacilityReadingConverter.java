@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * FacilityReadingConverter
@@ -51,7 +52,7 @@ public class FacilityReadingConverter implements Converter<Document, Facility> {
      * @return Facility entity reconstructed from the document
      */
     @Override
-    public Facility convert(Document document) {
+    public Facility convert(@NonNull Document document) {
         logger.info("Facility to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         FacilityType facilityType = FacilityType.fromString(document.getString(MongoFields.FACILITY_TYPE));

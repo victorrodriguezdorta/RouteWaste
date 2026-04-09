@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 /**
  * Service implementation for reading containers.
@@ -53,7 +54,7 @@ public class ReadContainerService implements ReadContainerUseCase {
      * @return a page of containers
      */
     @Override
-    public Page<Container> fetchAll(Pageable pageable) {
+    public Page<Container> fetchAll(@NonNull Pageable pageable) {
         return this.repository.findAll(pageable);
     }
 
@@ -65,7 +66,7 @@ public class ReadContainerService implements ReadContainerUseCase {
      * @return a page of matching containers
      */
     @Override
-    public Page<Container> fetchAll(Pageable pageable, WasteType wasteType) {
+    public Page<Container> fetchAll(@NonNull Pageable pageable, WasteType wasteType) {
         return this.repository.findAll(pageable, wasteType);
     }
 }

@@ -10,17 +10,16 @@ import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.TotalCost;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * InfrastructurePlanReadingConverter
@@ -54,7 +53,7 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
      * @return The InfrastructurePlan entity.
      */
     @Override
-    public InfrastructurePlan convert(Document document) {
+    public InfrastructurePlan convert(@NonNull Document document) {
         logger.info("Reading InfrastructurePlan from MongoDB document");
         UUID id = document.get(MongoFields.ID, UUID.class);
         String periodValue = document.getString(MongoFields.PERIOD);

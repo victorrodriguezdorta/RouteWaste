@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * VehicleReadingConverter
@@ -47,7 +48,7 @@ public class VehicleReadingConverter implements Converter<Document, Vehicle> {
      * @return Vehicle entity reconstructed from the document
      */
     @Override
-    public Vehicle convert(Document document) {
+    public Vehicle convert(@NonNull Document document) {
         logger.info("Vehicle to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         VehicleType vehicleType = VehicleType.fromString(document.getString(MongoFields.VEHICLE_TYPE));

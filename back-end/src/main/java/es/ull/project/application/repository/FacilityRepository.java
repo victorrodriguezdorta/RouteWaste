@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 /**
  * Repository interface for the Facility aggregate.
@@ -61,7 +62,7 @@ public interface FacilityRepository {
      * @param pageable the pagination information
      * @return a Page containing the paginated facilities
      */
-    public abstract Page<Facility> findAll(Pageable pageable);
+    public abstract Page<Facility> findAll(@NonNull Pageable pageable);
 
     /**
      * Finds all facilities with pagination, type filter, and status filter support.
@@ -71,5 +72,5 @@ public interface FacilityRepository {
      * @param status optional facility status filter
      * @return a Page containing the paginated and filtered facilities
      */
-    public abstract Page<Facility> findAll(Pageable pageable, FacilityType type, FacilityStatus status);
+    public abstract Page<Facility> findAll(@NonNull Pageable pageable, FacilityType type, FacilityStatus status);
 }

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -74,7 +75,7 @@ public class ContainerMongoRepository implements ContainerRepository {
      * @return page of containers
      */
     @Override
-    public Page<Container> findAll(Pageable pageable) {
+    public Page<Container> findAll(@NonNull Pageable pageable) {
         Query query = new Query().with(pageable);
         List<Container> containers = this.mongoTemplate.find(query, Container.class, COLLECTION_NAME);
         long total = this.mongoTemplate.count(new Query(), Container.class, COLLECTION_NAME);
@@ -89,7 +90,7 @@ public class ContainerMongoRepository implements ContainerRepository {
      * @return page of matching containers
      */
     @Override
-    public Page<Container> findAll(Pageable pageable, WasteType wasteType) {
+    public Page<Container> findAll(@NonNull Pageable pageable, WasteType wasteType) {
         Query dataQuery = new Query();
         Query countQuery = new Query();
         if (wasteType != null) {

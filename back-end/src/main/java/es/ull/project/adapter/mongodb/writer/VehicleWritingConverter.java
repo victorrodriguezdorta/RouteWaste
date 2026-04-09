@@ -3,12 +3,12 @@ package es.ull.project.adapter.mongodb.writer;
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Vehicle;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * VehicleWritingConverter
@@ -40,7 +40,7 @@ public class VehicleWritingConverter implements Converter<Vehicle, Document> {
      * @return The MongoDB Document representation of the Vehicle.
      */
     @Override
-    public Document convert(Vehicle vehicle) {
+    public Document convert(@NonNull Vehicle vehicle) {
         logger.info("Vehicle with id '{}' to be written", vehicle.getId());
         Document document = new Document();
         document.put(MongoFields.ID, vehicle.getId());

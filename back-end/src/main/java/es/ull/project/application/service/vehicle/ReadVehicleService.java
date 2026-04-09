@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 /**
  * Service responsible for reading vehicle data from the system.
@@ -57,7 +58,7 @@ public class ReadVehicleService implements ReadVehicleUseCase {
      * @return a page containing vehicles
      */
     @Override
-    public Page<Vehicle> fetchAll(Pageable pageable) {
+    public Page<Vehicle> fetchAll(@NonNull Pageable pageable) {
         return this.repository.findAll(pageable);
     }
 
@@ -69,7 +70,7 @@ public class ReadVehicleService implements ReadVehicleUseCase {
      * @return a page containing matching vehicles
      */
     @Override
-    public Page<Vehicle> fetchAll(Pageable pageable, VehicleType vehicleType) {
+    public Page<Vehicle> fetchAll(@NonNull Pageable pageable, VehicleType vehicleType) {
         return this.repository.findAll(pageable, vehicleType);
     }
 }

@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 /**
  * Repository interface for the Container aggregate.
@@ -44,7 +45,7 @@ public interface ContainerRepository {
      * @param pageable pagination configuration
      * @return page of containers
      */
-    public abstract Page<Container> findAll(Pageable pageable);
+    public abstract Page<Container> findAll(@NonNull Pageable pageable);
 
     /**
      * Find containers using pagination and an optional waste type filter.
@@ -53,7 +54,7 @@ public interface ContainerRepository {
      * @param wasteType optional waste type to filter by (null means no filter)
      * @return page of matching containers
      */
-    public abstract Page<Container> findAll(Pageable pageable, WasteType wasteType);
+    public abstract Page<Container> findAll(@NonNull Pageable pageable, WasteType wasteType);
 
     /**
      * Save or update a container.

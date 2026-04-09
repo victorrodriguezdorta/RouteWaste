@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 /**
  * Use case interface for reading vehicles.
@@ -35,7 +36,7 @@ public interface ReadVehicleUseCase {
      * @param pageable pagination information
      * @return a page of vehicles
      */
-    Page<Vehicle> fetchAll(Pageable pageable);
+    Page<Vehicle> fetchAll(@NonNull Pageable pageable);
 
     /**
      * Retrieves vehicles with pagination and an optional type filter.
@@ -44,5 +45,5 @@ public interface ReadVehicleUseCase {
      * @param vehicleType optional vehicle type to filter by (null means no filter)
      * @return a page of vehicles
      */
-    Page<Vehicle> fetchAll(Pageable pageable, VehicleType vehicleType);
+    Page<Vehicle> fetchAll(@NonNull Pageable pageable, VehicleType vehicleType);
 }

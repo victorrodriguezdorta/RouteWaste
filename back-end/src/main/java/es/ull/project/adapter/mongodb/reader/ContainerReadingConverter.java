@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * ContainerReadingConverter
@@ -47,7 +48,7 @@ public class ContainerReadingConverter implements Converter<Document, Container>
      * @return Container entity reconstructed from the document
      */
     @Override
-    public Container convert(Document document) {
+    public Container convert(@NonNull Document document) {
         logger.info("Container to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         Document locationDocument = (Document) document.get(MongoFields.LOCATION);

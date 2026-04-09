@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 /**
  * Use case for reading facilities.
@@ -32,7 +33,7 @@ public interface ReadFacilityUseCase {
      * @param pageable pagination information
      * @return a page of facilities
      */
-    Page<Facility> fetchAll(Pageable pageable);
+    Page<Facility> fetchAll(@NonNull Pageable pageable);
 
     /**
      * Retrieves facilities with pagination and an optional facility type filter.
@@ -41,5 +42,5 @@ public interface ReadFacilityUseCase {
      * @param facilityType optional facility type to filter by (null means no filter)
      * @return a page of facilities
      */
-    Page<Facility> fetchAll(Pageable pageable, FacilityType facilityType);
+    Page<Facility> fetchAll(@NonNull Pageable pageable, FacilityType facilityType);
 }

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -102,7 +103,7 @@ public class FacilityMongoRepository implements FacilityRepository {
      * @return a Page containing the paginated facilities
      */
     @Override
-    public Page<Facility> findAll(Pageable pageable) {
+    public Page<Facility> findAll(@NonNull Pageable pageable) {
         return this.findAll(pageable, null, null);
     }
 
@@ -115,7 +116,7 @@ public class FacilityMongoRepository implements FacilityRepository {
      * @return a Page containing the paginated and filtered facilities
      */
     @Override
-    public Page<Facility> findAll(Pageable pageable, FacilityType type, FacilityStatus status) {
+    public Page<Facility> findAll(@NonNull Pageable pageable, FacilityType type, FacilityStatus status) {
         Query dataQuery = new Query();
         Query countQuery = new Query();
         if (type != null) {

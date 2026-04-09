@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 /**
  * Use case for reading containers.
@@ -32,7 +33,7 @@ public interface ReadContainerUseCase {
      * @param pageable pagination information
      * @return a page of containers
      */
-    Page<Container> fetchAll(Pageable pageable);
+    Page<Container> fetchAll(@NonNull Pageable pageable);
 
     /**
      * Retrieves containers with pagination and an optional waste type filter.
@@ -41,5 +42,5 @@ public interface ReadContainerUseCase {
      * @param wasteType optional waste type to filter by (null means no filter)
      * @return a page of containers
      */
-    Page<Container> fetchAll(Pageable pageable, WasteType wasteType);
+    Page<Container> fetchAll(@NonNull Pageable pageable, WasteType wasteType);
 }
