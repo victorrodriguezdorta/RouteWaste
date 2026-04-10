@@ -3,6 +3,14 @@
 IMAGE_NAME="kaizten/sheriff:latest"
 
 if ! docker image inspect "$IMAGE_NAME" &>/dev/null; then
+  if ls sheriff_*.json &>/dev/null; then
+    echo -e "⚠️  Sheriff files must be deleted"
+    if ! rm -f sheriff_*.json; then
+      echo -e "🛑 Failed to delete Sheriff files. Exiting."
+      exit 1
+    fi
+    echo -e "✅ Sheriff files have been deleted."
+  fi
   echo -e "🔄 Local Docker image '${IMAGE_NAME}' not found. Pulling from Docker Hub..."
   if ! docker pull "$IMAGE_NAME"; then
     echo -e "🛑 Failed to pull image '${IMAGE_NAME}'. Exiting."
@@ -18,6 +26,14 @@ else
   echo "Remote Docker digest: $REMOTE_DIGEST"
   if [[ "$LOCAL_DIGEST" != "$REMOTE_DIGEST" ]]; then
     echo -e "⚠️  Local Docker image is outdated. It must be updated to ensure you have the latest features and fixes."
+    if ls sheriff_*.json &>/dev/null; then
+      echo -e "⚠️  Sheriff files must be deleted"
+      if ! rm -f sheriff_*.json; then
+        echo -e "🛑 Failed to delete Sheriff files. Exiting."
+        exit 1
+      fi
+      echo -e "✅ Sheriff files have been deleted."
+    fi
     docker rmi "${IMAGE_NAME}" --force
     echo -e "✅ Local Docker image '${IMAGE_NAME}' has been deleted."
     echo -e "🔄 Pulling Docker image '${IMAGE_NAME}' from Docker Hub..."
