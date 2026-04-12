@@ -30,7 +30,8 @@ public class ContainerResponseMapper {
         responseBody.id = container.getId();
         responseBody.location = container.getLocation();
         responseBody.wasteType = container.getWasteType();
-        responseBody.wasteDemand = container.getWasteDemand();
+        responseBody.capacityLiters = container.getCapacityLiters();
+        responseBody.dailyDemandLitersPerDay = container.getDailyDemandLitersPerDay();
         responseBody.serviceZone = container.getServiceZone().orElse(null);
         return responseBody;
     }

@@ -1,6 +1,7 @@
 import type { ServiceZone } from '@/domain/enumerate/service-zone';
 import type { WasteType } from '@/domain/enumerate/waste-type';
-import type { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import type { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-capacity-liters';
+import type { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import type { Location } from '@/domain/valueobject/location/location';
 import type { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
@@ -12,7 +13,8 @@ export interface UpdateContainerCommand {
     updatedFields: Partial<{
         location: Location;
         wasteType: WasteType;
-        wasteDemand: WasteDemand;
+        capacityLiters: ContainerCapacityLiters;
+        dailyDemandLitersPerDay: DailyWasteDemandLitersPerDay;
         serviceZone: ServiceZone | null;
     }>;
 }

@@ -1,13 +1,13 @@
 package es.ull.project.adapter.rest.serialization.container;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
-
-import java.io.IOException;
 /**
  * Custom JSON serializer for ContainerResponseBody
  * This serializer manually controls how Container response data is converted to JSON format
@@ -47,10 +47,11 @@ public class ContainerResponseBodySerializer extends StdSerializer<ContainerResp
         }
         gen.writeEndObject();
         gen.writeStringField(JsonFields.WASTE_TYPE, value.wasteType.name());
-        gen.writeObjectFieldStart(JsonFields.WASTE_DEMAND);
-        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.wasteDemand.getValue());
-        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.wasteDemand.getQuantityUnit().getValue());
-        gen.writeStringField(JsonFields.TIME_UNIT, value.wasteDemand.getTimeUnit().name());
+        gen.writeObjectFieldStart(JsonFields.CAPACITY_LITERS);
+        gen.writeNumberField("liters", value.capacityLiters.getLiters());
+        gen.writeEndObject();
+        gen.writeObjectFieldStart(JsonFields.DAILY_DEMAND_LITERS_PER_DAY);
+        gen.writeNumberField("litersPerDay", value.dailyDemandLitersPerDay.getLitersPerDay());
         gen.writeEndObject();
         if (value.serviceZone != null) {
             gen.writeStringField(JsonFields.SERVICE_ZONE, value.serviceZone.name());

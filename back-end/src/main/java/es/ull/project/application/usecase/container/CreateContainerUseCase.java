@@ -3,7 +3,8 @@ package es.ull.project.application.usecase.container;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.demand.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
 
 /**
@@ -15,9 +16,10 @@ public interface CreateContainerUseCase {
      *
      * @param location    the location of the container
      * @param wasteType   the type of waste the container handles
-     * @param wasteDemand the waste demand of the container
+     * @param capacityLiters the container capacity in liters
+     * @param dailyDemandLitersPerDay the daily waste demand in liters per day
      * @param serviceZone the service zone of the container
      * @return the created container
      */
-    Container create(Location location, WasteType wasteType, WasteDemand wasteDemand, ServiceZone serviceZone);
+    Container create(Location location, WasteType wasteType, ContainerCapacityLiters capacityLiters, DailyWasteDemandLitersPerDay dailyDemandLitersPerDay, ServiceZone serviceZone);
 }

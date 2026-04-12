@@ -1,6 +1,7 @@
 import { ServiceZone } from '@/domain/enumerate/service-zone';
 import { WasteType } from '@/domain/enumerate/waste-type';
-import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-capacity-liters';
+import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { Location } from '@/domain/valueobject/location/location';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
@@ -9,8 +10,8 @@ import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
  *
  * Represents a physical waste collection point (entity).
  *
- * Stores location, waste type and expected demand. Operations allow
- * updating fields and querying identifiers used by higher-level
+ * Stores location, waste type, capacity in liters, and daily demand in liters per day.
+ * Operations allow updating fields and querying identifiers used by higher-level
  * domain logic.
  */
 export class Container {
@@ -23,8 +24,11 @@ export class Container {
   /** Type/category of waste collected by this container */
   private wasteType: WasteType;
 
-  /** Expected waste demand object for the container */
-  private wasteDemand: WasteDemand;
+  /** Maximum capacity of the container in liters */
+  private capacityLiters: ContainerCapacityLiters;
+
+  /** Approximate daily waste demand in liters per day */
+  private dailyDemandLitersPerDay: DailyWasteDemandLitersPerDay;
 
   /** Optional service zone identifier for this container */
   private serviceZone?: ServiceZone | null;
@@ -33,19 +37,29 @@ export class Container {
    * Create a new `Container`.
    * @param location geographic location of the container
    * @param wasteType type/category of waste collected
-   * @param wasteDemand expected waste demand object
+   * @param capacityLiters maximum capacity of the container in liters
+   * @param dailyDemandLitersPerDay approximate daily waste demand in liters per day
    * @param serviceZone optional service zone identifier
    * @param id optional explicit id (generated when omitted)
    * @throws Error when required parameters are missing
    */
-  constructor(location: Location, wasteType: WasteType, wasteDemand: WasteDemand, serviceZone?: ServiceZone | null, id?: UllUUID) {
+  constructor(
+    location: Location,
+    wasteType: WasteType,
+    capacityLiters: ContainerCapacityLiters,
+    dailyDemandLitersPerDay: DailyWasteDemandLitersPerDay,
+    serviceZone?: ServiceZone | null,
+    id?: UllUUID
+  ) {
     if (!location) throw new Error('Container location is not defined');
     if (!wasteType) throw new Error('Waste type is not defined');
-    if (!wasteDemand) throw new Error('Waste demand is not defined');
+    if (!capacityLiters) throw new Error('Container capacity in liters is not defined');
+    if (!dailyDemandLitersPerDay) throw new Error('Daily waste demand in liters is not defined');
     this.id = id ?? UllUUID.random();
     this.location = location;
     this.wasteType = wasteType;
-    this.wasteDemand = wasteDemand;
+    this.capacityLiters = capacityLiters;
+    this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
     this.serviceZone = serviceZone ?? null;
   }
 
@@ -82,17 +96,30 @@ export class Container {
   updateWasteType(wt: WasteType): void { if (!wt) throw new Error('Waste type is not defined'); this.wasteType = wt; }
 
   /**
-   * Return the current waste demand value object.
-   * @returns The waste demand for this container
+   * Return the container capacity in liters.
+   * @returns The maximum capacity of this container in liters
    */
-  getWasteDemand(): WasteDemand { return this.wasteDemand; }
+  getCapacityLiters(): ContainerCapacityLiters { return this.capacityLiters; }
 
   /**
-   * Update the waste demand.
-   * @param wd The new waste demand for this container
-   * @throws Error when `wd` is falsy
+   * Update the container capacity in liters.
+   * @param capacityLiters The new capacity in liters
+   * @throws Error when `capacityLiters` is falsy
    */
-  updateWasteDemand(wd: WasteDemand): void { if (!wd) throw new Error('Waste demand is not defined'); this.wasteDemand = wd; }
+  updateCapacityLiters(capacityLiters: ContainerCapacityLiters): void { if (!capacityLiters) throw new Error('Container capacity in liters is not defined'); this.capacityLiters = capacityLiters; }
+
+  /**
+   * Return the approximate daily waste demand in liters per day.
+   * @returns The daily waste demand for this container
+   */
+  getDailyDemandLitersPerDay(): DailyWasteDemandLitersPerDay { return this.dailyDemandLitersPerDay; }
+
+  /**
+   * Update the approximate daily waste demand in liters per day.
+   * @param dailyDemandLitersPerDay The new daily demand in liters per day
+   * @throws Error when `dailyDemandLitersPerDay` is falsy
+   */
+  updateDailyDemandLitersPerDay(dailyDemandLitersPerDay: DailyWasteDemandLitersPerDay): void { if (!dailyDemandLitersPerDay) throw new Error('Daily waste demand in liters is not defined'); this.dailyDemandLitersPerDay = dailyDemandLitersPerDay; }
 
   /**
    * Return the optional service zone or null when not set.
@@ -117,5 +144,5 @@ export class Container {
    * Human-readable representation for debugging.
    * @returns A string representation of this container
    */
-  toString(): string { return `Container={id=${this.id}, location=${this.location}, wasteType=${this.wasteType}, wasteDemand=${this.wasteDemand}, serviceZone=${this.serviceZone}}`; }
+  toString(): string { return `Container={id=${this.id}, location=${this.location}, wasteType=${this.wasteType}, capacityLiters=${this.capacityLiters}, dailyDemandLitersPerDay=${this.dailyDemandLitersPerDay}, serviceZone=${this.serviceZone}}`; }
 }

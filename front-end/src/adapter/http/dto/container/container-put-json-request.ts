@@ -14,8 +14,11 @@ export class ContainerPutJsonRequest {
   /** Type of waste that the container holds */
   wasteType?: string;
 
-  /** Demand specification for waste management including value, quantity unit, and time unit */
-  wasteDemand?: { value: number; quantityUnit: string; timeUnit: string };
+  /** Maximum capacity of the container in liters */
+  capacityLiters?: { liters: number };
+
+  /** Approximate daily waste demand in liters per day */
+  dailyDemandLitersPerDay?: { litersPerDay: number };
 
   /** Service zone identifier for the container or null if not assigned */
   serviceZone?: string | null;
@@ -23,12 +26,14 @@ export class ContainerPutJsonRequest {
   constructor(
     location?: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
     wasteType?: string,
-    wasteDemand?: { value: number; quantityUnit: string; timeUnit: string },
+    capacityLiters?: { liters: number },
+    dailyDemandLitersPerDay?: { litersPerDay: number },
     serviceZone?: string | null
   ) {
     this.location = location;
     this.wasteType = wasteType;
-    this.wasteDemand = wasteDemand;
+    this.capacityLiters = capacityLiters;
+    this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
     this.serviceZone = serviceZone ?? null;
   }
 
@@ -50,11 +55,14 @@ export class ContainerPutJsonRequest {
           }
         : undefined,
       f.wasteType,
-      f.wasteDemand
+      f.capacityLiters
         ? {
-            value: f.wasteDemand.getValue(),
-            quantityUnit: f.wasteDemand.getQuantityUnit().getValue(),
-            timeUnit: f.wasteDemand.getTimeUnit().toString(),
+            liters: f.capacityLiters.getLiters(),
+          }
+        : undefined,
+      f.dailyDemandLitersPerDay
+        ? {
+            litersPerDay: f.dailyDemandLitersPerDay.getLitersPerDay(),
           }
         : undefined,
       f.serviceZone ?? null

@@ -10,12 +10,12 @@ import type { GetContainerCommand, GetContainerResult } from '@/application/usec
 import type { ListContainersCommand, ListContainersResult } from '@/application/usecase/container-management/list-containers/list-containers-use-case';
 import type { UpdateContainerCommand, UpdateContainerResult } from '@/application/usecase/container-management/update-container/update-container-use-case';
 import type {
-  ApiError,
-  DataError,
+    ApiError,
+    DataError,
 } from '@ull-tfg/ull-tfg-typescript';
 import {
-  Either,
-  http,
+    Either,
+    http,
 } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -49,7 +49,7 @@ export class ContainerHttpRepository implements ContainerRepository {
   }
   
   /**
-   * Retrieve a list of containers with optional pagination, sort and waste type filter.
+   * Retrieve a list of containers with optional pagination, sort and filtering.
    * 
    * @param command Optional pagination, sort and filter parameters.
    * @returns Either a DataError or a paginated list of Container entities.
@@ -62,11 +62,21 @@ export class ContainerHttpRepository implements ContainerRepository {
     const requestedSize = command?.pageSize ?? 10;
 
     url += `?page=${requestedPage}&size=${requestedSize}`;
+    
+    // Add sort parameters
     if (command?.sortBy) {
       url += `&sortBy=${encodeURIComponent(command.sortBy)}&sortOrder=${command.sortOrder ?? 'asc'}`;
     }
+    
+    // Add filter parameters
     if (command?.wasteType) {
       url += `&wasteType=${encodeURIComponent(command.wasteType)}`;
+    }
+    if (command?.serviceZone) {
+      url += `&serviceZone=${encodeURIComponent(command.serviceZone)}`;
+    }
+    if (command?.location) {
+      url += `&location=${encodeURIComponent(command.location)}`;
     }
 
     return new Promise((resolve, reject) => {

@@ -207,6 +207,7 @@
         "headers": {
           "wasteType": "Tipo de Residuo",
           "location": "Ubicación",
+          "capacity": "Capacidad Total",
           "demand": "Demanda",
           "serviceZone": "Zona de Servicio",
           "actions": "Acciones"

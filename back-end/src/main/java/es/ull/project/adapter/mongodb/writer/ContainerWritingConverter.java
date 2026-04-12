@@ -1,8 +1,5 @@
 package es.ull.project.adapter.mongodb.writer;
 
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.configuration.MongoConfiguration;
-import es.ull.project.domain.entity.Container;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,13 +7,17 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.lang.NonNull;
 
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
+import es.ull.project.domain.entity.Container;
+
 /**
  * ContainerWritingConverter
  *
  * Implements custom conversion logic for transforming Container entities
  * into MongoDB documents. This converter handles the serialization of
- * Container objects including their value objects (Location, WasteDemand)
- * into a MongoDB-compatible document structure.
+ * Container objects including their value objects (Location, ContainerCapacityLiters,
+ * DailyWasteDemandLitersPerDay) into a MongoDB-compatible document structure.
  */
 @WritingConverter
 public class ContainerWritingConverter implements Converter<Container, Document> {
@@ -53,11 +54,8 @@ public class ContainerWritingConverter implements Converter<Container, Document>
         locationDocument.put(MongoFields.GIS_REFERENCE, container.getLocation().getGISReference());
         document.put(MongoFields.LOCATION, locationDocument);
         document.put(MongoFields.WASTE_TYPE, container.getWasteType().toString());
-        Document wasteDemandDocument = new Document();
-        wasteDemandDocument.put(MongoFields.WASTE_DEMAND_VALUE, container.getWasteDemand().getValue());
-        wasteDemandDocument.put(MongoFields.WASTE_DEMAND_QUANTITY_UNIT, container.getWasteDemand().getQuantityUnit().getValue());
-        wasteDemandDocument.put(MongoFields.WASTE_DEMAND_TIME_UNIT, container.getWasteDemand().getTimeUnit().toString());
-        document.put(MongoFields.WASTE_DEMAND, wasteDemandDocument);
+        document.put(MongoFields.CAPACITY_LITERS, container.getCapacityLiters().getLiters());
+        document.put(MongoFields.DAILY_DEMAND_LITERS_PER_DAY, container.getDailyDemandLitersPerDay().getLitersPerDay());
         container.getServiceZone().ifPresent(serviceZone -> 
             document.put(MongoFields.SERVICE_ZONE, serviceZone.toString())
         );

@@ -1,6 +1,7 @@
 import { ServiceZone } from '@/domain/enumerate/service-zone';
 import { WasteType } from '@/domain/enumerate/waste-type';
-import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-capacity-liters';
+import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { Location } from '@/domain/valueobject/location/location';
 
 /**
@@ -9,6 +10,7 @@ import { Location } from '@/domain/valueobject/location/location';
 export interface CreateContainerCommand {
     location: Location;
     wasteType: WasteType;
-    wasteDemand: WasteDemand;
+    capacityLiters: ContainerCapacityLiters;
+    dailyDemandLitersPerDay: DailyWasteDemandLitersPerDay;
     serviceZone?: ServiceZone | null;
 }

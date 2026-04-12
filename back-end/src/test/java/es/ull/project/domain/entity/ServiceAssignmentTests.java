@@ -16,6 +16,8 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.Capacity;
+import es.ull.project.domain.valueobject.demand.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
@@ -28,6 +30,14 @@ class ServiceAssignmentTests {
     // Helpers
     private static WasteDemand randomWasteDemand() {
         return new WasteDemand(5.0);
+    }
+
+    private static ContainerCapacityLiters randomCapacityLiters() {
+        return new ContainerCapacityLiters(100.0 + Math.random() * 900.0);
+    }
+
+    private static DailyWasteDemandLitersPerDay randomDailyDemandLitersPerDay() {
+        return new DailyWasteDemandLitersPerDay(5.0 + Math.random() * 45.0);
     }
 
     private static Distance randomDistance() {
@@ -64,7 +74,7 @@ class ServiceAssignmentTests {
     }
 
     private static Container randomContainer() {
-        return new Container(randomLocation(), WasteType.random(), randomWasteDemand(), ServiceZone.random());
+        return new Container(randomLocation(), WasteType.random(), randomCapacityLiters(), randomDailyDemandLitersPerDay(), ServiceZone.random());
     }
 
     private static Facility randomFacility() {

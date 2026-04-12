@@ -1,21 +1,5 @@
 package es.ull.project.domain.entity;
 
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
-import es.ull.project.domain.enumerate.TimeUnit;
-import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.cost.MaximumBudget;
-import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
-import es.ull.project.domain.valueobject.location.Distance;
-import es.ull.project.domain.valueobject.location.Location;
-import es.ull.project.domain.valueobject.location.ServiceTime;
-import es.ull.project.domain.valueobject.policy.ServicePolicies;
-import es.ull.project.domain.valueobject.time.PlanningPeriod;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -24,6 +8,25 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.enumerate.ServiceZone;
+import es.ull.project.domain.enumerate.TimeUnit;
+import es.ull.project.domain.enumerate.WasteType;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
+import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.demand.Capacity;
+import es.ull.project.domain.valueobject.demand.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.demand.QuantityUnit;
+import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.location.Distance;
+import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.location.ServiceTime;
+import es.ull.project.domain.valueobject.policy.ServicePolicies;
+import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
 
 
@@ -61,11 +64,19 @@ class InfrastructurePlanTests {
     }
 
     private static Container randomContainer() {
-        return new Container(randomLocation(), WasteType.random(), new WasteDemand(10.0));
+        return new Container(
+            randomLocation(),
+            WasteType.random(),
+            new ContainerCapacityLiters(100.0),
+            new DailyWasteDemandLitersPerDay(10.0),
+            ServiceZone.random()
+        );
     }
 
     private static ServiceAssignment randomServiceAssignment(Container container, Facility facility) {
-        return new ServiceAssignment(container, facility, container.getWasteDemand(), Distance.fromMeters(1000.0), new ServiceTime(10.0), new TransportationVariableCost(50.0));
+        // Create a WasteDemand for ServiceAssignment from the Container's daily demand
+        WasteDemand wasteDemand = new WasteDemand(container.getDailyDemandLitersPerDay().getLitersPerDay());
+        return new ServiceAssignment(container, facility, wasteDemand, Distance.fromMeters(1000.0), new ServiceTime(10.0), new TransportationVariableCost(50.0));
     }
 
     // ========== Constructors ==========

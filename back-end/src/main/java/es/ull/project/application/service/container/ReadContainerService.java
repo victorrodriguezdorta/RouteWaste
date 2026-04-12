@@ -1,15 +1,19 @@
 package es.ull.project.application.service.container;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+
+import es.ull.project.adapter.mongodb.query.ContainerSearchCriteria;
+import es.ull.project.adapter.mongodb.repository.ContainerMongoRepository;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.usecase.container.ReadContainerUseCase;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.WasteType;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.lang.NonNull;
 
 /**
  * Service implementation for reading containers.
@@ -68,5 +72,21 @@ public class ReadContainerService implements ReadContainerUseCase {
     @Override
     public Page<Container> fetchAll(@NonNull Pageable pageable, WasteType wasteType) {
         return this.repository.findAll(pageable, wasteType);
+    }
+
+    /**
+     * Fetches containers from the repository using pagination and advanced search criteria.
+     *
+     * @param pageable pagination and sort information
+     * @param criteria search criteria with optional filters
+     * @return a page of matching containers
+     */
+    @Override
+    public Page<Container> fetchAll(@NonNull Pageable pageable, @NonNull ContainerSearchCriteria criteria) {
+        if (repository instanceof ContainerMongoRepository mongoRepository) {
+            return mongoRepository.findAll(pageable, criteria);
+        }
+        // Fallback for non-MongoDB implementations
+        return this.repository.findAll(pageable);
     }
 }

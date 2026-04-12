@@ -1,11 +1,10 @@
 package es.ull.project.adapter.mongodb.repository;
 
-import es.ull.project.application.repository.ContainerRepository;
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.enumerate.WasteType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -16,6 +15,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
+
+import es.ull.project.adapter.mongodb.query.ContainerSearchCriteria;
+import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
 
 /**
  * MongoDB implementation of the ContainerRepository interface.
@@ -129,5 +133,77 @@ public class ContainerMongoRepository implements ContainerRepository {
         Query query = new Query(Criteria.where(FIELD_ID).is(id));
         Container container = this.mongoTemplate.findOne(query, Container.class, COLLECTION_NAME);
         return Optional.ofNullable(container);
+    }
+
+    /**
+     * Find containers with advanced search criteria and pagination.
+     * Supports filtering by multiple attributes dynamically.
+     *
+     * @param pageable pagination and sort information
+     * @param criteria search criteria with optional filters
+     * @return page of matching containers
+     */
+    public Page<Container> findAll(@NonNull Pageable pageable, @NonNull ContainerSearchCriteria criteria) {
+        Query dataQuery = new Query();
+        Query countQuery = new Query();
+
+        // Build criteria list
+        List<Criteria> criterias = buildSearchCriterias(criteria);
+        
+        if (!criterias.isEmpty()) {
+            Criteria combinedCriteria = new Criteria().andOperator(criterias.toArray(new Criteria[0]));
+            dataQuery.addCriteria(combinedCriteria);
+            countQuery.addCriteria(combinedCriteria);
+        }
+
+        dataQuery.with(pageable);
+        List<Container> containers = this.mongoTemplate.find(dataQuery, Container.class, COLLECTION_NAME);
+        long total = this.mongoTemplate.count(countQuery, Container.class, COLLECTION_NAME);
+        
+        return new PageImpl<>(containers, pageable, total);
+    }
+
+    /**
+     * Builds a list of MongoDB Criteria from search criteria.
+     * Each non-null filter is converted to a corresponding Criteria object.
+     *
+     * @param criteria search criteria
+     * @return list of Criteria objects
+     */
+    private List<Criteria> buildSearchCriterias(@NonNull ContainerSearchCriteria criteria) {
+        List<Criteria> criterias = new ArrayList<>();
+
+        if (criteria.getWasteType() != null) {
+            criterias.add(Criteria.where(FIELD_WASTE_TYPE).is(criteria.getWasteType()));
+        }
+
+        if (criteria.getServiceZone() != null) {
+            criterias.add(Criteria.where("serviceZone").is(criteria.getServiceZone()));
+        }
+
+        if (criteria.getLocationPostalAddress() != null) {
+            criterias.add(Criteria.where("location.postalAddress")
+                    .regex(criteria.getLocationPostalAddress(), "i")); // Case-insensitive
+        }
+
+        if (criteria.getMinCapacityLiters() != null) {
+            criterias.add(Criteria.where("capacityLiters.liters").gte(criteria.getMinCapacityLiters()));
+        }
+
+        if (criteria.getMaxCapacityLiters() != null) {
+            criterias.add(Criteria.where("capacityLiters.liters").lte(criteria.getMaxCapacityLiters()));
+        }
+
+        if (criteria.getMinDailyDemand() != null) {
+            criterias.add(Criteria.where("dailyDemandLitersPerDay.litersPerDay")
+                    .gte(criteria.getMinDailyDemand()));
+        }
+
+        if (criteria.getMaxDailyDemand() != null) {
+            criterias.add(Criteria.where("dailyDemandLitersPerDay.litersPerDay")
+                    .lte(criteria.getMaxDailyDemand()));
+        }
+
+        return criterias;
     }
 }

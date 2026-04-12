@@ -56,6 +56,10 @@
           {{ item.location }}
         </template>
 
+        <template v-slot:item.capacityLiters="{ item }">
+          {{ item.capacityLiters }}
+        </template>
+
         <template v-slot:item.demand="{ item }">
           {{ item.demand }}
         </template>
@@ -119,19 +123,51 @@
       </v-data-table-server>
 
       <template #toolbar-append>
-        <div style="width: 250px;">
-          <v-select
-            v-model="selectedWasteTypeFilter"
-            :items="wasteTypeFilterOptions"
-            :placeholder="t('container.list.filterByWasteType')"
-            item-title="title"
-            item-value="value"
-            clearable
-            density="compact"
-            hide-details
-            variant="outlined"
-            @update:model-value="onWasteTypeFilterChange"
-          />
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px;">
+          <!-- Filter by Waste Type -->
+          <div style="width: 180px;">
+            <v-select
+              v-model="selectedWasteTypeFilter"
+              :items="wasteTypeFilterOptions"
+              :placeholder="t('container.list.filterByWasteType')"
+              item-title="title"
+              item-value="value"
+              clearable
+              density="compact"
+              hide-details
+              variant="outlined"
+              @update:model-value="onWasteTypeFilterChange"
+            />
+          </div>
+
+          <!-- Filter by Service Zone -->
+          <div style="width: 180px;">
+            <v-select
+              v-model="selectedServiceZoneFilter"
+              :items="serviceZoneFilterOptions"
+              :placeholder="t('container.list.filterByServiceZone')"
+              item-title="title"
+              item-value="value"
+              clearable
+              density="compact"
+              hide-details
+              variant="outlined"
+              @update:model-value="onServiceZoneFilterChange"
+            />
+          </div>
+
+          <!-- Filter by Location -->
+          <div style="width: 180px;">
+            <v-text-field
+              v-model="selectedLocationFilter"
+              placeholder="Location"
+              clearable
+              density="compact"
+              hide-details
+              variant="outlined"
+              @update:model-value="onLocationFilterChange"
+            />
+          </div>
         </div>
       </template>
     </CrudLayout>
@@ -152,12 +188,12 @@
 
 <script lang="ts" setup>
 import { ButtonTooltip, ErrorMessage } from '@ull-tfg/ull-tfg-vue';
-import CrudLayout from '../../components/common/CrudLayout.vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { serviceZoneColor } from '../../../../domain/enumerate/service-zone';
+import { serviceZoneColor, serviceZoneToOptions } from '../../../../domain/enumerate/service-zone';
 import { wasteTypeColor, wasteTypeToOptions } from '../../../../domain/enumerate/waste-type';
+import CrudLayout from '../../components/common/CrudLayout.vue';
 import router from '../../router/router';
 import { useContainerStore } from '../../stores/container-store';
 
@@ -169,6 +205,8 @@ const { containers, containerNotification, loading, totalContainers, currentPage
 const dialogDelete = ref(false);
 const selectedContainerId = ref('');
 const selectedWasteTypeFilter = ref<string | undefined>(undefined);
+const selectedServiceZoneFilter = ref<string | undefined>(undefined);
+const selectedLocationFilter = ref<string | undefined>(undefined);
 const tablePage = ref(1);
 const itemsPerPage = ref(10);
 const currentSortBy = ref<string | undefined>(undefined);
@@ -186,6 +224,12 @@ const headers = computed(() => [
     align: 'start' as const,
     sortable: true,
     key: 'location',
+  },
+  {
+    title: t('container.list.table.headers.capacity'),
+    align: 'center' as const,
+    sortable: true,
+    key: 'capacityLiters',
   },
   {
     title: t('container.list.table.headers.demand'),
@@ -208,11 +252,13 @@ const headers = computed(() => [
 ]);
 
 const wasteTypeFilterOptions = computed(() => wasteTypeToOptions(t));
+const serviceZoneFilterOptions = computed(() => serviceZoneToOptions(t));
 
 const containerItems = computed(() => {
   return containers.value.map((container) => {
     const location = container.getLocation();
-    const demand = container.getWasteDemand();
+    const capacity = container.getCapacityLiters();
+    const dailyDemand = container.getDailyDemandLitersPerDay();
     const serviceZone = container.getServiceZone();
 
     return {
@@ -221,7 +267,8 @@ const containerItems = computed(() => {
       rawServiceZone: serviceZone,
       wasteType: t(`container.add.wasteTypes.${container.getWasteType()}`),
       location: `${location.postalAddress} (${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)})`,
-      demand: `${demand.getValue()} ${demand.getQuantityUnit().getValue()}/${formatTimeUnitShort(demand.getTimeUnit())}`,
+      capacityLiters: `${capacity.getLiters()} L`,
+      demand: `${dailyDemand.getLitersPerDay()} L/day`,
       serviceZone: serviceZone
         ? t(`container.add.serviceZones.${serviceZone}`)
         : t('container.list.notAssigned'),
@@ -240,16 +287,30 @@ const loadContainers = async (
   size: number,
   sortBy?: string,
   sortOrder?: 'asc' | 'desc',
-  wasteType?: string
+  wasteType?: string,
+  serviceZone?: string,
+  location?: string
 ) => {
   currentSortBy.value = sortBy;
   currentSortOrder.value = sortOrder ?? 'asc';
-  await containerStore.getContainers(page, size, sortBy, sortOrder, wasteType);
+  await containerStore.getContainers(page, size, sortBy, sortOrder, wasteType, serviceZone, location);
 };
 
 const onWasteTypeFilterChange = async (newType: string | null) => {
   const wasteType = newType ?? undefined;
-  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, wasteType);
+  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, wasteType, selectedServiceZoneFilter.value, selectedLocationFilter.value);
+  tablePage.value = currentPage.value + 1;
+};
+
+const onServiceZoneFilterChange = async (newZone: string | null) => {
+  const serviceZone = newZone ?? undefined;
+  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, serviceZone, selectedLocationFilter.value);
+  tablePage.value = currentPage.value + 1;
+};
+
+const onLocationFilterChange = async (newLocation: string | null) => {
+  const location = newLocation ?? undefined;
+  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, location);
   tablePage.value = currentPage.value + 1;
 };
 
@@ -263,13 +324,9 @@ const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: numbe
   const newSortBy = options.sortBy[0]?.key;
   const newSortOrder = options.sortBy[0]?.order ?? 'asc';
 
-  await loadContainers(requestedPage, requestedSize, newSortBy, newSortOrder, selectedWasteTypeFilter.value);
+  await loadContainers(requestedPage, requestedSize, newSortBy, newSortOrder, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value);
   tablePage.value = currentPage.value + 1;
   itemsPerPage.value = rowsPerPage.value;
-};
-
-const formatTimeUnitShort = (unit: string): string => {
-  return t(`common.timeUnitsLowercase.${unit}`);
 };
 
 const addContainer = () => {
@@ -291,9 +348,9 @@ const deleteItem = (itemId: string) => {
 
 const confirmDelete = async () => {
   await containerStore.deleteContainer(selectedContainerId.value);
-  await loadContainers(currentPage.value, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value);
+  await loadContainers(currentPage.value, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value);
   if (containers.value.length === 0 && currentPage.value > 0) {
-    await loadContainers(currentPage.value - 1, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value);
+    await loadContainers(currentPage.value - 1, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value);
   }
   tablePage.value = currentPage.value + 1;
   dialogDelete.value = false;

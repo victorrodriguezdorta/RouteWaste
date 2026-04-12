@@ -1,8 +1,8 @@
 import { Container } from '@/domain/entity/container';
 import { serviceZoneFromString } from '@/domain/enumerate/service-zone';
 import { wasteTypeFromString } from '@/domain/enumerate/waste-type';
-import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
-import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-capacity-liters';
+import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { Location } from '@/domain/valueobject/location/location';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
@@ -28,11 +28,14 @@ export class ContainerJsonResponse {
   /** Type/category of waste collected by this container */
   wasteType: string;
 
-  /** Expected waste demand information for this container */
-  wasteDemand: {
-    value: number;
-    quantityUnit: string;
-    timeUnit: string;
+  /** Maximum capacity of the container in liters */
+  capacityLiters: {
+    liters: number;
+  };
+
+  /** Approximate daily waste demand in liters per day */
+  dailyDemandLitersPerDay: {
+    litersPerDay: number;
   };
 
   /** Optional service zone identifier for this container */
@@ -42,20 +45,22 @@ export class ContainerJsonResponse {
     id: string,
     location: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
     wasteType: string,
-    wasteDemand: { value: number; quantityUnit: string; timeUnit: string },
+    capacityLiters: { liters: number },
+    dailyDemandLitersPerDay: { litersPerDay: number },
     serviceZone?: string | null
   ) {
     this.id = id;
     this.location = location;
     this.wasteType = wasteType;
-    this.wasteDemand = wasteDemand;
+    this.capacityLiters = capacityLiters;
+    this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
     this.serviceZone = serviceZone ?? null;
   }
 
   /**
    * Convert JSON response into domain `Container` entity.
-   * Builds the required value objects (`Location`, `WasteDemand`) and parses
-   * enumerations for `WasteType` and `ServiceZone`.
+   * Builds the required value objects (`Location`, `ContainerCapacityLiters`, `DailyWasteDemandLitersPerDay`)
+   * and parses enumerations for `WasteType` and `ServiceZone`.
    * @param data The JSON response data to convert
    * @returns A new Container domain entity
    */
@@ -67,11 +72,11 @@ export class ContainerJsonResponse {
       data.location.postalAddress,
       data.location.gisReference
     );
-    const quantityUnit = new QuantityUnit(data.wasteDemand.quantityUnit);
-    const demand = new WasteDemand(data.wasteDemand.value, quantityUnit, (data.wasteDemand.timeUnit as any));
     const wasteType = wasteTypeFromString(data.wasteType);
+    const capacityLiters = new ContainerCapacityLiters(data.capacityLiters.liters);
+    const dailyDemandLitersPerDay = new DailyWasteDemandLitersPerDay(data.dailyDemandLitersPerDay.litersPerDay);
     const serviceZone = data.serviceZone ? serviceZoneFromString(data.serviceZone) : undefined;
 
-    return new Container(loc, wasteType, demand, serviceZone, id);
+    return new Container(loc, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone, id);
   }
 }

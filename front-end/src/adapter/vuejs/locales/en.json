@@ -207,6 +207,7 @@
         "headers": {
           "wasteType": "Waste Type",
           "location": "Location",
+          "capacity": "Total Capacity",
           "demand": "Demand",
           "serviceZone": "Service Zone",
           "actions": "Actions"

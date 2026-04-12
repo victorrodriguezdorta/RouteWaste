@@ -7,4 +7,6 @@ export interface ListContainersCommand {
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
     wasteType?: string;
+    serviceZone?: string;
+    location?: string;
 }

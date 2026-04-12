@@ -1,9 +1,8 @@
 import { Container } from '@/domain/entity/container';
 import { ServiceZone, serviceZoneFromString } from '@/domain/enumerate/service-zone';
-import { TimeUnit, timeUnitFromString } from '@/domain/enumerate/time-unit';
 import { WasteType, wasteTypeFromString } from '@/domain/enumerate/waste-type';
-import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
-import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
+import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-capacity-liters';
+import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { Location } from '@/domain/valueobject/location/location';
 
 /**
@@ -44,19 +43,14 @@ export class ContainerAdd {
   public wasteType: string;
 
   /**
-   * Numeric waste demand value (must be >= 0).
+   * Container capacity in liters (must be > 0).
    */
-  public wasteDemandValue: number;
+  public capacityLiters: number;
 
   /**
-   * Unit of measurement for waste demand (e.g., 'tons', 'kg').
+   * Daily waste demand in liters per day (must be > 0).
    */
-  public wasteDemandQuantityUnit: string;
-
-  /**
-   * Time unit for waste demand rate (e.g., DAY, WEEK, MONTH, YEAR).
-   */
-  public wasteDemandTimeUnit: string;
+  public dailyDemandLitersPerDay: number;
 
   /**
    * Service zone identifier (e.g., NEIGHBORHOOD, DISTRICT). Optional attribute.
@@ -71,9 +65,8 @@ export class ContainerAdd {
    * @param postalAddress Postal address
    * @param gisReference GIS reference
    * @param wasteType Type of waste
-   * @param wasteDemandValue Numeric demand value
-   * @param wasteDemandQuantityUnit Unit of measurement for demand
-   * @param wasteDemandTimeUnit Time unit for demand rate
+   * @param capacityLiters Container capacity in liters
+   * @param dailyDemandLitersPerDay Daily waste demand in liters per day
    * @param serviceZone Optional service zone identifier
    * @throws Error if any required attribute is undefined or null
    */
@@ -83,9 +76,8 @@ export class ContainerAdd {
     postalAddress: string,
     gisReference: string,
     wasteType: string,
-    wasteDemandValue: number,
-    wasteDemandQuantityUnit: string,
-    wasteDemandTimeUnit: string,
+    capacityLiters: number,
+    dailyDemandLitersPerDay: number,
     serviceZone?: string
   ) {
     this.validate<number>(latitude, 'Latitude is not defined');
@@ -93,18 +85,16 @@ export class ContainerAdd {
     this.validate<string>(postalAddress, 'Postal address is not defined');
     this.validate<string>(gisReference, 'GIS reference is not defined');
     this.validate<string>(wasteType, 'Waste type is not defined');
-    this.validate<number>(wasteDemandValue, 'Waste demand value is not defined');
-    this.validate<string>(wasteDemandQuantityUnit, 'Waste demand quantity unit is not defined');
-    this.validate<string>(wasteDemandTimeUnit, 'Waste demand time unit is not defined');
+    this.validate<number>(capacityLiters, 'Capacity in liters is not defined');
+    this.validate<number>(dailyDemandLitersPerDay, 'Daily demand in liters per day is not defined');
 
     this.latitude = latitude;
     this.longitude = longitude;
     this.postalAddress = postalAddress;
     this.gisReference = gisReference;
     this.wasteType = wasteType;
-    this.wasteDemandValue = wasteDemandValue;
-    this.wasteDemandQuantityUnit = wasteDemandQuantityUnit;
-    this.wasteDemandTimeUnit = wasteDemandTimeUnit;
+    this.capacityLiters = capacityLiters;
+    this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
     this.serviceZone = serviceZone;
   }
 
@@ -220,15 +210,15 @@ export class ContainerAdd {
   }
 
   /**
-   * Validate waste demand value for form fields.
+   * Validate container capacity liters for form fields.
    * 
-   * @param value Waste demand value to validate
+   * @param value Capacity value in liters to validate
    * @returns true if valid, error message string if invalid
    */
-  static externalValidateWasteDemandValue(value: number): boolean | string {
+  static externalValidateCapacityLiters(value: number): boolean | string {
     try {
-      if (value < 0) {
-        throw new Error('Waste demand cannot be negative');
+      if (value <= 0) {
+        throw new Error('Container capacity must be greater than 0 liters');
       }
       return true;
     } catch (error: any) {
@@ -237,29 +227,16 @@ export class ContainerAdd {
   }
 
   /**
-   * Validate waste demand quantity unit for form fields.
+   * Validate daily waste demand liters per day for form fields.
    * 
-   * @param value Quantity unit string to validate
+   * @param value Daily demand value in liters/day to validate
    * @returns true if valid, error message string if invalid
    */
-  static externalValidateWasteDemandQuantityUnit(value: string): boolean | string {
+  static externalValidateDailyDemandLitersPerDay(value: number): boolean | string {
     try {
-      new QuantityUnit(value);
-      return true;
-    } catch (error: any) {
-      return error.message;
-    }
-  }
-
-  /**
-   * Validate waste demand time unit for form fields.
-   * 
-   * @param value Time unit string to validate
-   * @returns true if valid, error message string if invalid
-   */
-  static externalValidateWasteDemandTimeUnit(value: string): boolean | string {
-    try {
-      timeUnitFromString(value);
+      if (value <= 0) {
+        throw new Error('Daily waste demand must be greater than 0 liters/day');
+      }
       return true;
     } catch (error: any) {
       return error.message;
@@ -294,9 +271,8 @@ export class ContainerAdd {
     const randomGisReference = `GIS-${Math.floor(Math.random() * 100000)}`;
     const wasteTypes = [WasteType.ORGANIC, WasteType.PACKAGING, WasteType.PAPER_CARDBOARD, WasteType.GLASS, WasteType.RESIDUAL];
     const randomWasteType = wasteTypes[Math.floor(Math.random() * wasteTypes.length)] as WasteType;
-    const randomDemandValue = parseFloat((Math.random() * 100).toFixed(2));
-    const randomQuantityUnit = 'tons';
-    const randomTimeUnit = TimeUnit.DAY;
+    const randomCapacityLiters = parseFloat((Math.random() * 500 + 50).toFixed(2)); // 50-550 liters
+    const randomDailyDemandLitersPerDay = parseFloat((Math.random() * 100 + 10).toFixed(2)); // 10-110 liters/day
     const serviceZones = [ServiceZone.NEIGHBORHOOD, ServiceZone.DISTRICT, ServiceZone.GEOGRAPHICAL_AREA];
     const randomServiceZone = Math.random() > 0.3 ? (serviceZones[Math.floor(Math.random() * serviceZones.length)] as ServiceZone) : undefined;
 
@@ -306,9 +282,8 @@ export class ContainerAdd {
       randomPostalAddress,
       randomGisReference,
       randomWasteType as string,
-      randomDemandValue,
-      randomQuantityUnit,
-      randomTimeUnit,
+      randomCapacityLiters,
+      randomDailyDemandLitersPerDay,
       randomServiceZone as string | undefined
     );
   }
@@ -328,11 +303,10 @@ export class ContainerAdd {
       containerAdd.gisReference
     );
     const wasteType = wasteTypeFromString(containerAdd.wasteType);
-    const quantityUnit = new QuantityUnit(containerAdd.wasteDemandQuantityUnit);
-    const timeUnit = timeUnitFromString(containerAdd.wasteDemandTimeUnit);
-    const wasteDemand = new WasteDemand(containerAdd.wasteDemandValue, quantityUnit, timeUnit);
+    const capacityLiters = new ContainerCapacityLiters(containerAdd.capacityLiters);
+    const dailyDemandLitersPerDay = new DailyWasteDemandLitersPerDay(containerAdd.dailyDemandLitersPerDay);
     const serviceZone = containerAdd.serviceZone ? serviceZoneFromString(containerAdd.serviceZone) : null;
 
-    return new Container(location, wasteType, wasteDemand, serviceZone);
+    return new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone);
   }
 }

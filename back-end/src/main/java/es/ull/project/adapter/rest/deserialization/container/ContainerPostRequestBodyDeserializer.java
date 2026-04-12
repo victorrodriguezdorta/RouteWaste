@@ -1,22 +1,23 @@
 package es.ull.project.adapter.rest.deserialization.container;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.exception.FieldError;
 import es.ull.project.adapter.rest.exception.ValidationException;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.domain.enumerate.ServiceZone;
-import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.demand.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * ContainerPostRequestBodyDeserializer
@@ -47,7 +48,8 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
         List<FieldError> errors = new ArrayList<>();
         Location location = parseLocation(rootNode, errors);
         WasteType wasteType = parseWasteType(rootNode, errors);
-        WasteDemand wasteDemand = parseWasteDemand(rootNode, errors);
+        ContainerCapacityLiters capacityLiters = parseCapacityLiters(rootNode, errors);
+        DailyWasteDemandLitersPerDay dailyDemandLitersPerDay = parseDailyDemandLitersPerDay(rootNode, errors);
         ServiceZone serviceZone = parseServiceZone(rootNode, errors);
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
@@ -55,7 +57,8 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
         ContainerPostRequestBody requestBody = new ContainerPostRequestBody();
         requestBody.location = location;
         requestBody.wasteType = wasteType;
-        requestBody.wasteDemand = wasteDemand;
+        requestBody.capacityLiters = capacityLiters;
+        requestBody.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
         requestBody.serviceZone = serviceZone;
         return requestBody;
     }
@@ -155,81 +158,71 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
     }
 
     /**
-     * Parses the wasteDemand nested object from JSON.
+     * Parses the capacity liters field from JSON.
+     * Handles both formats: simple number or nested object {liters: number}
      * 
      * @param rootNode the root JSON node
      * @param errors list to accumulate validation errors
-     * @return the parsed WasteDemand value object, or null if validation fails
+     * @return the parsed ContainerCapacityLiters value object, or null if validation fails
      */
-    private WasteDemand parseWasteDemand(JsonNode rootNode, List<FieldError> errors) {
-        if (!rootNode.has(JsonFields.WASTE_DEMAND)) {
-            errors.add(new FieldError(JsonFields.WASTE_DEMAND, "Field is required"));
+    private ContainerCapacityLiters parseCapacityLiters(JsonNode rootNode, List<FieldError> errors) {
+        if (!rootNode.has(JsonFields.CAPACITY_LITERS)) {
+            errors.add(new FieldError(JsonFields.CAPACITY_LITERS, "Field is required"));
             return null;
         }
-        JsonNode demandNode = rootNode.get(JsonFields.WASTE_DEMAND);
-        if (demandNode.isNull() || !demandNode.isObject()) {
-            errors.add(new FieldError(JsonFields.WASTE_DEMAND, "Must be a non-null object"));
-            return null;
-        }
-        Double value = null;
-        QuantityUnit quantityUnit = null;
-        TimeUnit timeUnit = null;
-        if (!demandNode.has(JsonFields.CAPACITY_VALUE)) {
-            errors.add(new FieldError(
-                JsonFields.WASTE_DEMAND + "." + JsonFields.CAPACITY_VALUE,
-                "Field is required"
-            ));
-        } else {
-            try {
-                value = demandNode.get(JsonFields.CAPACITY_VALUE).asDouble();
-            } catch (Exception e) {
-                errors.add(new FieldError(
-                    JsonFields.WASTE_DEMAND + "." + JsonFields.CAPACITY_VALUE,
-                    "Must be a valid number"
-                ));
-            }
-        }
-        if (!demandNode.has(JsonFields.QUANTITY_UNIT)) {
-            errors.add(new FieldError(
-                JsonFields.WASTE_DEMAND + "." + JsonFields.QUANTITY_UNIT,
-                "Field is required"
-            ));
-        } else {
-            try {
-                String quantityUnitStr = demandNode.get(JsonFields.QUANTITY_UNIT).asText();
-                quantityUnit = new QuantityUnit(quantityUnitStr);
-            } catch (Exception e) {
-                errors.add(new FieldError(
-                    JsonFields.WASTE_DEMAND + "." + JsonFields.QUANTITY_UNIT,
-                    "Invalid value"
-                ));
-            }
-        }
-        if (!demandNode.has(JsonFields.TIME_UNIT)) {
-            errors.add(new FieldError(
-                JsonFields.WASTE_DEMAND + "." + JsonFields.TIME_UNIT,
-                "Field is required"
-            ));
-        } else {
-            try {
-                String timeUnitStr = demandNode.get(JsonFields.TIME_UNIT).asText();
-                timeUnit = TimeUnit.valueOf(timeUnitStr.toUpperCase());
-            } catch (Exception e) {
-                errors.add(new FieldError(
-                    JsonFields.WASTE_DEMAND + "." + JsonFields.TIME_UNIT,
-                    "Invalid time unit"
-                ));
-            }
-        }
-        if (value != null && quantityUnit != null && timeUnit != null) {
-            try {
-                return new WasteDemand(value, quantityUnit, timeUnit);
-            } catch (Exception e) {
-                errors.add(new FieldError(JsonFields.WASTE_DEMAND, "Invalid waste demand: " + e.getMessage()));
+        try {
+            JsonNode capacityNode = rootNode.get(JsonFields.CAPACITY_LITERS);
+            double liters;
+            
+            if (capacityNode.isNumber()) {
+                // Simple number format
+                liters = capacityNode.asDouble();
+            } else if (capacityNode.isObject() && capacityNode.has("liters")) {
+                // Nested object format {liters: number}
+                liters = capacityNode.get("liters").asDouble();
+            } else {
+                errors.add(new FieldError(JsonFields.CAPACITY_LITERS, "Must be a valid number or object with 'liters' field"));
                 return null;
             }
+            return new ContainerCapacityLiters(liters);
+        } catch (Exception e) {
+            errors.add(new FieldError(JsonFields.CAPACITY_LITERS, "Must be a valid number"));
+            return null;
         }
-        return null;
+    }
+
+    /**
+     * Parses the daily demand liters per day field from JSON.
+     * Handles both formats: simple number or nested object {litersPerDay: number}
+     * 
+     * @param rootNode the root JSON node
+     * @param errors list to accumulate validation errors
+     * @return the parsed DailyWasteDemandLitersPerDay value object, or null if validation fails
+     */
+    private DailyWasteDemandLitersPerDay parseDailyDemandLitersPerDay(JsonNode rootNode, List<FieldError> errors) {
+        if (!rootNode.has(JsonFields.DAILY_DEMAND_LITERS_PER_DAY)) {
+            errors.add(new FieldError(JsonFields.DAILY_DEMAND_LITERS_PER_DAY, "Field is required"));
+            return null;
+        }
+        try {
+            JsonNode demandNode = rootNode.get(JsonFields.DAILY_DEMAND_LITERS_PER_DAY);
+            double litersPerDay;
+            
+            if (demandNode.isNumber()) {
+                // Simple number format
+                litersPerDay = demandNode.asDouble();
+            } else if (demandNode.isObject() && demandNode.has("litersPerDay")) {
+                // Nested object format {litersPerDay: number}
+                litersPerDay = demandNode.get("litersPerDay").asDouble();
+            } else {
+                errors.add(new FieldError(JsonFields.DAILY_DEMAND_LITERS_PER_DAY, "Must be a valid number or object with 'litersPerDay' field"));
+                return null;
+            }
+            return new DailyWasteDemandLitersPerDay(litersPerDay);
+        } catch (Exception e) {
+            errors.add(new FieldError(JsonFields.DAILY_DEMAND_LITERS_PER_DAY, "Must be a valid number"));
+            return null;
+        }
     }
 
     /**

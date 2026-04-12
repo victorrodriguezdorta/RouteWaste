@@ -1,23 +1,9 @@
 package es.ull.project.adapter.rest.controller;
 
-import es.ull.project.adapter.rest.mapper.ContainerResponseMapper;
-import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
-import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
-import es.ull.project.adapter.rest.response.container.ContainerPageResponseBody;
-import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
-import es.ull.project.application.usecase.container.CreateContainerUseCase;
-import es.ull.project.application.usecase.container.DeleteContainerUseCase;
-import es.ull.project.application.usecase.container.ReadContainerUseCase;
-import es.ull.project.application.usecase.container.UpdateContainerUseCase;
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.enumerate.WasteType;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +20,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import es.ull.project.adapter.mongodb.mapper.ContainerFieldMapper;
+import es.ull.project.adapter.mongodb.query.ContainerSearchCriteria;
+import es.ull.project.adapter.rest.mapper.ContainerResponseMapper;
+import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
+import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
+import es.ull.project.adapter.rest.response.container.ContainerPageResponseBody;
+import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
+import es.ull.project.application.usecase.container.CreateContainerUseCase;
+import es.ull.project.application.usecase.container.DeleteContainerUseCase;
+import es.ull.project.application.usecase.container.ReadContainerUseCase;
+import es.ull.project.application.usecase.container.UpdateContainerUseCase;
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 /**
  * ContainerController
@@ -52,18 +56,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContainerController {
 
     private static final int ZERO = 0;
-
-    private static final String SORT_BY_WASTE_TYPE = "wasteType";
-    private static final String FIELD_WASTE_TYPE = "wasteType";
-
-    private static final String SORT_BY_LOCATION = "location";
-    private static final String FIELD_LOCATION = "location.postalAddress";
-
-    private static final String SORT_BY_DEMAND = "demand";
-    private static final String FIELD_DEMAND = "wasteDemand.value";
-
-    private static final String SORT_BY_SERVICE_ZONE = "serviceZone";
-    private static final String FIELD_SERVICE_ZONE = "serviceZone";
 
     /**
      * Use case for reading container data.
@@ -96,19 +88,23 @@ public class ContainerController {
     /**
      * GET /containers/
      * 
-     * Retrieves all containers in the system.
-     * 
-     * This endpoint returns a list of all available containers without pagination.
-     * The containers are returned as ContainerResponseBody DTOs serialized to JSON.
+     * Retrieves all containers with advanced filtering and sorting options.
+     * Supports pagination, sorting by any attribute, and filtering by multiple criteria.
      * 
      * @param page the zero-based page index (defaults to 0)
      * @param size the number of elements per page (defaults to 10)
-     * @param sortBy the field to sort by (e.g. wasteType, location, demand, serviceZone)
+     * @param sortBy the field to sort by (any container attribute)
      * @param sortOrder the sort direction, "asc" or "desc" (defaults to "asc")
-     * @param wasteType optional filter by waste type enum value
-     * @return ResponseEntity containing a list of all containers and HTTP 200 (OK) status
+     * @param wasteType optional filter by waste type
+     * @param serviceZone optional filter by service zone
+     * @param minCapacity optional minimum capacity filter
+     * @param maxCapacity optional maximum capacity filter
+     * @param minDemand optional minimum daily demand filter
+     * @param maxDemand optional maximum daily demand filter
+     * @param location optional filter by location (postal address)
+     * @return ResponseEntity containing a page of containers with HTTP 200 (OK) status
      */
-    @Operation(summary = "Get all containers", description = "Retrieves a paginated list of containers with optional sorting and filtering")
+    @Operation(summary = "Get all containers", description = "Retrieves a paginated list of containers with optional sorting and advanced filtering")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Containers retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request parameters")
@@ -117,26 +113,31 @@ public class ContainerController {
     public ResponseEntity<ContainerPageResponseBody> getContainers(
             @Parameter(description = "Zero-based page index") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Number of elements per page") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Field to sort by: wasteType, location, demand, serviceZone") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Field to sort by (e.g., wasteType, location, capacity, demand, serviceZone, etc.)") 
+            @RequestParam(required = false) String sortBy,
             @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder,
-            @Parameter(description = "Filter by waste type") @RequestParam(required = false) String wasteType) {
+            @Parameter(description = "Filter by waste type") @RequestParam(required = false) String wasteType,
+            @Parameter(description = "Filter by service zone") @RequestParam(required = false) String serviceZone,
+            @Parameter(description = "Minimum capacity in liters") @RequestParam(required = false) Integer minCapacity,
+            @Parameter(description = "Maximum capacity in liters") @RequestParam(required = false) Integer maxCapacity,
+            @Parameter(description = "Minimum daily demand") @RequestParam(required = false) Integer minDemand,
+            @Parameter(description = "Maximum daily demand") @RequestParam(required = false) Integer maxDemand,
+            @Parameter(description = "Filter by location (postal address)") @RequestParam(required = false) String location) {
+        
+        // Validate pagination parameters
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        String mongoSortField = switch (sortBy != null ? sortBy : "") {
-            case SORT_BY_WASTE_TYPE -> FIELD_WASTE_TYPE;
-            case SORT_BY_LOCATION -> FIELD_LOCATION;
-            case SORT_BY_DEMAND -> FIELD_DEMAND;
-            case SORT_BY_SERVICE_ZONE -> FIELD_SERVICE_ZONE;
-            default -> null;
-        };
-        Sort sort = Sort.unsorted();
-        if (mongoSortField != null) {
-            Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder)
-                    ? Sort.Direction.DESC
-                    : Sort.Direction.ASC;
-            sort = Sort.by(direction, mongoSortField);
+
+        // Build sort configuration
+        Sort sort = buildSort(sortBy, sortOrder);
+
+        // Validate sort field if provided
+        if (sortBy != null && !sortBy.isBlank() && !ContainerFieldMapper.isValidField(sortBy)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+        // Validate waste type if provided
         WasteType wasteTypeFilter = null;
         if (wasteType != null && !wasteType.isBlank()) {
             try {
@@ -145,11 +146,62 @@ public class ContainerController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+
+        // Build search criteria
+        ContainerSearchCriteria criteria = new ContainerSearchCriteria.Builder()
+                .withWasteType(wasteTypeFilter)
+                .withServiceZone(serviceZone)
+                .withMinCapacityLiters(minCapacity)
+                .withMaxCapacityLiters(maxCapacity)
+                .withMinDailyDemand(minDemand)
+                .withMaxDailyDemand(maxDemand)
+                .withLocationPostalAddress(location)
+                .build();
+
+        // Execute query
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Container> containerPage = this.readContainerUseCase.fetchAll(pageable, wasteTypeFilter);
+        Page<Container> containerPage = this.readContainerUseCase.fetchAll(pageable, criteria);
+
+        // Map and return response
+        return buildSuccessResponse(containerPage);
+    }
+
+    /**
+     * Builds a Sort object from sortBy and sortOrder parameters.
+     * Uses the field mapper to translate public field names to MongoDB paths.
+     *
+     * @param sortBy the field name to sort by
+     * @param sortOrder the sort direction (asc/desc)
+     * @return Sort object, unsorted if sortBy is null
+     */
+    private Sort buildSort(String sortBy, String sortOrder) {
+        if (sortBy == null || sortBy.isBlank()) {
+            return Sort.unsorted();
+        }
+
+        String mongoField = ContainerFieldMapper.toMongoField(sortBy);
+        if (mongoField == null) {
+            return Sort.unsorted();
+        }
+
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder) 
+                ? Sort.Direction.DESC 
+                : Sort.Direction.ASC;
+        
+        return Sort.by(direction, mongoField);
+    }
+
+    /**
+     * Builds a successful response from a container page.
+     *
+     * @param containerPage the page of containers
+     * @return ResponseEntity with container page response body and HTTP 200
+     */
+    private ResponseEntity<ContainerPageResponseBody> buildSuccessResponse(Page<Container> containerPage) {
         List<ContainerResponseBody> responseBodies = containerPage.getContent().stream()
                 .map(ContainerResponseMapper::toResponseBody)
                 .toList();
+        
         ContainerPageResponseBody response = new ContainerPageResponseBody();
         response.content = responseBodies;
         response.totalElements = containerPage.getTotalElements();
@@ -159,6 +211,7 @@ public class ContainerController {
         response.numberOfElements = containerPage.getNumberOfElements();
         response.first = containerPage.isFirst();
         response.last = containerPage.isLast();
+        
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -218,7 +271,8 @@ public class ContainerController {
             Container createdContainer = this.createContainerUseCase.create(
                     requestBody.location,
                     requestBody.wasteType,
-                    requestBody.wasteDemand,
+                    requestBody.capacityLiters,
+                    requestBody.dailyDemandLitersPerDay,
                     requestBody.serviceZone
             );
             ContainerResponseBody responseBody = ContainerResponseMapper.toResponseBody(createdContainer);
@@ -259,7 +313,8 @@ public class ContainerController {
                     containerId,
                     requestBody.location,
                     requestBody.wasteType,
-                    requestBody.wasteDemand,
+                    requestBody.capacityLiters,
+                    requestBody.dailyDemandLitersPerDay,
                     requestBody.serviceZone
             );
             ContainerResponseBody responseBody = ContainerResponseMapper.toResponseBody(updatedContainer);

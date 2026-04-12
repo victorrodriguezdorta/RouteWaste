@@ -1,16 +1,16 @@
 package es.ull.project.domain.entity;
 
-import es.ull.project.domain.valueobject.cost.MaximumBudget;
-import es.ull.project.domain.valueobject.cost.TotalCost;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
-import es.ull.project.domain.valueobject.policy.ServicePolicies;
-import es.ull.project.domain.valueobject.time.PlanningPeriod;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
+import es.ull.project.domain.valueobject.cost.TotalCost;
+import es.ull.project.domain.valueobject.demand.WasteDemand;
+import es.ull.project.domain.valueobject.policy.ServicePolicies;
+import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
 /**
  * InfrastructurePlan
@@ -169,7 +169,6 @@ public class InfrastructurePlan {
         if (assignment == null) {
             throw new IllegalArgumentException(INVALID_ASSIGNMENT);
         }
-        assignment.getFacility().assignWasteDemand(assignment.getContainer().getWasteDemand());
         serviceAssignments.add(assignment);
         recalculateTotalCost();
     }

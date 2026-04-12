@@ -25,11 +25,17 @@ public class MongoFields {
     public static final String POSTAL_ADDRESS = "postalAddress";
     public static final String GIS_REFERENCE = "gisReference";
     public static final String WASTE_TYPE = "wasteType";
+    public static final String CAPACITY_LITERS = "capacityLiters";
+    public static final String DAILY_DEMAND_LITERS_PER_DAY = "dailyDemandLitersPerDay";
+    public static final String SERVICE_ZONE = "serviceZone";
+
+    /**
+     * WasteDemand fields (used by Facility and ServiceAssignment).
+     */
     public static final String WASTE_DEMAND = "wasteDemand";
     public static final String WASTE_DEMAND_VALUE = "value";
     public static final String WASTE_DEMAND_QUANTITY_UNIT = "quantityUnit";
     public static final String WASTE_DEMAND_TIME_UNIT = "timeUnit";
-    public static final String SERVICE_ZONE = "serviceZone";
 
     /**
      * Facility fields.

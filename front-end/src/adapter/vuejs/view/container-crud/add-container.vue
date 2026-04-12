@@ -48,10 +48,9 @@ import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { TimeUnit } from '../../../../domain/enumerate/time-unit';
 import { WasteType } from '../../../../domain/enumerate/waste-type';
-import ContainerFormFields from '../../components/container/container-form-fields.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
+import ContainerFormFields from '../../components/container/container-form-fields.vue';
 import { ContainerAdd } from '../../dto/container/container-add';
 import router from '../../router/router';
 import { useContainerStore } from '../../stores/container-store';
@@ -68,9 +67,8 @@ const newContainer = ref<ContainerAdd>(
     '',
     '',
     WasteType.ORGANIC,
-    0,
-    'tons',
-    TimeUnit.DAY
+    100,
+    50
   )
 );
 

@@ -111,7 +111,7 @@ export class InfrastructurePlan {
    */
   addServiceAssignment(assignment: ServiceAssignment): void {
     if (!assignment) throw new Error('Invalid assignment');
-    assignment.facility.assignWasteDemand(assignment.container.getWasteDemand());
+    assignment.facility.assignWasteDemand(assignment.wasteDemand);
     this.serviceAssignments.push(assignment);
     this.recalculateTotalCost();
   }

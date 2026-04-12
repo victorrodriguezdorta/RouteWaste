@@ -18,9 +18,14 @@ export class ContainerPostJsonRequest {
   wasteType: string;
 
   /**
-   * Waste demand specification including quantity value, unit, and time unit.
+   * Maximum capacity of the container in liters.
    */
-  wasteDemand: { value: number; quantityUnit: string; timeUnit: string };
+  capacityLiters: { liters: number };
+
+  /**
+   * Approximate daily waste demand in liters per day.
+   */
+  dailyDemandLitersPerDay: { litersPerDay: number };
 
   /**
    * Service zone identifier for the container (optional).
@@ -30,18 +35,20 @@ export class ContainerPostJsonRequest {
   constructor(
     location: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
     wasteType: string,
-    wasteDemand: { value: number; quantityUnit: string; timeUnit: string },
+    capacityLiters: { liters: number },
+    dailyDemandLitersPerDay: { litersPerDay: number },
     serviceZone?: string | null
   ) {
     this.location = location;
     this.wasteType = wasteType;
-    this.wasteDemand = wasteDemand;
+    this.capacityLiters = capacityLiters;
+    this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
     this.serviceZone = serviceZone ?? null;
   }
 
   /**
    * Map a `CreateContainerCommand` (domain input) into this DTO.
-   * Extracts primitive values from `Location` and `WasteDemand` value objects.
+   * Extracts primitive values from `Location`, `ContainerCapacityLiters`, and `DailyWasteDemandLitersPerDay` value objects.
    * @param data The CreateContainerCommand containing domain objects to convert.
    * @returns A new ContainerPostJsonRequest instance with primitive values for serialization.
    */
@@ -55,9 +62,10 @@ export class ContainerPostJsonRequest {
       },
       data.wasteType,
       {
-        value: data.wasteDemand.getValue(),
-        quantityUnit: data.wasteDemand.getQuantityUnit().getValue(),
-        timeUnit: data.wasteDemand.getTimeUnit().toString(),
+        liters: data.capacityLiters.getLiters(),
+      },
+      {
+        litersPerDay: data.dailyDemandLitersPerDay.getLitersPerDay(),
       },
       data.serviceZone ?? null
     );

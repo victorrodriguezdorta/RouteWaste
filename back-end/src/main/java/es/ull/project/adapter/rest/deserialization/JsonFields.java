@@ -55,8 +55,14 @@ public final class JsonFields {
      */
     public static final String LOCATION = "location";
     public static final String WASTE_TYPE = "wasteType";
-    public static final String WASTE_DEMAND = "wasteDemand";
+    public static final String CAPACITY_LITERS = "capacityLiters";
+    public static final String DAILY_DEMAND_LITERS_PER_DAY = "dailyDemandLitersPerDay";
     public static final String SERVICE_ZONE = "serviceZone";
+
+    /**
+     * WasteDemand fields (used by Facility and ServiceAssignment)
+     */
+    public static final String WASTE_DEMAND = "wasteDemand";
 
     /**
      * Location fields

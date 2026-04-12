@@ -122,71 +122,6 @@
         />
       </v-col>
       <v-col cols="12" sm="6">
-        <InputTooltip
-          :data="container.wasteDemandValue.toString()"
-          input-type="text"
-          :text="t('container.add.fields.wasteDemandValue')"
-          :tooltip="t('container.add.fields.wasteDemandValue')"
-          counter="10"
-          :rules="[
-            (value: string) => validateMaxDecimals(value, 2),
-            (value: string) => validateWasteDemandValue(value),
-          ]"
-          :required="!readonly"
-          :readonly="readonly"
-          :disabled="readonly"
-          @updateData="(value) => updateWasteDemandValue(Number(value) || 0)"
-        />
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12" sm="6">
-        <InputTooltip
-          :data="container.wasteDemandQuantityUnit"
-          input-type="text"
-          :text="t('container.add.fields.wasteDemandQuantityUnit')"
-          :tooltip="t('container.add.fields.wasteDemandQuantityUnit')"
-          counter="50"
-          :rules="[
-            (value: string) => ContainerAdd.externalValidateWasteDemandQuantityUnit(value),
-          ]"
-          :required="!readonly"
-          :readonly="readonly"
-          :disabled="readonly"
-          @updateData="updateWasteDemandQuantityUnit"
-        />
-      </v-col>
-      <v-col cols="12" sm="6">
-        <v-select
-          v-if="!readonly"
-          :model-value="container.wasteDemandTimeUnit"
-          :items="timeUnitOptions"
-          item-title="title"
-          item-value="value"
-          :rules="[
-            (value: string) => ContainerAdd.externalValidateWasteDemandTimeUnit(value),
-          ]"
-          :label="t('container.add.fields.wasteDemandTimeUnit')"
-          color="primary"
-          prepend-icon="mdi-clock-outline"
-          required
-          @update:model-value="updateWasteDemandTimeUnit"
-        />
-        <v-text-field
-          v-else
-          :model-value="translatedTimeUnit"
-          :label="t('container.add.fields.wasteDemandTimeUnit')"
-          color="primary"
-          prepend-icon="mdi-clock-outline"
-          readonly
-          disabled
-        />
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12" sm="6">
         <v-select
           v-if="!readonly"
           :model-value="container.serviceZone"
@@ -213,6 +148,43 @@
         />
       </v-col>
     </v-row>
+
+    <v-row>
+      <v-col cols="12" sm="6">
+        <InputTooltip
+          :data="container.capacityLiters.toString()"
+          input-type="text"
+          :text="t('container.add.fields.capacityLiters')"
+          :tooltip="t('container.add.fields.capacityLiters')"
+          counter="10"
+          :rules="[
+            (value: string) => validateMaxDecimals(value, 2),
+            (value: string) => validateCapacityLiters(value),
+          ]"
+          :required="!readonly"
+          :readonly="readonly"
+          :disabled="readonly"
+          @updateData="(value) => updateCapacityLiters(Number(value) || 0)"
+        />
+      </v-col>
+      <v-col cols="12" sm="6">
+        <InputTooltip
+          :data="container.dailyDemandLitersPerDay.toString()"
+          input-type="text"
+          :text="t('container.add.fields.dailyDemandLitersPerDay')"
+          :tooltip="t('container.add.fields.dailyDemandLitersPerDay')"
+          counter="10"
+          :rules="[
+            (value: string) => validateMaxDecimals(value, 2),
+            (value: string) => validateDailyDemandLitersPerDay(value),
+          ]"
+          :required="!readonly"
+          :readonly="readonly"
+          :disabled="readonly"
+          @updateData="(value) => updateDailyDemandLitersPerDay(Number(value) || 0)"
+        />
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -221,10 +193,9 @@ import { InputTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { serviceZoneToOptions } from '../../../../domain/enumerate/service-zone';
-import { timeUnitToOptions } from '../../../../domain/enumerate/time-unit';
 import { wasteTypeToOptions } from '../../../../domain/enumerate/waste-type';
-import LocationPickerMap from '../common/LocationPickerMap.vue';
 import { ContainerAdd } from '../../dto/container/container-add';
+import LocationPickerMap from '../common/LocationPickerMap.vue';
 
 const { t } = useI18n();
 
@@ -238,18 +209,12 @@ const emit = defineEmits<{
 }>();
 
 const wasteTypeOptions = computed(() => wasteTypeToOptions(t));
-const timeUnitOptions = computed(() => timeUnitToOptions(t));
 const serviceZoneOptions = computed(() => serviceZoneToOptions(t));
 const showMapSelector = ref(false);
 
 const translatedWasteType = computed(() => {
   if (!props.container.wasteType) return '';
   return t(`container.add.wasteTypes.${props.container.wasteType}`);
-});
-
-const translatedTimeUnit = computed(() => {
-  if (!props.container.wasteDemandTimeUnit) return '';
-  return t(`common.timeUnits.${props.container.wasteDemandTimeUnit}`);
 });
 
 const translatedServiceZone = computed(() => {
@@ -285,16 +250,12 @@ const updateWasteType = (value: string) => {
   emit('update:container', { ...props.container, wasteType: value });
 };
 
-const updateWasteDemandValue = (value: number) => {
-  emit('update:container', { ...props.container, wasteDemandValue: value });
+const updateCapacityLiters = (value: number) => {
+  emit('update:container', { ...props.container, capacityLiters: value });
 };
 
-const updateWasteDemandQuantityUnit = (value: string) => {
-  emit('update:container', { ...props.container, wasteDemandQuantityUnit: value });
-};
-
-const updateWasteDemandTimeUnit = (value: string) => {
-  emit('update:container', { ...props.container, wasteDemandTimeUnit: value });
+const updateDailyDemandLitersPerDay = (value: number) => {
+  emit('update:container', { ...props.container, dailyDemandLitersPerDay: value });
 };
 
 const updateServiceZone = (value: string | null) => {
@@ -352,14 +313,25 @@ const validateGISReference = (value: string): boolean | string => {
   return ContainerAdd.externalValidateGISReference(value);
 };
 
-const validateWasteDemandValue = (value: string): boolean | string => {
+const validateCapacityLiters = (value: string): boolean | string => {
   if (!value || value === '') return true;
 
   const numericValue = Number(value);
-  if (Number.isNaN(numericValue) || numericValue < 0) {
-    return t('common.validationMessages.wasteDemandNegative');
+  if (Number.isNaN(numericValue) || numericValue <= 0) {
+    return t('common.validationMessages.capacityLitersPositive');
   }
 
-  return ContainerAdd.externalValidateWasteDemandValue(numericValue);
+  return ContainerAdd.externalValidateCapacityLiters(numericValue);
+};
+
+const validateDailyDemandLitersPerDay = (value: string): boolean | string => {
+  if (!value || value === '') return true;
+
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue) || numericValue <= 0) {
+    return t('common.validationMessages.dailyDemandLitersPositive');
+  }
+
+  return ContainerAdd.externalValidateDailyDemandLitersPerDay(numericValue);
 };
 </script>

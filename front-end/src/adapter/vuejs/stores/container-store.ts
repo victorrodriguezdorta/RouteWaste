@@ -1,10 +1,10 @@
 import { ContainerHttpRepository } from '@/adapter/http/container-http-repository';
 import {
-  CreateContainerService,
-  DeleteContainerService,
-  GetContainerService,
-  ListContainersService,
-  UpdateContainerService
+    CreateContainerService,
+    DeleteContainerService,
+    GetContainerService,
+    ListContainersService,
+    UpdateContainerService
 } from '@/application/service/container';
 import type { Container } from '@/domain/entity/container';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
@@ -91,15 +91,25 @@ export const useContainerStore = defineStore('Container', {
    */
   actions: {
     /**
-     * Retrieve all containers from the backend with optional pagination, sort and filter
+     * Retrieve all containers from the backend with optional pagination, sort and filtering
      * 
      * @param page Optional page number for pagination
      * @param rowsPerPage Optional number of items per page
      * @param sortBy Optional sort column key
      * @param sortOrder Optional sort direction
      * @param wasteType Optional waste type filter
+     * @param serviceZone Optional service zone filter
+     * @param location Optional location filter
      */
-    async getContainers(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', wasteType?: string) {
+    async getContainers(
+      page?: number, 
+      rowsPerPage?: number, 
+      sortBy?: string, 
+      sortOrder?: 'asc' | 'desc', 
+      wasteType?: string,
+      serviceZone?: string,
+      location?: string
+    ) {
       this.loading = true;
       this.containers = [];
       const requestedPage = page ?? this.currentPage;
@@ -108,13 +118,15 @@ export const useContainerStore = defineStore('Container', {
       // Create service instance with repository
       const listService = new ListContainersService(this.containerRepository);
       
-      // Execute the list operation
+      // Execute the list operation with all available filters
       const result = await listService.execute({
         page: requestedPage,
         pageSize: requestedRowsPerPage,
         sortBy,
         sortOrder,
-        wasteType
+        wasteType,
+        serviceZone,
+        location
       });
       
       // Handle the result using Either pattern
@@ -178,7 +190,8 @@ export const useContainerStore = defineStore('Container', {
       const result = await createService.execute({
         location: container.getLocation(),
         wasteType: container.getWasteType(),
-        wasteDemand: container.getWasteDemand(),
+        capacityLiters: container.getCapacityLiters(),
+        dailyDemandLitersPerDay: container.getDailyDemandLitersPerDay(),
         serviceZone: container.getServiceZone()
       });
       
@@ -220,7 +233,8 @@ export const useContainerStore = defineStore('Container', {
         updatedFields: {
           location: container.getLocation(),
           wasteType: container.getWasteType(),
-          wasteDemand: container.getWasteDemand(),
+          capacityLiters: container.getCapacityLiters(),
+          dailyDemandLitersPerDay: container.getDailyDemandLitersPerDay(),
           serviceZone: container.getServiceZone()
         }
       });
