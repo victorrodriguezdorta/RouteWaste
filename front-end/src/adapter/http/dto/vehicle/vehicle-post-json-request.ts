@@ -9,12 +9,10 @@ import type { CreateVehicleCommand } from '@/application/usecase/vehicle-managem
 export class VehiclePostJsonRequest {
   /** Vehicle type as enum key string. */
   vehicleType: string;
-  /** Transport capacity expressed with primitive parts. */
-  transportCapacity: {
-    value: number;
-    quantityUnit: string;
-    timeUnit: string;
-  };
+  /** Capacity in kilograms. */
+  capacityKilograms: number;
+  /** Capacity in liters. */
+  CapacityLiters: number;
   /** Cost per kilometer expressed with primitive parts. */
   costPerKilometer: {
     amount: number;
@@ -24,16 +22,19 @@ export class VehiclePostJsonRequest {
   /**
    * Build a request DTO instance.
    * @param vehicleType vehicle type string
-   * @param transportCapacity capacity parts
+   * @param capacityKilograms capacity in kilograms
+   * @param CapacityLiters capacity in liters
    * @param costPerKilometer cost parts
    */
   constructor(
     vehicleType: string,
-    transportCapacity: { value: number; quantityUnit: string; timeUnit: string },
+    capacityKilograms: number,
+    CapacityLiters: number,
     costPerKilometer: { amount: number; currency?: string }
   ) {
     this.vehicleType = vehicleType;
-    this.transportCapacity = transportCapacity;
+    this.capacityKilograms = capacityKilograms;
+    this.CapacityLiters = CapacityLiters;
     this.costPerKilometer = costPerKilometer;
   }
 
@@ -47,11 +48,8 @@ export class VehiclePostJsonRequest {
   public static toRequest(data: CreateVehicleCommand): VehiclePostJsonRequest {
     return new VehiclePostJsonRequest(
       data.vehicleType,
-      {
-        value: data.transportCapacity.getValue(),
-        quantityUnit: data.transportCapacity.getQuantityUnit().getValue(),
-        timeUnit: data.transportCapacity.getTimeUnit().toString(),
-      },
+      data.capacityKilograms.getKilograms(),
+      data.capacityLiters.getLiters(),
       {
         amount: data.costPerKilometer.getAmount(),
         currency: data.costPerKilometer.getCurrency().getCode(),

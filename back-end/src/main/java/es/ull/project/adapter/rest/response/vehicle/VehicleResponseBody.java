@@ -1,10 +1,11 @@
 package es.ull.project.adapter.rest.response.vehicle;
 
-import es.ull.project.domain.enumerate.VehicleType;
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
-
 import java.util.UUID;
+
+import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 
 /**
  * Data Transfer Object representing a Vehicle response
@@ -24,9 +25,14 @@ public class VehicleResponseBody {
     public VehicleType vehicleType;
 
     /**
-     * Transport capacity of the vehicle
+     * Transport capacity of the vehicle in kilograms
      */
-    public Capacity transportCapacity;
+    public VehicleCapacityKilograms capacityKilograms;
+
+    /**
+     * Transport capacity of the vehicle in liters
+     */
+    public VehicleCapacityLiters CapacityLiters;
 
     /**
      * Variable cost per kilometer traveled

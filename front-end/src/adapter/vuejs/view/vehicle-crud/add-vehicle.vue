@@ -61,12 +61,11 @@
  */
 
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
-import CrudLayout from '../../components/common/CrudLayout.vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { TimeUnit } from '../../../../domain/enumerate/time-unit';
 import { VehicleType } from '../../../../domain/enumerate/vehicle-type';
+import CrudLayout from '../../components/common/CrudLayout.vue';
 import VehicleFormFields from '../../components/vehicle/vehicle-form-fields.vue';
 import { VehicleAdd } from '../../dto/vehicle/vehicle-add';
 import router from '../../router/router';
@@ -84,8 +83,7 @@ const newVehicle = ref<VehicleAdd>(
   new VehicleAdd(
     VehicleType.COLLECTION_TRUCK,
     0,
-    'tons',
-    TimeUnit.DAY,
+    0,
     0,
     'EUR'
   )

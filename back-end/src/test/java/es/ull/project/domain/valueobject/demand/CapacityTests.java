@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import es.ull.project.domain.enumerate.TimeUnit;
+import es.ull.project.domain.valueobject.capacity.Capacity;
 
 public class CapacityTests {
 

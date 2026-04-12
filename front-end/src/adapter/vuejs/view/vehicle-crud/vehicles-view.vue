@@ -60,9 +60,14 @@
           </v-chip>
         </template>
 
-        <!-- Capacity column -->
-        <template v-slot:item.capacity="{ item }">
-          {{ item.capacity }}
+        <!-- Capacity (Kilograms) column -->
+        <template v-slot:item.capacityKilograms="{ item }">
+          {{ item.capacityKilograms }} kg
+        </template>
+
+        <!-- Capacity (Liters) column -->
+        <template v-slot:item.capacityLiters="{ item }">
+          {{ item.capacityLiters }} L
         </template>
 
         <!-- Cost column -->
@@ -161,11 +166,11 @@
  */
 
 import { ButtonTooltip, ErrorMessage } from '@ull-tfg/ull-tfg-vue';
-import CrudLayout from '../../components/common/CrudLayout.vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { VehicleType, vehicleTypeColor, vehicleTypeToOptions } from '../../../../domain/enumerate/vehicle-type';
+import CrudLayout from '../../components/common/CrudLayout.vue';
 import router from '../../router/router';
 import { useVehicleStore } from '../../stores/vehicle-store';
 
@@ -191,19 +196,25 @@ const headers = computed(() => [
     title: t('vehicle.list.table.headers.type'),
     align: 'start' as const,
     sortable: true,
-    key: 'type',
+    key: 'type',                    // Sent to backend as sortBy parameter
   },
   {
-    title: t('vehicle.list.table.headers.capacity'),
+    title: t('vehicle.list.table.headers.capacityKilograms'),
     align: 'center' as const,
     sortable: true,
-    key: 'capacity',
+    key: 'capacityKilograms',       // Maps to capacityKilograms.Kilograms in MongoDB
+  },
+  {
+    title: t('vehicle.list.table.headers.capacityLiters'),
+    align: 'center' as const,
+    sortable: true,
+    key: 'capacityLiters',          // Maps to CapacityLiters.liters in MongoDB
   },
   {
     title: t('vehicle.list.table.headers.cost'),
     align: 'center' as const,
     sortable: true,
-    key: 'cost',
+    key: 'cost',                    // Maps to costPerKilometer.amount in MongoDB
   },
   {
     title: t('vehicle.list.table.headers.actions'),
@@ -228,7 +239,8 @@ const vehicleItems = computed(() => {
     id: vehicle.getId().toString(),
     rawType: vehicle.getVehicleType(),
     type: formatVehicleType(vehicle.getVehicleType()),
-    capacity: `${vehicle.getTransportCapacity().getValue()} ${vehicle.getTransportCapacity().getQuantityUnit().getValue()}/${formatTimeUnitShort(vehicle.getTransportCapacity().getTimeUnit())}`,
+    capacityKilograms: vehicle.getCapacityKilograms().getKilograms(),
+    capacityLiters: vehicle.getCapacityLiters().getLiters(),
     cost: `${vehicle.getCostPerKilometer().getAmount().toFixed(2)} ${vehicle.getCostPerKilometer().getCurrency().getCode()}`,
   }));
 });
@@ -254,6 +266,9 @@ const loadVehicles = async (page: number, size: number, sortBy?: string, sortOrd
 /**
  * Handle pagination and sort changes coming from Vuetify table.
  * Vuetify pages are 1-based, backend pages are 0-based.
+ * 
+ * The sort field keys (type, capacityKilograms, capacityLiters, cost) are automatically
+ * mapped by the backend VehicleFieldMapper to the corresponding MongoDB paths.
  */
 const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: number; sortBy: { key: string; order: 'asc' | 'desc' }[] }) => {
   const requestedSize = options.itemsPerPage;
@@ -262,7 +277,7 @@ const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: numbe
   }
 
   const requestedPage = Math.max(options.page - 1, 0);
-  const newSortBy = options.sortBy[0]?.key;
+  const newSortBy = options.sortBy[0]?.key;  // Can be: type, capacityKilograms, capacityLiters, cost
   const newSortOrder = options.sortBy[0]?.order ?? 'asc';
 
   await loadVehicles(requestedPage, requestedSize, newSortBy, newSortOrder, selectedVehicleTypeFilter.value);
@@ -286,15 +301,6 @@ const onVehicleTypeFilterChange = async (newType: string | null) => {
  */
 const formatVehicleType = (type: VehicleType): string => {
   return t(`vehicle.add.vehicleTypes.${type}`);
-};
-
-/**
- * Format time unit to short display string using i18n
- * @param unit - Time unit string (e.g., 'DAY', 'WEEK')
- * @returns Short formatted time unit
- */
-const formatTimeUnitShort = (unit: string): string => {
-  return t(`common.timeUnitsLowercase.${unit}`);
 };
 
 /**

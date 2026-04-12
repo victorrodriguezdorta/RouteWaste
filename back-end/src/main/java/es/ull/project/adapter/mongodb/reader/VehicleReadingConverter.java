@@ -1,21 +1,22 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.configuration.MongoConfiguration;
-import es.ull.project.domain.entity.Vehicle;
-import es.ull.project.domain.enumerate.TimeUnit;
-import es.ull.project.domain.enumerate.VehicleType;
-import es.ull.project.domain.valueobject.cost.Currency;
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import java.util.UUID;
+
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.lang.NonNull;
+
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
+import es.ull.project.domain.valueobject.cost.Currency;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 
 /**
  * VehicleReadingConverter
@@ -52,24 +53,46 @@ public class VehicleReadingConverter implements Converter<Document, Vehicle> {
         logger.info("Vehicle to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         VehicleType vehicleType = VehicleType.fromString(document.getString(MongoFields.VEHICLE_TYPE));
-        Document capacityDocument = (Document) document.get(MongoFields.TRANSPORT_CAPACITY);
-        double capacityValue = capacityDocument.getDouble(MongoFields.CAPACITY_VALUE);
-        String capacityQuantityUnitValue = capacityDocument.getString(MongoFields.CAPACITY_QUANTITY_UNIT);
-        QuantityUnit capacityQuantityUnit = new QuantityUnit(capacityQuantityUnitValue);
-        String capacityTimeUnitString = capacityDocument.getString(MongoFields.CAPACITY_TIME_UNIT);
-        TimeUnit capacityTimeUnit = TimeUnit.fromString(capacityTimeUnitString);
-        Capacity transportCapacity = new Capacity(capacityValue, capacityQuantityUnit, capacityTimeUnit);
-        Document costDocument = (Document) document.get(MongoFields.COST_PER_KILOMETER);
-        double costAmount = costDocument.getDouble(MongoFields.COST_PER_KILOMETER_AMOUNT);
-        TransportationVariableCost costPerKilometer;
-        if (costDocument.containsKey(MongoFields.COST_PER_KILOMETER_CURRENCY)) {
-            String currencyCode = costDocument.getString(MongoFields.COST_PER_KILOMETER_CURRENCY);
-            Currency currency = new Currency(currencyCode);
-            costPerKilometer = new TransportationVariableCost(costAmount, currency);
+        
+        // Read capacity in kilograms with null check
+        VehicleCapacityKilograms capacityKilograms;
+        Document capacityKgDocument = (Document) document.get(MongoFields.CAPACITY_Kilograms);
+        if (capacityKgDocument != null && capacityKgDocument.containsKey(MongoFields.CAPACITY_Kilograms_VALUE)) {
+            double capacityKgValue = capacityKgDocument.getDouble(MongoFields.CAPACITY_Kilograms_VALUE);
+            capacityKilograms = new VehicleCapacityKilograms(capacityKgValue);
         } else {
-            costPerKilometer = new TransportationVariableCost(costAmount);
+            logger.warn("Missing or null capacityKilograms in vehicle document: {}", id);
+            capacityKilograms = new VehicleCapacityKilograms(0.0);
         }
-        Vehicle vehicle = new Vehicle(id, vehicleType, transportCapacity, costPerKilometer);
+        
+        // Read capacity in liters with null check
+        VehicleCapacityLiters CapacityLiters;
+        Document capacityLDocument = (Document) document.get(MongoFields.CAPACITY_liters);
+        if (capacityLDocument != null && capacityLDocument.containsKey(MongoFields.CAPACITY_liters_VALUE)) {
+            double capacityLValue = capacityLDocument.getDouble(MongoFields.CAPACITY_liters_VALUE);
+            CapacityLiters = new VehicleCapacityLiters(capacityLValue);
+        } else {
+            logger.warn("Missing or null capacityLiters in vehicle document: {}", id);
+            CapacityLiters = new VehicleCapacityLiters(0.0);
+        }
+        
+        TransportationVariableCost costPerKilometer;
+        Document costDocument = (Document) document.get(MongoFields.COST_PER_KILOMETER);
+        if (costDocument != null && costDocument.containsKey(MongoFields.COST_PER_KILOMETER_AMOUNT)) {
+            double costAmount = costDocument.getDouble(MongoFields.COST_PER_KILOMETER_AMOUNT);
+            if (costDocument.containsKey(MongoFields.COST_PER_KILOMETER_CURRENCY)) {
+                String currencyCode = costDocument.getString(MongoFields.COST_PER_KILOMETER_CURRENCY);
+                Currency currency = new Currency(currencyCode);
+                costPerKilometer = new TransportationVariableCost(costAmount, currency);
+            } else {
+                costPerKilometer = new TransportationVariableCost(costAmount);
+            }
+        } else {
+            logger.warn("Missing or null costPerKilometer in vehicle document: {}", id);
+            costPerKilometer = new TransportationVariableCost(0.0);
+        }
+        
+        Vehicle vehicle = new Vehicle(id, vehicleType, capacityKilograms, CapacityLiters, costPerKilometer);
         return vehicle;
     }
 }

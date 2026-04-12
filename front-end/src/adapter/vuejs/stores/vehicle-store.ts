@@ -1,10 +1,10 @@
 import { VehicleHttpRepository } from '@/adapter/http/vehicle-http-repository';
 import {
-  CreateVehicleService,
-  DeleteVehicleService,
-  GetVehicleService,
-  ListVehiclesService,
-  UpdateVehicleService
+    CreateVehicleService,
+    DeleteVehicleService,
+    GetVehicleService,
+    ListVehiclesService,
+    UpdateVehicleService
 } from '@/application/service/vehicle';
 import type { Vehicle } from '@/domain/entity/vehicle';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
@@ -95,9 +95,11 @@ export const useVehicleStore = defineStore('Vehicle', {
      *
      * @param page         Optional page number (0-based)
      * @param rowsPerPage  Optional number of items per page
-     * @param sortBy       Optional sort column key ('capacity', 'cost' or 'type')
+     * @param sortBy       Optional sort field: type, vehicleType, capacityKilograms, CapacityLiters, capacityLiters, cost, costPerKilometer, etc.
      * @param sortOrder    Optional sort direction ('asc' or 'desc')
      * @param vehicleType  Optional vehicle type enum name to filter by
+     * 
+     * Note: sortBy values are mapped by backend VehicleFieldMapper to MongoDB field paths
      */
     async getVehicles(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', vehicleType?: string) {
       this.loading = true;
@@ -172,7 +174,8 @@ export const useVehicleStore = defineStore('Vehicle', {
       // Execute the create operation with vehicle properties
       const result = await createService.execute({
         vehicleType: vehicle.getVehicleType(),
-        transportCapacity: vehicle.getTransportCapacity(),
+        capacityKilograms: vehicle.getCapacityKilograms(),
+        capacityLiters: vehicle.getCapacityLiters(),
         costPerKilometer: vehicle.getCostPerKilometer()
       });
       
@@ -213,7 +216,8 @@ export const useVehicleStore = defineStore('Vehicle', {
         vehicleId, 
         updatedFields: {
           vehicleType: vehicle.getVehicleType(),
-          transportCapacity: vehicle.getTransportCapacity(),
+          capacityKilograms: vehicle.getCapacityKilograms(),
+          capacityLiters: vehicle.getCapacityLiters(),
           costPerKilometer: vehicle.getCostPerKilometer()
         }
       });

@@ -1,8 +1,9 @@
 package es.ull.project.adapter.rest.request.vehicle;
 
 import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
 
 /**
  * VehiclePutRequestBody
@@ -26,10 +27,16 @@ public class VehiclePutRequestBody {
     public VehicleType vehicleType;
 
     /**
-     * Transport capacity of the vehicle.
+     * Transport capacity of the vehicle in kilograms.
      * Required field.
      */
-    public Capacity transportCapacity;
+    public VehicleCapacityKilograms capacityKilograms;
+
+    /**
+     * Transport capacity of the vehicle in liters.
+     * Required field.
+     */
+    public VehicleCapacityLiters CapacityLiters;
 
     /**
      * Cost per kilometer of operation.
@@ -45,9 +52,10 @@ public class VehiclePutRequestBody {
     @Override
     public String toString() {
         return String.format(
-                "VehiclePutRequestBody={vehicleType=%s, transportCapacity=%s, costPerKilometer=%s}",
+                "VehiclePutRequestBody={vehicleType=%s, capacityKilograms=%s, CapacityLiters=%s, costPerKilometer=%s}",
                 this.vehicleType,
-                this.transportCapacity,
+                this.capacityKilograms,
+                this.CapacityLiters,
                 this.costPerKilometer);
     }
 }

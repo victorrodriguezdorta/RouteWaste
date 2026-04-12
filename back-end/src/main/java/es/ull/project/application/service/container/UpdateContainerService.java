@@ -8,7 +8,7 @@ import es.ull.project.application.usecase.container.UpdateContainerUseCase;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.demand.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
 

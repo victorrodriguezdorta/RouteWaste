@@ -1,11 +1,12 @@
 package es.ull.project.domain.entity;
 
-import es.ull.project.domain.enumerate.VehicleType;
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
-
 import java.util.Objects;
 import java.util.UUID;
+
+import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 
 /**
  * Vehicle
@@ -17,7 +18,8 @@ public class Vehicle {
 
     public static final String ID_NOT_DEFINED = "Vehicle id is not defined";
     public static final String TYPE_NOT_DEFINED = "Vehicle type is not defined";
-    public static final String CAPACITY_NOT_DEFINED = "Vehicle capacity is not defined";
+    public static final String CAPACITY_Kilograms_NOT_DEFINED = "Vehicle capacity in kilograms is not defined";
+    public static final String CAPACITY_liters_NOT_DEFINED = "Vehicle capacity in liters is not defined";
     public static final String COST_NOT_DEFINED = "Transportation variable cost is not defined";
 
     /**
@@ -34,10 +36,16 @@ public class Vehicle {
     private VehicleType vehicleType;
 
     /**
-     * Transport capacity of the vehicle.
+     * Transport capacity of the vehicle in kilograms.
      * It is a required attribute.
      */
-    private Capacity transportCapacity;
+    private VehicleCapacityKilograms capacityKilograms;
+
+    /**
+     * Transport capacity of the vehicle in liters.
+     * It is a required attribute.
+     */
+    private VehicleCapacityLiters CapacityLiters;
 
     /**
      * Cost per kilometer of operation.
@@ -49,19 +57,23 @@ public class Vehicle {
      * Creates a new Vehicle with the specified parameters.
      *
      * @param vehicleType       the type of vehicle
-     * @param transportCapacity the transport capacity of the vehicle
+     * @param capacityKilograms the capacity of the vehicle in kilograms
+     * @param CapacityLiters    the capacity of the vehicle in liters
      * @param costPerKilometer  the cost per kilometer of operation
      */
     public Vehicle(
             VehicleType vehicleType,
-            Capacity transportCapacity,
+            VehicleCapacityKilograms capacityKilograms,
+            VehicleCapacityLiters CapacityLiters,
             TransportationVariableCost costPerKilometer) {
         validateVehicleType(vehicleType);
-        validateCapacity(transportCapacity);
+        validateCapacityKilograms(capacityKilograms);
+        validateCapacityLiters(CapacityLiters);
         validateCost(costPerKilometer);
         this.id = UUID.randomUUID();
         this.vehicleType = vehicleType;
-        this.transportCapacity = transportCapacity;
+        this.capacityKilograms = capacityKilograms;
+        this.CapacityLiters = CapacityLiters;
         this.costPerKilometer = costPerKilometer;
     }
 
@@ -74,7 +86,8 @@ public class Vehicle {
     public Vehicle(Vehicle otherObject) {
         this.id = otherObject.id;
         this.vehicleType = otherObject.vehicleType;
-        this.transportCapacity = otherObject.transportCapacity;
+        this.capacityKilograms = otherObject.capacityKilograms;
+        this.CapacityLiters = otherObject.CapacityLiters;
         this.costPerKilometer = otherObject.costPerKilometer;
     }
 
@@ -84,19 +97,23 @@ public class Vehicle {
      *
      * @param id                the vehicle identifier
      * @param vehicleType       the type of vehicle
-     * @param transportCapacity the transport capacity
+     * @param capacityKilograms the capacity in kilograms
+     * @param CapacityLiters    the capacity in liters
      * @param costPerKilometer  the cost per kilometer
      */
     public Vehicle(UUID id,
             VehicleType vehicleType,
-            Capacity transportCapacity,
+            VehicleCapacityKilograms capacityKilograms,
+            VehicleCapacityLiters CapacityLiters,
             TransportationVariableCost costPerKilometer) {
         validateVehicleType(vehicleType);
-        validateCapacity(transportCapacity);
+        validateCapacityKilograms(capacityKilograms);
+        validateCapacityLiters(CapacityLiters);
         validateCost(costPerKilometer);
         this.id = id;
         this.vehicleType = vehicleType;
-        this.transportCapacity = transportCapacity;
+        this.capacityKilograms = capacityKilograms;
+        this.CapacityLiters = CapacityLiters;
         this.costPerKilometer = costPerKilometer;
     }
 
@@ -113,14 +130,26 @@ public class Vehicle {
     }
 
     /**
-     * Validates that the capacity is not null.
+     * Validates that the capacity in Kilograms is not null.
      *
      * @param capacity the capacity to validate
      * @throws IllegalArgumentException if the capacity is null
      */
-    private void validateCapacity(Capacity capacity) {
+    private void validateCapacityKilograms(VehicleCapacityKilograms capacity) {
         if (capacity == null) {
-            throw new IllegalArgumentException(CAPACITY_NOT_DEFINED);
+            throw new IllegalArgumentException(CAPACITY_Kilograms_NOT_DEFINED);
+        }
+    }
+
+    /**
+     * Validates that the capacity in liters is not null.
+     *
+     * @param capacity the capacity to validate
+     * @throws IllegalArgumentException if the capacity is null
+     */
+    private void validateCapacityLiters(VehicleCapacityLiters capacity) {
+        if (capacity == null) {
+            throw new IllegalArgumentException(CAPACITY_liters_NOT_DEFINED);
         }
     }
 
@@ -165,22 +194,41 @@ public class Vehicle {
     }
 
     /**
-     * Returns the transport capacity.
+     * Returns the transport capacity in kilograms.
      *
-     * @return the transport capacity of the vehicle
+     * @return the transport capacity in kilograms
      */
-    public Capacity getTransportCapacity() {
-        return this.transportCapacity;
+    public VehicleCapacityKilograms getCapacityKilograms() {
+        return this.capacityKilograms;
     }
 
     /**
-     * Updates the transport capacity.
+     * Updates the transport capacity in kilograms.
      *
-     * @param capacity the new transport capacity
+     * @param capacity the new transport capacity in kilograms
      */
-    public void updateTransportCapacity(Capacity capacity) {
-        validateCapacity(capacity);
-        this.transportCapacity = capacity;
+    public void updateCapacityKilograms(VehicleCapacityKilograms capacity) {
+        validateCapacityKilograms(capacity);
+        this.capacityKilograms = capacity;
+    }
+
+    /**
+     * Returns the transport capacity in liters.
+     *
+     * @return the transport capacity in liters
+     */
+    public VehicleCapacityLiters getCapacityLiters() {
+        return this.CapacityLiters;
+    }
+
+    /**
+     * Updates the transport capacity in liters.
+     *
+     * @param capacity the new transport capacity in liters
+     */
+    public void updateCapacityLiters(VehicleCapacityLiters capacity) {
+        validateCapacityLiters(capacity);
+        this.CapacityLiters = capacity;
     }
 
     /**
@@ -238,10 +286,11 @@ public class Vehicle {
     @Override
     public String toString() {
         return String.format(
-                "Vehicle={id=%s, type=%s, capacity=%s, costPerKm=%s}",
+                "Vehicle={id=%s, type=%s, capacityKilograms=%s, CapacityLiters=%s, costPerKm=%s}",
                 this.id,
                 this.vehicleType,
-                this.transportCapacity,
+                this.capacityKilograms,
+                this.CapacityLiters,
                 this.costPerKilometer);
     }
 }

@@ -115,7 +115,8 @@
       "table": {
         "headers": {
           "type": "Vehicle Type",
-          "capacity": "Capacity",
+          "capacityKilograms": "Capacity (kg)",
+          "capacityLiters": "Capacity (L)",
           "cost": "Cost per Km",
           "actions": "Actions"
         },

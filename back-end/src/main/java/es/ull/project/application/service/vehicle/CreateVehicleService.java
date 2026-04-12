@@ -4,8 +4,9 @@ import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
 
 /**
  * Service responsible for creating new vehicles in the system.
@@ -29,13 +30,14 @@ public class CreateVehicleService implements CreateVehicleUseCase {
      * Creates a new vehicle with the specified parameters.
      *
      * @param vehicleType the type of vehicle to create
-     * @param transportCapacity the transport capacity of the vehicle
+     * @param capacityKilograms the transport capacity in kilograms
+     * @param CapacityLiters the transport capacity in liters
      * @param costPerKilometer the transportation cost per kilometer
      * @return the newly created and persisted vehicle
      */
     @Override
-    public Vehicle create(VehicleType vehicleType, Capacity transportCapacity, TransportationVariableCost costPerKilometer) {
-        Vehicle newVehicle = new Vehicle(vehicleType, transportCapacity, costPerKilometer);
+    public Vehicle create(VehicleType vehicleType, VehicleCapacityKilograms capacityKilograms, VehicleCapacityLiters CapacityLiters, TransportationVariableCost costPerKilometer) {
+        Vehicle newVehicle = new Vehicle(vehicleType, capacityKilograms, CapacityLiters, costPerKilometer);
         Vehicle saved = this.repository.save(newVehicle);
         return saved;
     }

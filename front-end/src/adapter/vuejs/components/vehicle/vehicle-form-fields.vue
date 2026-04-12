@@ -1,6 +1,6 @@
 <!--
   VehicleFormFields.vue
-  Reusable component that encapsulates the 6 vehicle-specific form fields.
+  Reusable component that encapsulates the vehicle-specific form fields.
   Used in AddVehicle, EditVehicle, and ShowVehicle views.
   Supports both editable and read-only modes.
   Uses InputTooltip consistently for all form fields from ull-tfg-vue.
@@ -38,74 +38,48 @@
       </v-col>
     </v-row>
 
-    <!-- Transport capacity (value and quantity unit) -->
+    <!-- Capacity in kilograms -->
     <v-row>
       <v-col cols="12" sm="6">
         <InputTooltip
-          :data="vehicle.capacityValue.toString()"
+          :data="vehicle.capacityKilograms.toString()"
           input-type="text"
-          :text="t('vehicle.add.fields.capacityValue')"
-          :tooltip="t('vehicle.add.fields.capacityValue')"
+          :text="t('vehicle.add.fields.capacityKilograms')"
+          :tooltip="t('vehicle.add.fields.capacityKilograms')"
           counter="10"
           :rules="[
             (value: string) => validateMaxDecimals(value, 2),
             (value: string) =>
-              VehicleAdd.externalValidateCapacityValue(Number(value)),
+              VehicleAdd.externalValidateCapacityKilograms(Number(value)),
           ]"
           :required="!readonly"
           :readonly="readonly"
           :disabled="readonly"
-          @updateData="(v) => updateCapacityValue(Number(v) || 0)"
+          @updateData="(v) => updateCapacityKilograms(Number(v) || 0)"
         />
       </v-col>
       <v-col cols="12" sm="6">
         <InputTooltip
-          :data="vehicle.capacityQuantityUnit"
+          :data="vehicle.capacityLiters.toString()"
           input-type="text"
-          :text="t('vehicle.add.fields.capacityUnit')"
-          :tooltip="t('vehicle.add.fields.capacityUnit')"
-          counter="50"
+          :text="t('vehicle.add.fields.capacityLiters')"
+          :tooltip="t('vehicle.add.fields.capacityLiters')"
+          counter="10"
           :rules="[
+            (value: string) => validateMaxDecimals(value, 2),
             (value: string) =>
-              VehicleAdd.externalValidateCapacityQuantityUnit(value),
+              VehicleAdd.externalValidateCapacityLiters(Number(value)),
           ]"
           :required="!readonly"
           :readonly="readonly"
           :disabled="readonly"
-          @updateData="updateCapacityQuantityUnit"
+          @updateData="(v) => updateCapacityLiters(Number(v) || 0)"
         />
       </v-col>
     </v-row>
 
-    <!-- Capacity time unit and cost per kilometer -->
+    <!-- Cost per kilometer and currency -->
     <v-row>
-      <v-col cols="12" sm="6">
-        <v-select
-          v-if="!readonly"
-          :model-value="vehicle.capacityTimeUnit"
-          :items="timeUnitOptions"
-          item-title="title"
-          item-value="value"
-          :rules="[
-            (value: string) =>
-              VehicleAdd.externalValidateCapacityTimeUnit(value),
-          ]"
-          :label="t('vehicle.add.fields.timeUnit')"
-          color="primary"
-          prepend-icon="mdi-clock-outline"
-          required
-          @update:model-value="updateCapacityTimeUnit"
-        ></v-select>
-        <v-text-field
-          v-else
-          :model-value="translatedTimeUnit"
-          :label="t('vehicle.add.fields.timeUnit')"
-          color="primary"
-          prepend-icon="mdi-clock-outline"
-          readonly
-          disabled
-        ></v-text-field>
-      </v-col>
       <v-col cols="12" sm="6">
         <InputTooltip
           :data="vehicle.costPerKilometer.toString()"
@@ -123,10 +97,6 @@
           @updateData="(v) => updateCostPerKilometer(Number(v) || 0)"
         />
       </v-col>
-    </v-row>
-
-    <!-- Currency code -->
-    <v-row>
       <v-col cols="12" sm="6">
         <InputTooltip
           :data="vehicle.currencyCode"
@@ -152,7 +122,7 @@
 /**
  * VehicleFormFields Component
  * 
- * Encapsulates the 6 reusable vehicle-specific form fields.
+ * Encapsulates the vehicle-specific form fields.
  * Provides a single component that can be used in Add, Edit, and Show views.
  * Supports read-only mode for displaying vehicle details.
  * 
@@ -163,7 +133,6 @@
 import { InputTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { timeUnitToOptions } from '../../../../domain/enumerate/time-unit';
 import { VehicleType, vehicleTypeToOptions } from '../../../../domain/enumerate/vehicle-type';
 import { VehicleAdd } from '../../dto/vehicle/vehicle-add';
 
@@ -193,24 +162,11 @@ const emit = defineEmits<{
 const vehicleTypeOptions = computed(() => vehicleTypeToOptions(t));
 
 /**
- * Options for the time unit selector (derived from domain)
- */
-const timeUnitOptions = computed(() => timeUnitToOptions(t));
-
-/**
  * Translated vehicle type for read-only display
  */
 const translatedVehicleType = computed(() => {
   if (!props.vehicle.vehicleType) return '';
   return t(`vehicle.add.vehicleTypes.${props.vehicle.vehicleType}`);
-});
-
-/**
- * Translated time unit for read-only display
- */
-const translatedTimeUnit = computed(() => {
-  if (!props.vehicle.capacityTimeUnit) return '';
-  return t(`common.timeUnits.${props.vehicle.capacityTimeUnit}`);
 });
 
 /**
@@ -223,29 +179,20 @@ const updateVehicleType = (value: VehicleType) => {
 };
 
 /**
- * Update capacity value and emit change event
- * @param value - New capacity value as number
+ * Update capacity in kilograms and emit change event
+ * @param value - New capacity in kilograms as number
  */
-const updateCapacityValue = (value: number) => {
-  const updated = { ...props.vehicle, capacityValue: value };
+const updateCapacityKilograms = (value: number) => {
+  const updated = { ...props.vehicle, capacityKilograms: value };
   emit('update:vehicle', updated);
 };
 
 /**
- * Update capacity quantity unit and emit change event
- * @param value - New quantity unit as string
+ * Update capacity in liters and emit change event
+ * @param value - New capacity in liters as number
  */
-const updateCapacityQuantityUnit = (value: string) => {
-  const updated = { ...props.vehicle, capacityQuantityUnit: value };
-  emit('update:vehicle', updated);
-};
-
-/**
- * Update capacity time unit and emit change event
- * @param value - New time unit as string
- */
-const updateCapacityTimeUnit = (value: string) => {
-  const updated = { ...props.vehicle, capacityTimeUnit: value };
+const updateCapacityLiters = (value: number) => {
+  const updated = { ...props.vehicle, capacityLiters: value };
   emit('update:vehicle', updated);
 };
 

@@ -74,11 +74,11 @@
  */
 
 import { ButtonTooltip, LoaderDialog } from '@ull-tfg/ull-tfg-vue';
-import CrudLayout from '../../components/common/CrudLayout.vue';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import CrudLayout from '../../components/common/CrudLayout.vue';
 import VehicleFormFields from '../../components/vehicle/vehicle-form-fields.vue';
 import { VehicleEdit } from '../../dto/vehicle/vehicle-edit';
 import router from '../../router/router';
@@ -129,9 +129,8 @@ const setVehicle = () => {
     editVehicle.value = new VehicleEdit(
       vehicle.value.getId().toString(),
       vehicle.value.getVehicleType(),
-      vehicle.value.getTransportCapacity().getValue(),
-      vehicle.value.getTransportCapacity().getQuantityUnit().getValue(),
-      vehicle.value.getTransportCapacity().getTimeUnit(),
+      vehicle.value.getCapacityKilograms().getKilograms(),
+      vehicle.value.getCapacityLiters().getLiters(),
       vehicle.value.getCostPerKilometer().getAmount(),
       vehicle.value.getCostPerKilometer().getCurrency().getCode()
     );

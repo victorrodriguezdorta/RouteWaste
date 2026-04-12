@@ -1,6 +1,8 @@
 package es.ull.project.domain.valueobject.demand;
 
 import es.ull.project.domain.enumerate.TimeUnit;
+import es.ull.project.domain.valueobject.capacity.Capacity;
+
 import java.util.Objects;
 
 /**

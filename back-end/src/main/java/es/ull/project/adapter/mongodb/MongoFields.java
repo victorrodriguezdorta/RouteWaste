@@ -55,7 +55,10 @@ public class MongoFields {
      * Vehicle fields.
      */
     public static final String VEHICLE_TYPE = "vehicleType";
-    public static final String TRANSPORT_CAPACITY = "transportCapacity";
+    public static final String CAPACITY_Kilograms = "capacityKilograms";
+    public static final String CAPACITY_Kilograms_VALUE = "Kilograms";
+    public static final String CAPACITY_liters = "CapacityLiters";
+    public static final String CAPACITY_liters_VALUE = "liters";
     public static final String COST_PER_KILOMETER = "costPerKilometer";
     public static final String COST_PER_KILOMETER_AMOUNT = "amount";
     public static final String COST_PER_KILOMETER_CURRENCY = "currency";

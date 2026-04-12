@@ -1,23 +1,9 @@
 package es.ull.project.adapter.rest.controller;
 
-import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
-import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
-import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
-import es.ull.project.adapter.rest.response.vehicle.VehiclePageResponseBody;
-import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
-import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
-import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
-import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
-import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
-import es.ull.project.domain.entity.Vehicle;
-import es.ull.project.domain.enumerate.VehicleType;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +20,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import es.ull.project.adapter.mongodb.mapper.VehicleFieldMapper;
+import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
+import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
+import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
+import es.ull.project.adapter.rest.response.vehicle.VehiclePageResponseBody;
+import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
+import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 /**
  * VehicleController
@@ -52,15 +55,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class VehicleController {
 
     private static final int ZERO = 0;
-
-    private static final String SORT_BY_CAPACITY = "capacity";
-    private static final String FIELD_CAPACITY = "transportCapacity.value";
-
-    private static final String SORT_BY_COST = "cost";
-    private static final String FIELD_COST = "costPerKilometer.amount";
-
-    private static final String SORT_BY_TYPE = "type";
-    private static final String FIELD_TYPE = "vehicleType";
 
     /**
      * Use case for reading vehicle data.
@@ -97,7 +91,7 @@ public class VehicleController {
      *
      * @param page        page index (0-based, default 0)
      * @param size        page size (default 10)
-     * @param sortBy      optional column to sort by: "capacity", "cost" or "type"
+     * @param sortBy      optional column to sort by: capacityKilograms, CapacityLiters, cost, type, etc.
      * @param sortOrder   sort direction: "asc" (default) or "desc"
      * @param vehicleType optional vehicle type filter (enum name, e.g. "COLLECTION_TRUCK")
      * @return paginated list of vehicles or 400 if parameters are invalid
@@ -111,25 +105,24 @@ public class VehicleController {
     public ResponseEntity<VehiclePageResponseBody> getVehicles(
             @Parameter(description = "Zero-based page index") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Number of elements per page") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Field to sort by: capacity, cost, type") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Field to sort by (e.g., vehicleType, capacityKilograms, CapacityLiters, cost, etc.)") @RequestParam(required = false) String sortBy,
             @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder,
             @Parameter(description = "Filter by vehicle type") @RequestParam(required = false) String vehicleType) {
+        
+        // Validate pagination parameters
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        String mongoSortField = switch (sortBy != null ? sortBy : "") {
-            case SORT_BY_CAPACITY -> FIELD_CAPACITY;
-            case SORT_BY_COST     -> FIELD_COST;
-            case SORT_BY_TYPE     -> FIELD_TYPE;
-            default               -> null;
-        };
-        Sort sort = Sort.unsorted();
-        if (mongoSortField != null) {
-            Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder)
-                    ? Sort.Direction.DESC
-                    : Sort.Direction.ASC;
-            sort = Sort.by(direction, mongoSortField);
+
+        // Validate sort field if provided
+        if (sortBy != null && !sortBy.isBlank() && !VehicleFieldMapper.isValidField(sortBy)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+        // Build sort configuration
+        Sort sort = buildSort(sortBy, sortOrder);
+
+        // Validate and filter by vehicle type if provided
         VehicleType vehicleTypeFilter = null;
         if (vehicleType != null && !vehicleType.isBlank()) {
             try {
@@ -138,8 +131,47 @@ public class VehicleController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+
+        // Fetch paginated vehicles with sorting and filtering
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Vehicle> vehiclePage = this.readVehicleUseCase.fetchAll(pageable, vehicleTypeFilter);
+
+        // Build and return response
+        return buildSuccessResponse(vehiclePage);
+    }
+
+    /**
+     * Builds a Sort object from sortBy and sortOrder parameters.
+     * Uses the field mapper to translate public field names to MongoDB paths.
+     *
+     * @param sortBy the field name to sort by
+     * @param sortOrder the sort direction (asc/desc)
+     * @return Sort object, unsorted if sortBy is null
+     */
+    private Sort buildSort(String sortBy, String sortOrder) {
+        if (sortBy == null || sortBy.isBlank()) {
+            return Sort.unsorted();
+        }
+
+        String mongoField = VehicleFieldMapper.toMongoField(sortBy);
+        if (mongoField == null) {
+            return Sort.unsorted();
+        }
+
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder) 
+                ? Sort.Direction.DESC 
+                : Sort.Direction.ASC;
+        
+        return Sort.by(direction, mongoField);
+    }
+
+    /**
+     * Builds a successful response from a vehicle page.
+     *
+     * @param vehiclePage the page of vehicles
+     * @return ResponseEntity with vehicle page response body and HTTP 200
+     */
+    private ResponseEntity<VehiclePageResponseBody> buildSuccessResponse(Page<Vehicle> vehiclePage) {
         List<VehicleResponseBody> responseBodies = vehiclePage.getContent().stream()
                 .map(VehicleResponseMapper::toResponseBody)
                 .toList();
@@ -209,7 +241,8 @@ public class VehicleController {
             @Parameter(description = "Vehicle data") @RequestBody VehiclePostRequestBody requestBody) {
         Vehicle createdVehicle = this.createVehicleUseCase.create(
                 requestBody.vehicleType,
-                requestBody.transportCapacity,
+                requestBody.capacityKilograms,
+                requestBody.CapacityLiters,
                 requestBody.costPerKilometer
         );
         VehicleResponseBody responseBody = VehicleResponseMapper.toResponseBody(createdVehicle);
@@ -246,7 +279,8 @@ public class VehicleController {
             Vehicle updatedVehicle = this.updateVehicleUseCase.update(
                     vehicleId,
                     requestBody.vehicleType,
-                    requestBody.transportCapacity,
+                    requestBody.capacityKilograms,
+                    requestBody.CapacityLiters,
                     requestBody.costPerKilometer
             );
             VehicleResponseBody responseBody = VehicleResponseMapper.toResponseBody(updatedVehicle);

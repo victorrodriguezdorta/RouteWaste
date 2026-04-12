@@ -1,18 +1,19 @@
 package es.ull.project.adapter.rest.deserialization.vehicle;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
-import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
-import java.io.IOException;
 
 /**
  * VehiclePutRequestBodyDeserializer
@@ -23,8 +24,9 @@ import java.io.IOException;
  * primitive JSON fields.
  * 
  * The deserializer validates each attribute and provides meaningful error messages
- * when validation fails. It handles nested value objects (Capacity, TransportationVariableCost)
- * by extracting their constituent parts from the JSON structure.
+ * when validation fails. It handles nested value objects (VehicleCapacityKilograms, 
+ * VehicleCapacityLiters, TransportationVariableCost) by extracting their constituent 
+ * parts from the JSON structure.
  */
 public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehiclePutRequestBody> {
 
@@ -42,11 +44,13 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
         JsonNode rootNode = parser.getCodec().readTree(parser);
         try {
             VehicleType vehicleType = parseVehicleType(rootNode);
-            Capacity transportCapacity = parseCapacity(rootNode);
+            VehicleCapacityKilograms capacityKilograms = parseCapacityKilograms(rootNode);
+            VehicleCapacityLiters CapacityLiters = parseCapacityLiters(rootNode);
             TransportationVariableCost costPerKilometer = parseCost(rootNode);
             VehiclePutRequestBody requestBody = new VehiclePutRequestBody();
             requestBody.vehicleType = vehicleType;
-            requestBody.transportCapacity = transportCapacity;
+            requestBody.capacityKilograms = capacityKilograms;
+            requestBody.CapacityLiters = CapacityLiters;
             requestBody.costPerKilometer = costPerKilometer;
             return requestBody;
         } catch (Exception e) {
@@ -79,39 +83,64 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
     }
 
     /**
-     * Parses the transportCapacity nested object from JSON.
+     * Parses the capacityKilograms field from JSON.
      * 
      * @param rootNode the root JSON node
-     * @return the parsed Capacity value object
+     * @return the parsed VehicleCapacityKilograms value object
      * @throws IllegalArgumentException if the field is missing or invalid
      */
-    private Capacity parseCapacity(JsonNode rootNode) {
-        if (!rootNode.has(JsonFields.TRANSPORT_CAPACITY)) {
-            throw new IllegalArgumentException("Required field '" + JsonFields.TRANSPORT_CAPACITY + "' is missing");
+    private VehicleCapacityKilograms parseCapacityKilograms(JsonNode rootNode) {
+        if (!rootNode.has("capacityKilograms")) {
+            throw new IllegalArgumentException("Required field 'capacityKilograms' is missing");
         }
-        JsonNode capacityNode = rootNode.get(JsonFields.TRANSPORT_CAPACITY);
-        if (capacityNode.isNull() || !capacityNode.isObject()) {
-            throw new IllegalArgumentException("Field '" + JsonFields.TRANSPORT_CAPACITY + "' must be a non-null object");
+        JsonNode capacityNode = rootNode.get("capacityKilograms");
+        if (capacityNode.isNull()) {
+            throw new IllegalArgumentException("Field 'capacityKilograms' must be a non-null value");
         }
         try {
-            if (!capacityNode.has(JsonFields.CAPACITY_VALUE)) {
-                throw new IllegalArgumentException("Required field '" + JsonFields.CAPACITY_VALUE + "' is missing");
+            Double Kilograms;
+            if (capacityNode.isNumber()) {
+                Kilograms = capacityNode.asDouble();
+            } else if (capacityNode.isObject() && capacityNode.has("Kilograms")) {
+                Kilograms = capacityNode.get("Kilograms").asDouble();
+            } else {
+                throw new IllegalArgumentException("Field 'capacityKilograms' must be a number or object with 'Kilograms' field");
             }
-            double value = capacityNode.get(JsonFields.CAPACITY_VALUE).asDouble();
-            if (!capacityNode.has(JsonFields.QUANTITY_UNIT)) {
-                throw new IllegalArgumentException("Required field '" + JsonFields.QUANTITY_UNIT + "' is missing");
-            }
-            String quantityUnitStr = capacityNode.get(JsonFields.QUANTITY_UNIT).asText();
-            QuantityUnit quantityUnit = new QuantityUnit(quantityUnitStr);
-            if (!capacityNode.has(JsonFields.TIME_UNIT)) {
-                throw new IllegalArgumentException("Required field '" + JsonFields.TIME_UNIT + "' is missing");
-            }
-            String timeUnitStr = capacityNode.get(JsonFields.TIME_UNIT).asText();
-            TimeUnit timeUnit = TimeUnit.fromString(timeUnitStr);
-            return new Capacity(value, quantityUnit, timeUnit);
+            return new VehicleCapacityKilograms(Kilograms);
         } catch (Exception e) {
             throw new IllegalArgumentException(
-                "Invalid value for field '" + JsonFields.TRANSPORT_CAPACITY + "': " + e.getMessage(), e);
+                "Invalid value for field 'capacityKilograms': " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Parses the CapacityLiters field from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @return the parsed VehicleCapacityLiters value object
+     * @throws IllegalArgumentException if the field is missing or invalid
+     */
+    private VehicleCapacityLiters parseCapacityLiters(JsonNode rootNode) {
+        if (!rootNode.has("CapacityLiters")) {
+            throw new IllegalArgumentException("Required field 'CapacityLiters' is missing");
+        }
+        JsonNode capacityNode = rootNode.get("CapacityLiters");
+        if (capacityNode.isNull()) {
+            throw new IllegalArgumentException("Field 'CapacityLiters' must be a non-null value");
+        }
+        try {
+            Double liters;
+            if (capacityNode.isNumber()) {
+                liters = capacityNode.asDouble();
+            } else if (capacityNode.isObject() && capacityNode.has("liters")) {
+                liters = capacityNode.get("liters").asDouble();
+            } else {
+                throw new IllegalArgumentException("Field 'CapacityLiters' must be a number or object with 'liters' field");
+            }
+            return new VehicleCapacityLiters(liters);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                "Invalid value for field 'CapacityLiters': " + e.getMessage(), e);
         }
     }
 

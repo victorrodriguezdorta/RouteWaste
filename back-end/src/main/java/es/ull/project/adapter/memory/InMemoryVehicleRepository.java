@@ -1,8 +1,5 @@
 package es.ull.project.adapter.memory;
 
-import es.ull.project.application.repository.VehicleRepository;
-import es.ull.project.domain.entity.Vehicle;
-import es.ull.project.domain.enumerate.VehicleType;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -12,17 +9,23 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.VehicleType;
 
 /**
  * In-memory VehicleRepository for tests and local runs.
  */
 public class InMemoryVehicleRepository implements VehicleRepository {
 
-    private static final String FIELD_CAPACITY = "transportCapacity.value";
+    private static final String FIELD_CAPACITY_KILOGRAMS = "capacityKilograms.Kilograms";
+    private static final String FIELD_CAPACITY_LITERS = "CapacityLiters.liters";
     private static final String FIELD_COST = "costPerKilometer.amount";
     private static final String FIELD_TYPE = "vehicleType";
 
@@ -96,8 +99,10 @@ public class InMemoryVehicleRepository implements VehicleRepository {
             Comparator<Vehicle> comparator = null;
             for (Sort.Order order : pageable.getSort()) {
                 Comparator<Vehicle> fieldComparator = switch (order.getProperty()) {
-                    case FIELD_CAPACITY ->
-                            Comparator.comparingDouble(v -> v.getTransportCapacity().getValue());
+                    case FIELD_CAPACITY_KILOGRAMS ->
+                            Comparator.comparingDouble(v -> v.getCapacityKilograms().getKilograms());
+                    case FIELD_CAPACITY_LITERS ->
+                            Comparator.comparingDouble(v -> v.getCapacityLiters().getLiters());
                     case FIELD_COST ->
                             Comparator.comparingDouble(v -> v.getCostPerKilometer().getAmount());
                     case FIELD_TYPE ->

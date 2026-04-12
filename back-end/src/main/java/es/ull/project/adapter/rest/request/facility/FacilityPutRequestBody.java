@@ -2,8 +2,8 @@ package es.ull.project.adapter.rest.request.facility;
 
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.valueobject.capacity.Capacity;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.location.Location;
 
 /**

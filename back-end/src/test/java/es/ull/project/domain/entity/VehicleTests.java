@@ -9,17 +9,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
 
 class VehicleTests {
 
 	// Helpers
-	private static Capacity randomCapacity() {
-		return new Capacity(5000.0, new QuantityUnit("kg"), TimeUnit.DAY);
+	private static VehicleCapacityKilograms randomCapacityKilograms() {
+		return new VehicleCapacityKilograms(5000.0);
+	}
+
+	private static VehicleCapacityLiters randomCapacityLiters() {
+		return new VehicleCapacityLiters(8000.0);
 	}
 
 	private static TransportationVariableCost randomCost() {
@@ -27,7 +30,7 @@ class VehicleTests {
 	}
 
 	private static Vehicle randomVehicle() {
-		return new Vehicle(VehicleType.random(), randomCapacity(), randomCost());
+		return new Vehicle(VehicleType.random(), randomCapacityKilograms(), randomCapacityLiters(), randomCost());
 	}
 
 	// ========== Constructors ==========
@@ -35,13 +38,15 @@ class VehicleTests {
 	@Test
 	void constructor_1_right() {
 		VehicleType type = VehicleType.random();
-		Capacity capacity = randomCapacity();
+		VehicleCapacityKilograms capacityKg = randomCapacityKilograms();
+		VehicleCapacityLiters capacityL = randomCapacityLiters();
 		TransportationVariableCost cost = randomCost();
 
-		Vehicle v = new Vehicle(type, capacity, cost);
+		Vehicle v = new Vehicle(type, capacityKg, capacityL, cost);
 
 		assertEquals(type, v.getVehicleType());
-		assertEquals(capacity, v.getTransportCapacity());
+		assertEquals(capacityKg, v.getCapacityKilograms());
+		assertEquals(capacityL, v.getCapacityLiters());
 		assertEquals(cost, v.getCostPerKilometer());
 		assertNotNull(v.getId());
 	}
@@ -49,38 +54,55 @@ class VehicleTests {
 	@Test
 	void constructor_1_type_undefined() {
 		VehicleType type = null;
-		Capacity capacity = randomCapacity();
+		VehicleCapacityKilograms capacityKg = randomCapacityKilograms();
+		VehicleCapacityLiters capacityL = randomCapacityLiters();
 		TransportationVariableCost cost = randomCost();
 
 		IllegalArgumentException exception = assertThrows(
 			IllegalArgumentException.class,
-			() -> new Vehicle(type, capacity, cost)
+			() -> new Vehicle(type, capacityKg, capacityL, cost)
 		);
 		assertEquals(Vehicle.TYPE_NOT_DEFINED, exception.getMessage());
 	}
 
 	@Test
-	void constructor_1_capacity_undefined() {
+	void constructor_1_capacity_Kilograms_undefined() {
 		VehicleType type = VehicleType.random();
-		Capacity capacity = null;
+		VehicleCapacityKilograms capacityKg = null;
+		VehicleCapacityLiters capacityL = randomCapacityLiters();
 		TransportationVariableCost cost = randomCost();
 
 		IllegalArgumentException exception = assertThrows(
 			IllegalArgumentException.class,
-			() -> new Vehicle(type, capacity, cost)
+			() -> new Vehicle(type, capacityKg, capacityL, cost)
 		);
-		assertEquals(Vehicle.CAPACITY_NOT_DEFINED, exception.getMessage());
+		assertEquals(Vehicle.CAPACITY_Kilograms_NOT_DEFINED, exception.getMessage());
+	}
+
+	@Test
+	void constructor_1_capacity_liters_undefined() {
+		VehicleType type = VehicleType.random();
+		VehicleCapacityKilograms capacityKg = randomCapacityKilograms();
+		VehicleCapacityLiters capacityL = null;
+		TransportationVariableCost cost = randomCost();
+
+		IllegalArgumentException exception = assertThrows(
+			IllegalArgumentException.class,
+			() -> new Vehicle(type, capacityKg, capacityL, cost)
+		);
+		assertEquals(Vehicle.CAPACITY_liters_NOT_DEFINED, exception.getMessage());
 	}
 
 	@Test
 	void constructor_1_cost_undefined() {
 		VehicleType type = VehicleType.random();
-		Capacity capacity = randomCapacity();
+		VehicleCapacityKilograms capacityKg = randomCapacityKilograms();
+		VehicleCapacityLiters capacityL = randomCapacityLiters();
 		TransportationVariableCost cost = null;
 
 		IllegalArgumentException exception = assertThrows(
 			IllegalArgumentException.class,
-			() -> new Vehicle(type, capacity, cost)
+			() -> new Vehicle(type, capacityKg, capacityL, cost)
 		);
 		assertEquals(Vehicle.COST_NOT_DEFINED, exception.getMessage());
 	}
@@ -128,21 +150,39 @@ class VehicleTests {
 	}
 
 	@Test
-	void updateTransportCapacity_valid() {
+	void updateCapacityKilograms_valid() {
 		Vehicle v = randomVehicle();
-		Capacity newCap = new Capacity(6000.0, new QuantityUnit("kg"), TimeUnit.DAY);
-		v.updateTransportCapacity(newCap);
-		assertEquals(newCap, v.getTransportCapacity());
+		VehicleCapacityKilograms newCapKg = new VehicleCapacityKilograms(6000.0);
+		v.updateCapacityKilograms(newCapKg);
+		assertEquals(newCapKg, v.getCapacityKilograms());
 	}
 
 	@Test
-	void updateTransportCapacity_undefined() {
+	void updateCapacityKilograms_undefined() {
 		Vehicle v = randomVehicle();
 		IllegalArgumentException exception = assertThrows(
 			IllegalArgumentException.class,
-			() -> v.updateTransportCapacity(null)
+			() -> v.updateCapacityKilograms(null)
 		);
-		assertEquals(Vehicle.CAPACITY_NOT_DEFINED, exception.getMessage());
+		assertEquals(Vehicle.CAPACITY_Kilograms_NOT_DEFINED, exception.getMessage());
+	}
+
+	@Test
+	void updateCapacityLiters_valid() {
+		Vehicle v = randomVehicle();
+		VehicleCapacityLiters newCapL = new VehicleCapacityLiters(10000.0);
+		v.updateCapacityLiters(newCapL);
+		assertEquals(newCapL, v.getCapacityLiters());
+	}
+
+	@Test
+	void updateCapacityLiters_undefined() {
+		Vehicle v = randomVehicle();
+		IllegalArgumentException exception = assertThrows(
+			IllegalArgumentException.class,
+			() -> v.updateCapacityLiters(null)
+		);
+		assertEquals(Vehicle.CAPACITY_liters_NOT_DEFINED, exception.getMessage());
 	}
 
 	@Test
@@ -168,7 +208,7 @@ class VehicleTests {
 	@Test
 	void toStringMethod() {
 		Vehicle v = randomVehicle();
-		String expected = String.format("Vehicle={id=%s, type=%s, capacity=%s, costPerKm=%s}", v.getId(), v.getVehicleType(), v.getTransportCapacity(), v.getCostPerKilometer());
+		String expected = String.format("Vehicle={id=%s, type=%s, capacityKilograms=%s, CapacityLiters=%s, costPerKm=%s}", v.getId(), v.getVehicleType(), v.getCapacityKilograms(), v.getCapacityLiters(), v.getCostPerKilometer());
 		assertEquals(expected, v.toString());
 	}
 }

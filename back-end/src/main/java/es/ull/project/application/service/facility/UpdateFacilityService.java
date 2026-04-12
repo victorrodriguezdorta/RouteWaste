@@ -5,8 +5,8 @@ import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.valueobject.capacity.Capacity;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.demand.Capacity;
 import es.ull.project.domain.valueobject.location.Location;
 
 import java.util.NoSuchElementException;

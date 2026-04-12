@@ -38,19 +38,19 @@ GET /containers/?location=Madrid
 // 3️⃣ EJEMPLOS CON RANGOS (CAPACIDAD Y DEMANDA)
 // ============================================================
 
-// Contenedores con capacidad MÍNIMA de 500 litros
+// Contenedores con capacidad MÍNIMA de 500 liters
 GET /containers/?minCapacity=500
 
-// Contenedores con capacidad MÁXIMA de 1000 litros
+// Contenedores con capacidad MÁXIMA de 1000 liters
 GET /containers/?maxCapacity=1000
 
-// Contenedores con capacidad ENTRE 500 y 1000 litros
+// Contenedores con capacidad ENTRE 500 y 1000 liters
 GET /containers/?minCapacity=500&maxCapacity=1000
 
-// Contenedores con demanda diaria MÍNIMA de 100 litros/día
+// Contenedores con demanda diaria MÍNIMA de 100 liters/día
 GET /containers/?minDemand=100
 
-// Contenedores con demanda ENTRE 100 y 500 litros/día
+// Contenedores con demanda ENTRE 100 y 500 liters/día
 GET /containers/?minDemand=100&maxDemand=500
 
 // ============================================================
@@ -88,7 +88,7 @@ GET /containers/?page=0&size=25&minCapacity=250&maxCapacity=750&minDemand=50&max
 // - postalAddress
 // - latitude
 // - longitude
-// - capacity (capacidad en litros)
+// - capacity (capacidad en liters)
 // - capacityLiters
 // - demand (demanda diaria)
 // - dailyDemand

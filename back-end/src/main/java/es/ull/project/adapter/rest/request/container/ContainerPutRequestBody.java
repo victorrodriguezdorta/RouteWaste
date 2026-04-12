@@ -2,7 +2,7 @@ package es.ull.project.adapter.rest.request.container;
 
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.demand.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
 

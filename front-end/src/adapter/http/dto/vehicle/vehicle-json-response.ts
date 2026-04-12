@@ -1,29 +1,30 @@
 import { Vehicle } from '@/domain/entity/vehicle';
-import { timeUnitFromString } from '@/domain/enumerate/time-unit';
 import { vehicleTypeFromString } from '@/domain/enumerate/vehicle-type';
+import { VehicleCapacityKilograms } from '@/domain/valueobject/capacity/vehicle-capacity-kilograms';
+import { VehicleCapacityLiters } from '@/domain/valueobject/capacity/vehicle-capacity-liters';
 import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
-import { Capacity } from '@/domain/valueobject/demand/capacity';
-import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
  * VehicleJsonResponse DTO
  *
  * Represents the JSON payload returned by the backend API for a Vehicle resource.
- * This DTO uses primitive types (strings, numbers) for transport and exposes a
- * static `toVehicle` helper to convert the JSON payload into the domain
- * `Vehicle` entity by constructing the required value objects.
+ * This DTO uses primitive types (strings, numbers) and maps the backend's new
+ * capacity structure (capacityKilograms and CapacityLiters) into the domain
+ * `Vehicle` entity with separate capacity value objects.
  */
 export class VehicleJsonResponse {
   /** Resource identifier as string (UUID). */
   id: string;
   /** Optional vehicle type as string (enum key). */
   vehicleType?: string;
-  /** Transport capacity encoded with primitive parts. */
-  transportCapacity: {
-    value: number;
-    quantityUnit: string;
-    timeUnit: string;
+  /** Capacity in kilograms. */
+  capacityKilograms: {
+    Kilograms: number;
+  };
+  /** Capacity in liters. */
+  CapacityLiters: {
+    liters: number;
   };
   /** Cost per kilometer encoded as primitives. */
   costPerKilometer: {
@@ -34,19 +35,22 @@ export class VehicleJsonResponse {
   /**
    * Create a JSON representation instance.
    * @param id resource id
-   * @param transportCapacity capacity pieces (value, quantityUnit, timeUnit)
+   * @param capacityKilograms capacity in kilograms 
+   * @param CapacityLiters capacity in liters
    * @param costPerKilometer cost pieces (amount and optional currency code)
    * @param vehicleType optional vehicle type string
    */
   constructor(
     id: string,
-    transportCapacity: { value: number; quantityUnit: string; timeUnit: string },
+    capacityKilograms: { Kilograms: number },
+    CapacityLiters: { liters: number },
     costPerKilometer: { amount: number; currency?: string },
     vehicleType?: string
   ) {
     this.id = id;
     this.vehicleType = vehicleType;
-    this.transportCapacity = transportCapacity;
+    this.capacityKilograms = capacityKilograms;
+    this.CapacityLiters = CapacityLiters;
     this.costPerKilometer = costPerKilometer;
   }
 
@@ -59,9 +63,8 @@ export class VehicleJsonResponse {
    */
   public static toVehicle(data: VehicleJsonResponse): Vehicle {
     const id = new UllUUID(data.id);
-    const quantityUnit = new QuantityUnit(data.transportCapacity.quantityUnit);
-    const timeUnit = timeUnitFromString(data.transportCapacity.timeUnit);
-    const capacity = new Capacity(data.transportCapacity.value, quantityUnit, timeUnit);
+    const capacityKg = new VehicleCapacityKilograms(data.capacityKilograms.Kilograms);
+    const capacityL = new VehicleCapacityLiters(data.CapacityLiters.liters);
     const cost = new TransportationVariableCost(data.costPerKilometer.amount, data.costPerKilometer.currency);
     const vehicleType = data.vehicleType ? vehicleTypeFromString(data.vehicleType) : undefined;
 
@@ -69,6 +72,6 @@ export class VehicleJsonResponse {
       throw new Error('Vehicle type is required in response');
     }
 
-    return new Vehicle(vehicleType, capacity, cost, id);
+    return new Vehicle(vehicleType, capacityKg, capacityL, cost, id);
   }
 }

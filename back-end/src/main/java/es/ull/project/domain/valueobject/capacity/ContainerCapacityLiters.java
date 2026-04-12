@@ -1,4 +1,4 @@
-package es.ull.project.domain.valueobject.demand;
+package es.ull.project.domain.valueobject.capacity;
 
 import java.util.Objects;
 

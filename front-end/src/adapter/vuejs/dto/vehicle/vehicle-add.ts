@@ -1,13 +1,11 @@
 import { Vehicle } from "@/domain/entity/vehicle";
-import { TimeUnit, timeUnitFromString } from "@/domain/enumerate/time-unit";
 import {
-  VehicleType,
-  vehicleTypeFromString,
+  vehicleTypeFromString
 } from "@/domain/enumerate/vehicle-type";
+import { VehicleCapacityKilograms } from "@/domain/valueobject/capacity/vehicle-capacity-kilograms";
+import { VehicleCapacityLiters } from "@/domain/valueobject/capacity/vehicle-capacity-liters";
 import { Currency } from "@/domain/valueobject/cost/currency";
 import { TransportationVariableCost } from "@/domain/valueobject/cost/transportation-variable-cost";
-import { Capacity } from "@/domain/valueobject/demand/capacity";
-import { QuantityUnit } from "@/domain/valueobject/demand/quantity-unit";
 
 /**
  * VehicleAdd
@@ -27,19 +25,14 @@ export class VehicleAdd {
   public vehicleType: string;
 
   /**
-   * Numeric capacity value (must be >= 0).
+   * Capacity in kilograms (must be >= 0).
    */
-  public capacityValue: number;
+  public capacityKilograms: number;
 
   /**
-   * Unit of measurement for capacity (e.g., 'tons', 'kg').
+   * Capacity in liters (must be >= 0).
    */
-  public capacityQuantityUnit: string;
-
-  /**
-   * Time unit for capacity rate (e.g., DAY, WEEK, MONTH, YEAR).
-   */
-  public capacityTimeUnit: string;
+  public capacityLiters: number;
 
   /**
    * Cost per kilometer amount (must be >= 0).
@@ -55,31 +48,22 @@ export class VehicleAdd {
    * Create a new VehicleAdd DTO.
    *
    * @param vehicleType Type of the vehicle
-   * @param capacityValue Numeric capacity value
-   * @param capacityQuantityUnit Unit of measurement for capacity
-   * @param capacityTimeUnit Time unit for capacity rate
+   * @param capacityKilograms Capacity in kilograms
+   * @param capacityLiters Capacity in liters
    * @param costPerKilometer Cost per kilometer amount
    * @param currencyCode ISO 4217 currency code
    * @throws Error if any required attribute is undefined or null
    */
   constructor(
     vehicleType: string,
-    capacityValue: number,
-    capacityQuantityUnit: string,
-    capacityTimeUnit: string,
+    capacityKilograms: number,
+    capacityLiters: number,
     costPerKilometer: number,
     currencyCode: string,
   ) {
     this.validate<string>(vehicleType, "Vehicle type is not defined");
-    this.validate<number>(capacityValue, "Capacity value is not defined");
-    this.validate<string>(
-      capacityQuantityUnit,
-      "Capacity quantity unit is not defined",
-    );
-    this.validate<string>(
-      capacityTimeUnit,
-      "Capacity time unit is not defined",
-    );
+    this.validate<number>(capacityKilograms, "Capacity in kilograms is not defined");
+    this.validate<number>(capacityLiters, "Capacity in liters is not defined");
     this.validate<number>(
       costPerKilometer,
       "Cost per kilometer is not defined",
@@ -87,9 +71,8 @@ export class VehicleAdd {
     this.validate<string>(currencyCode, "Currency code is not defined");
 
     this.vehicleType = vehicleType;
-    this.capacityValue = capacityValue;
-    this.capacityQuantityUnit = capacityQuantityUnit;
-    this.capacityTimeUnit = capacityTimeUnit;
+    this.capacityKilograms = capacityKilograms;
+    this.capacityLiters = capacityLiters;
     this.costPerKilometer = costPerKilometer;
     this.currencyCode = currencyCode;
   }
@@ -126,15 +109,15 @@ export class VehicleAdd {
   }
 
   /**
-   * Validate capacity value for form fields.
+   * Validate capacity in kilograms for form fields.
    *
-   * @param value Capacity value to validate
+   * @param value Capacity in kilograms to validate
    * @returns true if valid, error message string if invalid
    */
-  static externalValidateCapacityValue(value: number): boolean | string {
+  static externalValidateCapacityKilograms(value: number): boolean | string {
     try {
       if (value < 0) {
-        throw new Error("Capacity value must be greater than or equal to 0");
+        throw new Error("Capacity in kilograms must be greater than or equal to 0");
       }
       return true;
     } catch (error: any) {
@@ -143,29 +126,16 @@ export class VehicleAdd {
   }
 
   /**
-   * Validate capacity quantity unit for form fields.
+   * Validate capacity in liters for form fields.
    *
-   * @param value Quantity unit string to validate
+   * @param value Capacity in liters to validate
    * @returns true if valid, error message string if invalid
    */
-  static externalValidateCapacityQuantityUnit(value: string): boolean | string {
+  static externalValidateCapacityLiters(value: number): boolean | string {
     try {
-      new QuantityUnit(value);
-      return true;
-    } catch (error: any) {
-      return error.message;
-    }
-  }
-
-  /**
-   * Validate capacity time unit for form fields.
-   *
-   * @param value Time unit string to validate
-   * @returns true if valid, error message string if invalid
-   */
-  static externalValidateCapacityTimeUnit(value: string): boolean | string {
-    try {
-      timeUnitFromString(value);
+      if (value < 0) {
+        throw new Error("Capacity in liters must be greater than or equal to 0");
+      }
       return true;
     } catch (error: any) {
       return error.message;
@@ -203,32 +173,18 @@ export class VehicleAdd {
   }
 
   /**
-   * Generate a random VehicleAdd instance for testing purposes.
+   * Create a VehicleAdd DTO from a Vehicle domain entity.
    *
-   * @returns A new VehicleAdd instance with random valid values
+   * @param vehicle Vehicle domain entity
+   * @returns A new VehicleAdd DTO with values from the domain entity
    */
-  static random(): VehicleAdd {
-    const vehicleTypes = [
-      VehicleType.COLLECTION_TRUCK,
-      VehicleType.TRANSFER_TRUCK,
-      VehicleType.SUPPORT_VEHICLE,
-    ];
-    const randomVehicleType = vehicleTypes[
-      Math.floor(Math.random() * vehicleTypes.length)
-    ] as VehicleType;
-    const randomCapacityValue = Math.floor(Math.random() * 100) + 1;
-    const randomQuantityUnit = "tons";
-    const randomTimeUnit = TimeUnit.DAY;
-    const randomCostPerKm = parseFloat((Math.random() * 10).toFixed(2));
-    const randomCurrency = "EUR";
-
+  static fromVehicle(vehicle: Vehicle): VehicleAdd {
     return new VehicleAdd(
-      randomVehicleType as string,
-      randomCapacityValue,
-      randomQuantityUnit,
-      randomTimeUnit,
-      randomCostPerKm,
-      randomCurrency,
+      vehicle.getVehicleType(),
+      vehicle.getCapacityKilograms().getKilograms(),
+      vehicle.getCapacityLiters().getLiters(),
+      vehicle.getCostPerKilometer().getAmount(),
+      vehicle.getCostPerKilometer().getCurrency().getCode()
     );
   }
 
@@ -241,18 +197,30 @@ export class VehicleAdd {
    */
   static toVehicle(vehicleAdd: VehicleAdd): Vehicle {
     const vehicleType = vehicleTypeFromString(vehicleAdd.vehicleType);
-    const quantityUnit = new QuantityUnit(vehicleAdd.capacityQuantityUnit);
-    const timeUnit = timeUnitFromString(vehicleAdd.capacityTimeUnit);
-    const capacity = new Capacity(
-      vehicleAdd.capacityValue,
-      quantityUnit,
-      timeUnit,
-    );
+    const capacityKg = new VehicleCapacityKilograms(vehicleAdd.capacityKilograms);
+    const capacityL = new VehicleCapacityLiters(vehicleAdd.capacityLiters);
     const cost = new TransportationVariableCost(
       vehicleAdd.costPerKilometer,
       vehicleAdd.currencyCode,
     );
 
-    return new Vehicle(vehicleType, capacity, cost);
+    return new Vehicle(vehicleType, capacityKg, capacityL, cost);
+  }
+
+  /**
+   * Convert the DTO to a CreateVehicleCommand for use case layer.
+   *
+   * @returns Command object for creating a vehicle
+   */
+  toCreateVehicleCommand(): any {
+    return {
+      vehicleType: vehicleTypeFromString(this.vehicleType),
+      capacityKilograms: new VehicleCapacityKilograms(this.capacityKilograms),
+      capacityLiters: new VehicleCapacityLiters(this.capacityLiters),
+      costPerKilometer: new TransportationVariableCost(
+        this.costPerKilometer,
+        this.currencyCode
+      ),
+    };
   }
 }

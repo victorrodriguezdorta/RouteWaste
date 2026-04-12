@@ -10,12 +10,10 @@ import type { UpdateVehicleCommand } from '@/application/usecase/vehicle-managem
 export class VehiclePutJsonRequest {
   /** Optional vehicle type string. */
   vehicleType?: string;
-  /** Optional transport capacity parts. */
-  transportCapacity?: {
-    value: number;
-    quantityUnit: string;
-    timeUnit: string;
-  };
+  /** Optional capacity in kilograms. */
+  capacityKilograms?: number;
+  /** Optional capacity in liters. */
+  CapacityLiters?: number;
   /** Optional cost per kilometer parts. */
   costPerKilometer?: {
     amount: number;
@@ -25,16 +23,19 @@ export class VehiclePutJsonRequest {
   /**
    * Create a PUT request DTO instance. All params are optional.
    * @param vehicleType optional vehicle type
-   * @param transportCapacity optional capacity parts
+   * @param capacityKilograms optional capacity in kilograms
+   * @param CapacityLiters optional capacity in liters
    * @param costPerKilometer optional cost parts
    */
   constructor(
     vehicleType?: string,
-    transportCapacity?: { value: number; quantityUnit: string; timeUnit: string },
+    capacityKilograms?: number,
+    CapacityLiters?: number,
     costPerKilometer?: { amount: number; currency?: string }
   ) {
     this.vehicleType = vehicleType;
-    this.transportCapacity = transportCapacity;
+    this.capacityKilograms = capacityKilograms;
+    this.CapacityLiters = CapacityLiters;
     this.costPerKilometer = costPerKilometer;
   }
 
@@ -48,12 +49,11 @@ export class VehiclePutJsonRequest {
     const f = data.updatedFields;
     return new VehiclePutJsonRequest(
       f.vehicleType,
-      f.transportCapacity
-        ? {
-            value: f.transportCapacity.getValue(),
-            quantityUnit: f.transportCapacity.getQuantityUnit().getValue(),
-            timeUnit: f.transportCapacity.getTimeUnit().toString(),
-          }
+      f.capacityKilograms
+        ? f.capacityKilograms.getKilograms()
+        : undefined,
+      f.capacityLiters
+        ? f.capacityLiters.getLiters()
         : undefined,
       f.costPerKilometer
         ? { amount: f.costPerKilometer.getAmount(), currency: f.costPerKilometer.getCurrency().getCode() }

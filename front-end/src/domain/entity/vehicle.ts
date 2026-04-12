@@ -1,6 +1,7 @@
 import { VehicleType } from '@/domain/enumerate/vehicle-type';
+import { VehicleCapacityKilograms } from '@/domain/valueobject/capacity/vehicle-capacity-kilograms';
+import { VehicleCapacityLiters } from '@/domain/valueobject/capacity/vehicle-capacity-liters';
 import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
-import { Capacity } from '@/domain/valueobject/demand/capacity';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -8,33 +9,44 @@ import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
  *
  * Represents a transport unit (aggregate root).
  *
- * Encapsulates vehicle type, transport capacity and per-kilometer
- * cost information used for routing and costing calculations.
+ * Encapsulates vehicle type, two separate capacities (kilograms and liters),
+ * and per-kilometer cost information used for routing and costing calculations.
  */
 export class Vehicle {
   /** The unique identifier of the vehicle. */
   readonly id: UllUUID;
-  /** The type of vehicle (e.g., car, truck, van). */
+  /** The type of vehicle (e.g., COLLECTION_TRUCK, TRANSFER_TRUCK). */
   private vehicleType: VehicleType;
-  /** The capacity of the vehicle for transporting goods. */
-  private transportCapacity: Capacity;
+  /** The capacity of the vehicle in kilograms. */
+  private capacityKilograms: VehicleCapacityKilograms;
+  /** The capacity of the vehicle in liters. */
+  private capacityLiters: VehicleCapacityLiters;
   /** The cost per kilometer for operating this vehicle. */
   private costPerKilometer: TransportationVariableCost;
 
   /**
    * Create a new `Vehicle` aggregate.
    * @param vehicleType vehicle classification
-   * @param transportCapacity capacity value object
+   * @param capacityKilograms capacity in kilograms value object
+   * @param capacityLiters capacity in liters value object
    * @param costPerKilometer transportation variable cost value object
    * @param id optional explicit id (generated when omitted)
    */
-  constructor(vehicleType: VehicleType, transportCapacity: Capacity, costPerKilometer: TransportationVariableCost, id?: UllUUID) {
+  constructor(
+    vehicleType: VehicleType,
+    capacityKilograms: VehicleCapacityKilograms,
+    capacityLiters: VehicleCapacityLiters,
+    costPerKilometer: TransportationVariableCost,
+    id?: UllUUID
+  ) {
     if (!vehicleType) throw new Error('Vehicle type is not defined');
-    if (!transportCapacity) throw new Error('Vehicle capacity is not defined');
+    if (!capacityKilograms) throw new Error('Vehicle capacity in kilograms is not defined');
+    if (!capacityLiters) throw new Error('Vehicle capacity in liters is not defined');
     if (!costPerKilometer) throw new Error('Transportation variable cost is not defined');
     this.id = id ?? UllUUID.random();
     this.vehicleType = vehicleType;
-    this.transportCapacity = transportCapacity;
+    this.capacityKilograms = capacityKilograms;
+    this.capacityLiters = capacityLiters;
     this.costPerKilometer = costPerKilometer;
   }
 
@@ -57,16 +69,28 @@ export class Vehicle {
   updateVehicleType(t: VehicleType): void { if (!t) throw new Error('Vehicle type is not defined'); this.vehicleType = t; }
 
   /**
-   * Return the transport capacity value object.
-   * @returns The transport capacity.
+   * Return the vehicle capacity in kilograms.
+   * @returns The capacity in kilograms.
    */
-  getTransportCapacity(): Capacity { return this.transportCapacity; }
+  getCapacityKilograms(): VehicleCapacityKilograms { return this.capacityKilograms; }
 
   /**
-   * Update transport capacity. Throws when `c` is falsy.
-   * @param c The new transport capacity.
+   * Update vehicle capacity in kilograms. Throws when `c` is falsy.
+   * @param c The new capacity in kilograms.
    */
-  updateTransportCapacity(c: Capacity): void { if (!c) throw new Error('Vehicle capacity is not defined'); this.transportCapacity = c; }
+  updateCapacityKilograms(c: VehicleCapacityKilograms): void { if (!c) throw new Error('Vehicle capacity in kilograms is not defined'); this.capacityKilograms = c; }
+
+  /**
+   * Return the vehicle capacity in liters.
+   * @returns The capacity in liters.
+   */
+  getCapacityLiters(): VehicleCapacityLiters { return this.capacityLiters; }
+
+  /**
+   * Update vehicle capacity in liters. Throws when `c` is falsy.
+   * @param c The new capacity in liters.
+   */
+  updateCapacityLiters(c: VehicleCapacityLiters): void { if (!c) throw new Error('Vehicle capacity in liters is not defined'); this.capacityLiters = c; }
 
   /**
    * Return the per-kilometer cost value object.
@@ -91,5 +115,5 @@ export class Vehicle {
    * Human-readable representation for debugging.
    * @returns A string representation of the vehicle.
    */
-  toString(): string { return `Vehicle={id=${this.id}, type=${this.vehicleType}, capacity=${this.transportCapacity}, costPerKm=${this.costPerKilometer}}`; }
+  toString(): string { return `Vehicle={id=${this.id}, type=${this.vehicleType}, capacityKg=${this.capacityKilograms}, capacityL=${this.capacityLiters}, costPerKm=${this.costPerKilometer}}`; }
 }

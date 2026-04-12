@@ -33,7 +33,7 @@
    - Limpiable: Sí
    - Reacción: Se filtra automáticamente
 
-4. MIN CAPACITY - MAX CAPACITY (Rango de Capacidad en Litros)
+4. MIN CAPACITY - MAX CAPACITY (Rango de Capacidad en liters)
    - Campos numéricos para mínimo y máximo
    - Tipo: Number Input
    - Limpiables: Sí
@@ -54,7 +54,7 @@
  * La tabla permite ordenar por:
  * - wasteType (Tipo de residuo)
  * - location (Ubicación/Dirección postal)
- * - capacityLiters (Capacidad en litros)
+ * - capacityLiters (Capacidad en liters)
  * - demand (Demanda diaria)
  * - serviceZone (Zona de servicio)
  * 
