@@ -27,11 +27,14 @@
  * Uses vue-i18n's locale property to switch between available translations.
  */
 
-import { ref, watch } from 'vue';
+import { inject, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 // Get i18n composable
 const { locale } = useI18n();
+
+// Get Vuetify instance injected globally
+const vuetify = inject('vuetify') as any;
 
 // Current selected locale
 const currentLocale = ref(locale.value);
@@ -48,6 +51,9 @@ const languages = [
  */
 const changeLanguage = (selectedLanguage: string) => {
   locale.value = selectedLanguage;
+  if (vuetify?.locale) {
+    vuetify.locale.current.value = selectedLanguage;
+  }
 };
 
 /**
@@ -55,6 +61,9 @@ const changeLanguage = (selectedLanguage: string) => {
  */
 watch(locale, (newLocale) => {
   currentLocale.value = newLocale;
+  if (vuetify?.locale) {
+    vuetify.locale.current.value = newLocale;
+  }
 });
 </script>
 

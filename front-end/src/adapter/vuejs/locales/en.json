@@ -57,7 +57,9 @@
       "latitudeRange": "Latitude must be between -90 and 90",
       "longitudeRange": "Longitude must be between -180 and 180",
       "capacityNegative": "Capacity cannot be negative",
-      "openingFixedCostNegative": "Opening fixed cost cannot be negative"
+      "openingFixedCostNegative": "Opening fixed cost cannot be negative",
+      "capacityLitersPositive": "Capacity must be positive liters",
+      "dailyDemandLitersPositive": "Daily demand must be positive liters per day"
     }
   },
   "vehicle": {
@@ -148,7 +150,9 @@
         "wasteDemandValue": "Demand Value",
         "wasteDemandQuantityUnit": "Demand Unit (e.g., tons, kg)",
         "wasteDemandTimeUnit": "Time Unit",
-        "serviceZone": "Service Zone"
+        "serviceZone": "Service Zone",
+        "capacityLiters": "Capacity (liters)",
+        "dailyDemandLitersPerDay": "Daily Demand (liters/day)"
       },
       "wasteTypes": {
         "ORGANIC": "Organic",
@@ -203,13 +207,14 @@
       "title": "Containers",
       "addButton": "Add Container",
       "filterByWasteType": "Filter by waste type",
+      "filterByServiceZone": "Filter by service zone",
       "notAssigned": "Not assigned",
       "table": {
         "headers": {
           "wasteType": "Waste Type",
           "location": "Location",
-          "capacity": "Total Capacity",
-          "demand": "Demand",
+          "capacity": "Capacity (L)",
+          "demand": "Demand (L/day)",
           "serviceZone": "Service Zone",
           "actions": "Actions"
         },
