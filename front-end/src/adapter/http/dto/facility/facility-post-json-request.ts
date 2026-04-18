@@ -88,7 +88,7 @@ export class FacilityPostJsonRequest {
       { timeValue: data.unloadingTime.getMinutes() },
       {
         amount: data.openingFixedCost.amount,
-        currency: data.openingFixedCost.currency,
+        currency: data.openingFixedCost.currency.getCode(),
       },
       data.status
     );

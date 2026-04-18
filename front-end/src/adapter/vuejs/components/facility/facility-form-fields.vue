@@ -310,10 +310,6 @@ const updateGisReference = (value: string) => {
   emit('update:facility', { ...props.facility, gisReference: value });
 };
 
-const updateCapacityValue = (value: number) => {
-  emit('update:facility', { ...props.facility, storageCapacity: value });
-};
-
 const updateProcessingCapacity = (value: number) => {
   emit('update:facility', { ...props.facility, processingCapacity: value });
 };

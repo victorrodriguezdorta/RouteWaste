@@ -1,11 +1,13 @@
 import { FacilityStatus, facilityStatusIsDiscarded } from '@/domain/enumerate/facility-status';
 import { FacilityType } from '@/domain/enumerate/facility-type';
+import { TimeUnit } from '@/domain/enumerate/time-unit';
 import { ProcessingCapacityKilogramsPerDay } from '@/domain/valueobject/capacity/processing-capacity-kilograms-per-day';
 import { StorageCapacityKilograms } from '@/domain/valueobject/capacity/storage-capacity-kilograms';
 import { UnloadingTime } from '@/domain/valueobject/capacity/unloading-time';
 import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
 import { Capacity } from '@/domain/valueobject/demand/capacity';
 import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
+import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
 import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
 import { Location } from '@/domain/valueobject/location/location';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
@@ -228,6 +230,19 @@ export class Facility {
     if (!capacity) throw new Error('Facility storage capacity is not defined');
     this.storageCapacity = capacity;
     this.capacity = this.createLegacyCapacity();
+  }
+
+  /**
+   * Creates a legacy Capacity object from current storage capacity.
+   * This is a helper method for backward compatibility.
+   * @returns A new Capacity instance based on storage capacity
+   * @private
+   */
+  private createLegacyCapacity(): Capacity {
+    // Storage capacity in kilograms, converted to tons/day as default legacy format
+    const quantityUnit = new QuantityUnit('tons');
+    const value = this.storageCapacity.getKilograms() / 1000; // Convert kg to tons
+    return new Capacity(value, quantityUnit, TimeUnit.DAY);
   }
 
   /**

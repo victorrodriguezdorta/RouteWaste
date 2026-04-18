@@ -1,11 +1,13 @@
 import { Facility } from '@/domain/entity/facility';
 import { FacilityStatus, facilityStatusFromString } from '@/domain/enumerate/facility-status';
 import { FacilityType, facilityTypeFromString } from '@/domain/enumerate/facility-type';
+import { timeUnitFromString } from '@/domain/enumerate/time-unit';
 import { ProcessingCapacityKilogramsPerDay } from '@/domain/valueobject/capacity/processing-capacity-kilograms-per-day';
 import { StorageCapacityKilograms } from '@/domain/valueobject/capacity/storage-capacity-kilograms';
 import { UnloadingTime } from '@/domain/valueobject/capacity/unloading-time';
 import { Currency } from '@/domain/valueobject/cost/currency';
 import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
+import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
 import { Location } from '@/domain/valueobject/location/location';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
@@ -373,8 +375,8 @@ export class FacilityEdit {
     const randomPostalAddress = `${Math.floor(Math.random() * 1000)} Industrial Park, City`;
     const randomGisReference = `GIS-FAC-${Math.floor(Math.random() * 100000)}`;
     const randomCapacityValue = Math.floor(Math.random() * 1000) + 100;
-    const randomQuantityUnit = 'tons';
-    const randomTimeUnit = TimeUnit.DAY;
+    const randomProcessingCapacity = Math.floor(Math.random() * 500) + 50;
+    const randomUnloadingTime = Math.floor(Math.random() * 480) + 30; // 30-510 minutes
     const randomOpeningFixedCost = parseFloat((Math.random() * 100000 + 10000).toFixed(2));
     const randomCurrency = 'EUR';
     const statuses = [FacilityStatus.CANDIDATE, FacilityStatus.PLANNED, FacilityStatus.OPEN, FacilityStatus.DISCARDED];
@@ -388,8 +390,8 @@ export class FacilityEdit {
       randomPostalAddress,
       randomGisReference,
       randomCapacityValue,
-      randomQuantityUnit,
-      randomTimeUnit,
+      randomProcessingCapacity,
+      randomUnloadingTime,
       randomOpeningFixedCost,
       randomCurrency,
       randomStatus as string
