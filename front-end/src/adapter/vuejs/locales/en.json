@@ -305,11 +305,16 @@
       "title": "Facilities",
       "addButton": "Add Facility",
       "filterByType": "Filter by type",
+      "filterByStatus": "Filter by status",
+      "filterByLocation": "Search by location",
       "table": {
         "headers": {
           "type": "Facility Type",
           "location": "Location",
-          "capacity": "Capacity",
+          "storageCapacity": "Storage (kg)",
+          "processingCapacity": "Processing (kg/day)",
+          "unloadingTime": "Unloading (min)",
+          "openingCost": "Opening Cost",
           "status": "Status",
           "actions": "Actions"
         },

@@ -305,11 +305,16 @@
       "title": "Instalaciones",
       "addButton": "Agregar Instalación",
       "filterByType": "Filtrar por tipo",
+      "filterByStatus": "Filtrar por estado",
+      "filterByLocation": "Buscar por ubicación",
       "table": {
         "headers": {
           "type": "Tipo de Instalación",
           "location": "Ubicación",
-          "capacity": "Capacidad",
+          "storageCapacity": "Almacenamiento (kg)",
+          "processingCapacity": "Procesamiento (kg/día)",
+          "unloadingTime": "Descarga (min)",
+          "openingCost": "Coste Apertura",
           "status": "Estado",
           "actions": "Acciones"
         },

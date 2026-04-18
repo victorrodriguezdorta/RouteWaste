@@ -1,18 +1,21 @@
 package es.ull.project.adapter.memory;
 
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+
+import es.ull.project.adapter.mongodb.query.FacilitySearchCriteria;
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
 
 /**
  * In-memory FacilityRepository for tests and local runs.
@@ -130,8 +133,8 @@ public class InMemoryFacilityRepository implements FacilityRepository {
                             cmp = loc1.compareTo(loc2);
                         }
                         case FIELD_CAPACITY_VALUE -> {
-                            double cap1 = f1.getCapacity() != null ? f1.getCapacity().getValue() : 0.0;
-                            double cap2 = f2.getCapacity() != null ? f2.getCapacity().getValue() : 0.0;
+                            double cap1 = f1.getStorageCapacity() != null ? f1.getStorageCapacity().getKilograms() : 0.0;
+                            double cap2 = f2.getStorageCapacity() != null ? f2.getStorageCapacity().getKilograms() : 0.0;
                             cmp = Double.compare(cap1, cap2);
                         }
                     }
@@ -142,6 +145,91 @@ public class InMemoryFacilityRepository implements FacilityRepository {
                 return ZERO;
             });
         }
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), allFacilities.size());
+        List<Facility> pageContent;
+        if (start >= allFacilities.size()) {
+            pageContent = new ArrayList<>();
+        } else {
+            pageContent = allFacilities.subList(start, end);
+        }
+        return new PageImpl<>(pageContent, pageable, allFacilities.size());
+    }
+
+    /**
+     * Finds all facilities with advanced search criteria and pagination.
+     * Supports filtering by multiple attributes dynamically.
+     *
+     * @param pageable pagination and sort information
+     * @param criteria search criteria with optional filters
+     * @return page of matching facilities
+     */
+    @Override
+    public Page<Facility> findAll(Pageable pageable, FacilitySearchCriteria criteria) {
+        List<Facility> allFacilities = new ArrayList<>(store.values());
+        
+        // Apply criteria filters
+        if (criteria != null && criteria.hasCriteria()) {
+            allFacilities = allFacilities.stream()
+                    .filter(f -> criteria.getFacilityType() == null || f.getFacilityType() == criteria.getFacilityType())
+                    .filter(f -> criteria.getStatus() == null || f.getStatus() == criteria.getStatus())
+                    .filter(f -> criteria.getLocationPostalAddress() == null || 
+                            (f.getLocation() != null && f.getLocation().getPostalAddress() != null &&
+                             f.getLocation().getPostalAddress().toLowerCase()
+                                .contains(criteria.getLocationPostalAddress().toLowerCase())))
+                    .toList();
+        }
+        
+        // Apply sorting
+        if (!pageable.getSort().isEmpty()) {
+            allFacilities = new ArrayList<>(allFacilities);
+            allFacilities.sort((f1, f2) -> {
+                for (var order : pageable.getSort()) {
+                    int cmp = ZERO;
+                    String property = order.getProperty();
+                    switch (property) {
+                        case "facilityType" -> cmp = f1.getFacilityType().compareTo(f2.getFacilityType());
+                        case "status" -> cmp = f1.getStatus().compareTo(f2.getStatus());
+                        case "location" -> {
+                            String loc1 = f1.getLocation() != null ? f1.getLocation().getPostalAddress() : "";
+                            String loc2 = f2.getLocation() != null ? f2.getLocation().getPostalAddress() : "";
+                            cmp = loc1.compareTo(loc2);
+                        }
+                        case "storageCapacity" -> {
+                            double cap1 = f1.getStorageCapacity() != null ? f1.getStorageCapacity().getKilograms() : 0.0;
+                            double cap2 = f2.getStorageCapacity() != null ? f2.getStorageCapacity().getKilograms() : 0.0;
+                            cmp = Double.compare(cap1, cap2);
+                        }
+                        case "processingCapacity" -> {
+                            double proc1 = f1.getProcessingCapacity() != null ? f1.getProcessingCapacity().getKilogramsPerDay() : 0.0;
+                            double proc2 = f2.getProcessingCapacity() != null ? f2.getProcessingCapacity().getKilogramsPerDay() : 0.0;
+                            cmp = Double.compare(proc1, proc2);
+                        }
+                        case "unloadingTime" -> {
+                            int time1 = f1.getUnloadingTime() != null ? f1.getUnloadingTime().getMinutes() : 0;
+                            int time2 = f2.getUnloadingTime() != null ? f2.getUnloadingTime().getMinutes() : 0;
+                            cmp = Integer.compare(time1, time2);
+                        }
+                        case "openingFixedCost" -> {
+                            double cost1 = f1.getOpeningFixedCost() != null ? f1.getOpeningFixedCost().getAmount() : 0.0;
+                            double cost2 = f2.getOpeningFixedCost() != null ? f2.getOpeningFixedCost().getAmount() : 0.0;
+                            cmp = Double.compare(cost1, cost2);
+                        }
+                        case "currentFillingLevel" -> {
+                            double fill1 = f1.getCurrentFillingLevel() != null ? f1.getCurrentFillingLevel().getLitersPerDay() : 0.0;
+                            double fill2 = f2.getCurrentFillingLevel() != null ? f2.getCurrentFillingLevel().getLitersPerDay() : 0.0;
+                            cmp = Double.compare(fill1, fill2);
+                        }
+                    }
+                    if (cmp != ZERO) {
+                        return order.isAscending() ? cmp : -cmp;
+                    }
+                }
+                return ZERO;
+            });
+        }
+        
+        // Apply pagination
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), allFacilities.size());
         List<Facility> pageContent;

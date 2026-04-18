@@ -144,60 +144,56 @@
     <v-row>
       <v-col cols="12" sm="6">
         <InputTooltip
-          :data="facility.capacityValue.toString()"
+          :data="facility.storageCapacity.toString()"
           input-type="text"
-          :text="t('facility.add.fields.capacityValue')"
-          :tooltip="t('facility.add.fields.capacityValue')"
+          :text="t('facility.add.fields.storageCapacity')"
+          :tooltip="t('facility.add.fields.storageCapacity')"
           counter="10"
           :rules="[
-            (value: string) => validateMaxDecimals(value, 2),
-            (value: string) => validateCapacityValue(value),
+            (value: string) => validateMaxDecimals(value, 0),
+            (value: string) => validateStorageCapacity(value),
           ]"
           :required="!readonly"
           :readonly="readonly"
           :disabled="readonly"
-          @updateData="(value) => updateCapacityValue(Number(value) || 0)"
+          @updateData="(value) => updateStorageCapacity(Number(value) || 0)"
         />
       </v-col>
       <v-col cols="12" sm="6">
         <InputTooltip
-          :data="facility.capacityQuantityUnit"
+          :data="facility.processingCapacity.toString()"
           input-type="text"
-          :text="t('facility.add.fields.capacityQuantityUnit')"
-          :tooltip="t('facility.add.fields.capacityQuantityUnit')"
-          counter="50"
-          :rules="[(value: string) => FacilityAdd.externalValidateCapacityQuantityUnit(value)]"
+          :text="t('facility.add.fields.processingCapacity')"
+          :tooltip="t('facility.add.fields.processingCapacity')"
+          counter="10"
+          :rules="[
+            (value: string) => validateMaxDecimals(value, 0),
+            (value: string) => validateProcessingCapacity(value),
+          ]"
           :required="!readonly"
           :readonly="readonly"
           :disabled="readonly"
-          @updateData="updateCapacityQuantityUnit"
+          @updateData="(value) => updateProcessingCapacity(Number(value) || 0)"
         />
       </v-col>
     </v-row>
 
     <v-row>
       <v-col cols="12" sm="6">
-        <v-select
-          v-if="!readonly"
-          :model-value="facility.capacityTimeUnit"
-          :items="timeUnitOptions"
-          item-title="title"
-          item-value="value"
-          :rules="[(value: string) => FacilityAdd.externalValidateCapacityTimeUnit(value)]"
-          :label="t('facility.add.fields.capacityTimeUnit')"
-          color="primary"
-          prepend-icon="mdi-clock-outline"
-          required
-          @update:model-value="updateCapacityTimeUnit"
-        />
-        <v-text-field
-          v-else
-          :model-value="translatedTimeUnit"
-          :label="t('facility.add.fields.capacityTimeUnit')"
-          color="primary"
-          prepend-icon="mdi-clock-outline"
-          readonly
-          disabled
+        <InputTooltip
+          :data="facility.unloadingTime.toString()"
+          input-type="text"
+          :text="t('facility.add.fields.unloadingTime')"
+          :tooltip="t('facility.add.fields.unloadingTime')"
+          counter="10"
+          :rules="[
+            (value: string) => validateMaxDecimals(value, 0),
+            (value: string) => validateUnloadingTime(value),
+          ]"
+          :required="!readonly"
+          :readonly="readonly"
+          :disabled="readonly"
+          @updateData="(value) => updateUnloadingTime(Number(value) || 0)"
         />
       </v-col>
       <v-col cols="12" sm="6">
@@ -244,9 +240,8 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { FacilityStatus, facilityStatusValues } from '../../../../domain/enumerate/facility-status';
 import { FacilityType, facilityTypeValues } from '../../../../domain/enumerate/facility-type';
-import { timeUnitToOptions } from '../../../../domain/enumerate/time-unit';
-import LocationPickerMap from '../common/LocationPickerMap.vue';
 import { FacilityAdd } from '../../dto/facility/facility-add';
+import LocationPickerMap from '../common/LocationPickerMap.vue';
 
 const { t } = useI18n();
 
@@ -260,7 +255,6 @@ const emit = defineEmits<{
 }>();
 
 const showMapSelector = ref(false);
-const timeUnitOptions = computed(() => timeUnitToOptions(t));
 const facilityTypeOptions = computed(() =>
   facilityTypeValues().map((value) => ({
     title: t(`facility.add.facilityTypes.${value}`),
@@ -282,11 +276,6 @@ const translatedFacilityType = computed(() => {
 const translatedStatus = computed(() => {
   if (!props.facility.status) return '';
   return t(`facility.add.statuses.${props.facility.status}`);
-});
-
-const translatedTimeUnit = computed(() => {
-  if (!props.facility.capacityTimeUnit) return '';
-  return t(`common.timeUnits.${props.facility.capacityTimeUnit}`);
 });
 
 const updateFacilityType = (value: FacilityType) => {
@@ -322,15 +311,19 @@ const updateGisReference = (value: string) => {
 };
 
 const updateCapacityValue = (value: number) => {
-  emit('update:facility', { ...props.facility, capacityValue: value });
+  emit('update:facility', { ...props.facility, storageCapacity: value });
 };
 
-const updateCapacityQuantityUnit = (value: string) => {
-  emit('update:facility', { ...props.facility, capacityQuantityUnit: value });
+const updateProcessingCapacity = (value: number) => {
+  emit('update:facility', { ...props.facility, processingCapacity: value });
 };
 
-const updateCapacityTimeUnit = (value: string) => {
-  emit('update:facility', { ...props.facility, capacityTimeUnit: value });
+const updateUnloadingTime = (value: number) => {
+  emit('update:facility', { ...props.facility, unloadingTime: value });
+};
+
+const updateStorageCapacity = (value: number) => {
+  emit('update:facility', { ...props.facility, storageCapacity: value });
 };
 
 const updateOpeningFixedCost = (value: number) => {
@@ -397,11 +390,35 @@ const validateCapacityValue = (value: string): boolean | string => {
 
   const numericValue = Number(value);
   if (Number.isNaN(numericValue) || numericValue < 0) {
-    return t('common.validationMessages.capacityNegative');
+    return t('common.validationMessages.storageCaacityNegative');
   }
 
-  return FacilityAdd.externalValidateCapacityValue(numericValue);
+  return FacilityAdd.externalValidateStorageCapacity(numericValue);
 };
+
+const validateProcessingCapacity = (value: string): boolean | string => {
+  if (!value || value === '') return true;
+
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue) || numericValue < 0) {
+    return t('common.validationMessages.processingCapacityNegative');
+  }
+
+  return FacilityAdd.externalValidateProcessingCapacity(numericValue);
+};
+
+const validateUnloadingTime = (value: string): boolean | string => {
+  if (!value || value === '') return true;
+
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue) || numericValue < 0) {
+    return t('common.validationMessages.unloadingTimeNegative');
+  }
+
+  return FacilityAdd.externalValidateUnloadingTime(numericValue);
+};
+
+const validateStorageCapacity = validateCapacityValue;
 
 const validateOpeningFixedCost = (value: string): boolean | string => {
   if (!value || value === '') return true;

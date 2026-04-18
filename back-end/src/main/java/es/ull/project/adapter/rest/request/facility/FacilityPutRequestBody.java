@@ -2,7 +2,9 @@ package es.ull.project.adapter.rest.request.facility;
 
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
-import es.ull.project.domain.valueobject.capacity.Capacity;
+import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
+import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.location.Location;
 
@@ -34,10 +36,22 @@ public class FacilityPutRequestBody {
     public Location location;
 
     /**
-     * Maximum capacity of the facility.
+     * Storage capacity of the facility in kilograms.
      * Required field.
      */
-    public Capacity capacity;
+    public StorageCapacityKilograms storageCapacity;
+
+    /**
+     * Processing capacity of the facility in kilograms per day.
+     * Required field.
+     */
+    public ProcessingCapacityKilogramsPerDay processingCapacity;
+
+    /**
+     * Truck unloading time in minutes.
+     * Required field.
+     */
+    public UnloadingTime unloadingTime;
 
     /**
      * Fixed cost to open the facility.
@@ -59,10 +73,12 @@ public class FacilityPutRequestBody {
     @Override
     public String toString() {
         return String.format(
-                "FacilityPutRequestBody={facilityType=%s, location=%s, capacity=%s, openingFixedCost=%s, status=%s}",
+                "FacilityPutRequestBody={facilityType=%s, location=%s, storageCapacity=%s, processingCapacity=%s, unloadingTime=%s, openingFixedCost=%s, status=%s}",
                 this.facilityType,
                 this.location,
-                this.capacity,
+                this.storageCapacity,
+                this.processingCapacity,
+                this.unloadingTime,
                 this.openingFixedCost,
                 this.status);
     }

@@ -100,8 +100,11 @@ export const useFacilityStore = defineStore('Facility', {
      * @param sortOrder Optional sort direction
      * @param facilityType Optional facility type filter
      * @param status Optional facility status filter
+     * @param location Optional location filter (postal address)
      */
-    async getFacilities(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', facilityType?: string, status?: string) {
+    async getFacilities(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', facilityType?: string, status?: string, location?: string) {
+      console.log('[FacilityStore.getFacilities] Starting fetch with params:', { page, rowsPerPage, sortBy, sortOrder, facilityType, status, location });
+      
       this.loading = true;
       this.facilities = [];
       const requestedPage = page ?? this.currentPage;
@@ -117,18 +120,21 @@ export const useFacilityStore = defineStore('Facility', {
         sortBy,
         sortOrder,
         facilityType,
-        status
+        status,
+        location
       });
       
       // Handle the result using Either pattern
       result.fold(
         error => {
           // Error case: handle and notify user
+          console.error('[FacilityStore.getFacilities] Error:', error);
           this.handleError(error);
           this.loading = false;
         },
         data => {
           // Success case: update state with facilities
+          console.log('[FacilityStore.getFacilities] Success, received facilities:', data);
           this.facilities = data.items;
           this.totalFacilities = data.totalElements;
           this.currentPage = data.page;
@@ -181,7 +187,9 @@ export const useFacilityStore = defineStore('Facility', {
       const result = await createService.execute({
         facilityType: facility.getFacilityType(),
         location: facility.getLocation(),
-        capacity: facility.getCapacity(),
+        storageCapacity: facility.getStorageCapacity(),
+        processingCapacity: facility.getProcessingCapacity(),
+        unloadingTime: facility.getUnloadingTime(),
         openingFixedCost: facility.getOpeningFixedCost(),
         status: facility.getStatus()
       });
@@ -224,7 +232,9 @@ export const useFacilityStore = defineStore('Facility', {
         updatedFields: {
           facilityType: facility.getFacilityType(),
           location: facility.getLocation(),
-          capacity: facility.getCapacity(),
+          storageCapacity: facility.getStorageCapacity(),
+          processingCapacity: facility.getProcessingCapacity(),
+          unloadingTime: facility.getUnloadingTime(),
           openingFixedCost: facility.getOpeningFixedCost(),
           status: facility.getStatus()
         }

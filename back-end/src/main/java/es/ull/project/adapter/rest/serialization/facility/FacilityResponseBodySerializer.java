@@ -1,13 +1,13 @@
 package es.ull.project.adapter.rest.serialization.facility;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
-
-import java.io.IOException;
 
 /**
  * Custom JSON serializer for FacilityResponseBody
@@ -44,10 +44,14 @@ public class FacilityResponseBodySerializer extends StdSerializer<FacilityRespon
         gen.writeStringField(JsonFields.POSTAL_ADDRESS, value.location.getPostalAddress());
         gen.writeStringField(JsonFields.GIS_REFERENCE, value.location.getGISReference());
         gen.writeEndObject();
-        gen.writeObjectFieldStart(JsonFields.CAPACITY);
-        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.capacity.getValue());
-        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.capacity.getQuantityUnit().getValue());
-        gen.writeStringField(JsonFields.TIME_UNIT, value.capacity.getTimeUnit().name());
+        gen.writeObjectFieldStart(JsonFields.STORAGE_CAPACITY);
+        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.storageCapacity.getKilograms());
+        gen.writeEndObject();
+        gen.writeObjectFieldStart(JsonFields.PROCESSING_CAPACITY);
+        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.processingCapacity.getKilogramsPerDay());
+        gen.writeEndObject();
+        gen.writeObjectFieldStart(JsonFields.UNLOADING_TIME);
+        gen.writeNumberField(JsonFields.TIME_VALUE, value.unloadingTime.getMinutes());
         gen.writeEndObject();
         gen.writeObjectFieldStart(JsonFields.OPENING_FIXED_COST);
         gen.writeNumberField(JsonFields.AMOUNT, value.openingFixedCost.getAmount());
@@ -56,10 +60,8 @@ public class FacilityResponseBodySerializer extends StdSerializer<FacilityRespon
         }
         gen.writeEndObject();
         gen.writeStringField(JsonFields.STATUS, value.status.name());
-        gen.writeObjectFieldStart(JsonFields.WASTE_DEMAND);
-        gen.writeNumberField(JsonFields.CAPACITY_VALUE, value.assignedWasteDemand.getValue());
-        gen.writeStringField(JsonFields.QUANTITY_UNIT, value.assignedWasteDemand.getQuantityUnit().getValue());
-        gen.writeStringField(JsonFields.TIME_UNIT, value.assignedWasteDemand.getTimeUnit().name());
+        gen.writeObjectFieldStart(JsonFields.CURRENT_FILLING_LEVEL);
+        gen.writeNumberField(JsonFields.WASTE_DEMAND_VALUE, value.currentFillingLevel.getLitersPerDay());
         gen.writeEndObject();
         gen.writeEndObject();
     }

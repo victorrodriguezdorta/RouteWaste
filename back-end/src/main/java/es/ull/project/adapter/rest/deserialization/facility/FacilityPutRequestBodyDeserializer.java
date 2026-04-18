@@ -1,20 +1,22 @@
 package es.ull.project.adapter.rest.deserialization.facility;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
-import es.ull.project.domain.enumerate.TimeUnit;
-import es.ull.project.domain.valueobject.capacity.Capacity;
+import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
+import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.location.Location;
-import java.io.IOException;
 
 /**
  * FacilityPutRequestBodyDeserializer
@@ -45,13 +47,17 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
         try {
             FacilityType facilityType = parseFacilityType(rootNode);
             Location location = parseLocation(rootNode);
-            Capacity capacity = parseCapacity(rootNode);
+            StorageCapacityKilograms storageCapacity = parseStorageCapacity(rootNode);
+            ProcessingCapacityKilogramsPerDay processingCapacity = parseProcessingCapacity(rootNode);
+            UnloadingTime unloadingTime = parseUnloadingTime(rootNode);
             OpeningFixedCost openingFixedCost = parseOpeningFixedCost(rootNode);
             FacilityStatus status = parseStatus(rootNode);
             FacilityPutRequestBody requestBody = new FacilityPutRequestBody();
             requestBody.facilityType = facilityType;
             requestBody.location = location;
-            requestBody.capacity = capacity;
+            requestBody.storageCapacity = storageCapacity;
+            requestBody.processingCapacity = processingCapacity;
+            requestBody.unloadingTime = unloadingTime;
             requestBody.openingFixedCost = openingFixedCost;
             requestBody.status = status;
             return requestBody;
@@ -124,39 +130,83 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
     }
 
     /**
-     * Parses the capacity nested object from JSON.
+     * Parses the storage capacity nested object from JSON.
      * 
      * @param rootNode the root JSON node
-     * @return the parsed Capacity value object
+     * @return the parsed StorageCapacityKilograms value object
      * @throws IllegalArgumentException if the field is missing or invalid
      */
-    private Capacity parseCapacity(JsonNode rootNode) {
-        if (!rootNode.has(JsonFields.CAPACITY)) {
-            throw new IllegalArgumentException("Required field '" + JsonFields.CAPACITY + "' is missing");
+    private StorageCapacityKilograms parseStorageCapacity(JsonNode rootNode) {
+        if (!rootNode.has(JsonFields.STORAGE_CAPACITY)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.STORAGE_CAPACITY + "' is missing");
         }
-        JsonNode capacityNode = rootNode.get(JsonFields.CAPACITY);
+        JsonNode capacityNode = rootNode.get(JsonFields.STORAGE_CAPACITY);
         if (capacityNode.isNull() || !capacityNode.isObject()) {
-            throw new IllegalArgumentException("Field '" + JsonFields.CAPACITY + "' must be a non-null object");
+            throw new IllegalArgumentException("Field '" + JsonFields.STORAGE_CAPACITY + "' must be a non-null object");
         }
         try {
             if (!capacityNode.has(JsonFields.CAPACITY_VALUE)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.CAPACITY_VALUE + "' is missing");
             }
             double value = capacityNode.get(JsonFields.CAPACITY_VALUE).asDouble();
-            if (!capacityNode.has(JsonFields.QUANTITY_UNIT)) {
-                throw new IllegalArgumentException("Required field '" + JsonFields.QUANTITY_UNIT + "' is missing");
-            }
-            String quantityUnitStr = capacityNode.get(JsonFields.QUANTITY_UNIT).asText();
-            QuantityUnit quantityUnit = new QuantityUnit(quantityUnitStr);
-            if (!capacityNode.has(JsonFields.TIME_UNIT)) {
-                throw new IllegalArgumentException("Required field '" + JsonFields.TIME_UNIT + "' is missing");
-            }
-            String timeUnitStr = capacityNode.get(JsonFields.TIME_UNIT).asText();
-            TimeUnit timeUnit = TimeUnit.fromString(timeUnitStr);
-            return new Capacity(value, quantityUnit, timeUnit);
+            return new StorageCapacityKilograms(value);
         } catch (Exception e) {
             throw new IllegalArgumentException(
-                "Invalid value for field '" + JsonFields.CAPACITY + "': " + e.getMessage(), e);
+                "Invalid value for field '" + JsonFields.STORAGE_CAPACITY + "': " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Parses the processing capacity nested object from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @return the parsed ProcessingCapacityKilogramsPerDay value object
+     * @throws IllegalArgumentException if the field is missing or invalid
+     */
+    private ProcessingCapacityKilogramsPerDay parseProcessingCapacity(JsonNode rootNode) {
+        if (!rootNode.has(JsonFields.PROCESSING_CAPACITY)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.PROCESSING_CAPACITY + "' is missing");
+        }
+        JsonNode capacityNode = rootNode.get(JsonFields.PROCESSING_CAPACITY);
+        if (capacityNode.isNull() || !capacityNode.isObject()) {
+            throw new IllegalArgumentException("Field '" + JsonFields.PROCESSING_CAPACITY + "' must be a non-null object");
+        }
+        try {
+            if (!capacityNode.has(JsonFields.CAPACITY_VALUE)) {
+                throw new IllegalArgumentException("Required field '" + JsonFields.CAPACITY_VALUE + "' is missing");
+            }
+            double value = capacityNode.get(JsonFields.CAPACITY_VALUE).asDouble();
+            return new ProcessingCapacityKilogramsPerDay(value);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                "Invalid value for field '" + JsonFields.PROCESSING_CAPACITY + "': " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Parses the unloading time nested object from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @return the parsed UnloadingTime value object
+     * @throws IllegalArgumentException if the field is missing or invalid
+     */
+    private UnloadingTime parseUnloadingTime(JsonNode rootNode) {
+        if (!rootNode.has(JsonFields.UNLOADING_TIME)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.UNLOADING_TIME + "' is missing");
+        }
+        JsonNode timeNode = rootNode.get(JsonFields.UNLOADING_TIME);
+        if (timeNode.isNull() || !timeNode.isObject()) {
+            throw new IllegalArgumentException("Field '" + JsonFields.UNLOADING_TIME + "' must be a non-null object");
+        }
+        try {
+            if (!timeNode.has(JsonFields.TIME_VALUE)) {
+                throw new IllegalArgumentException("Required field '" + JsonFields.TIME_VALUE + "' is missing");
+            }
+            int value = timeNode.get(JsonFields.TIME_VALUE).asInt();
+            return new UnloadingTime(value);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                "Invalid value for field '" + JsonFields.UNLOADING_TIME + "': " + e.getMessage(), e);
         }
     }
 

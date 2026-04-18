@@ -56,8 +56,20 @@
           {{ item.location }}
         </template>
 
-        <template v-slot:item.capacity="{ item }">
-          {{ item.capacity }}
+        <template v-slot:item.storageCapacity="{ item }">
+          {{ item.storageCapacity }}
+        </template>
+
+        <template v-slot:item.processingCapacity="{ item }">
+          {{ item.processingCapacity }}
+        </template>
+
+        <template v-slot:item.unloadingTime="{ item }">
+          {{ item.unloadingTime }}
+        </template>
+
+        <template v-slot:item.openingCost="{ item }">
+          {{ item.openingCost }}
         </template>
 
         <template v-slot:item.status="{ item }">
@@ -117,19 +129,51 @@
       </v-data-table-server>
 
       <template #toolbar-append>
-        <div style="width: 250px;">
-          <v-select
-            v-model="selectedFacilityTypeFilter"
-            :items="facilityTypeFilterOptions"
-            :placeholder="t('facility.list.filterByType')"
-            item-title="title"
-            item-value="value"
-            clearable
-            density="compact"
-            hide-details
-            variant="outlined"
-            @update:model-value="onFacilityTypeFilterChange"
-          />
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px;">
+          <!-- Filter by Facility Type -->
+          <div style="width: 180px;">
+            <v-select
+              v-model="selectedFacilityTypeFilter"
+              :items="facilityTypeFilterOptions"
+              :placeholder="t('facility.list.filterByType')"
+              item-title="title"
+              item-value="value"
+              clearable
+              density="compact"
+              hide-details
+              variant="outlined"
+              @update:model-value="onFacilityTypeFilterChange"
+            />
+          </div>
+
+          <!-- Filter by Facility Status -->
+          <div style="width: 180px;">
+            <v-select
+              v-model="selectedFacilityStatusFilter"
+              :items="facilityStatusFilterOptions"
+              :placeholder="t('facility.list.filterByStatus')"
+              item-title="title"
+              item-value="value"
+              clearable
+              density="compact"
+              hide-details
+              variant="outlined"
+              @update:model-value="onFacilityStatusFilterChange"
+            />
+          </div>
+
+          <!-- Filter by Location -->
+          <div style="width: 180px;">
+            <v-text-field
+              v-model="selectedLocationFilter"
+              :placeholder="t('facility.list.filterByLocation')"
+              clearable
+              density="compact"
+              hide-details
+              variant="outlined"
+              @update:model-value="onLocationFilterChange"
+            />
+          </div>
         </div>
       </template>
     </CrudLayout>
@@ -153,7 +197,7 @@ import { ButtonTooltip, ErrorMessage } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { facilityStatusColor } from '../../../../domain/enumerate/facility-status';
+import { facilityStatusColor, facilityStatusToOptions } from '../../../../domain/enumerate/facility-status';
 import { facilityTypeColor, facilityTypeToOptions } from '../../../../domain/enumerate/facility-type';
 import CrudLayout from '../../components/common/CrudLayout.vue';
 import router from '../../router/router';
@@ -167,6 +211,8 @@ const { facilities, facilityNotification, loading, totalFacilities, currentPage,
 const dialogDelete = ref(false);
 const selectedFacilityId = ref('');
 const selectedFacilityTypeFilter = ref<string | undefined>(undefined);
+const selectedFacilityStatusFilter = ref<string | undefined>(undefined);
+const selectedLocationFilter = ref<string | undefined>(undefined);
 const tablePage = ref(1);
 const itemsPerPage = ref(10);
 const currentSortBy = ref<string | undefined>(undefined);
@@ -186,10 +232,28 @@ const headers = computed(() => [
     key: 'location',
   },
   {
-    title: t('facility.list.table.headers.capacity'),
+    title: t('facility.list.table.headers.storageCapacity'),
     align: 'center' as const,
     sortable: true,
-    key: 'capacity',
+    key: 'storageCapacity',
+  },
+  {
+    title: t('facility.list.table.headers.processingCapacity'),
+    align: 'center' as const,
+    sortable: true,
+    key: 'processingCapacity',
+  },
+  {
+    title: t('facility.list.table.headers.unloadingTime'),
+    align: 'center' as const,
+    sortable: true,
+    key: 'unloadingTime',
+  },
+  {
+    title: t('facility.list.table.headers.openingCost'),
+    align: 'center' as const,
+    sortable: true,
+    key: 'openingCost',
   },
   {
     title: t('facility.list.table.headers.status'),
@@ -207,10 +271,15 @@ const headers = computed(() => [
 
 const facilityTypeFilterOptions = computed(() => facilityTypeToOptions(t));
 
+const facilityStatusFilterOptions = computed(() => facilityStatusToOptions(t));
+
 const facilityItems = computed(() => {
   return facilities.value.map((facility) => {
     const location = facility.getLocation();
-    const capacity = facility.getCapacity();
+    const storageCapacity = facility.getStorageCapacity().getKilograms();
+    const processingCapacity = facility.getProcessingCapacity().getKilogramsPerDay();
+    const unloadingTime = facility.getUnloadingTime().getMinutes();
+    const openingCost = facility.getOpeningFixedCost();
 
     return {
       id: facility.getId().toString(),
@@ -218,7 +287,10 @@ const facilityItems = computed(() => {
       rawStatus: facility.getStatus(),
       type: t(`facility.add.facilityTypes.${facility.getFacilityType()}`),
       location: `${location.postalAddress} (${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)})`,
-      capacity: `${capacity.getValue()} ${capacity.getQuantityUnit().getValue()}/${formatTimeUnitShort(capacity.getTimeUnit())}`,
+      storageCapacity: `${storageCapacity.toFixed(2)} kg`,
+      processingCapacity: `${processingCapacity.toFixed(2)} kg/día`,
+      unloadingTime: `${unloadingTime} min`,
+      openingCost: `${openingCost.getAmount().toFixed(2)} ${openingCost.getCurrency().getCode()}`,
       status: t(`facility.add.statuses.${facility.getStatus()}`),
     };
   });
@@ -235,16 +307,30 @@ const loadFacilities = async (
   size: number,
   sortBy?: string,
   sortOrder?: 'asc' | 'desc',
-  facilityType?: string
+  facilityType?: string,
+  status?: string,
+  location?: string
 ) => {
   currentSortBy.value = sortBy;
   currentSortOrder.value = sortOrder ?? 'asc';
-  await facilityStore.getFacilities(page, size, sortBy, sortOrder, facilityType);
+  await facilityStore.getFacilities(page, size, sortBy, sortOrder, facilityType, status, location);
 };
 
 const onFacilityTypeFilterChange = async (newType: string | null) => {
   const facilityType = newType ?? undefined;
-  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, facilityType);
+  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, facilityType, selectedFacilityStatusFilter.value, selectedLocationFilter.value);
+  tablePage.value = currentPage.value + 1;
+};
+
+const onFacilityStatusFilterChange = async (newStatus: string | null) => {
+  const status = newStatus ?? undefined;
+  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value, status, selectedLocationFilter.value);
+  tablePage.value = currentPage.value + 1;
+};
+
+const onLocationFilterChange = async (newLocation: string | null) => {
+  const location = newLocation ?? undefined;
+  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value, selectedFacilityStatusFilter.value, location);
   tablePage.value = currentPage.value + 1;
 };
 
@@ -258,13 +344,9 @@ const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: numbe
   const newSortBy = options.sortBy[0]?.key;
   const newSortOrder = options.sortBy[0]?.order ?? 'asc';
 
-  await loadFacilities(requestedPage, requestedSize, newSortBy, newSortOrder, selectedFacilityTypeFilter.value);
+  await loadFacilities(requestedPage, requestedSize, newSortBy, newSortOrder, selectedFacilityTypeFilter.value, selectedFacilityStatusFilter.value, selectedLocationFilter.value);
   tablePage.value = currentPage.value + 1;
   itemsPerPage.value = rowsPerPage.value;
-};
-
-const formatTimeUnitShort = (unit: string): string => {
-  return t(`common.timeUnitsLowercase.${unit}`);
 };
 
 const addFacility = () => {

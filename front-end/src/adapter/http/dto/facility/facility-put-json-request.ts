@@ -4,54 +4,69 @@ import type { UpdateFacilityCommand } from '@/application/usecase/facility-manag
  * FacilityPutJsonRequest DTO
  *
  * Represents the JSON body sent to the backend when updating a Facility.
- * All fields are optional to allow partial updates; primitives are used for
- * straightforward serialization.
+ * All fields are optional to allow partial updates. VO fields use the structure
+ * that matches backend VOs for proper Jackson deserialization.
  */
 export class FacilityPutJsonRequest {
 
   /**
-   * Tipo de instalación (opcional).
+   * Type of facility (optional).
    */
   facilityType?: string;
 
   /**
-   * Ubicación de la instalación (opcional).
+   * Geographic location of the facility (optional).
    */
   location?: { latitude: number; longitude: number; postalAddress: string; gisReference: string };
 
   /**
-   * Capacidad de la instalación (opcional).
+   * Storage capacity value object (optional) - matches backend's StorageCapacityKilograms structure.
    */
-  capacity?: { value: number; quantityUnit: string; timeUnit: string };
+  storageCapacity?: { value: number };
 
   /**
-   * Coste fijo de apertura (opcional).
+   * Processing capacity value object (optional) - matches backend's ProcessingCapacityKilogramsPerDay structure.
    */
-  openingFixedCost?: { amount: number; currency?: string };
+  processingCapacity?: { value: number };
 
   /**
-   * Estado de la instalación (opcional).
+   * Unloading time value object (optional) - matches backend's UnloadingTime structure.
+   */
+  unloadingTime?: { timeValue: number };
+
+  /**
+   * Opening fixed cost with amount and currency (optional).
+   */
+  openingFixedCost?: { amount: number; currency: string };
+
+  /**
+   * Status of the facility (optional).
    */
   status?: string;
 
   constructor(
     facilityType?: string,
     location?: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
-    capacity?: { value: number; quantityUnit: string; timeUnit: string },
-    openingFixedCost?: { amount: number; currency?: string },
+    storageCapacity?: { value: number },
+    processingCapacity?: { value: number },
+    unloadingTime?: { timeValue: number },
+    openingFixedCost?: { amount: number; currency: string },
     status?: string
   ) {
     this.facilityType = facilityType;
     this.location = location;
-    this.capacity = capacity;
+    this.storageCapacity = storageCapacity;
+    this.processingCapacity = processingCapacity;
+    this.unloadingTime = unloadingTime;
     this.openingFixedCost = openingFixedCost;
     this.status = status;
   }
 
   /**
-   * Mapea un `UpdateFacilityCommand` (actualización parcial de dominio) a este DTO.
-   * @param data Comando de actualización de instalación.
-   * @returns Instancia de FacilityPutJsonRequest con los campos actualizados.
+   * Map an `UpdateFacilityCommand` (domain partial update) into this DTO.
+   *
+   * @param data The UpdateFacilityCommand containing the fields to update
+   * @returns A new FacilityPutJsonRequest instance with the mapped data
    */
   public static toRequest(data: UpdateFacilityCommand): FacilityPutJsonRequest {
     const f = data.updatedFields;
@@ -65,10 +80,24 @@ export class FacilityPutJsonRequest {
             gisReference: f.location.gisReference,
           }
         : undefined,
-      f.capacity
-        ? { value: f.capacity.getValue(), quantityUnit: f.capacity.getQuantityUnit().getValue(), timeUnit: f.capacity.getTimeUnit().toString() }
+      // Wrap in backend VO structure
+      f.storageCapacity
+        ? { value: f.storageCapacity.getKilograms() }
         : undefined,
-      f.openingFixedCost ? { amount: f.openingFixedCost.getAmount(), currency: f.openingFixedCost.getCurrency().getCode() } : undefined,
+      // Wrap in backend VO structure
+      f.processingCapacity
+        ? { value: f.processingCapacity.getKilogramsPerDay() }
+        : undefined,
+      // Wrap in backend VO structure
+      f.unloadingTime
+        ? { timeValue: f.unloadingTime.getMinutes() }
+        : undefined,
+      f.openingFixedCost
+        ? {
+            amount: f.openingFixedCost.getAmount(),
+            currency: f.openingFixedCost.getCurrency().getCode(),
+          }
+        : undefined,
       f.status
     );
   }

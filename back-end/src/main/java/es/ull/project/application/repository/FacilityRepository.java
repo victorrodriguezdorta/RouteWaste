@@ -1,14 +1,17 @@
 package es.ull.project.application.repository;
 
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+
+import es.ull.project.adapter.mongodb.query.FacilitySearchCriteria;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
 
 /**
  * Repository interface for the Facility aggregate.
@@ -73,4 +76,14 @@ public interface FacilityRepository {
      * @return a Page containing the paginated and filtered facilities
      */
     public abstract Page<Facility> findAll(@NonNull Pageable pageable, FacilityType type, FacilityStatus status);
+
+    /**
+     * Finds all facilities with advanced search criteria and pagination.
+     * Supports filtering by multiple attributes dynamically.
+     *
+     * @param pageable pagination and sort information
+     * @param criteria search criteria with optional filters
+     * @return page of matching facilities
+     */
+    public abstract Page<Facility> findAll(@NonNull Pageable pageable, @NonNull FacilitySearchCriteria criteria);
 }

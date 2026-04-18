@@ -1,14 +1,5 @@
 package es.ull.project.domain.entity;
 
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
-import es.ull.project.domain.enumerate.TimeUnit;
-import es.ull.project.domain.valueobject.capacity.Capacity;
-import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
-import es.ull.project.domain.valueobject.location.Location;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -17,6 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
+import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.UnloadingTime;
+import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.location.Location;
 
 
 class FacilityTests {
@@ -32,12 +32,16 @@ class FacilityTests {
         );
     }
     
-    private static Capacity randomCapacity() {
-        return new Capacity(
-            100.0 + Math.random() * 500.0,
-            new QuantityUnit("tons"),
-            TimeUnit.DAY
-        );
+    private static StorageCapacityKilograms randomStorageCapacity() {
+        return new StorageCapacityKilograms(1000.0 + Math.random() * 5000.0);
+    }
+    
+    private static ProcessingCapacityKilogramsPerDay randomProcessingCapacity() {
+        return new ProcessingCapacityKilogramsPerDay(500.0 + Math.random() * 2000.0);
+    }
+    
+    private static UnloadingTime randomUnloadingTime() {
+        return new UnloadingTime(30 + (int)(Math.random() * 120));
     }
     
     private static OpeningFixedCost randomOpeningFixedCost() {
@@ -48,7 +52,9 @@ class FacilityTests {
         return new Facility(
             FacilityType.random(),
             randomLocation(),
-            randomCapacity(),
+            randomStorageCapacity(),
+            randomProcessingCapacity(),
+            randomUnloadingTime(),
             randomOpeningFixedCost(),
             FacilityStatus.random()
         );
@@ -60,36 +66,50 @@ class FacilityTests {
     void constructor_1_right() {
         FacilityType facilityType = FacilityType.random();
         Location location = randomLocation();
-        Capacity capacity = randomCapacity();
+        StorageCapacityKilograms storageCapacity = randomStorageCapacity();
+        ProcessingCapacityKilogramsPerDay processingCapacity = randomProcessingCapacity();
+        UnloadingTime unloadingTime = randomUnloadingTime();
         OpeningFixedCost openingFixedCost = randomOpeningFixedCost();
         FacilityStatus status = FacilityStatus.random();
         
-        Facility facility = new Facility(facilityType, location, capacity, openingFixedCost, status);
+        Facility facility = new Facility(
+            facilityType,
+            location,
+            storageCapacity,
+            processingCapacity,
+            unloadingTime,
+            openingFixedCost,
+            status
+        );
         
         // Required attributes:
         assertEquals(facilityType, facility.getFacilityType());
         assertEquals(location, facility.getLocation());
-        assertEquals(capacity, facility.getCapacity());
+        assertEquals(storageCapacity, facility.getStorageCapacity());
+        assertEquals(processingCapacity, facility.getProcessingCapacity());
+        assertEquals(unloadingTime, facility.getUnloadingTime());
         assertEquals(openingFixedCost, facility.getOpeningFixedCost());
         assertEquals(status, facility.getStatus());
         
         // Computed attributes:
         assertNotNull(facility.getId());
-        assertNotNull(facility.getAssignedWasteDemand());
-        assertEquals(0.0, facility.getAssignedWasteDemand().getValue());
+        assertNotNull(facility.getCurrentFillingLevel());
+        assertEquals(0.0, facility.getCurrentFillingLevel().getLitersPerDay());
     }
     
     @Test
     void constructor_1_facilityType_undefined() {
         FacilityType facilityType = null;
         Location location = randomLocation();
-        Capacity capacity = randomCapacity();
+        StorageCapacityKilograms storageCapacity = randomStorageCapacity();
+        ProcessingCapacityKilogramsPerDay processingCapacity = randomProcessingCapacity();
+        UnloadingTime unloadingTime = randomUnloadingTime();
         OpeningFixedCost openingFixedCost = randomOpeningFixedCost();
         FacilityStatus status = FacilityStatus.random();
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, capacity, openingFixedCost, status)
+            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.TYPE_NOT_DEFINED, exception.getMessage());
@@ -99,45 +119,87 @@ class FacilityTests {
     void constructor_1_location_undefined() {
         FacilityType facilityType = FacilityType.random();
         Location location = null;
-        Capacity capacity = randomCapacity();
+        StorageCapacityKilograms storageCapacity = randomStorageCapacity();
+        ProcessingCapacityKilogramsPerDay processingCapacity = randomProcessingCapacity();
+        UnloadingTime unloadingTime = randomUnloadingTime();
         OpeningFixedCost openingFixedCost = randomOpeningFixedCost();
         FacilityStatus status = FacilityStatus.random();
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, capacity, openingFixedCost, status)
+            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.LOCATION_NOT_DEFINED, exception.getMessage());
     }
     
     @Test
-    void constructor_1_capacity_undefined() {
+    void constructor_1_storageCapacity_undefined() {
         FacilityType facilityType = FacilityType.random();
         Location location = randomLocation();
-        Capacity capacity = null;
+        StorageCapacityKilograms storageCapacity = null;
+        ProcessingCapacityKilogramsPerDay processingCapacity = randomProcessingCapacity();
+        UnloadingTime unloadingTime = randomUnloadingTime();
         OpeningFixedCost openingFixedCost = randomOpeningFixedCost();
         FacilityStatus status = FacilityStatus.random();
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, capacity, openingFixedCost, status)
+            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
-        assertEquals(Facility.CAPACITY_NOT_DEFINED, exception.getMessage());
+        assertEquals(Facility.STORAGE_CAPACITY_NOT_DEFINED, exception.getMessage());
+    }
+    
+    @Test
+    void constructor_1_processingCapacity_undefined() {
+        FacilityType facilityType = FacilityType.random();
+        Location location = randomLocation();
+        StorageCapacityKilograms storageCapacity = randomStorageCapacity();
+        ProcessingCapacityKilogramsPerDay processingCapacity = null;
+        UnloadingTime unloadingTime = randomUnloadingTime();
+        OpeningFixedCost openingFixedCost = randomOpeningFixedCost();
+        FacilityStatus status = FacilityStatus.random();
+        
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
+        );
+        
+        assertEquals(Facility.PROCESSING_CAPACITY_NOT_DEFINED, exception.getMessage());
+    }
+    
+    @Test
+    void constructor_1_unloadingTime_undefined() {
+        FacilityType facilityType = FacilityType.random();
+        Location location = randomLocation();
+        StorageCapacityKilograms storageCapacity = randomStorageCapacity();
+        ProcessingCapacityKilogramsPerDay processingCapacity = randomProcessingCapacity();
+        UnloadingTime unloadingTime = null;
+        OpeningFixedCost openingFixedCost = randomOpeningFixedCost();
+        FacilityStatus status = FacilityStatus.random();
+        
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
+        );
+        
+        assertEquals(Facility.UNLOADING_TIME_NOT_DEFINED, exception.getMessage());
     }
     
     @Test
     void constructor_1_openingFixedCost_undefined() {
         FacilityType facilityType = FacilityType.random();
         Location location = randomLocation();
-        Capacity capacity = randomCapacity();
+        StorageCapacityKilograms storageCapacity = randomStorageCapacity();
+        ProcessingCapacityKilogramsPerDay processingCapacity = randomProcessingCapacity();
+        UnloadingTime unloadingTime = randomUnloadingTime();
         OpeningFixedCost openingFixedCost = null;
         FacilityStatus status = FacilityStatus.random();
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, capacity, openingFixedCost, status)
+            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.OPENING_COST_NOT_DEFINED, exception.getMessage());
@@ -147,13 +209,15 @@ class FacilityTests {
     void constructor_1_status_undefined() {
         FacilityType facilityType = FacilityType.random();
         Location location = randomLocation();
-        Capacity capacity = randomCapacity();
+        StorageCapacityKilograms storageCapacity = randomStorageCapacity();
+        ProcessingCapacityKilogramsPerDay processingCapacity = randomProcessingCapacity();
+        UnloadingTime unloadingTime = randomUnloadingTime();
         OpeningFixedCost openingFixedCost = randomOpeningFixedCost();
         FacilityStatus status = null;
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, capacity, openingFixedCost, status)
+            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.STATUS_NOT_DEFINED, exception.getMessage());
@@ -167,7 +231,9 @@ class FacilityTests {
         Facility facility2 = new Facility(
             facility1.getFacilityType(),
             facility1.getLocation(),
-            facility1.getCapacity(),
+            facility1.getStorageCapacity(),
+            facility1.getProcessingCapacity(),
+            facility1.getUnloadingTime(),
             facility1.getOpeningFixedCost(),
             facility1.getStatus()
         );
@@ -190,7 +256,9 @@ class FacilityTests {
         Facility facility2 = new Facility(
             facility1.getFacilityType(),
             facility1.getLocation(),
-            facility1.getCapacity(),
+            facility1.getStorageCapacity(),
+            facility1.getProcessingCapacity(),
+            facility1.getUnloadingTime(),
             facility1.getOpeningFixedCost(),
             facility1.getStatus()
         );
@@ -228,60 +296,41 @@ class FacilityTests {
     
     @Test
     void assignWasteDemand_valid() {
-        Capacity capacity = new Capacity(100.0, new QuantityUnit("tons"), TimeUnit.DAY);
         Facility facility = new Facility(
             FacilityType.random(),
             randomLocation(),
-            capacity,
+            randomStorageCapacity(),
+            randomProcessingCapacity(),
+            randomUnloadingTime(),
             randomOpeningFixedCost(),
             FacilityStatus.PLANNED
         );
         
-        WasteDemand demand = new WasteDemand(10.0);
+        DailyWasteDemandLitersPerDay demand = new DailyWasteDemandLitersPerDay(10.0);
         facility.assignWasteDemand(demand);
         
-        assertEquals(10.0, facility.getAssignedWasteDemand().getValue());
+        assertEquals(10.0, facility.getCurrentFillingLevel().getLitersPerDay());
     }
     
     @Test
     void assignWasteDemand_multiple() {
-        Capacity capacity = new Capacity(100.0, new QuantityUnit("tons"), TimeUnit.DAY);
         Facility facility = new Facility(
             FacilityType.random(),
             randomLocation(),
-            capacity,
+            randomStorageCapacity(),
+            randomProcessingCapacity(),
+            randomUnloadingTime(),
             randomOpeningFixedCost(),
             FacilityStatus.PLANNED
         );
         
-        WasteDemand demand1 = new WasteDemand(20.0);
-        WasteDemand demand2 = new WasteDemand(30.0);
+        DailyWasteDemandLitersPerDay demand1 = new DailyWasteDemandLitersPerDay(20.0);
+        DailyWasteDemandLitersPerDay demand2 = new DailyWasteDemandLitersPerDay(30.0);
         
         facility.assignWasteDemand(demand1);
         facility.assignWasteDemand(demand2);
         
-        assertEquals(50.0, facility.getAssignedWasteDemand().getValue());
-    }
-    
-    @Test
-    void assignWasteDemand_capacityExceeded() {
-        Capacity capacity = new Capacity(50.0, new QuantityUnit("tons"), TimeUnit.DAY);
-        Facility facility = new Facility(
-            FacilityType.random(),
-            randomLocation(),
-            capacity,
-            randomOpeningFixedCost(),
-            FacilityStatus.PLANNED
-        );
-        
-        WasteDemand demand = new WasteDemand(60.0);
-        
-        IllegalStateException exception = assertThrows(
-            IllegalStateException.class,
-            () -> facility.assignWasteDemand(demand)
-        );
-        
-        assertEquals(Facility.CAPACITY_EXCEEDED, exception.getMessage());
+        assertEquals(50.0, facility.getCurrentFillingLevel().getLitersPerDay());
     }
     
     @Test
@@ -289,12 +338,14 @@ class FacilityTests {
         Facility facility = new Facility(
             FacilityType.random(),
             randomLocation(),
-            randomCapacity(),
+            randomStorageCapacity(),
+            randomProcessingCapacity(),
+            randomUnloadingTime(),
             randomOpeningFixedCost(),
             FacilityStatus.DISCARDED
         );
         
-        WasteDemand demand = new WasteDemand(10.0);
+        DailyWasteDemandLitersPerDay demand = new DailyWasteDemandLitersPerDay(10.0);
         
         IllegalStateException exception = assertThrows(
             IllegalStateException.class,
@@ -311,13 +362,15 @@ class FacilityTests {
         Facility facility = randomFacility();
         
         String expectedValue = String.format(
-            "Facility={id=%s, type=%s, location=%s, capacity=%s, assignedDemand=%s, openingCost=%s, status=%s}",
+            "Facility={id=%s, type=%s, location=%s, storageCapacity=%s, processingCapacity=%s, unloadingTime=%s, openingCost=%s, currentFillingLevel=%s, status=%s}",
             facility.getId(),
             facility.getFacilityType(),
             facility.getLocation(),
-            facility.getCapacity(),
-            facility.getAssignedWasteDemand(),
+            facility.getStorageCapacity(),
+            facility.getProcessingCapacity(),
+            facility.getUnloadingTime(),
             facility.getOpeningFixedCost(),
+            facility.getCurrentFillingLevel(),
             facility.getStatus()
         );
         

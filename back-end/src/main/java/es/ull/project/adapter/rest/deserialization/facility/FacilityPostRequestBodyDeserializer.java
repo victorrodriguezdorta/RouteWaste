@@ -1,24 +1,26 @@
 package es.ull.project.adapter.rest.deserialization.facility;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.exception.FieldError;
 import es.ull.project.adapter.rest.exception.ValidationException;
 import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
-import es.ull.project.domain.enumerate.TimeUnit;
-import es.ull.project.domain.valueobject.capacity.Capacity;
+import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
+import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.location.Location;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * FacilityPostRequestBodyDeserializer
@@ -49,7 +51,9 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
         List<FieldError> errors = new ArrayList<>();
         FacilityType facilityType = parseFacilityType(rootNode, errors);
         Location location = parseLocation(rootNode, errors);
-        Capacity capacity = parseCapacity(rootNode, errors);
+        StorageCapacityKilograms storageCapacity = parseStorageCapacity(rootNode, errors);
+        ProcessingCapacityKilogramsPerDay processingCapacity = parseProcessingCapacity(rootNode, errors);
+        UnloadingTime unloadingTime = parseUnloadingTime(rootNode, errors);
         OpeningFixedCost openingFixedCost = parseOpeningFixedCost(rootNode, errors);
         FacilityStatus status = parseStatus(rootNode, errors);
         if (!errors.isEmpty()) {
@@ -58,7 +62,9 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
         FacilityPostRequestBody requestBody = new FacilityPostRequestBody();
         requestBody.facilityType = facilityType;
         requestBody.location = location;
-        requestBody.capacity = capacity;
+        requestBody.storageCapacity = storageCapacity;
+        requestBody.processingCapacity = processingCapacity;
+        requestBody.unloadingTime = unloadingTime;
         requestBody.openingFixedCost = openingFixedCost;
         requestBody.status = status;
         return requestBody;
@@ -159,28 +165,26 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
     }
 
     /**
-     * Parses the capacity nested object from JSON.
+     * Parses the storage capacity nested object from JSON.
      * 
      * @param rootNode the root JSON node
      * @param errors list to accumulate validation errors
-     * @return the parsed Capacity value object, or null if validation fails
+     * @return the parsed StorageCapacityKilograms value object, or null if validation fails
      */
-    private Capacity parseCapacity(JsonNode rootNode, List<FieldError> errors) {
-        if (!rootNode.has(JsonFields.CAPACITY)) {
-            errors.add(new FieldError(JsonFields.CAPACITY, "Field is required"));
+    private StorageCapacityKilograms parseStorageCapacity(JsonNode rootNode, List<FieldError> errors) {
+        if (!rootNode.has(JsonFields.STORAGE_CAPACITY)) {
+            errors.add(new FieldError(JsonFields.STORAGE_CAPACITY, "Field is required"));
             return null;
         }
-        JsonNode capacityNode = rootNode.get(JsonFields.CAPACITY);
+        JsonNode capacityNode = rootNode.get(JsonFields.STORAGE_CAPACITY);
         if (capacityNode.isNull() || !capacityNode.isObject()) {
-            errors.add(new FieldError(JsonFields.CAPACITY, "Must be a non-null object"));
+            errors.add(new FieldError(JsonFields.STORAGE_CAPACITY, "Must be a non-null object"));
             return null;
         }
         Double value = null;
-        QuantityUnit quantityUnit = null;
-        TimeUnit timeUnit = null;
         if (!capacityNode.has(JsonFields.CAPACITY_VALUE)) {
             errors.add(new FieldError(
-                JsonFields.CAPACITY + "." + JsonFields.CAPACITY_VALUE,
+                JsonFields.STORAGE_CAPACITY + "." + JsonFields.CAPACITY_VALUE,
                 "Field is required"
             ));
         } else {
@@ -188,48 +192,104 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
                 value = capacityNode.get(JsonFields.CAPACITY_VALUE).asDouble();
             } catch (Exception e) {
                 errors.add(new FieldError(
-                    JsonFields.CAPACITY + "." + JsonFields.CAPACITY_VALUE,
+                    JsonFields.STORAGE_CAPACITY + "." + JsonFields.CAPACITY_VALUE,
                     "Must be a valid number"
                 ));
             }
         }
-        if (!capacityNode.has(JsonFields.QUANTITY_UNIT)) {
+        if (value != null) {
+            try {
+                return new StorageCapacityKilograms(value);
+            } catch (Exception e) {
+                errors.add(new FieldError(JsonFields.STORAGE_CAPACITY, "Invalid storage capacity: " + e.getMessage()));
+                return null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Parses the processing capacity nested object from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @param errors list to accumulate validation errors
+     * @return the parsed ProcessingCapacityKilogramsPerDay value object, or null if validation fails
+     */
+    private ProcessingCapacityKilogramsPerDay parseProcessingCapacity(JsonNode rootNode, List<FieldError> errors) {
+        if (!rootNode.has(JsonFields.PROCESSING_CAPACITY)) {
+            errors.add(new FieldError(JsonFields.PROCESSING_CAPACITY, "Field is required"));
+            return null;
+        }
+        JsonNode capacityNode = rootNode.get(JsonFields.PROCESSING_CAPACITY);
+        if (capacityNode.isNull() || !capacityNode.isObject()) {
+            errors.add(new FieldError(JsonFields.PROCESSING_CAPACITY, "Must be a non-null object"));
+            return null;
+        }
+        Double value = null;
+        if (!capacityNode.has(JsonFields.CAPACITY_VALUE)) {
             errors.add(new FieldError(
-                JsonFields.CAPACITY + "." + JsonFields.QUANTITY_UNIT,
+                JsonFields.PROCESSING_CAPACITY + "." + JsonFields.CAPACITY_VALUE,
                 "Field is required"
             ));
         } else {
             try {
-                String quantityUnitStr = capacityNode.get(JsonFields.QUANTITY_UNIT).asText();
-                quantityUnit = new QuantityUnit(quantityUnitStr);
+                value = capacityNode.get(JsonFields.CAPACITY_VALUE).asDouble();
             } catch (Exception e) {
                 errors.add(new FieldError(
-                    JsonFields.CAPACITY + "." + JsonFields.QUANTITY_UNIT,
-                    "Invalid value"
+                    JsonFields.PROCESSING_CAPACITY + "." + JsonFields.CAPACITY_VALUE,
+                    "Must be a valid number"
                 ));
             }
         }
-        if (!capacityNode.has(JsonFields.TIME_UNIT)) {
+        if (value != null) {
+            try {
+                return new ProcessingCapacityKilogramsPerDay(value);
+            } catch (Exception e) {
+                errors.add(new FieldError(JsonFields.PROCESSING_CAPACITY, "Invalid processing capacity: " + e.getMessage()));
+                return null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Parses the unloading time nested object from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @param errors list to accumulate validation errors
+     * @return the parsed UnloadingTime value object, or null if validation fails
+     */
+    private UnloadingTime parseUnloadingTime(JsonNode rootNode, List<FieldError> errors) {
+        if (!rootNode.has(JsonFields.UNLOADING_TIME)) {
+            errors.add(new FieldError(JsonFields.UNLOADING_TIME, "Field is required"));
+            return null;
+        }
+        JsonNode timeNode = rootNode.get(JsonFields.UNLOADING_TIME);
+        if (timeNode.isNull() || !timeNode.isObject()) {
+            errors.add(new FieldError(JsonFields.UNLOADING_TIME, "Must be a non-null object"));
+            return null;
+        }
+        Integer value = null;
+        if (!timeNode.has(JsonFields.TIME_VALUE)) {
             errors.add(new FieldError(
-                JsonFields.CAPACITY + "." + JsonFields.TIME_UNIT,
+                JsonFields.UNLOADING_TIME + "." + JsonFields.TIME_VALUE,
                 "Field is required"
             ));
         } else {
             try {
-                String timeUnitStr = capacityNode.get(JsonFields.TIME_UNIT).asText();
-                timeUnit = TimeUnit.fromString(timeUnitStr);
+                value = timeNode.get(JsonFields.TIME_VALUE).asInt();
             } catch (Exception e) {
                 errors.add(new FieldError(
-                    JsonFields.CAPACITY + "." + JsonFields.TIME_UNIT,
-                    "Invalid time unit"
+                    JsonFields.UNLOADING_TIME + "." + JsonFields.TIME_VALUE,
+                    "Must be a valid integer"
                 ));
             }
         }
-        if (value != null && quantityUnit != null && timeUnit != null) {
+        if (value != null) {
             try {
-                return new Capacity(value, quantityUnit, timeUnit);
+                return new UnloadingTime(value);
             } catch (Exception e) {
-                errors.add(new FieldError(JsonFields.CAPACITY, "Invalid capacity: " + e.getMessage()));
+                errors.add(new FieldError(JsonFields.UNLOADING_TIME, "Invalid unloading time: " + e.getMessage()));
                 return null;
             }
         }

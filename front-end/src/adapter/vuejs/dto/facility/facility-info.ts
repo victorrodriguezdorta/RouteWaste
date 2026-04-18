@@ -1,7 +1,6 @@
 import { Facility } from '@/domain/entity/facility';
 import { FacilityStatus } from '@/domain/enumerate/facility-status';
 import { FacilityType } from '@/domain/enumerate/facility-type';
-import { TimeUnit } from '@/domain/enumerate/time-unit';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -16,7 +15,7 @@ import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
  * Unlike FacilityAdd and FacilityEdit, this DTO does not include validation methods
  * since it is only used for displaying information, not for capturing user input.
  * 
- * This DTO includes assignedWasteDemand to show current facility utilization.
+ * This DTO includes currentFillingLevel to show current facility utilization.
  * 
  * All attributes are public to allow direct access in Vue.js templates.
  */
@@ -52,19 +51,19 @@ export class FacilityInfo {
   public gisReference: string;
 
   /**
-   * Numeric capacity value.
+   * Storage capacity in kilograms.
    */
-  public capacityValue: number;
+  public storageCapacity: number;
 
   /**
-   * Unit of measurement for capacity.
+   * Processing capacity in kilograms per day.
    */
-  public capacityQuantityUnit: string;
+  public processingCapacity: number;
 
   /**
-   * Time unit for capacity rate.
+   * Unloading time in minutes.
    */
-  public capacityTimeUnit: string;
+  public unloadingTime: number;
 
   /**
    * Opening fixed cost amount.
@@ -82,19 +81,9 @@ export class FacilityInfo {
   public status: string;
 
   /**
-   * Current assigned waste demand value.
+   * Current filling level in liters per day.
    */
-  public assignedWasteDemandValue: number;
-
-  /**
-   * Unit of measurement for assigned waste demand.
-   */
-  public assignedWasteDemandQuantityUnit: string;
-
-  /**
-   * Time unit for assigned waste demand rate.
-   */
-  public assignedWasteDemandTimeUnit: string;
+  public currentFillingLevel: number;
 
   /**
    * Create a new FacilityInfo DTO.
@@ -105,15 +94,13 @@ export class FacilityInfo {
    * @param longitude Longitude coordinate
    * @param postalAddress Postal address
    * @param gisReference GIS reference
-   * @param capacityValue Numeric capacity value
-   * @param capacityQuantityUnit Unit of measurement for capacity
-   * @param capacityTimeUnit Time unit for capacity rate
+   * @param storageCapacity Storage capacity in kilograms
+   * @param processingCapacity Processing capacity in kilograms per day
+   * @param unloadingTime Unloading time in minutes
    * @param openingFixedCost Opening fixed cost amount
    * @param currencyCode ISO 4217 currency code
    * @param status Current facility status
-   * @param assignedWasteDemandValue Current assigned waste demand value
-   * @param assignedWasteDemandQuantityUnit Unit of measurement for assigned demand
-   * @param assignedWasteDemandTimeUnit Time unit for assigned demand rate
+   * @param currentFillingLevel Current filling level in liters per day
    * @throws Error if any required attribute is undefined or null
    */
   constructor(
@@ -123,15 +110,13 @@ export class FacilityInfo {
     longitude: number,
     postalAddress: string,
     gisReference: string,
-    capacityValue: number,
-    capacityQuantityUnit: string,
-    capacityTimeUnit: string,
+    storageCapacity: number,
+    processingCapacity: number,
+    unloadingTime: number,
     openingFixedCost: number,
     currencyCode: string,
     status: string,
-    assignedWasteDemandValue: number,
-    assignedWasteDemandQuantityUnit: string,
-    assignedWasteDemandTimeUnit: string
+    currentFillingLevel: number
   ) {
     this.validate<string>(id, 'Facility id is not defined');
     this.validate<string>(facilityType, 'Facility type is not defined');
@@ -139,15 +124,13 @@ export class FacilityInfo {
     this.validate<number>(longitude, 'Longitude is not defined');
     this.validate<string>(postalAddress, 'Postal address is not defined');
     this.validate<string>(gisReference, 'GIS reference is not defined');
-    this.validate<number>(capacityValue, 'Capacity value is not defined');
-    this.validate<string>(capacityQuantityUnit, 'Capacity quantity unit is not defined');
-    this.validate<string>(capacityTimeUnit, 'Capacity time unit is not defined');
+    this.validate<number>(storageCapacity, 'Storage capacity is not defined');
+    this.validate<number>(processingCapacity, 'Processing capacity is not defined');
+    this.validate<number>(unloadingTime, 'Unloading time is not defined');
     this.validate<number>(openingFixedCost, 'Opening fixed cost is not defined');
     this.validate<string>(currencyCode, 'Currency code is not defined');
     this.validate<string>(status, 'Facility status is not defined');
-    this.validate<number>(assignedWasteDemandValue, 'Assigned waste demand value is not defined');
-    this.validate<string>(assignedWasteDemandQuantityUnit, 'Assigned waste demand quantity unit is not defined');
-    this.validate<string>(assignedWasteDemandTimeUnit, 'Assigned waste demand time unit is not defined');
+    this.validate<number>(currentFillingLevel, 'Current filling level is not defined');
 
     this.id = id;
     this.facilityType = facilityType;
@@ -155,15 +138,13 @@ export class FacilityInfo {
     this.longitude = longitude;
     this.postalAddress = postalAddress;
     this.gisReference = gisReference;
-    this.capacityValue = capacityValue;
-    this.capacityQuantityUnit = capacityQuantityUnit;
-    this.capacityTimeUnit = capacityTimeUnit;
+    this.storageCapacity = storageCapacity;
+    this.processingCapacity = processingCapacity;
+    this.unloadingTime = unloadingTime;
     this.openingFixedCost = openingFixedCost;
     this.currencyCode = currencyCode;
     this.status = status;
-    this.assignedWasteDemandValue = assignedWasteDemandValue;
-    this.assignedWasteDemandQuantityUnit = assignedWasteDemandQuantityUnit;
-    this.assignedWasteDemandTimeUnit = assignedWasteDemandTimeUnit;
+    this.currentFillingLevel = currentFillingLevel;
   }
 
   /**
@@ -195,14 +176,14 @@ export class FacilityInfo {
     const randomLongitude = parseFloat((Math.random() * 360 - 180).toFixed(6));
     const randomPostalAddress = `${Math.floor(Math.random() * 1000)} Industrial Park, City`;
     const randomGisReference = `GIS-FAC-${Math.floor(Math.random() * 100000)}`;
-    const randomCapacityValue = Math.floor(Math.random() * 1000) + 100;
-    const randomQuantityUnit = 'tons';
-    const randomTimeUnit = TimeUnit.DAY;
+    const randomStorageCapacity = Math.floor(Math.random() * 5000) + 1000;
+    const randomProcessingCapacity = Math.floor(Math.random() * 1000) + 100;
+    const randomUnloadingTime = Math.floor(Math.random() * 120) + 15;
     const randomOpeningFixedCost = parseFloat((Math.random() * 100000 + 10000).toFixed(2));
     const randomCurrency = 'EUR';
     const statuses = [FacilityStatus.CANDIDATE, FacilityStatus.PLANNED, FacilityStatus.OPEN, FacilityStatus.DISCARDED];
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)] as FacilityStatus;
-    const randomAssignedDemand = parseFloat((Math.random() * randomCapacityValue * 0.8).toFixed(2));
+    const randomFillingLevel = parseFloat((Math.random() * randomStorageCapacity * 0.8).toFixed(2));
 
     return new FacilityInfo(
       randomId,
@@ -211,15 +192,13 @@ export class FacilityInfo {
       randomLongitude,
       randomPostalAddress,
       randomGisReference,
-      randomCapacityValue,
-      randomQuantityUnit,
-      randomTimeUnit,
+      randomStorageCapacity,
+      randomProcessingCapacity,
+      randomUnloadingTime,
       randomOpeningFixedCost,
       randomCurrency,
       randomStatus as string,
-      randomAssignedDemand,
-      randomQuantityUnit,
-      randomTimeUnit
+      randomFillingLevel
     );
   }
 
@@ -231,9 +210,11 @@ export class FacilityInfo {
    */
   static fromFacility(facility: Facility): FacilityInfo {
     const location = facility.getLocation();
-    const capacity = facility.getCapacity();
+    const storageCapacity = facility.getStorageCapacity();
+    const processingCapacity = facility.getProcessingCapacity();
+    const unloadingTime = facility.getUnloadingTime();
     const openingFixedCost = facility.getOpeningFixedCost();
-    const assignedWasteDemand = facility.getAssignedWasteDemand();
+    const currentFillingLevel = facility.getCurrentFillingLevel();
 
     return new FacilityInfo(
       facility.getId().getValue(),
@@ -242,15 +223,13 @@ export class FacilityInfo {
       location.longitude,
       location.postalAddress,
       location.gisReference,
-      capacity.getValue(),
-      capacity.getQuantityUnit().getValue(),
-      capacity.getTimeUnit(),
+      storageCapacity.getKilograms(),
+      processingCapacity.getKilogramsPerDay(),
+      unloadingTime.getMinutes(),
       openingFixedCost.getAmount(),
       openingFixedCost.getCurrency().getCode(),
       facility.getStatus(),
-      assignedWasteDemand.getValue(),
-      assignedWasteDemand.getQuantityUnit().getValue(),
-      assignedWasteDemand.getTimeUnit()
+      currentFillingLevel.getLitersPerDay()
     );
   }
 
@@ -264,21 +243,39 @@ export class FacilityInfo {
   }
 
   /**
-   * Get a formatted string representing the capacity with units.
+   * Get a formatted string representing the storage capacity.
    * 
-   * @returns Formatted capacity string (e.g., "500 tons/day")
+   * @returns Formatted storage capacity string (e.g., "5000 kg")
    */
-  getFormattedCapacity(): string {
-    return `${this.capacityValue} ${this.capacityQuantityUnit}/${this.capacityTimeUnit.toLowerCase()}`;
+  getFormattedStorageCapacity(): string {
+    return `${this.storageCapacity} kg`;
   }
 
   /**
-   * Get a formatted string representing the assigned waste demand with units.
+   * Get a formatted string representing the processing capacity.
    * 
-   * @returns Formatted assigned demand string (e.g., "350 tons/day")
+   * @returns Formatted processing capacity string (e.g., "500 kg/day")
    */
-  getFormattedAssignedWasteDemand(): string {
-    return `${this.assignedWasteDemandValue} ${this.assignedWasteDemandQuantityUnit}/${this.assignedWasteDemandTimeUnit.toLowerCase()}`;
+  getFormattedProcessingCapacity(): string {
+    return `${this.processingCapacity} kg/day`;
+  }
+
+  /**
+   * Get a formatted string representing the unloading time.
+   * 
+   * @returns Formatted unloading time string (e.g., "45 minutes")
+   */
+  getFormattedUnloadingTime(): string {
+    return `${this.unloadingTime} minutes`;
+  }
+
+  /**
+   * Get a formatted string representing the current filling level.
+   * 
+   * @returns Formatted filling level string (e.g., "2500 liters/day")
+   */
+  getFormattedCurrentFillingLevel(): string {
+    return `${this.currentFillingLevel.toFixed(2)} liters/day`;
   }
 
   /**
@@ -306,43 +303,6 @@ export class FacilityInfo {
    */
   getFormattedStatus(): string {
     return this.status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-  }
-
-  /**
-   * Calculate the utilization percentage of the facility.
-   * 
-   * @returns Utilization percentage (0-100)
-   */
-  getUtilizationPercentage(): number {
-    if (this.capacityValue === 0) return 0;
-    return parseFloat(((this.assignedWasteDemandValue / this.capacityValue) * 100).toFixed(2));
-  }
-
-  /**
-   * Calculate the remaining available capacity.
-   * 
-   * @returns Remaining capacity value
-   */
-  getRemainingCapacity(): number {
-    return Math.max(0, this.capacityValue - this.assignedWasteDemandValue);
-  }
-
-  /**
-   * Get a formatted string representing the remaining capacity with units.
-   * 
-   * @returns Formatted remaining capacity string
-   */
-  getFormattedRemainingCapacity(): string {
-    return `${this.getRemainingCapacity()} ${this.capacityQuantityUnit}/${this.capacityTimeUnit.toLowerCase()}`;
-  }
-
-  /**
-   * Check if the facility is at full capacity.
-   * 
-   * @returns true if facility is at or over capacity
-   */
-  isAtFullCapacity(): boolean {
-    return this.assignedWasteDemandValue >= this.capacityValue;
   }
 
   /**

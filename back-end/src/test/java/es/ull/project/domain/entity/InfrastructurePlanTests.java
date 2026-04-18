@@ -12,15 +12,15 @@ import org.junit.jupiter.api.Test;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.enumerate.ServiceZone;
-import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.capacity.Capacity;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
+import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.Location;
@@ -49,15 +49,13 @@ class InfrastructurePlanTests {
         return new Location(28.47, -16.25, "Addr " + ((int)(Math.random()*1000)), "GIS-" + ((int)(Math.random()*1000)));
     }
 
-    private static Capacity randomCapacity() {
-        return new Capacity(100.0, new QuantityUnit("tons"), TimeUnit.DAY);
-    }
-
     private static Facility randomFacility() {
         return new Facility(
                 FacilityType.random(),
                 randomLocation(),
-                randomCapacity(),
+                new StorageCapacityKilograms(1000.0),
+                new ProcessingCapacityKilogramsPerDay(500.0),
+                new UnloadingTime(60),
                 new OpeningFixedCost(10000.0),
                 FacilityStatus.PLANNED
         );
@@ -181,7 +179,15 @@ class InfrastructurePlanTests {
         MaximumBudget smallBudget = new MaximumBudget(1.0);
         InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), smallBudget, randomServicePolicies());
         // Facility with large opening cost
-        Facility expensive = new Facility(FacilityType.random(), randomLocation(), randomCapacity(), new OpeningFixedCost(10000.0), FacilityStatus.PLANNED);
+        Facility expensive = new Facility(
+            FacilityType.random(),
+            randomLocation(),
+            new StorageCapacityKilograms(1000.0),
+            new ProcessingCapacityKilogramsPerDay(500.0),
+            new UnloadingTime(60),
+            new OpeningFixedCost(10000.0),
+            FacilityStatus.PLANNED
+        );
         plan.addFacility(expensive);
 
         IllegalStateException exception = assertThrows(

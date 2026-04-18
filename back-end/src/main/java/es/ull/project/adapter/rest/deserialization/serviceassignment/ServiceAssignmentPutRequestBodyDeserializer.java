@@ -16,8 +16,10 @@ import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.capacity.Capacity;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
+import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
@@ -131,14 +133,16 @@ public class ServiceAssignmentPutRequestBodyDeserializer extends JsonDeserialize
             String facilityTypeStr = facilityNode.get(JsonFields.FACILITY_TYPE).asText();
             FacilityType facilityType = FacilityType.fromString(facilityTypeStr);
             Location location = parseLocationFromNode(facilityNode, JsonFields.LOCATION);
-            Capacity capacity = parseCapacityFromNode(facilityNode, JsonFields.CAPACITY);
+            StorageCapacityKilograms storageCapacity = parseStorageCapacityFromNode(facilityNode);
+            ProcessingCapacityKilogramsPerDay processingCapacity = parseProcessingCapacityFromNode(facilityNode);
+            UnloadingTime unloadingTime = parseUnloadingTimeFromNode(facilityNode);
             OpeningFixedCost openingFixedCost = parseOpeningFixedCostFromNode(facilityNode);
             if (!facilityNode.has(JsonFields.STATUS)) {
                 throw new IllegalArgumentException("Required field '" + JsonFields.STATUS + "' is missing in facility");
             }
             String statusStr = facilityNode.get(JsonFields.STATUS).asText();
             FacilityStatus status = FacilityStatus.fromString(statusStr);
-            return new Facility(facilityType, location, capacity, openingFixedCost, status);
+            return new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status);
         } catch (Exception e) {
             throw new IllegalArgumentException(
                 "Invalid value for field '" + JsonFields.FACILITY + "': " + e.getMessage(), e);
@@ -211,26 +215,57 @@ public class ServiceAssignmentPutRequestBodyDeserializer extends JsonDeserialize
     }
 
     /**
-     * Parses a Capacity value object from a parent node.
+     * Parses a StorageCapacityKilograms value object from a parent node.
      * 
-     * @param parentNode the parent JSON node containing the capacity
-     * @param fieldName the name of the capacity field
-     * @return the parsed Capacity
+     * @param parentNode the parent JSON node containing the storage capacity
+     * @return the parsed StorageCapacityKilograms
      */
-    private Capacity parseCapacityFromNode(JsonNode parentNode, String fieldName) {
-        if (!parentNode.has(fieldName)) {
-            throw new IllegalArgumentException("Required field '" + fieldName + "' is missing");
+    private StorageCapacityKilograms parseStorageCapacityFromNode(JsonNode parentNode) {
+        if (!parentNode.has(JsonFields.STORAGE_CAPACITY)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.STORAGE_CAPACITY + "' is missing");
         }
-        JsonNode capacityNode = parentNode.get(fieldName);
+        JsonNode capacityNode = parentNode.get(JsonFields.STORAGE_CAPACITY);
         if (capacityNode.isNull() || !capacityNode.isObject()) {
-            throw new IllegalArgumentException("Field '" + fieldName + "' must be a non-null object");
+            throw new IllegalArgumentException("Field '" + JsonFields.STORAGE_CAPACITY + "' must be a non-null object");
         }
         double value = capacityNode.get(JsonFields.CAPACITY_VALUE).asDouble();
-        String quantityUnitStr = capacityNode.get(JsonFields.QUANTITY_UNIT).asText();
-        QuantityUnit quantityUnit = new QuantityUnit(quantityUnitStr);
-        String timeUnitStr = capacityNode.get(JsonFields.TIME_UNIT).asText();
-        TimeUnit timeUnit = TimeUnit.fromString(timeUnitStr);
-        return new Capacity(value, quantityUnit, timeUnit);
+        return new StorageCapacityKilograms(value);
+    }
+
+    /**
+     * Parses a ProcessingCapacityKilogramsPerDay value object from a parent node.
+     * 
+     * @param parentNode the parent JSON node containing the processing capacity
+     * @return the parsed ProcessingCapacityKilogramsPerDay
+     */
+    private ProcessingCapacityKilogramsPerDay parseProcessingCapacityFromNode(JsonNode parentNode) {
+        if (!parentNode.has(JsonFields.PROCESSING_CAPACITY)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.PROCESSING_CAPACITY + "' is missing");
+        }
+        JsonNode capacityNode = parentNode.get(JsonFields.PROCESSING_CAPACITY);
+        if (capacityNode.isNull() || !capacityNode.isObject()) {
+            throw new IllegalArgumentException("Field '" + JsonFields.PROCESSING_CAPACITY + "' must be a non-null object");
+        }
+        double value = capacityNode.get(JsonFields.CAPACITY_VALUE).asDouble();
+        return new ProcessingCapacityKilogramsPerDay(value);
+    }
+
+    /**
+     * Parses an UnloadingTime value object from a parent node.
+     * 
+     * @param parentNode the parent JSON node containing the unloading time
+     * @return the parsed UnloadingTime
+     */
+    private UnloadingTime parseUnloadingTimeFromNode(JsonNode parentNode) {
+        if (!parentNode.has(JsonFields.UNLOADING_TIME)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.UNLOADING_TIME + "' is missing");
+        }
+        JsonNode timeNode = parentNode.get(JsonFields.UNLOADING_TIME);
+        if (timeNode.isNull() || !timeNode.isObject()) {
+            throw new IllegalArgumentException("Field '" + JsonFields.UNLOADING_TIME + "' must be a non-null object");
+        }
+        int value = timeNode.get(JsonFields.TIME_VALUE).asInt();
+        return new UnloadingTime(value);
     }
 
     /**

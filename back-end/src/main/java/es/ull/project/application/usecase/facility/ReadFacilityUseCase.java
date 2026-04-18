@@ -1,12 +1,15 @@
 package es.ull.project.application.usecase.facility;
 
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityType;
 import java.util.List;
 import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+
+import es.ull.project.adapter.mongodb.query.FacilitySearchCriteria;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityType;
 
 /**
  * Use case for reading facilities.
@@ -43,4 +46,14 @@ public interface ReadFacilityUseCase {
      * @return a page of facilities
      */
     Page<Facility> fetchAll(@NonNull Pageable pageable, FacilityType facilityType);
+
+    /**
+     * Retrieves facilities with advanced search criteria and pagination.
+     * Supports filtering by multiple attributes dynamically.
+     *
+     * @param pageable pagination and sort information
+     * @param criteria search criteria with optional filters
+     * @return a page of facilities
+     */
+    Page<Facility> fetchAll(@NonNull Pageable pageable, @NonNull FacilitySearchCriteria criteria);
 }

@@ -1,23 +1,9 @@
 package es.ull.project.adapter.rest.controller;
 
-import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
-import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
-import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
-import es.ull.project.adapter.rest.response.facility.FacilityPageResponseBody;
-import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
-import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
-import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
-import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
-import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityType;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +20,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import es.ull.project.adapter.mongodb.mapper.FacilityFieldMapper;
+import es.ull.project.adapter.mongodb.query.FacilitySearchCriteria;
+import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
+import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
+import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
+import es.ull.project.adapter.rest.response.facility.FacilityPageResponseBody;
+import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
+import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
+import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
+import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
+import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 /**
  * FacilityController
@@ -52,18 +57,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class FacilityController {
 
     private static final int ZERO = 0;
-
-    private static final String SORT_BY_TYPE = "type";
-    private static final String FIELD_TYPE = "facilityType";
-
-    private static final String SORT_BY_LOCATION = "location";
-    private static final String FIELD_LOCATION = "location.postalAddress";
-
-    private static final String SORT_BY_CAPACITY = "capacity";
-    private static final String FIELD_CAPACITY = "capacity.value";
-
-    private static final String SORT_BY_STATUS = "status";
-    private static final String FIELD_STATUS = "status";
 
     /**
      * Use case for reading facility data.
@@ -96,20 +89,19 @@ public class FacilityController {
     /**
      * GET /facilities
      * 
-     * Retrieves facilities in the system with pagination support.
+     * Retrieves facilities in the system with advanced filtering and sorting options.
+     * Supports pagination, sorting by any attribute, and filtering by multiple criteria.
      * 
-     * This endpoint returns a paginated list of facilities with optional filtering
-     * and sorting capabilities. Facilities are returned as FacilityResponseBody DTOs
-     * serialized to JSON.
-     * 
-     * @param page zero-based page index (default: 0)
-     * @param size page size (default: 10)
-     * @param sortBy field to sort by: type, location, capacity, or status (optional)
-     * @param sortOrder sort direction: asc or desc (default: asc)
-     * @param facilityType optional facility type filter
-     * @return ResponseEntity containing paginated facilities and HTTP 200 (OK) status
+     * @param page the zero-based page index (defaults to 0)
+     * @param size the number of elements per page (defaults to 10)
+     * @param sortBy the field to sort by (any facility attribute)
+     * @param sortOrder the sort direction, "asc" or "desc" (defaults to "asc")
+     * @param facilityType optional filter by facility type
+     * @param status optional filter by facility status
+     * @param location optional filter by location (postal address)
+     * @return ResponseEntity containing a page of facilities with HTTP 200 (OK) status
      */
-    @Operation(summary = "Get all facilities", description = "Retrieves a paginated list of facilities with optional sorting and filtering")
+    @Operation(summary = "Get all facilities", description = "Retrieves a paginated list of facilities with optional sorting and advanced filtering")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Facilities retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request parameters")
@@ -118,26 +110,27 @@ public class FacilityController {
     public ResponseEntity<FacilityPageResponseBody> getFacilities(
             @Parameter(description = "Zero-based page index") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Number of elements per page") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Field to sort by: type, location, capacity, status") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Field to sort by (e.g., type, location, storageCapacity, processingCapacity, unloadingTime, openingCost, status, etc.)") 
+            @RequestParam(required = false) String sortBy,
             @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder,
-            @Parameter(description = "Filter by facility type") @RequestParam(required = false) String facilityType) {
+            @Parameter(description = "Filter by facility type") @RequestParam(required = false) String facilityType,
+            @Parameter(description = "Filter by facility status") @RequestParam(required = false) String status,
+            @Parameter(description = "Filter by location (postal address)") @RequestParam(required = false) String location) {
+        
+        // Validate pagination parameters
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        String mongoSortField = switch (sortBy != null ? sortBy : "") {
-            case SORT_BY_TYPE -> FIELD_TYPE;
-            case SORT_BY_LOCATION -> FIELD_LOCATION;
-            case SORT_BY_CAPACITY -> FIELD_CAPACITY;
-            case SORT_BY_STATUS -> FIELD_STATUS;
-            default -> null;
-        };
-        Sort sort = Sort.unsorted();
-        if (mongoSortField != null) {
-            Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder)
-                    ? Sort.Direction.DESC
-                    : Sort.Direction.ASC;
-            sort = Sort.by(direction, mongoSortField);
+
+        // Build sort configuration
+        Sort sort = buildSort(sortBy, sortOrder);
+
+        // Validate sort field if provided
+        if (sortBy != null && !sortBy.isBlank() && !FacilityFieldMapper.isValidField(sortBy)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+        // Validate facility type if provided
         FacilityType facilityTypeFilter = null;
         if (facilityType != null && !facilityType.isBlank()) {
             try {
@@ -146,11 +139,68 @@ public class FacilityController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+
+        // Validate status if provided
+        FacilityStatus statusFilter = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                statusFilter = FacilityStatus.valueOf(status);
+            } catch (IllegalArgumentException e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // Build search criteria
+        FacilitySearchCriteria criteria = new FacilitySearchCriteria.Builder()
+                .withFacilityType(facilityTypeFilter)
+                .withStatus(statusFilter)
+                .withLocationPostalAddress(location)
+                .build();
+
+        // Execute query
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Facility> facilityPage = this.readFacilityUseCase.fetchAll(pageable, facilityTypeFilter);
+        Page<Facility> facilityPage = this.readFacilityUseCase.fetchAll(pageable, criteria);
+
+        // Map and return response
+        return buildSuccessResponse(facilityPage);
+    }
+
+    /**
+     * Builds a Sort object from sortBy and sortOrder parameters.
+     * Uses the field mapper to translate public field names to MongoDB paths.
+     *
+     * @param sortBy the field name to sort by
+     * @param sortOrder the sort direction (asc/desc)
+     * @return Sort object, unsorted if sortBy is null
+     */
+    private Sort buildSort(String sortBy, String sortOrder) {
+        if (sortBy == null || sortBy.isBlank()) {
+            return Sort.unsorted();
+        }
+
+        String mongoField = FacilityFieldMapper.toMongoField(sortBy);
+        if (mongoField == null) {
+            return Sort.unsorted();
+        }
+
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder) 
+                ? Sort.Direction.DESC 
+                : Sort.Direction.ASC;
+        
+        return Sort.by(direction, mongoField);
+    }
+
+    /**
+     * Builds a successful response from a facility page.
+     *
+     * @param facilityPage the page of facilities
+     * @return ResponseEntity with facility page response body and HTTP 200
+     */
+    private ResponseEntity<FacilityPageResponseBody> buildSuccessResponse(Page<Facility> facilityPage) {
         List<FacilityResponseBody> responseBodies = facilityPage.getContent().stream()
                 .map(FacilityResponseMapper::toResponseBody)
                 .toList();
+        
         FacilityPageResponseBody response = new FacilityPageResponseBody();
         response.content = responseBodies;
         response.totalElements = facilityPage.getTotalElements();
@@ -160,6 +210,7 @@ public class FacilityController {
         response.numberOfElements = facilityPage.getNumberOfElements();
         response.first = facilityPage.isFirst();
         response.last = facilityPage.isLast();
+        
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -219,7 +270,9 @@ public class FacilityController {
             Facility createdFacility = this.createFacilityUseCase.create(
                     requestBody.facilityType,
                     requestBody.location,
-                    requestBody.capacity,
+                    requestBody.storageCapacity,
+                    requestBody.processingCapacity,
+                    requestBody.unloadingTime,
                     requestBody.openingFixedCost,
                     requestBody.status
             );
@@ -261,7 +314,9 @@ public class FacilityController {
                     facilityId,
                     requestBody.facilityType,
                     requestBody.location,
-                    requestBody.capacity,
+                    requestBody.storageCapacity,
+                    requestBody.processingCapacity,
+                    requestBody.unloadingTime,
                     requestBody.openingFixedCost,
                     requestBody.status
             );

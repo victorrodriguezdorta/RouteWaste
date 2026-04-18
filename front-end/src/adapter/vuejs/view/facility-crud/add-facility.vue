@@ -50,7 +50,6 @@ import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { FacilityStatus } from '../../../../domain/enumerate/facility-status';
 import { FacilityType } from '../../../../domain/enumerate/facility-type';
-import { TimeUnit } from '../../../../domain/enumerate/time-unit';
 import CrudLayout from '../../components/common/CrudLayout.vue';
 import FacilityFormFields from '../../components/facility/facility-form-fields.vue';
 import { FacilityAdd } from '../../dto/facility/facility-add';
@@ -70,8 +69,8 @@ const newFacility = ref<FacilityAdd>(
     '',
     '',
     0,
-    'tons',
-    TimeUnit.DAY,
+    0,
+    0,
     0,
     'EUR',
     FacilityStatus.CANDIDATE

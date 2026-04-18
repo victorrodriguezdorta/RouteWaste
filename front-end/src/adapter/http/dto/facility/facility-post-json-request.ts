@@ -4,26 +4,39 @@ import type { CreateFacilityCommand } from '@/application/usecase/facility-manag
  * FacilityPostJsonRequest DTO
  *
  * Represents the JSON body sent to the backend when creating a new Facility.
- * Uses primitive types for all fields so it can be serialized directly.
+ * Contains VO objects that match the backend's expected structure for JSON deserialization.
  */
 export class FacilityPostJsonRequest {
   /**
-   * Tipo de la instalación (facility).
+   * Tipo de la instalación.
    */
   facilityType: string;
 
   /**
-   * Ubicación de la instalación, incluyendo latitud, longitud, dirección postal y referencia GIS.
+   * Ubicación de la instalación.
    */
   location: { latitude: number; longitude: number; postalAddress: string; gisReference: string };
 
   /**
-   * Capacidad de la instalación, incluyendo valor, unidad de cantidad y unidad de tiempo.
+   * Storage capacity value object - matches backend's StorageCapacityKilograms structure.
+   * Contains the `value` property that Jackson deserializes to the backend VO.
    */
-  capacity: { value: number; quantityUnit: string; timeUnit: string };
+  storageCapacity: { value: number };
 
   /**
-   * Coste fijo de apertura, incluyendo cantidad y moneda.
+   * Processing capacity value object - matches backend's ProcessingCapacityKilogramsPerDay structure.
+   * Contains the `value` property that Jackson deserializes to the backend VO.
+   */
+  processingCapacity: { value: number };
+
+  /**
+   * Unloading time value object - matches backend's UnloadingTime structure.
+   * Contains the `timeValue` property that Jackson deserializes to the backend VO.
+   */
+  unloadingTime: { timeValue: number };
+
+  /**
+   * Coste fijo de apertura.
    */
   openingFixedCost: { amount: number; currency?: string };
 
@@ -35,24 +48,31 @@ export class FacilityPostJsonRequest {
   constructor(
     facilityType: string,
     location: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
-    capacity: { value: number; quantityUnit: string; timeUnit: string },
+    storageCapacity: { value: number },
+    processingCapacity: { value: number },
+    unloadingTime: { timeValue: number },
     openingFixedCost: { amount: number; currency?: string },
     status: string
   ) {
     this.facilityType = facilityType;
     this.location = location;
-    this.capacity = capacity;
+    this.storageCapacity = storageCapacity;
+    this.processingCapacity = processingCapacity;
+    this.unloadingTime = unloadingTime;
     this.openingFixedCost = openingFixedCost;
     this.status = status;
   }
 
   /**
-   * Mapea un `CreateFacilityCommand` (entrada de dominio) a este DTO.
-   * @param data Comando de creación de instalación a mapear.
-   * @returns Una instancia de FacilityPostJsonRequest con los datos mapeados.
+   * Map a `CreateFacilityCommand` (domain input) into this DTO.
+   * Extracts values from VOs and wraps them in the VO structure that matches the backend.
+   * @param data The CreateFacilityCommand containing domain objects to convert.
+   * @returns A new FacilityPostJsonRequest instance with VO structures.
    */
   public static toRequest(data: CreateFacilityCommand): FacilityPostJsonRequest {
-    return new FacilityPostJsonRequest(
+    console.log('[FacilityPostJsonRequest.toRequest] Converting command to request:', data);
+    
+    const request = new FacilityPostJsonRequest(
       data.facilityType,
       {
         latitude: data.location.latitude,
@@ -60,16 +80,20 @@ export class FacilityPostJsonRequest {
         postalAddress: data.location.postalAddress,
         gisReference: data.location.gisReference,
       },
+      // Wrap in backend VO structure
+      { value: data.storageCapacity.getKilograms() },
+      // Wrap in backend VO structure
+      { value: data.processingCapacity.getKilogramsPerDay() },
+      // Wrap in backend VO structure
+      { timeValue: data.unloadingTime.getMinutes() },
       {
-        value: data.capacity.getValue(),
-        quantityUnit: data.capacity.getQuantityUnit().getValue(),
-        timeUnit: data.capacity.getTimeUnit().toString(),
-      },
-      {
-        amount: data.openingFixedCost.getAmount(),
-        currency: data.openingFixedCost.getCurrency().getCode(),
+        amount: data.openingFixedCost.amount,
+        currency: data.openingFixedCost.currency,
       },
       data.status
     );
+    
+    console.log('[FacilityPostJsonRequest.toRequest] Converted request:', request);
+    return request;
   }
 }

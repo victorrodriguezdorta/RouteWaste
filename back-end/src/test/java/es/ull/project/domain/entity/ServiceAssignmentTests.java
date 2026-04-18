@@ -9,16 +9,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.enumerate.ServiceZone;
-import es.ull.project.domain.enumerate.TimeUnit;
 import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.capacity.Capacity;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
+import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
-import es.ull.project.domain.valueobject.demand.QuantityUnit;
 import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.Location;
@@ -61,12 +62,16 @@ class ServiceAssignmentTests {
         );
     }
 
-    private static Capacity randomCapacity() {
-        return new Capacity(
-            100.0 + Math.random() * 500.0,
-            new QuantityUnit("tons"),
-            TimeUnit.DAY
-        );
+    private static StorageCapacityKilograms randomStorageCapacity() {
+        return new StorageCapacityKilograms(1000.0 + Math.random() * 5000.0);
+    }
+
+    private static ProcessingCapacityKilogramsPerDay randomProcessingCapacity() {
+        return new ProcessingCapacityKilogramsPerDay(500.0 + Math.random() * 2000.0);
+    }
+
+    private static UnloadingTime randomUnloadingTime() {
+        return new UnloadingTime(30 + (int)(Math.random() * 120));
     }
 
     private static OpeningFixedCost randomOpeningFixedCost() {
@@ -78,7 +83,15 @@ class ServiceAssignmentTests {
     }
 
     private static Facility randomFacility() {
-        return new Facility(FacilityType.random(), randomLocation(), randomCapacity(), randomOpeningFixedCost(), es.ull.project.domain.enumerate.FacilityStatus.random());
+        return new Facility(
+            FacilityType.random(),
+            randomLocation(),
+            randomStorageCapacity(),
+            randomProcessingCapacity(),
+            randomUnloadingTime(),
+            randomOpeningFixedCost(),
+            FacilityStatus.random()
+        );
     }
 
     // ========== Constructors ==========

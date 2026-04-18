@@ -1,13 +1,10 @@
 package es.ull.project.adapter.mongodb.repository;
 
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -18,6 +15,13 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
+
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.adapter.mongodb.query.FacilitySearchCriteria;
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
 
 /**
  * MongoDB implementation of the FacilityRepository interface.
@@ -117,21 +121,64 @@ public class FacilityMongoRepository implements FacilityRepository {
      */
     @Override
     public Page<Facility> findAll(@NonNull Pageable pageable, FacilityType type, FacilityStatus status) {
+        FacilitySearchCriteria criteria = new FacilitySearchCriteria.Builder()
+                .withFacilityType(type)
+                .withStatus(status)
+                .build();
+        return findAll(pageable, criteria);
+    }
+
+    /**
+     * Find facilities with advanced search criteria and pagination.
+     * Supports filtering by multiple attributes dynamically.
+     *
+     * @param pageable pagination and sort information
+     * @param criteria search criteria with optional filters
+     * @return page of matching facilities
+     */
+    public Page<Facility> findAll(@NonNull Pageable pageable, @NonNull FacilitySearchCriteria criteria) {
         Query dataQuery = new Query();
         Query countQuery = new Query();
-        if (type != null) {
-            Criteria criteria = Criteria.where(MongoFields.FACILITY_TYPE).is(type);
-            dataQuery.addCriteria(criteria);
-            countQuery.addCriteria(criteria);
+
+        // Build criteria list
+        List<Criteria> criterias = buildSearchCriterias(criteria);
+        
+        if (!criterias.isEmpty()) {
+            Criteria combinedCriteria = new Criteria().andOperator(criterias.toArray(new Criteria[0]));
+            dataQuery.addCriteria(combinedCriteria);
+            countQuery.addCriteria(combinedCriteria);
         }
-        if (status != null) {
-            Criteria criteria = Criteria.where(MongoFields.STATUS).is(status);
-            dataQuery.addCriteria(criteria);
-            countQuery.addCriteria(criteria);
-        }
+
         dataQuery.with(pageable);
-        List<Facility> content = this.mongoTemplate.find(dataQuery, Facility.class, COLLECTION_NAME);
-        long total = this.mongoTemplate.count(countQuery, COLLECTION_NAME);
-        return new PageImpl<>(content, pageable, total);
+        List<Facility> facilities = this.mongoTemplate.find(dataQuery, Facility.class, COLLECTION_NAME);
+        long total = this.mongoTemplate.count(countQuery, Facility.class, COLLECTION_NAME);
+        
+        return new PageImpl<>(facilities, pageable, total);
+    }
+
+    /**
+     * Builds a list of MongoDB Criteria from search criteria.
+     * Each non-null filter is converted to a corresponding Criteria object.
+     *
+     * @param criteria search criteria
+     * @return list of Criteria objects
+     */
+    private List<Criteria> buildSearchCriterias(@NonNull FacilitySearchCriteria criteria) {
+        List<Criteria> criterias = new ArrayList<>();
+
+        if (criteria.getFacilityType() != null) {
+            criterias.add(Criteria.where(MongoFields.FACILITY_TYPE).is(criteria.getFacilityType()));
+        }
+
+        if (criteria.getStatus() != null) {
+            criterias.add(Criteria.where(MongoFields.STATUS).is(criteria.getStatus()));
+        }
+
+        if (criteria.getLocationPostalAddress() != null) {
+            criterias.add(Criteria.where("location.postalAddress")
+                    .regex(criteria.getLocationPostalAddress(), "i")); // Case-insensitive
+        }
+
+        return criterias;
     }
 }

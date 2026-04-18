@@ -1,7 +1,11 @@
 import { FacilityStatus, facilityStatusIsDiscarded } from '@/domain/enumerate/facility-status';
 import { FacilityType } from '@/domain/enumerate/facility-type';
+import { ProcessingCapacityKilogramsPerDay } from '@/domain/valueobject/capacity/processing-capacity-kilograms-per-day';
+import { StorageCapacityKilograms } from '@/domain/valueobject/capacity/storage-capacity-kilograms';
+import { UnloadingTime } from '@/domain/valueobject/capacity/unloading-time';
 import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
 import { Capacity } from '@/domain/valueobject/demand/capacity';
+import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
 import { Location } from '@/domain/valueobject/location/location';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
@@ -32,9 +36,19 @@ export class Facility {
   private location: Location;
 
   /**
-   * Capacidad máxima de la instalación.
+   * Capacidad de almacenamiento máxima de la instalación en kilogramos.
    */
-  private capacity: Capacity;
+  private storageCapacity: StorageCapacityKilograms;
+
+  /**
+   * Capacidad de procesamiento de la instalación en kilogramos por día.
+   */
+  private processingCapacity: ProcessingCapacityKilogramsPerDay;
+
+  /**
+   * Tiempo de descarga de camiones en la instalación en minutos.
+   */
+  private unloadingTime: UnloadingTime;
 
   /**
    * Coste fijo de apertura de la instalación.
@@ -47,7 +61,17 @@ export class Facility {
   private status: FacilityStatus;
 
   /**
-   * Demanda de residuos asignada actualmente a la instalación.
+   * Nivel de llenado actual de la instalación en litros por día.
+   */
+  private currentFillingLevel: DailyWasteDemandLitersPerDay;
+
+  /**
+   * Capacidad máxima de la instalación (legacy - mantenido para compatibilidad).
+   */
+  private capacity: Capacity;
+
+  /**
+   * Demanda de residuos asignada actualmente a la instalación (legacy).
    */
   private assignedWasteDemand: WasteDemand;
 
@@ -55,25 +79,45 @@ export class Facility {
    * Create a new `Facility` aggregate.
    * @param facilityType facility classification
    * @param location facility geographic location
-   * @param capacity capacity value object
+   * @param storageCapacity storage capacity value object in kilograms
+   * @param processingCapacity processing capacity value object in kilograms per day
+   * @param unloadingTime unloading time value object in minutes
    * @param openingFixedCost fixed opening cost value object
    * @param status current facility status
    * @param id optional explicit id (generated if omitted)
+   * @param currentFillingLevel optional current filling level in liters per day
    * @throws Error when required parameters are missing
    */
-  constructor(facilityType: FacilityType, location: Location, capacity: Capacity, openingFixedCost: OpeningFixedCost, status: FacilityStatus, id?: UllUUID) {
+  constructor(
+    facilityType: FacilityType,
+    location: Location,
+    storageCapacity: StorageCapacityKilograms,
+    processingCapacity: ProcessingCapacityKilogramsPerDay,
+    unloadingTime: UnloadingTime,
+    openingFixedCost: OpeningFixedCost,
+    status: FacilityStatus,
+    id?: UllUUID,
+    currentFillingLevel?: DailyWasteDemandLitersPerDay
+  ) {
     if (!facilityType) throw new Error('Facility type is not defined');
     if (!location) throw new Error('Facility location is not defined');
-    if (!capacity) throw new Error('Facility capacity is not defined');
+    if (!storageCapacity) throw new Error('Facility storage capacity is not defined');
+    if (!processingCapacity) throw new Error('Facility processing capacity is not defined');
+    if (!unloadingTime) throw new Error('Facility unloading time is not defined');
     if (!openingFixedCost) throw new Error('Opening fixed cost is not defined');
     if (!status) throw new Error('Facility status is not defined');
 
     this.id = id ?? UllUUID.random();
     this.facilityType = facilityType;
     this.location = location;
-    this.capacity = capacity;
+    this.storageCapacity = storageCapacity;
+    this.processingCapacity = processingCapacity;
+    this.unloadingTime = unloadingTime;
     this.openingFixedCost = openingFixedCost;
     this.status = status;
+    this.currentFillingLevel = currentFillingLevel ?? new DailyWasteDemandLitersPerDay(0);
+    // Legacy capacity - no longer needed with new VO architecture
+    this.capacity = undefined as any;
     this.assignedWasteDemand = WasteDemand.withDefaultUnit(0);
   }
 
@@ -104,16 +148,40 @@ export class Facility {
   getFacilityType(): FacilityType { return this.facilityType; }
 
   /**
+   * Devuelve la capacidad de almacenamiento máxima de la instalación.
+   * @returns La capacidad de almacenamiento en kilogramos.
+   */
+  getStorageCapacity(): StorageCapacityKilograms { return this.storageCapacity; }
+
+  /**
+   * Devuelve la capacidad de procesamiento de la instalación.
+   * @returns La capacidad de procesamiento en kilogramos por día.
+   */
+  getProcessingCapacity(): ProcessingCapacityKilogramsPerDay { return this.processingCapacity; }
+
+  /**
+   * Devuelve el tiempo de descarga de la instalación.
+   * @returns El tiempo de descarga en minutos.
+   */
+  getUnloadingTime(): UnloadingTime { return this.unloadingTime; }
+
+  /**
+   * Devuelve el nivel de llenado actual de la instalación.
+   * @returns El nivel de llenado actual en litros por día.
+   */
+  getCurrentFillingLevel(): DailyWasteDemandLitersPerDay { return this.currentFillingLevel; }
+
+  /**
+   * Devuelve la capacidad máxima de la instalación (legacy).
+   * @returns La capacidad máxima de la instalación.
+   */
+  getCapacity(): Capacity { return this.capacity; }
+
+  /**
    * Devuelve la ubicación de la instalación.
    * @returns La ubicación de la instalación.
    */
   getLocation(): Location { return this.location; }
-
-  /**
-   * Devuelve la capacidad máxima de la instalación.
-   * @returns La capacidad máxima de la instalación.
-   */
-  getCapacity(): Capacity { return this.capacity; }
 
   /**
    * Devuelve el coste fijo de apertura de la instalación.
@@ -128,20 +196,10 @@ export class Facility {
   getStatus(): FacilityStatus { return this.status; }
 
   /**
-   * Devuelve la demanda de residuos actualmente asignada a la instalación.
+   * Devuelve la demanda de residuos actualmente asignada a la instalación (legacy).
    * @returns La demanda de residuos asignada.
    */
   getAssignedWasteDemand(): WasteDemand { return this.assignedWasteDemand; }
-
-
-  /**
-   * Actualiza el estado de la instalación.
-   * @param status Nuevo estado de la instalación.
-   */
-  updateStatus(status: FacilityStatus): void {
-    if (!status) throw new Error('Facility status is not defined');
-    this.status = status;
-  }
 
 
   /**
@@ -153,7 +211,6 @@ export class Facility {
     this.facilityType = ft;
   }
 
-
   /**
    * Actualiza la ubicación de la instalación.
    * @param loc Nueva ubicación de la instalación.
@@ -163,16 +220,51 @@ export class Facility {
     this.location = loc;
   }
 
+  /**
+   * Actualiza la capacidad de almacenamiento de la instalación.
+   * @param capacity Nueva capacidad de almacenamiento.
+   */
+  updateStorageCapacity(capacity: StorageCapacityKilograms): void {
+    if (!capacity) throw new Error('Facility storage capacity is not defined');
+    this.storageCapacity = capacity;
+    this.capacity = this.createLegacyCapacity();
+  }
 
   /**
-   * Actualiza la capacidad máxima de la instalación.
+   * Actualiza la capacidad de procesamiento de la instalación.
+   * @param capacity Nueva capacidad de procesamiento.
+   */
+  updateProcessingCapacity(capacity: ProcessingCapacityKilogramsPerDay): void {
+    if (!capacity) throw new Error('Facility processing capacity is not defined');
+    this.processingCapacity = capacity;
+  }
+
+  /**
+   * Actualiza el tiempo de descarga de la instalación.
+   * @param time Nuevo tiempo de descarga.
+   */
+  updateUnloadingTime(time: UnloadingTime): void {
+    if (!time) throw new Error('Facility unloading time is not defined');
+    this.unloadingTime = time;
+  }
+
+  /**
+   * Actualiza el nivel de llenado actual de la instalación.
+   * @param fillingLevel Nuevo nivel de llenado.
+   */
+  updateCurrentFillingLevel(fillingLevel: DailyWasteDemandLitersPerDay): void {
+    if (!fillingLevel) throw new Error('Facility current filling level is not defined');
+    this.currentFillingLevel = fillingLevel;
+  }
+
+  /**
+   * Actualiza la capacidad máxima de la instalación (legacy).
    * @param cap Nueva capacidad máxima.
    */
   updateCapacity(cap: Capacity): void {
     if (!cap) throw new Error('Facility capacity is not defined');
     this.capacity = cap;
   }
-
 
   /**
    * Actualiza el coste fijo de apertura de la instalación.
@@ -181,6 +273,15 @@ export class Facility {
   updateOpeningFixedCost(cost: OpeningFixedCost): void {
     if (!cost) throw new Error('Opening fixed cost is not defined');
     this.openingFixedCost = cost;
+  }
+
+  /**
+   * Actualiza el estado de la instalación.
+   * @param status Nuevo estado de la instalación.
+   */
+  updateStatus(status: FacilityStatus): void {
+    if (!status) throw new Error('Facility status is not defined');
+    this.status = status;
   }
 
 

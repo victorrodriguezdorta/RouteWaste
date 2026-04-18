@@ -51,13 +51,15 @@ public class FacilityWritingConverter implements Converter<Facility, Document> {
         locationDocument.put(MongoFields.POSTAL_ADDRESS, facility.getLocation().getPostalAddress());
         locationDocument.put(MongoFields.GIS_REFERENCE, facility.getLocation().getGISReference());
         document.put(MongoFields.LOCATION, locationDocument);
-        Document capacityDocument = new Document();
-        capacityDocument.put(MongoFields.CAPACITY_VALUE, facility.getCapacity().getValue());
-        capacityDocument.put(MongoFields.CAPACITY_QUANTITY_UNIT, 
-            facility.getCapacity().getQuantityUnit().getValue());
-        capacityDocument.put(MongoFields.CAPACITY_TIME_UNIT, 
-            facility.getCapacity().getTimeUnit().toString());
-        document.put(MongoFields.CAPACITY, capacityDocument);
+        Document storageCapacityDocument = new Document();
+        storageCapacityDocument.put(MongoFields.CAPACITY_VALUE, facility.getStorageCapacity().getKilograms());
+        document.put(MongoFields.STORAGE_CAPACITY, storageCapacityDocument);
+        Document processingCapacityDocument = new Document();
+        processingCapacityDocument.put(MongoFields.CAPACITY_VALUE, facility.getProcessingCapacity().getKilogramsPerDay());
+        document.put(MongoFields.PROCESSING_CAPACITY, processingCapacityDocument);
+        Document unloadingTimeDocument = new Document();
+        unloadingTimeDocument.put(MongoFields.TIME_VALUE, facility.getUnloadingTime().getMinutes());
+        document.put(MongoFields.UNLOADING_TIME, unloadingTimeDocument);
         Document openingFixedCostDocument = new Document();
         openingFixedCostDocument.put(MongoFields.OPENING_FIXED_COST_AMOUNT, 
             facility.getOpeningFixedCost().getAmount());
@@ -67,14 +69,10 @@ public class FacilityWritingConverter implements Converter<Facility, Document> {
         );
         document.put(MongoFields.OPENING_FIXED_COST, openingFixedCostDocument);
         document.put(MongoFields.STATUS, facility.getStatus().toString());
-        Document wasteDemandDocument = new Document();
-        wasteDemandDocument.put(MongoFields.WASTE_DEMAND_VALUE, 
-            facility.getAssignedWasteDemand().getValue());
-        wasteDemandDocument.put(MongoFields.WASTE_DEMAND_QUANTITY_UNIT, 
-            facility.getAssignedWasteDemand().getQuantityUnit().getValue());
-        wasteDemandDocument.put(MongoFields.WASTE_DEMAND_TIME_UNIT, 
-            facility.getAssignedWasteDemand().getTimeUnit().toString());
-        document.put(MongoFields.ASSIGNED_WASTE_DEMAND, wasteDemandDocument);
+        Document currentFillingLevelDocument = new Document();
+        currentFillingLevelDocument.put(MongoFields.WASTE_DEMAND_VALUE, 
+            facility.getCurrentFillingLevel().getLitersPerDay());
+        document.put(MongoFields.CURRENT_FILLING_LEVEL, currentFillingLevelDocument);
         return document;
     }
 }

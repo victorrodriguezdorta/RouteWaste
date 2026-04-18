@@ -10,10 +10,10 @@ import type { GetFacilityCommand, GetFacilityResult } from '@/application/usecas
 import type { ListFacilitiesCommand, ListFacilitiesResult } from '@/application/usecase/facility-management/list-facilities/list-facilities-use-case';
 import type { UpdateFacilityCommand, UpdateFacilityResult } from '@/application/usecase/facility-management/update-facility/update-facility-use-case';
 import {
-  type ApiError,
-  type DataError,
-  Either,
-  http,
+    type ApiError,
+    type DataError,
+    Either,
+    http,
 } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -60,25 +60,39 @@ export class FacilityHttpRepository implements FacilityRepository {
     const requestedSize = command?.pageSize ?? 10;
 
     url += `?page=${requestedPage}&size=${requestedSize}`;
+    
+    // Add sort parameters
     if (command?.sortBy) {
       url += `&sortBy=${encodeURIComponent(command.sortBy)}&sortOrder=${command.sortOrder ?? 'asc'}`;
     }
+    
+    // Add filter parameters
     if (command?.facilityType) {
       url += `&facilityType=${encodeURIComponent(command.facilityType)}`;
     }
     if (command?.status) {
       url += `&status=${encodeURIComponent(command.status)}`;
     }
+    if (command?.location) {
+      url += `&location=${encodeURIComponent(command.location)}`;
+    }
+
+    console.log('[FacilityHttpRepository.list] Fetching from:', url);
 
     return new Promise((resolve, reject) => {
       http
         .get(url, this.headers)
         .then(response => {
+          console.log('[FacilityHttpRepository.list] Response status:', response.status, 'OK:', response.ok);
+          
           if (response.ok) {
             response.json().then((data: FacilityPageJsonResponse | FacilityJsonResponse[]) => {
+              console.log('[FacilityHttpRepository.list] Raw response data:', data);
+              
               let convertedData: ListFacilitiesResult;
 
               if (Array.isArray(data)) {
+                console.log('[FacilityHttpRepository.list] Response is array, converting...');
                 const items = data.map((facility: FacilityJsonResponse) => FacilityJsonResponse.toFacility(facility));
                 convertedData = {
                   items,
@@ -88,6 +102,7 @@ export class FacilityHttpRepository implements FacilityRepository {
                   size: requestedSize,
                 };
               } else {
+                console.log('[FacilityHttpRepository.list] Response is paginated, converting...');
                 const items = data.content.map((facility: FacilityJsonResponse) => FacilityJsonResponse.toFacility(facility));
                 convertedData = {
                   items,
@@ -98,15 +113,18 @@ export class FacilityHttpRepository implements FacilityRepository {
                 };
               }
 
+              console.log('[FacilityHttpRepository.list] Converted data:', convertedData);
               resolve(Either.right(convertedData));
             });
           } else {
+            console.log('[FacilityHttpRepository.list] Response not OK');
             response.json().then((data: ApiError) => {
               reject(Either.left(data));
             });
           }
         })
         .catch((error: any) => {
+          console.error('[FacilityHttpRepository.list] Error:', error);
           resolve(Either.left({ kind: 'UnexpectedError', message: error }));
         });
     });
@@ -153,22 +171,29 @@ export class FacilityHttpRepository implements FacilityRepository {
     command: CreateFacilityCommand
   ): Promise<Either<DataError, CreateFacilityResult>> {
     const body = FacilityPostJsonRequest.toRequest(command);
+    console.log('[FacilityHttpRepository.create] Creating facility with body:', body);
+    console.log('[FacilityHttpRepository.create] JSON stringified:', JSON.stringify(body));
 
     return new Promise((resolve, reject) => {
       http
         .post(this.API_URL, body, this.headers)
         .then(response => {
+          console.log('[FacilityHttpRepository.create] Response status:', response.status, 'OK:', response.ok);
+          
           if (response.ok) {
             response.json().then((data: FacilityJsonResponse) => {
+              console.log('[FacilityHttpRepository.create] Success, received:', data);
               resolve(Either.right(FacilityJsonResponse.toFacility(data)));
             });
           } else {
             response.json().then((data: ApiError) => {
+              console.error('[FacilityHttpRepository.create] Error response:', data);
               reject(Either.left(data));
             });
           }
         })
         .catch((error: any) => {
+          console.error('[FacilityHttpRepository.create] Request error:', error);
           resolve(Either.left({ kind: 'UnexpectedError', message: error }));
         });
     });
@@ -185,23 +210,30 @@ export class FacilityHttpRepository implements FacilityRepository {
   ): Promise<Either<DataError, UpdateFacilityResult>> {
     const url = `${this.API_URL}${command.facilityId.toString()}`;
     const body = FacilityPutJsonRequest.toRequest(command);
+    console.log('[FacilityHttpRepository.update] Updating facility with URL:', url, 'body:', body);
+    console.log('[FacilityHttpRepository.update] JSON stringified:', JSON.stringify(body));
 
     return new Promise((resolve) => {
       http
         .put(url, body, this.headers)
         .then(response => {
+          console.log('[FacilityHttpRepository.update] Response status:', response.status, 'OK:', response.ok);
+          
           if (response.ok) {
             response.json().then((data: FacilityJsonResponse) => {
+              console.log('[FacilityHttpRepository.update] Success, received:', data);
               resolve(Either.right(FacilityJsonResponse.toFacility(data)));
             });
           } else {
             response.json().then((data: ApiError) => {
+              console.error('[FacilityHttpRepository.update] Error response:', data);
               data.kind = 'ApiError';
               resolve(Either.left(data));
             });
           }
         })
         .catch((error: any) => {
+          console.error('[FacilityHttpRepository.update] Request error:', error);
           resolve(Either.left({ kind: 'UnexpectedError', message: error }));
         });
     });

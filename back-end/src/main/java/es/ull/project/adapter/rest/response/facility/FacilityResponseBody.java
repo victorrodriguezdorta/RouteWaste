@@ -2,9 +2,11 @@ package es.ull.project.adapter.rest.response.facility;
 
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
-import es.ull.project.domain.valueobject.capacity.Capacity;
+import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
+import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.UnloadingTime;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Location;
 
 import java.util.UUID;
@@ -32,9 +34,19 @@ public class FacilityResponseBody {
     public Location location;
 
     /**
-     * Maximum capacity of the facility (value object)
+     * Storage capacity of the facility in kilograms (value object)
      */
-    public Capacity capacity;
+    public StorageCapacityKilograms storageCapacity;
+
+    /**
+     * Processing capacity of the facility in kilograms per day (value object)
+     */
+    public ProcessingCapacityKilogramsPerDay processingCapacity;
+
+    /**
+     * Truck unloading time in minutes (value object)
+     */
+    public UnloadingTime unloadingTime;
 
     /**
      * Fixed cost to open the facility (value object)
@@ -47,7 +59,7 @@ public class FacilityResponseBody {
     public FacilityStatus status;
 
     /**
-     * Accumulated waste demand assigned to the facility (value object)
+     * Current filling level - accumulated waste demand assigned to the facility (value object)
      */
-    public WasteDemand assignedWasteDemand;
+    public DailyWasteDemandLitersPerDay currentFillingLevel;
 }

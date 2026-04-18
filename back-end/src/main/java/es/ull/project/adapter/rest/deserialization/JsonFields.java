@@ -78,8 +78,27 @@ public final class JsonFields {
      */
     public static final String FACILITY_TYPE = "facilityType";
     public static final String CAPACITY = "capacity";
+    public static final String STORAGE_CAPACITY = "storageCapacity";
+    public static final String PROCESSING_CAPACITY = "processingCapacity";
+    public static final String UNLOADING_TIME = "unloadingTime";
+    public static final String TIME_VALUE = "timeValue";
+    public static final String CURRENT_FILLING_LEVEL = "currentFillingLevel";
+    public static final String WASTE_DEMAND_VALUE = "wasteDemandValue";
     public static final String OPENING_FIXED_COST = "openingFixedCost";
     public static final String STATUS = "status";
+
+    /**
+     * Entity fields
+     */
+    public static final String FACILITY = "facility";
+    public static final String CONTAINER = "container";
+
+    /**
+     * ServiceAssignment fields
+     */
+    public static final String DISTANCE = "distance";
+    public static final String SERVICE_TIME = "serviceTime";
+    public static final String TRANSPORT_COST = "transportCost";
 
     /**
      * InfrastructurePlan fields
@@ -101,13 +120,8 @@ public final class JsonFields {
     /**
      * ServiceAssignment fields
      */
-    public static final String CONTAINER = "container";
-    public static final String FACILITY = "facility";
     public static final String CONTAINER_ID = "containerId";
-    public static final String FACILITY_ID = "facilityId";
-    public static final String DISTANCE = "distance";
-    public static final String SERVICE_TIME = "serviceTime";
-    public static final String TRANSPORT_COST = "transportCost";
+    public static final String FACILITY_ID = "facilityId";;
 
     /**
      * Distance fields

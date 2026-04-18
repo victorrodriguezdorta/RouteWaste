@@ -41,15 +41,20 @@ public class MongoFields {
      * Facility fields.
      */
     public static final String FACILITY_TYPE = "facilityType";
+    public static final String STORAGE_CAPACITY = "storageCapacity";
+    public static final String PROCESSING_CAPACITY = "processingCapacity";
+    public static final String UNLOADING_TIME = "unloadingTime";
     public static final String CAPACITY = "capacity";
     public static final String CAPACITY_VALUE = "value";
     public static final String CAPACITY_QUANTITY_UNIT = "quantityUnit";
     public static final String CAPACITY_TIME_UNIT = "timeUnit";
+    public static final String TIME_VALUE = "value";
     public static final String OPENING_FIXED_COST = "openingFixedCost";
     public static final String OPENING_FIXED_COST_AMOUNT = "amount";
     public static final String OPENING_FIXED_COST_CURRENCY = "currency";
     public static final String STATUS = "status";
     public static final String ASSIGNED_WASTE_DEMAND = "assignedWasteDemand";
+    public static final String CURRENT_FILLING_LEVEL = "currentFillingLevel";
 
     /**
      * Vehicle fields.

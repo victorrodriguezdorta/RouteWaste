@@ -75,8 +75,18 @@ export function facilityStatusRandom(): FacilityStatus {
   return values[Math.floor(Math.random() * values.length)]!;
 }
 
-/**
- * Checks whether the given status allows service assignments.
+/** * Returns the options for a facility status selector.
+ * @param {Function} t Translation function.
+ * @returns {{ title: string; value: FacilityStatus }[]} array of options.
+ */
+export function facilityStatusToOptions(t: (key: string) => string): { title: string; value: FacilityStatus }[] {
+  return facilityStatusValues().map((status) => ({
+    title: t(`facility.add.statuses.${status}`),
+    value: status,
+  }));
+}
+
+/** * Checks whether the given status allows service assignments.
  * @param {FacilityStatus} status Status to check.
  * @returns {boolean} True if containers can be assigned to the facility.
  */
@@ -107,16 +117,4 @@ export function facilityStatusColor(status: FacilityStatus | string): string {
     case FacilityStatus.DISCARDED: return 'red';
     default: return 'grey';
   }
-}
-
-/**
- * Returns the options for a facility status selector.
- * @param {Function} t Translation function.
- * @returns {{ title: string; value: FacilityStatus }[]} array of options.
- */
-export function facilityStatusToOptions(t: (key: string) => string): { title: string; value: FacilityStatus }[] {
-  return facilityStatusValues().map((status) => ({
-    title: t(`facility.add.statuses.${status}`),
-    value: status,
-  }));
 }

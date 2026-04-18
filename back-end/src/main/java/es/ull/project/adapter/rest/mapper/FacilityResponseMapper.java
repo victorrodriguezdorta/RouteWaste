@@ -30,10 +30,12 @@ public class FacilityResponseMapper {
         responseBody.id = facility.getId();
         responseBody.facilityType = facility.getFacilityType();
         responseBody.location = facility.getLocation();
-        responseBody.capacity = facility.getCapacity();
+        responseBody.storageCapacity = facility.getStorageCapacity();
+        responseBody.processingCapacity = facility.getProcessingCapacity();
+        responseBody.unloadingTime = facility.getUnloadingTime();
         responseBody.openingFixedCost = facility.getOpeningFixedCost();
         responseBody.status = facility.getStatus();
-        responseBody.assignedWasteDemand = facility.getAssignedWasteDemand();
+        responseBody.currentFillingLevel = facility.getCurrentFillingLevel();
         return responseBody;
     }
 }

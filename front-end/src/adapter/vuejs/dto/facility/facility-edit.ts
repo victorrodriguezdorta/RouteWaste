@@ -1,11 +1,11 @@
 import { Facility } from '@/domain/entity/facility';
 import { FacilityStatus, facilityStatusFromString } from '@/domain/enumerate/facility-status';
 import { FacilityType, facilityTypeFromString } from '@/domain/enumerate/facility-type';
-import { TimeUnit, timeUnitFromString } from '@/domain/enumerate/time-unit';
+import { ProcessingCapacityKilogramsPerDay } from '@/domain/valueobject/capacity/processing-capacity-kilograms-per-day';
+import { StorageCapacityKilograms } from '@/domain/valueobject/capacity/storage-capacity-kilograms';
+import { UnloadingTime } from '@/domain/valueobject/capacity/unloading-time';
 import { Currency } from '@/domain/valueobject/cost/currency';
 import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
-import { Capacity } from '@/domain/valueobject/demand/capacity';
-import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
 import { Location } from '@/domain/valueobject/location/location';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
@@ -54,19 +54,19 @@ export class FacilityEdit {
   public gisReference: string;
 
   /**
-   * Numeric capacity value (must be >= 0).
+   * Storage capacity in kilograms (must be >= 0).
    */
-  public capacityValue: number;
+  public storageCapacity: number;
 
   /**
-   * Unit of measurement for capacity (e.g., 'tons', 'kg').
+   * Processing capacity in kilograms per day (must be >= 0).
    */
-  public capacityQuantityUnit: string;
+  public processingCapacity: number;
 
   /**
-   * Time unit for capacity rate (e.g., DAY, WEEK, MONTH, YEAR).
+   * Unloading time in minutes (must be >= 0).
    */
-  public capacityTimeUnit: string;
+  public unloadingTime: number;
 
   /**
    * Opening fixed cost amount (must be >= 0).
@@ -92,9 +92,9 @@ export class FacilityEdit {
    * @param longitude Longitude coordinate
    * @param postalAddress Postal address
    * @param gisReference GIS reference
-   * @param capacityValue Numeric capacity value
-   * @param capacityQuantityUnit Unit of measurement for capacity
-   * @param capacityTimeUnit Time unit for capacity rate
+   * @param storageCapacity Storage capacity in kilograms
+   * @param processingCapacity Processing capacity in kilograms per day
+   * @param unloadingTime Unloading time in minutes
    * @param openingFixedCost Opening fixed cost amount
    * @param currencyCode ISO 4217 currency code
    * @param status Current facility status
@@ -107,9 +107,9 @@ export class FacilityEdit {
     longitude: number,
     postalAddress: string,
     gisReference: string,
-    capacityValue: number,
-    capacityQuantityUnit: string,
-    capacityTimeUnit: string,
+    storageCapacity: number,
+    processingCapacity: number,
+    unloadingTime: number,
     openingFixedCost: number,
     currencyCode: string,
     status: string
@@ -120,9 +120,9 @@ export class FacilityEdit {
     this.validate<number>(longitude, 'Longitude is not defined');
     this.validate<string>(postalAddress, 'Postal address is not defined');
     this.validate<string>(gisReference, 'GIS reference is not defined');
-    this.validate<number>(capacityValue, 'Capacity value is not defined');
-    this.validate<string>(capacityQuantityUnit, 'Capacity quantity unit is not defined');
-    this.validate<string>(capacityTimeUnit, 'Capacity time unit is not defined');
+    this.validate<number>(storageCapacity, 'Storage capacity is not defined');
+    this.validate<number>(processingCapacity, 'Processing capacity is not defined');
+    this.validate<number>(unloadingTime, 'Unloading time is not defined');
     this.validate<number>(openingFixedCost, 'Opening fixed cost is not defined');
     this.validate<string>(currencyCode, 'Currency code is not defined');
     this.validate<string>(status, 'Facility status is not defined');
@@ -133,9 +133,9 @@ export class FacilityEdit {
     this.longitude = longitude;
     this.postalAddress = postalAddress;
     this.gisReference = gisReference;
-    this.capacityValue = capacityValue;
-    this.capacityQuantityUnit = capacityQuantityUnit;
-    this.capacityTimeUnit = capacityTimeUnit;
+    this.storageCapacity = storageCapacity;
+    this.processingCapacity = processingCapacity;
+    this.unloadingTime = unloadingTime;
     this.openingFixedCost = openingFixedCost;
     this.currencyCode = currencyCode;
     this.status = status;
@@ -411,14 +411,14 @@ export class FacilityEdit {
       facilityEdit.postalAddress,
       facilityEdit.gisReference
     );
-    const quantityUnit = new QuantityUnit(facilityEdit.capacityQuantityUnit);
-    const timeUnit = timeUnitFromString(facilityEdit.capacityTimeUnit);
-    const capacity = new Capacity(facilityEdit.capacityValue, quantityUnit, timeUnit);
+    const storageCapacity = new StorageCapacityKilograms(facilityEdit.storageCapacity);
+    const processingCapacity = new ProcessingCapacityKilogramsPerDay(facilityEdit.processingCapacity);
+    const unloadingTime = new UnloadingTime(facilityEdit.unloadingTime);
     const openingFixedCost = new OpeningFixedCost(facilityEdit.openingFixedCost, facilityEdit.currencyCode);
     const status = facilityStatusFromString(facilityEdit.status);
     const id = new UllUUID(facilityEdit.id);
 
-    return new Facility(facilityType, location, capacity, openingFixedCost, status, id);
+    return new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status, id);
   }
 
   /**
@@ -429,7 +429,9 @@ export class FacilityEdit {
    */
   static fromFacility(facility: Facility): FacilityEdit {
     const location = facility.getLocation();
-    const capacity = facility.getCapacity();
+    const storageCapacity = facility.getStorageCapacity();
+    const processingCapacity = facility.getProcessingCapacity();
+    const unloadingTime = facility.getUnloadingTime();
     const openingFixedCost = facility.getOpeningFixedCost();
 
     return new FacilityEdit(
@@ -439,9 +441,9 @@ export class FacilityEdit {
       location.longitude,
       location.postalAddress,
       location.gisReference,
-      capacity.getValue(),
-      capacity.getQuantityUnit().getValue(),
-      capacity.getTimeUnit(),
+      storageCapacity.getKilograms(),
+      processingCapacity.getKilogramsPerDay(),
+      unloadingTime.getMinutes(),
       openingFixedCost.getAmount(),
       openingFixedCost.getCurrency().getCode(),
       facility.getStatus()

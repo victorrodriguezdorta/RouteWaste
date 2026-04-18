@@ -1,11 +1,11 @@
 import { Facility } from '@/domain/entity/facility';
 import { FacilityStatus, facilityStatusFromString } from '@/domain/enumerate/facility-status';
 import { FacilityType, facilityTypeFromString } from '@/domain/enumerate/facility-type';
-import { TimeUnit, timeUnitFromString } from '@/domain/enumerate/time-unit';
+import { ProcessingCapacityKilogramsPerDay } from '@/domain/valueobject/capacity/processing-capacity-kilograms-per-day';
+import { StorageCapacityKilograms } from '@/domain/valueobject/capacity/storage-capacity-kilograms';
+import { UnloadingTime } from '@/domain/valueobject/capacity/unloading-time';
 import { Currency } from '@/domain/valueobject/cost/currency';
 import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
-import { Capacity } from '@/domain/valueobject/demand/capacity';
-import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
 import { Location } from '@/domain/valueobject/location/location';
 
 /**
@@ -46,19 +46,19 @@ export class FacilityAdd {
   public gisReference: string;
 
   /**
-   * Numeric capacity value (must be >= 0).
+   * Storage capacity in kilograms (must be >= 0).
    */
-  public capacityValue: number;
+  public storageCapacity: number;
 
   /**
-   * Unit of measurement for capacity (e.g., 'tons', 'kg').
+   * Processing capacity in kilograms per day (must be >= 0).
    */
-  public capacityQuantityUnit: string;
+  public processingCapacity: number;
 
   /**
-   * Time unit for capacity rate (e.g., DAY, WEEK, MONTH, YEAR).
+   * Unloading time in minutes (must be >= 0).
    */
-  public capacityTimeUnit: string;
+  public unloadingTime: number;
 
   /**
    * Opening fixed cost amount (must be >= 0).
@@ -83,9 +83,9 @@ export class FacilityAdd {
    * @param longitude Longitude coordinate
    * @param postalAddress Postal address
    * @param gisReference GIS reference
-   * @param capacityValue Numeric capacity value
-   * @param capacityQuantityUnit Unit of measurement for capacity
-   * @param capacityTimeUnit Time unit for capacity rate
+   * @param storageCapacity Storage capacity in kilograms
+   * @param processingCapacity Processing capacity in kilograms per day
+   * @param unloadingTime Unloading time in minutes
    * @param openingFixedCost Opening fixed cost amount
    * @param currencyCode ISO 4217 currency code
    * @param status Current facility status
@@ -97,9 +97,9 @@ export class FacilityAdd {
     longitude: number,
     postalAddress: string,
     gisReference: string,
-    capacityValue: number,
-    capacityQuantityUnit: string,
-    capacityTimeUnit: string,
+    storageCapacity: number,
+    processingCapacity: number,
+    unloadingTime: number,
     openingFixedCost: number,
     currencyCode: string,
     status: string
@@ -109,9 +109,9 @@ export class FacilityAdd {
     this.validate<number>(longitude, 'Longitude is not defined');
     this.validate<string>(postalAddress, 'Postal address is not defined');
     this.validate<string>(gisReference, 'GIS reference is not defined');
-    this.validate<number>(capacityValue, 'Capacity value is not defined');
-    this.validate<string>(capacityQuantityUnit, 'Capacity quantity unit is not defined');
-    this.validate<string>(capacityTimeUnit, 'Capacity time unit is not defined');
+    this.validate<number>(storageCapacity, 'Storage capacity is not defined');
+    this.validate<number>(processingCapacity, 'Processing capacity is not defined');
+    this.validate<number>(unloadingTime, 'Unloading time is not defined');
     this.validate<number>(openingFixedCost, 'Opening fixed cost is not defined');
     this.validate<string>(currencyCode, 'Currency code is not defined');
     this.validate<string>(status, 'Facility status is not defined');
@@ -121,9 +121,9 @@ export class FacilityAdd {
     this.longitude = longitude;
     this.postalAddress = postalAddress;
     this.gisReference = gisReference;
-    this.capacityValue = capacityValue;
-    this.capacityQuantityUnit = capacityQuantityUnit;
-    this.capacityTimeUnit = capacityTimeUnit;
+    this.storageCapacity = storageCapacity;
+    this.processingCapacity = processingCapacity;
+    this.unloadingTime = unloadingTime;
     this.openingFixedCost = openingFixedCost;
     this.currencyCode = currencyCode;
     this.status = status;
@@ -241,16 +241,14 @@ export class FacilityAdd {
   }
 
   /**
-   * Validate capacity value for form fields.
+   * Validate storage capacity for form fields.
    * 
-   * @param value Capacity value to validate
+   * @param value Storage capacity value to validate
    * @returns true if valid, error message string if invalid
    */
-  static externalValidateCapacityValue(value: number): boolean | string {
+  static externalValidateStorageCapacity(value: number): boolean | string {
     try {
-      if (value < 0) {
-        throw new Error('Capacity value must be greater than or equal to 0');
-      }
+      new StorageCapacityKilograms(value);
       return true;
     } catch (error: any) {
       return error.message;
@@ -258,14 +256,14 @@ export class FacilityAdd {
   }
 
   /**
-   * Validate capacity quantity unit for form fields.
+   * Validate processing capacity for form fields.
    * 
-   * @param value Quantity unit string to validate
+   * @param value Processing capacity value to validate
    * @returns true if valid, error message string if invalid
    */
-  static externalValidateCapacityQuantityUnit(value: string): boolean | string {
+  static externalValidateProcessingCapacity(value: number): boolean | string {
     try {
-      new QuantityUnit(value);
+      new ProcessingCapacityKilogramsPerDay(value);
       return true;
     } catch (error: any) {
       return error.message;
@@ -273,14 +271,14 @@ export class FacilityAdd {
   }
 
   /**
-   * Validate capacity time unit for form fields.
+   * Validate unloading time for form fields.
    * 
-   * @param value Time unit string to validate
+   * @param value Unloading time value to validate
    * @returns true if valid, error message string if invalid
    */
-  static externalValidateCapacityTimeUnit(value: string): boolean | string {
+  static externalValidateUnloadingTime(value: number): boolean | string {
     try {
-      timeUnitFromString(value);
+      new UnloadingTime(value);
       return true;
     } catch (error: any) {
       return error.message;
@@ -344,9 +342,9 @@ export class FacilityAdd {
     const randomLongitude = parseFloat((Math.random() * 360 - 180).toFixed(6));
     const randomPostalAddress = `${Math.floor(Math.random() * 1000)} Industrial Park, City`;
     const randomGisReference = `GIS-FAC-${Math.floor(Math.random() * 100000)}`;
-    const randomCapacityValue = Math.floor(Math.random() * 1000) + 100;
-    const randomQuantityUnit = 'tons';
-    const randomTimeUnit = TimeUnit.DAY;
+    const randomStorageCapacity = Math.floor(Math.random() * 5000) + 1000;
+    const randomProcessingCapacity = Math.floor(Math.random() * 1000) + 100;
+    const randomUnloadingTime = Math.floor(Math.random() * 120) + 15;
     const randomOpeningFixedCost = parseFloat((Math.random() * 100000 + 10000).toFixed(2));
     const randomCurrency = 'EUR';
     const statuses = [FacilityStatus.CANDIDATE, FacilityStatus.PLANNED, FacilityStatus.OPEN, FacilityStatus.DISCARDED];
@@ -358,9 +356,9 @@ export class FacilityAdd {
       randomLongitude,
       randomPostalAddress,
       randomGisReference,
-      randomCapacityValue,
-      randomQuantityUnit,
-      randomTimeUnit,
+      randomStorageCapacity,
+      randomProcessingCapacity,
+      randomUnloadingTime,
       randomOpeningFixedCost,
       randomCurrency,
       randomStatus as string
@@ -382,12 +380,20 @@ export class FacilityAdd {
       facilityAdd.postalAddress,
       facilityAdd.gisReference
     );
-    const quantityUnit = new QuantityUnit(facilityAdd.capacityQuantityUnit);
-    const timeUnit = timeUnitFromString(facilityAdd.capacityTimeUnit);
-    const capacity = new Capacity(facilityAdd.capacityValue, quantityUnit, timeUnit);
+    const storageCapacity = new StorageCapacityKilograms(facilityAdd.storageCapacity);
+    const processingCapacity = new ProcessingCapacityKilogramsPerDay(facilityAdd.processingCapacity);
+    const unloadingTime = new UnloadingTime(facilityAdd.unloadingTime);
     const openingFixedCost = new OpeningFixedCost(facilityAdd.openingFixedCost, facilityAdd.currencyCode);
     const status = facilityStatusFromString(facilityAdd.status);
 
-    return new Facility(facilityType, location, capacity, openingFixedCost, status);
+    return new Facility(
+      facilityType,
+      location,
+      storageCapacity,
+      processingCapacity,
+      unloadingTime,
+      openingFixedCost,
+      status
+    );
   }
 }
