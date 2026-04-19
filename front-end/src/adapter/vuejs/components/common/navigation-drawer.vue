@@ -51,6 +51,17 @@
         class="text-white"
         @click="navigateTo('Facilities')"
       ></v-list-item>
+      
+      <v-divider color="white" class="my-2" opacity="0.3"></v-divider>
+      
+      <v-list-item
+        prepend-icon="mdi-router"
+        :title="t('selection.types.algorithm.title')"
+        value="algorithm"
+        active-color="white"
+        class="text-white"
+        @click="navigateTo('Algorithm')"
+      ></v-list-item>
     </v-list>
 
     <template v-slot:append>

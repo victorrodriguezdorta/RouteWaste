@@ -34,6 +34,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('../view/facility-crud/facilities-view.vue'),
     },
     {
+        path: '/algorithm',
+        name: 'Algorithm',
+        component: () => import('../view/algorithm/algorithm-view.vue'),
+    },
+    {
         path: '/vehicles/add',
         name: 'AddVehicle',
         component: () => import('../view/vehicle-crud/add-vehicle.vue'),

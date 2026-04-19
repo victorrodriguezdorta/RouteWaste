@@ -333,6 +333,8 @@
     }
   },
   "selection": {
+    "welcome": "Bienvenido a Route Waste",
+    "welcomeDescription": "Optimiza y gestiona las rutas de recolección de residuos de forma eficiente",
     "title": "Gestión de Entidades",
     "subtitle": "Selecciona el módulo que deseas gestionar",
     "types": {
@@ -347,6 +349,11 @@
       "facilities": {
         "title": "Instalaciones",
         "description": "Configura las instalaciones de procesamiento, almacenes y puntos de transferencia."
+      },
+      "algorithm": {
+        "title": "Algoritmo de Ruta",
+        "description": "Visualiza y gestiona el algoritmo de optimización de rutas de recolección.",
+        "buttonText": "Calcular Ruta"
       }
     }
   }

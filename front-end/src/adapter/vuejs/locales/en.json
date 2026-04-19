@@ -333,6 +333,8 @@
     }
   },
   "selection": {
+    "welcome": "Welcome to Route Waste",
+    "welcomeDescription": "Optimize and manage waste collection routes efficiently",
     "title": "Entity Management",
     "subtitle": "Select the module you want to manage",
     "types": {
@@ -347,6 +349,11 @@
       "facilities": {
         "title": "Facilities",
         "description": "Configure processing facilities, warehouses and transfer points."
+      },
+      "algorithm": {
+        "title": "Route Algorithm",
+        "description": "View and manage the collection route optimization algorithm.",
+        "buttonText": "Calculate Route"
       }
     }
   }
