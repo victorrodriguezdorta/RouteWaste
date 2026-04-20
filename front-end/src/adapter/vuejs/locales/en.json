@@ -332,6 +332,25 @@
       }
     }
   },
+  "algorithm": {
+    "list": {
+      "title": "Algorithms",
+      "runButton": "Run algorithm",
+      "table": {
+        "headers": {
+          "name": "Name",
+          "description": "Description",
+          "actions": "Actions"
+        },
+        "noData": "No algorithms available.",
+        "runFirst": "Run algorithm"
+      }
+    },
+    "execute": {
+      "title": "Execute Algorithm",
+      "description": "Run the collection route optimization algorithm."
+    }
+  },
   "selection": {
     "welcome": "Welcome to Route Waste",
     "welcomeDescription": "Optimize and manage waste collection routes efficiently",

@@ -16,7 +16,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/',
         name: 'Selection',
-        component: () => import('../view/selection/selection-view.vue'),
+        component: () => import('../view/home-menu/home-menu.vue'),
     },
     {
         path: '/vehicles',
@@ -88,6 +88,11 @@ const routes: RouteRecordRaw[] = [
         name: 'ShowFacility',
         component: () => import('../view/facility-crud/show-facility.vue'),
         props: true,
+    },
+    {
+        path: '/algorithm/execute',
+        name: 'ExecuteAlgorithm',
+        component: () => import('../view/algorithm/execute-algorithm.vue'),
     },
 ];
 

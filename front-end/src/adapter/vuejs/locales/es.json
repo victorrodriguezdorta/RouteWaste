@@ -332,6 +332,25 @@
       }
     }
   },
+  "algorithm": {
+    "list": {
+      "title": "Algoritmos",
+      "runButton": "Ejecutar algoritmo",
+      "table": {
+        "headers": {
+          "name": "Nombre",
+          "description": "Descripción",
+          "actions": "Acciones"
+        },
+        "noData": "No hay algoritmos disponibles.",
+        "runFirst": "Ejecutar algoritmo"
+      }
+    },
+    "execute": {
+      "title": "Ejecutar Algoritmo",
+      "description": "Ejecuta el algoritmo de optimización de rutas de recolección."
+    }
+  },
   "selection": {
     "welcome": "Bienvenido a Route Waste",
     "welcomeDescription": "Optimiza y gestiona las rutas de recolección de residuos de forma eficiente",
