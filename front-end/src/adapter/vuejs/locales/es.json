@@ -13,7 +13,8 @@
       "update": "Actualizar",
       "delete": "Eliminar",
       "back": "Volver",
-      "edit": "Editar"
+      "edit": "Editar",
+      "next": "Siguiente"
     },
     "timeUnits": {
       "DAY": "Día",
@@ -348,7 +349,19 @@
     },
     "execute": {
       "title": "Ejecutar Algoritmo",
-      "description": "Ejecuta el algoritmo de optimización de rutas de recolección."
+      "description": "Ejecuta el algoritmo de optimización de rutas de recolección.",
+      "step1": {
+        "label": "Instalaciones y Vehículos",
+        "title": "Seleccionar Instalaciones y Vehículos"
+      },
+      "step2": {
+        "label": "Contenedores",
+        "title": "Seleccionar Contenedores"
+      },
+      "step3": {
+        "label": "Datos Adicionales",
+        "title": "Datos Adicionales"
+      }
     }
   },
   "selection": {

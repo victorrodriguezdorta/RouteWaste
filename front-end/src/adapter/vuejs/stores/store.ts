@@ -9,6 +9,7 @@
  * in a separate file and exported here.
  */
 
+export * from './algorithm-store';
 export * from './container-store';
 export * from './facility-store';
 export * from './infrastructure-plan-store';

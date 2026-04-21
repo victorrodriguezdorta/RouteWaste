@@ -13,7 +13,8 @@
       "update": "Update",
       "delete": "Delete",
       "back": "Back",
-      "edit": "Edit"
+      "edit": "Edit",
+      "next": "Next"
     },
     "timeUnits": {
       "DAY": "Day",
@@ -348,7 +349,19 @@
     },
     "execute": {
       "title": "Execute Algorithm",
-      "description": "Run the collection route optimization algorithm."
+      "description": "Run the collection route optimization algorithm.",
+      "step1": {
+        "label": "Facilities & Vehicles",
+        "title": "Select Facilities and Vehicles"
+      },
+      "step2": {
+        "label": "Containers",
+        "title": "Select Containers"
+      },
+      "step3": {
+        "label": "Additional Data",
+        "title": "Additional Data"
+      }
     }
   },
   "selection": {

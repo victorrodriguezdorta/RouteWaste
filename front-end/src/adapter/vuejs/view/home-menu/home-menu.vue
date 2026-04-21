@@ -256,7 +256,7 @@ const navigateTo = (routeName: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(var(--v-theme-primary), 0.02);
+  background: white;
   flex-shrink: 0;
   position: relative;
 }

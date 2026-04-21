@@ -1,5 +1,5 @@
 <template>
-  <v-footer app color="primary" class="d-flex flex-column text-center">
+  <v-footer color="white" class="d-flex flex-column text-center">
     <div class="px-4 py-3">
       TFG - V&iacute;ctor Rodr&iacute;guez Dorta
     </div>
