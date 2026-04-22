@@ -143,7 +143,7 @@ onMounted(async () => {
 /**
  * Handle pagination and sort changes from Vuetify table
  */
-const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: number; sortBy: { key: string; order: 'asc' | 'desc' }[] }) => {
+const onTableOptionsUpdate = async (_options: { page: number; itemsPerPage: number; sortBy: { key: string; order: 'asc' | 'desc' }[] }) => {
   // Placeholder for future implementation
 };
 

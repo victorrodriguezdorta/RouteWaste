@@ -1,8 +1,8 @@
 import { AlgorithmExecutionRequestJson } from '@/adapter/http/dto/algorithm/algorithm-execution-request-json';
 import type { AlgorithmRepository } from '@/application/repository/algorithm-repository';
 import type { CreateAlgorithmCommand, CreateAlgorithmResult } from '@/application/usecase/algorithm-management/create-algorithm/create-algorithm-use-case';
-import type { ApiError, DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import { http } from '@ull-tfg/ull-tfg-typescript';
+import type { ApiError, DataError } from '@ull-tfg/ull-tfg-typescript';
+import { Either, http, UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
  * AlgorithmJsonResponse
@@ -64,7 +64,7 @@ export class AlgorithmHttpRepository implements AlgorithmRepository {
           if (response.ok) {
             response.json().then((data: AlgorithmJsonResponse) => {
               const result: CreateAlgorithmResult = {
-                executionId: data.executionId,
+                executionId: new UllUUID(data.executionId),
                 status: data.status,
                 message: data.message,
               };

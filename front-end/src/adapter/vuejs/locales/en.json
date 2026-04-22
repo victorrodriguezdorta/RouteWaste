@@ -14,7 +14,8 @@
       "delete": "Delete",
       "back": "Back",
       "edit": "Edit",
-      "next": "Next"
+      "next": "Next",
+      "confirm": "Confirm"
     },
     "timeUnits": {
       "DAY": "Day",
@@ -209,6 +210,7 @@
       "addButton": "Add Container",
       "filterByWasteType": "Filter by waste type",
       "filterByServiceZone": "Filter by service zone",
+      "filterByLocation": "Search by location",
       "notAssigned": "Not assigned",
       "table": {
         "headers": {
@@ -352,15 +354,36 @@
       "description": "Run the collection route optimization algorithm.",
       "step1": {
         "label": "Facilities & Vehicles",
-        "title": "Select Facilities and Vehicles"
+        "title": "Select Facilities and Vehicles",
+        "summary": "Selection Summary:",
+        "selectedCount": "{count} facility(ies) with {vehicleCount} vehicle(s) selected",
+        "jsonPreview": "JSON to send to backend:"
       },
       "step2": {
         "label": "Containers",
-        "title": "Select Containers"
+        "title": "Select Containers",
+        "summary": "Selection Summary:",
+        "selectedCount": "{count} container(s) selected",
+        "jsonPreview": "JSON to send to backend:"
       },
       "step3": {
         "label": "Additional Data",
-        "title": "Additional Data"
+        "title": "Additional Data",
+        "numberOfDays": "Number of Days",
+        "numberOfDaysPlaceholder": "E.g.: 7",
+        "numberOfDaysError": "Number of days must be greater than 0",
+        "averagePickupTime": "Average Pickup Time (minutes)",
+        "averagePickupTimePlaceholder": "E.g.: 15",
+        "averagePickupTimeError": "Pickup time must be greater than 0",
+        "finalSummary": "Final Summary",
+        "facilitiesSelected": "facility(ies) selected",
+        "noFacilitiesSelected": "No facilities selected",
+        "vehiclesSelected": "vehicle(s) selected",
+        "containersSelected": "container(s) selected",
+        "noContainersSelected": "No containers selected",
+        "days": "days",
+        "minutes": "minutes",
+        "jsonPreview": "JSON to send to backend:"
       }
     }
   },

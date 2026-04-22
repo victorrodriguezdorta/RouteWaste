@@ -14,7 +14,8 @@
       "delete": "Eliminar",
       "back": "Volver",
       "edit": "Editar",
-      "next": "Siguiente"
+      "next": "Siguiente",
+      "confirm": "Confirmar"
     },
     "timeUnits": {
       "DAY": "Día",
@@ -209,6 +210,7 @@
       "addButton": "Agregar Contenedor",
       "filterByWasteType": "Filtrar por tipo de residuo",
       "filterByServiceZone": "Filtrar por zona de servicio",
+      "filterByLocation": "Buscar por ubicación",
       "notAssigned": "No asignada",
       "table": {
         "headers": {
@@ -352,15 +354,36 @@
       "description": "Ejecuta el algoritmo de optimización de rutas de recolección.",
       "step1": {
         "label": "Instalaciones y Vehículos",
-        "title": "Seleccionar Instalaciones y Vehículos"
+        "title": "Seleccionar Instalaciones y Vehículos",
+        "summary": "Resumen de selección:",
+        "selectedCount": "{count} instalación(es) con {vehicleCount} vehículo(s) seleccionado(s)",
+        "jsonPreview": "JSON a enviar al backend:"
       },
       "step2": {
         "label": "Contenedores",
-        "title": "Seleccionar Contenedores"
+        "title": "Seleccionar Contenedores",
+        "summary": "Resumen de selección:",
+        "selectedCount": "{count} contenedor(es) seleccionado(s)",
+        "jsonPreview": "JSON a enviar al backend:"
       },
       "step3": {
         "label": "Datos Adicionales",
-        "title": "Datos Adicionales"
+        "title": "Datos Adicionales",
+        "numberOfDays": "Número de Días",
+        "numberOfDaysPlaceholder": "Ej: 7",
+        "numberOfDaysError": "El número de días debe ser mayor que 0",
+        "averagePickupTime": "Tiempo Promedio de Recogida (minutos)",
+        "averagePickupTimePlaceholder": "Ej: 15",
+        "averagePickupTimeError": "El tiempo de recogida debe ser mayor que 0",
+        "finalSummary": "Resumen Final",
+        "facilitiesSelected": "instalación(es) seleccionada(s)",
+        "noFacilitiesSelected": "No hay instalaciones seleccionadas",
+        "vehiclesSelected": "vehículo(s) seleccionado(s)",
+        "containersSelected": "contenedor(es) seleccionado(s)",
+        "noContainersSelected": "No hay contenedores seleccionados",
+        "days": "días",
+        "minutes": "minutos",
+        "jsonPreview": "JSON a enviar al backend:"
       }
     }
   },
