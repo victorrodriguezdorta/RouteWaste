@@ -191,7 +191,7 @@ export function useAlgorithmExecution() {
    */
   const isStep1Valid = computed(() => {
     return algorithmStore.facilitiesWithVehicles.length > 0 &&
-           algorithmStore.facilitiesWithVehicles.some(f => f.selectedVehicleIds.length > 0);
+           algorithmStore.facilitiesWithVehicles.every(f => f.selectedVehicleIds.length > 0);
   });
 
   /**
@@ -435,7 +435,11 @@ export function useAlgorithmExecution() {
     );
     
     if (facilityIndex !== -1) {
-      algorithmStore.facilitiesWithVehicles[facilityIndex].selectedVehicleIds = [...tempSelectedVehicleIds.value];
+      if (tempSelectedVehicleIds.value.length === 0) {
+        algorithmStore.removeFacilityWithVehicles(selectedFacilityForVehiclesId.value);
+      } else {
+        algorithmStore.facilitiesWithVehicles[facilityIndex].selectedVehicleIds = [...tempSelectedVehicleIds.value];
+      }
     }
     
     closeVehicleDialog();

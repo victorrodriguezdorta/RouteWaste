@@ -1,10 +1,13 @@
 package es.ull.project.configuration;
 
+import es.ull.project.application.port.algorithm.AlgorithmRunner;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.application.service.algorithm.ExecuteAlgorithmService;
+import es.ull.project.application.service.algorithm.RunAlgorithmService;
 import es.ull.project.application.service.container.CreateContainerService;
 import es.ull.project.application.service.container.DeleteContainerService;
 import es.ull.project.application.service.container.ReadContainerService;
@@ -35,6 +38,33 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class ServiceConfiguration {
+
+    /**
+     * Creates a bean for the ExecuteAlgorithmService.
+     *
+     * @param facilityRepository repository used to resolve facilities
+     * @param vehicleRepository repository used to resolve vehicles
+     * @param containerRepository repository used to resolve containers
+     * @return a new ExecuteAlgorithmService instance
+     */
+    @Bean
+    public ExecuteAlgorithmService executeAlgorithmService(
+            FacilityRepository facilityRepository,
+            VehicleRepository vehicleRepository,
+            ContainerRepository containerRepository) {
+        return new ExecuteAlgorithmService(facilityRepository, vehicleRepository, containerRepository);
+    }
+
+    /**
+     * Creates a bean for the RunAlgorithmService.
+     *
+     * @param algorithmRunner adapter used to run the algorithm process
+     * @return a new RunAlgorithmService instance
+     */
+    @Bean
+    public RunAlgorithmService runAlgorithmService(AlgorithmRunner algorithmRunner) {
+        return new RunAlgorithmService(algorithmRunner);
+    }
 
     /**
      * Creates a bean for the CreateContainerService.

@@ -1,4 +1,11 @@
 services:
+  # Algorithm
+  algorithm:
+    build:
+      context: ./algorithm
+    image: sensor-app_algorithm:latest
+    profiles: ["algorithm", "full"]
+
   # Front-end
   front-end:
     image: kaizten/sensor-app_front-end:latest

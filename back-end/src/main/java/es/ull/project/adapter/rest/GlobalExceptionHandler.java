@@ -1,5 +1,6 @@
 package es.ull.project.adapter.rest;
 
+import es.ull.project.application.exception.AlgorithmExecutionException;
 import es.ull.project.adapter.rest.exception.ValidationException;
 import es.ull.project.adapter.rest.response.ErrorResponse;
 import java.util.HashMap;
@@ -109,6 +110,20 @@ public class GlobalExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put(ERROR_KEY, ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles failures produced while running the external algorithm process.
+     *
+     * @param ex the algorithm execution exception
+     * @return ResponseEntity with error message and HTTP 500 (INTERNAL_SERVER_ERROR)
+     */
+    @ExceptionHandler(AlgorithmExecutionException.class)
+    public ResponseEntity<Map<String, String>> handleAlgorithmExecutionError(AlgorithmExecutionException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put(ERROR_KEY, ex.getMessage());
+        logger.error("Algorithm execution failed: {}", ex.getMessage(), ex);
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**

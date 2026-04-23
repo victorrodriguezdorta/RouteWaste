@@ -1,4 +1,5 @@
 .mvn/
+.m2/
 mvnw
 mvnw.cmd
 target/

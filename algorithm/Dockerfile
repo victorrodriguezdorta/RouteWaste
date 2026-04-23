@@ -1,14 +1,20 @@
-# Base image
+# Build stage
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
+
+WORKDIR /build
+
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn -q -DskipTests package assembly:single
+
+# Runtime stage
 FROM eclipse-temurin:21-jdk-alpine
 
-# Volume
-VOLUME /data
+WORKDIR /app
 
-# Copy JAR
-COPY target/algorithm-1.0-SNAPSHOT-jar-with-dependencies.jar app.jar
+COPY --from=build /build/target/algorithm-1.0-SNAPSHOT-jar-with-dependencies.jar app.jar
 
-# Install libgudev-dev
-RUN apk add libgudev-dev
+RUN apk add --no-cache libgudev
 
-# Execution
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]

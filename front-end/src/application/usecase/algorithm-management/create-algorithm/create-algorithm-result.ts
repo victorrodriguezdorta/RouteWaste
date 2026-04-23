@@ -1,24 +1,49 @@
-import type { UllUUID } from "@ull-tfg/ull-tfg-typescript";
-
 /**
  * CreateAlgorithmResult
  *
- * Result object for the algorithm creation use case.
- * Contains the execution ID and status of the algorithm request.
+ * Result object for the algorithm execution use case.
+ * Contains the processed data returned by the backend after resolving all
+ * selected identifiers.
  */
 export interface CreateAlgorithmResult {
   /**
-   * Unique identifier for the algorithm execution request
+   * Facilities and vehicles resolved from the backend.
    */
-  executionId: UllUUID;
+  facilitiesWithVehicles: AlgorithmFacilityVehiclesResult[];
 
   /**
-   * Status of the algorithm execution
+   * Containers resolved from the backend.
    */
-  status: string;
+  selectedContainers: AlgorithmEntityResult[];
 
   /**
-   * Message describing the result of the algorithm execution
+   * Number of planning days used in the request.
    */
-  message: string;
+  numberOfDays: number;
+
+  /**
+   * Average pickup time in minutes used in the request.
+   */
+  averagePickupTimeMinutes: number;
+}
+
+/**
+ * AlgorithmFacilityVehiclesResult
+ *
+ * Represents one resolved facility together with the resolved vehicles
+ * selected for it.
+ */
+export interface AlgorithmFacilityVehiclesResult {
+  facility: AlgorithmEntityResult;
+  selectedVehicles: AlgorithmEntityResult[];
+}
+
+/**
+ * AlgorithmEntityResult
+ *
+ * Generic shape used to store the processed entities returned by the backend.
+ */
+export interface AlgorithmEntityResult {
+  id: string;
+  [key: string]: unknown;
 }

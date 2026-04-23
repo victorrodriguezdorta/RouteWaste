@@ -108,6 +108,7 @@ export const useAlgorithmStore = defineStore('Algorithm', {
     isFormValid: (state) => {
       return (
         state.facilitiesWithVehicles.length > 0 &&
+        state.facilitiesWithVehicles.every(f => f.selectedVehicleIds.length > 0) &&
         state.selectedContainerIds.length > 0 &&
         state.extraData.numberOfDays > 0 &&
         state.extraData.averagePickupTimeMinutes > 0
@@ -162,6 +163,16 @@ export const useAlgorithmStore = defineStore('Algorithm', {
     },
 
     /**
+     * Remove all facilities that do not have selected vehicles.
+     * This keeps the payload aligned with the backend validation rules.
+     */
+    removeFacilitiesWithoutVehicles() {
+      this.facilitiesWithVehicles = this.facilitiesWithVehicles.filter(
+        f => f.selectedVehicleIds.length > 0
+      );
+    },
+
+    /**
      * Set the selected containers for Step 2
      * 
      * @param containerIds Array of container ID strings
@@ -210,11 +221,13 @@ export const useAlgorithmStore = defineStore('Algorithm', {
      * Uses the CreateAlgorithmService to handle the business logic.
      */
     async executeAlgorithm() {
+      this.removeFacilitiesWithoutVehicles();
+
       // Validate that all required data is present
       if (!this.isFormValid) {
         this.setNotification(
           'Validation Error',
-          'Please complete all steps before executing the algorithm',
+          'Please select at least one vehicle for every selected facility before executing the algorithm',
           'mdi-alert',
           'warning'
         );
@@ -253,7 +266,7 @@ export const useAlgorithmStore = defineStore('Algorithm', {
           this.loading = false;
           this.setNotification(
             'Success',
-            `Algorithm executed successfully. Execution ID: ${data.executionId}`,
+            `Algorithm executed successfully. ${data.facilitiesWithVehicles.length} facilities and ${data.selectedContainers.length} containers were processed.`,
             'mdi-check',
             'success'
           );

@@ -60,4 +60,10 @@ public final class ApiRoutes {
      * Full path: /api/v1/service-assignments
      */
     public static final String SERVICE_ASSIGNMENTS = API_BASE + "/service-assignments";
+
+    /**
+     * Algorithm resource endpoints.
+     * Full path: /api/v1/algorithms
+     */
+    public static final String ALGORITHMS = API_BASE + "/algorithms";
 }

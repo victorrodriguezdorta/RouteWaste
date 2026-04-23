@@ -20,11 +20,14 @@ public class Main {
         String problemString = args[0]; // The serialized problem string
         JSONObject jsonInstance = new JSONObject(problemString);
         
-        DeliveryPlanningProblem optimizationProblem = new DeliveryPlanningProblemJsonFileSupplier().get(jsonInstance).findFirst().get();
-        Algorithm solver = new Algorithm(optimizationProblem);
-        DeliveryPlanningSolution solution = solver.run();
-        JSONObject output = new DeliveryPlanningSolutionToJson().apply(solution);
+        // DeliveryPlanningProblem optimizationProblem = new DeliveryPlanningProblemJsonFileSupplier().get(jsonInstance).findFirst().get();
+        // Algorithm solver = new Algorithm(optimizationProblem);
+        // DeliveryPlanningSolution solution = solver.run();
+        // JSONObject output = new DeliveryPlanningSolutionToJson().apply(solution);
         
-        System.out.println(output.toString(4));
+        // System.out.println(output.toString(4));
+
+        // Return input JSON directly
+        System.out.println(jsonInstance.toString(4));
     }
 }

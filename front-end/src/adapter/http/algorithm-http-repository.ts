@@ -2,18 +2,14 @@ import { AlgorithmExecutionRequestJson } from '@/adapter/http/dto/algorithm/algo
 import type { AlgorithmRepository } from '@/application/repository/algorithm-repository';
 import type { CreateAlgorithmCommand, CreateAlgorithmResult } from '@/application/usecase/algorithm-management/create-algorithm/create-algorithm-use-case';
 import type { ApiError, DataError } from '@ull-tfg/ull-tfg-typescript';
-import { Either, http, UllUUID } from '@ull-tfg/ull-tfg-typescript';
+import { Either, http } from '@ull-tfg/ull-tfg-typescript';
 
 /**
  * AlgorithmJsonResponse
  *
  * JSON response from the backend after algorithm execution.
  */
-interface AlgorithmJsonResponse {
-  executionId: string;
-  status: string;
-  message: string;
-}
+type AlgorithmJsonResponse = CreateAlgorithmResult;
 
 /**
  * AlgorithmHttpRepository
@@ -63,12 +59,7 @@ export class AlgorithmHttpRepository implements AlgorithmRepository {
         .then((response: Response) => {
           if (response.ok) {
             response.json().then((data: AlgorithmJsonResponse) => {
-              const result: CreateAlgorithmResult = {
-                executionId: new UllUUID(data.executionId),
-                status: data.status,
-                message: data.message,
-              };
-              resolve(Either.right(result));
+              resolve(Either.right(data));
             });
           } else {
             response.json().then((data: ApiError) => {
