@@ -91,6 +91,7 @@ const tablePage = ref(1);
 const itemsPerPage = ref(10);
 const loading = ref(false);
 const totalAlgorithms = ref(0);
+const isNavigating = ref(false);
 
 // Notification state
 const algorithmNotification = ref({
@@ -150,8 +151,15 @@ const onTableOptionsUpdate = async (_options: { page: number; itemsPerPage: numb
 /**
  * Navigate to algorithm execution view
  */
-const runAlgorithm = () => {
-  router.push({ name: 'ExecuteAlgorithm' });
+const runAlgorithm = async () => {
+  isNavigating.value = true;
+
+  try {
+    await router.push({ name: 'ExecuteAlgorithm' });
+  } catch (error) {
+    console.error('Failed to open algorithm stepper:', error);
+    isNavigating.value = false;
+  }
 };
 </script>
 

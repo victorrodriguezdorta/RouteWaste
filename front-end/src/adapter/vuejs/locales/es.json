@@ -352,6 +352,9 @@
     "execute": {
       "title": "Ejecutar Algoritmo",
       "description": "Ejecuta el algoritmo de optimización de rutas de recolección.",
+      "opening": "Abriendo el asistente del algoritmo...",
+      "loadingData": "Cargando instalaciones, vehiculos y contenedores...",
+      "executing": "Ejecutando algoritmo...",
       "step1": {
         "label": "Instalaciones y Vehículos",
         "title": "Seleccionar Instalaciones y Vehículos",

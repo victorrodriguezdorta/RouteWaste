@@ -47,7 +47,7 @@
         <!-- Filter by Location -->
         <div style="width: 180px;">
           <v-text-field
-            v-model="selectedLocationFilter"
+            v-model="selectedContainerLocationFilter"
             :placeholder="t('container.list.filterByLocation')"
             clearable
             density="compact"
@@ -165,13 +165,13 @@ const emit = defineEmits<{
   next: [];
 }>();
 
-const {
+  const {
   // State - Step 2
   step2TablePage,
   step2ItemsPerPage,
   selectedWasteTypeFilter,
   selectedServiceZoneFilter,
-  selectedLocationFilter,
+  selectedContainerLocationFilter,
   containerLoading,
   totalContainers,
 
@@ -189,18 +189,14 @@ const {
   // Methods - Step 2
   onWasteTypeFilterChange,
   onServiceZoneFilterChange,
-  onLocationFilterChange: onLocationFilterChangeContainer,
+  onContainerLocationFilterChange,
   onStep2TableOptionsUpdate,
   isContainerSelected,
   toggleContainer,
-  initializeContainers,
 } = useAlgorithmExecution();
-
-// Initialize on component mount
-initializeContainers();
 
 // Handler wrapper for location filter (Step 2 version)
 const onLocationFilterChange = (newValue: string | null) => {
-  onLocationFilterChangeContainer(newValue);
+  onContainerLocationFilterChange(newValue);
 };
 </script>

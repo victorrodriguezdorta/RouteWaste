@@ -352,6 +352,9 @@
     "execute": {
       "title": "Execute Algorithm",
       "description": "Run the collection route optimization algorithm.",
+      "opening": "Opening the algorithm wizard...",
+      "loadingData": "Loading facilities, vehicles and containers...",
+      "executing": "Executing algorithm...",
       "step1": {
         "label": "Facilities & Vehicles",
         "title": "Select Facilities and Vehicles",
