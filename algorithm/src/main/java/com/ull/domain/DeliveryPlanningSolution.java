@@ -1,115 +1,176 @@
 package com.ull.domain;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import com.ull.domain.entity.DailyPlan;
+import com.ull.domain.entity.FacilityCluster;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-//Clase que contiene los datos de la solución al problema.
+/**
+ * Represents the output of the algorithm execution.
+ *
+ * <p>Holds:
+ * <ul>
+ *   <li>The execution status (OPTIMAL, SUBOPTIMAL, INFEASIBLE).</li>
+ *   <li>The clustering result: one {@link FacilityCluster} per facility,
+ *       each containing the containers assigned to it.</li>
+ *   <li>The routing result: one {@link DailyPlan} per vehicle per day,
+ *       each containing the ordered stops for that vehicle on that day.</li>
+ * </ul>
+ */
 public class DeliveryPlanningSolution {
+
+  public static final String CLUSTERS_NOT_DEFINED = "Clusters list is not defined";
+  public static final String DAILY_PLANS_NOT_DEFINED = "Daily plans list is not defined";
+
+  /**
+   * Possible statuses for the algorithm execution.
+   */
   public enum Status {
+    /** The solver found a provably optimal solution. */
     OPTIMAL,
-    INFEASIBLE,
-    SUBOPTIMAL
+    /** The solver found a feasible but not provably optimal solution. */
+    SUBOPTIMAL,
+    /** The problem has no feasible solution with the given constraints. */
+    INFEASIBLE
   }
 
   private Status status;
-  private JSONArray routes;
-  private double totalDistance;
+  private final Instant executedAt;
+  private final List<FacilityCluster> clusters;
+  private final List<DailyPlan> dailyPlans;
 
+  /**
+   * Creates an empty solution stamped with the current instant.
+   * Status defaults to {@link Status#INFEASIBLE} until the algorithm updates it.
+   */
   public DeliveryPlanningSolution() {
-    this.routes = new JSONArray();
-    this.totalDistance = 0.0;
     this.status = Status.INFEASIBLE;
+    this.executedAt = Instant.now();
+    this.clusters = new ArrayList<>();
+    this.dailyPlans = new ArrayList<>();
   }
 
-  public void addRoute(String truckId, LocalDateTime startTime, LocalDateTime endTime,
-      double[] capacities, String[] orderIds) {
-    JSONObject route = new JSONObject();
-    route.put("truck", truckId);
-    route.put("starting_time", startTime.format(DateTimeFormatter.ISO_DATE_TIME));
-    route.put("ending_time", endTime.format(DateTimeFormatter.ISO_DATE_TIME));
-
-    JSONArray capacitiesArray = new JSONArray();
-    for (double capacity : capacities) {
-      capacitiesArray.put(capacity);
-    }
-    route.put("capacities", capacitiesArray);
-
-    JSONArray pathArray = new JSONArray();
-    for (String orderId : orderIds) {
-      pathArray.put(orderId);
-    }
-    route.put("path", pathArray);
-
-    route.put("metrics", new JSONArray());
-
-    routes.put(route);
-  }
-
-  public void addRouteStop(String truckId, String orderId,
-      String arrivalTime, String departureTime,
-      double remainingCapacityClean, double remainingCapacityDirty,
-      double distanceFromPrevious, boolean hasPickup, boolean hasDelivery,
-      double pickupVolume, double deliveryVolume) {
-    // Buscar la ruta del camión o crear una nueva
-    JSONObject route = null;
-    for (int i = 0; i < routes.length(); i++) {
-      JSONObject r = routes.getJSONObject(i);
-      if (r.getString("truck").equals(truckId)) {
-        route = r;
-        break;
-      }
-    }
-
-    if (route == null) {
-      route = new JSONObject();
-      route.put("truck", truckId);
-      route.put("stops", new JSONArray());
-      routes.put(route);
-    }
-
-    // Crear la nueva parada
-    JSONObject stop = new JSONObject();
-    stop.put("order", orderId);
-    stop.put("arrivalTime", arrivalTime);
-    stop.put("departureTime", departureTime);
-    stop.put("remainingCleanLoad", remainingCapacityClean);
-    stop.put("availableDirtySpace", remainingCapacityDirty);
-    stop.put("distanceFromPrevious", distanceFromPrevious);
-    stop.put("hasPickup", hasPickup);
-    stop.put("hasDelivery", hasDelivery);
-    stop.put("pickupVolume", pickupVolume);
-    stop.put("deliveryVolume", deliveryVolume);
-
-    // Agregar la parada a la ruta
-    route.getJSONArray("stops").put(stop);
-
-    // Actualizar la distancia total
-    this.totalDistance += distanceFromPrevious;
-  }
+  // -------------------------------------------------------------------------
+  // Status
+  // -------------------------------------------------------------------------
 
   public Status getStatus() {
-    return status;
+    return this.status;
   }
 
-  public void setStatus(Status status) {
+  public void updateStatus(Status status) {
+    if (status == null) {
+      throw new IllegalArgumentException("Status is not defined");
+    }
     this.status = status;
   }
 
-  public JSONArray getRoutes() {
-    return routes;
+  // -------------------------------------------------------------------------
+  // Execution timestamp
+  // -------------------------------------------------------------------------
+
+  public Instant getExecutedAt() {
+    return this.executedAt;
   }
 
-  public double getTotalDistance() {
-    return totalDistance;
+  // -------------------------------------------------------------------------
+  // Clusters
+  // -------------------------------------------------------------------------
+
+  /**
+   * Returns an unmodifiable view of the facility clusters.
+   *
+   * @return the clustering result
+   */
+  public List<FacilityCluster> getClusters() {
+    return Collections.unmodifiableList(this.clusters);
   }
 
-  public void setTotalDistance(double totalDistance) {
-    this.totalDistance = totalDistance;
+  /**
+   * Adds a facility cluster to the solution.
+   *
+   * @param cluster the cluster to add
+   */
+  public void addCluster(FacilityCluster cluster) {
+    if (cluster == null) {
+      throw new IllegalArgumentException(CLUSTERS_NOT_DEFINED);
+    }
+    this.clusters.add(cluster);
   }
 
-  public JSONArray toJson() {
-    return routes;
+  // -------------------------------------------------------------------------
+  // Daily plans (routes)
+  // -------------------------------------------------------------------------
+
+  /**
+   * Returns an unmodifiable view of the daily plans.
+   *
+   * @return the routing result
+   */
+  public List<DailyPlan> getDailyPlans() {
+    return Collections.unmodifiableList(this.dailyPlans);
+  }
+
+  /**
+   * Adds a daily vehicle route to the solution.
+   *
+   * @param dailyPlan the daily plan to add
+   */
+  public void addDailyPlan(DailyPlan dailyPlan) {
+    if (dailyPlan == null) {
+      throw new IllegalArgumentException(DAILY_PLANS_NOT_DEFINED);
+    }
+    this.dailyPlans.add(dailyPlan);
+  }
+
+  // -------------------------------------------------------------------------
+  // Derived metrics
+  // -------------------------------------------------------------------------
+
+  /**
+   * Returns the total route distance across all daily plans, in meters.
+   *
+   * @return total distance in meters
+   */
+  public double getTotalDistanceMeters() {
+    return this.dailyPlans.stream()
+        .mapToDouble(DailyPlan::getTotalDistanceMeters)
+        .sum();
+  }
+
+  /**
+   * Returns the total kilograms collected across all daily plans.
+   *
+   * @return total collected kilograms
+   */
+  public double getTotalCollectedKilograms() {
+    return this.dailyPlans.stream()
+        .mapToDouble(DailyPlan::getTotalCollectedKilograms)
+        .sum();
+  }
+
+  /**
+   * Returns the total liters collected across all daily plans.
+   *
+   * @return total collected liters
+   */
+  public double getTotalCollectedLiters() {
+    return this.dailyPlans.stream()
+        .mapToDouble(DailyPlan::getTotalCollectedLiters)
+        .sum();
+  }
+
+  @Override
+  public String toString() {
+    return String.format(
+        "DeliveryPlanningSolution{status=%s, executedAt=%s, clusters=%d, dailyPlans=%d,"
+            + " totalDistanceMeters=%.2f}",
+        this.status,
+        this.executedAt,
+        this.clusters.size(),
+        this.dailyPlans.size(),
+        getTotalDistanceMeters());
   }
 }

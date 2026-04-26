@@ -101,7 +101,8 @@ public final class Location {
             * Math.sin(longitudeDifference / 2) * Math.sin(longitudeDifference / 2);
     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    return EARTH_RADIUS_METERS * c;
+    double distance = EARTH_RADIUS_METERS * c;
+    return Math.round(distance * 100.0) / 100.0;
   }
 
   @Override
