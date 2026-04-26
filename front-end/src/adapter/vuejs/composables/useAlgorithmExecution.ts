@@ -539,6 +539,7 @@ export function useAlgorithmExecution() {
   const step2CurrentSortOrder = ref<'asc' | 'desc'>('asc');
   const selectedWasteTypeFilter = ref<string | undefined>(undefined);
   const selectedServiceZoneFilter = ref<string | undefined>(undefined);
+  const selectedContainerLocationFilter = ref<string | undefined>(undefined);
 
   const totalContainers = computed(() => step2TotalContainers.value);
 
@@ -679,7 +680,7 @@ export function useAlgorithmExecution() {
    */
   const onWasteTypeFilterChange = async (newType: string | null) => {
     const wasteType = newType ?? undefined;
-    await loadContainers(0, step2ItemsPerPage.value, step2CurrentSortBy.value, step2CurrentSortOrder.value, wasteType, selectedServiceZoneFilter.value, selectedLocationFilter.value);
+    await loadContainers(0, step2ItemsPerPage.value, step2CurrentSortBy.value, step2CurrentSortOrder.value, wasteType, selectedServiceZoneFilter.value, selectedContainerLocationFilter.value);
     step2TablePage.value = containerCurrentPage.value + 1;
   };
 
@@ -688,7 +689,16 @@ export function useAlgorithmExecution() {
    */
   const onServiceZoneFilterChange = async (newZone: string | null) => {
     const serviceZone = newZone ?? undefined;
-    await loadContainers(0, step2ItemsPerPage.value, step2CurrentSortBy.value, step2CurrentSortOrder.value, selectedWasteTypeFilter.value, serviceZone, selectedLocationFilter.value);
+    await loadContainers(0, step2ItemsPerPage.value, step2CurrentSortBy.value, step2CurrentSortOrder.value, selectedWasteTypeFilter.value, serviceZone, selectedContainerLocationFilter.value);
+    step2TablePage.value = containerCurrentPage.value + 1;
+  };
+
+  /**
+   * Handle container location filter change
+   */
+  const onContainerLocationFilterChange = async (newLocation: string | null) => {
+    const location = newLocation ?? undefined;
+    await loadContainers(0, step2ItemsPerPage.value, step2CurrentSortBy.value, step2CurrentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, location);
     step2TablePage.value = containerCurrentPage.value + 1;
   };
 
@@ -705,7 +715,7 @@ export function useAlgorithmExecution() {
     const newSortBy = options.sortBy[0]?.key;
     const newSortOrder = options.sortBy[0]?.order ?? 'asc';
 
-    await loadContainers(requestedPage, requestedSize, newSortBy, newSortOrder, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value);
+    await loadContainers(requestedPage, requestedSize, newSortBy, newSortOrder, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedContainerLocationFilter.value);
     step2TablePage.value = containerCurrentPage.value + 1;
     step2ItemsPerPage.value = containerRowsPerPage.value;
   };
@@ -800,6 +810,7 @@ export function useAlgorithmExecution() {
     step2ItemsPerPage,
     selectedWasteTypeFilter,
     selectedServiceZoneFilter,
+    selectedContainerLocationFilter,
     containerLoading,
     totalContainers,
     
@@ -820,6 +831,7 @@ export function useAlgorithmExecution() {
     initializeContainers,
     onWasteTypeFilterChange,
     onServiceZoneFilterChange,
+    onContainerLocationFilterChange,
     onStep2TableOptionsUpdate,
     isContainerSelected,
     toggleContainer,
