@@ -1,9 +1,5 @@
 package es.ull.project.adapter.rest.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -15,15 +11,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.ull.project.application.exception.AlgorithmExecutionException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import es.ull.project.adapter.rest.mapper.AlgorithmExecutionResponseMapper;
 import es.ull.project.adapter.rest.request.algorithm.AlgorithmExecutionRequestBody;
 import es.ull.project.adapter.rest.request.algorithm.FacilityVehiclesSelectionRequestBody;
 import es.ull.project.adapter.rest.response.algorithm.AlgorithmExecutionResponseBody;
+import es.ull.project.adapter.rest.response.algorithm.MaximumBudgetResponseBody;
+import es.ull.project.application.exception.AlgorithmExecutionException;
 import es.ull.project.application.usecase.algorithm.AlgorithmExecutionResult;
 import es.ull.project.application.usecase.algorithm.AlgorithmExecutionSelection;
 import es.ull.project.application.usecase.algorithm.ExecuteAlgorithmUseCase;
+import es.ull.project.application.usecase.algorithm.PersistAlgorithmExecutionResultUseCase;
 import es.ull.project.application.usecase.algorithm.RunAlgorithmUseCase;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -53,6 +56,12 @@ public class AlgorithmController {
      */
     @Autowired
     private RunAlgorithmUseCase runAlgorithmUseCase;
+
+    /**
+     * Use case for persisting the algorithm result into MongoDB.
+     */
+    @Autowired
+    private PersistAlgorithmExecutionResultUseCase persistAlgorithmExecutionResultUseCase;
 
     /**
      * Shared object mapper used to serialize and deserialize JSON payloads.
@@ -86,25 +95,44 @@ public class AlgorithmController {
                 requestBody.facilitiesWithVehicles);
         List<UUID> selectedContainerIds = this.mapUuidList(requestBody.selectedContainerIds);
 
+        Integer numberOfDays = this.requirePositiveInteger(requestBody.numberOfDays, "numberOfDays");
+        Integer averagePickupTimeMinutes = this.requirePositiveInteger(requestBody.averagePickupTimeMinutes, "averagePickupTimeMinutes");
+
+        MaximumBudget providedMaxBudget = null;
+        if (requestBody.maxBudget != null && requestBody.maxBudget.amount != null) {
+            if (requestBody.maxBudget.currency != null && !requestBody.maxBudget.currency.isBlank()) {
+                providedMaxBudget = new MaximumBudget(requestBody.maxBudget.amount, requestBody.maxBudget.currency);
+            } else {
+                providedMaxBudget = new MaximumBudget(requestBody.maxBudget.amount);
+            }
+        }
+
         AlgorithmExecutionResult result = this.executeAlgorithmUseCase.execute(
                 facilitiesWithVehicles,
                 selectedContainerIds,
-                this.requirePositiveInteger(requestBody.numberOfDays, "numberOfDays"),
-                this.requirePositiveInteger(requestBody.averagePickupTimeMinutes, "averagePickupTimeMinutes"));
+                numberOfDays,
+                averagePickupTimeMinutes);
 
         AlgorithmExecutionResponseBody processedResponseBody = AlgorithmExecutionResponseMapper.toResponseBody(result);
+        if (providedMaxBudget != null) {
+            MaximumBudgetResponseBody maxBudgetResponse = new MaximumBudgetResponseBody();
+            maxBudgetResponse.amount = providedMaxBudget.getAmount();
+            maxBudgetResponse.currency = providedMaxBudget.getCurrency().map(c -> c.getCode()).orElse("EUR");
+            processedResponseBody.maxBudget = maxBudgetResponse;
+        }
+
         String processedJson = this.serializeProcessedResponse(processedResponseBody);
         String algorithmJson = this.runAlgorithmUseCase.execute(processedJson);
         JsonNode responseBody = this.deserializeAlgorithmResponse(algorithmJson);
+        this.persistAlgorithmResult(responseBody, numberOfDays, averagePickupTimeMinutes, providedMaxBudget);
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
     /**
-     * Serializes the processed response body before sending it to the algorithm.
-     *
-     * @param processedResponseBody processed response body
-     * @return serialized JSON string
-     */
+      * Serializes the processed response body before sending it to the algorithm.
+      *
+      * @return serialized JSON string
+      */
     private String serializeProcessedResponse(AlgorithmExecutionResponseBody processedResponseBody) {
         try {
             return this.objectMapper.writeValueAsString(processedResponseBody);
@@ -128,11 +156,19 @@ public class AlgorithmController {
     }
 
     /**
-     * Maps facility selections from the request body into application objects.
+     * Persists the algorithm JSON as an infrastructure plan aggregate.
      *
-     * @param requestSelections request selections to map
-     * @return mapped immutable selection list
+     * @param responseBody raw algorithm response
+     * @param numberOfDays number of days for the planning period
+     * @param averagePickupTimeMinutes average pickup time in minutes
      */
+    private void persistAlgorithmResult(JsonNode responseBody, Integer numberOfDays, Integer averagePickupTimeMinutes, MaximumBudget providedMaxBudget) {
+        try {
+            this.persistAlgorithmExecutionResultUseCase.persist(responseBody, numberOfDays, averagePickupTimeMinutes, providedMaxBudget);
+        } catch (RuntimeException e) {
+            throw new AlgorithmExecutionException("Failed to persist the algorithm response", e);
+        }
+    }
     private List<AlgorithmExecutionSelection> mapFacilitySelections(
             List<FacilityVehiclesSelectionRequestBody> requestSelections) {
         if (requestSelections == null) {

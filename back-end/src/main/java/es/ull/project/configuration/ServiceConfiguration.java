@@ -1,36 +1,34 @@
 package es.ull.project.configuration;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import es.ull.project.application.port.algorithm.AlgorithmRunner;
 import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.application.repository.DailyPlanRepository;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.application.service.algorithm.ExecuteAlgorithmService;
+import es.ull.project.application.service.algorithm.PersistAlgorithmExecutionResultService;
 import es.ull.project.application.service.algorithm.RunAlgorithmService;
 import es.ull.project.application.service.container.CreateContainerService;
 import es.ull.project.application.service.container.DeleteContainerService;
 import es.ull.project.application.service.container.ReadContainerService;
 import es.ull.project.application.service.container.UpdateContainerService;
+import es.ull.project.application.service.dailyplan.ReadDailyPlanService;
 import es.ull.project.application.service.facility.CreateFacilityService;
 import es.ull.project.application.service.facility.DeleteFacilityService;
 import es.ull.project.application.service.facility.ReadFacilityService;
 import es.ull.project.application.service.facility.UpdateFacilityService;
-import es.ull.project.application.service.infrastructureplan.CreateInfrastructurePlanService;
 import es.ull.project.application.service.infrastructureplan.DeleteInfrastructurePlanService;
 import es.ull.project.application.service.infrastructureplan.ReadInfrastructurePlanService;
-import es.ull.project.application.service.infrastructureplan.UpdateInfrastructurePlanService;
-import es.ull.project.application.service.serviceassignment.CreateServiceAssignmentService;
-import es.ull.project.application.service.serviceassignment.DeleteServiceAssignmentService;
-import es.ull.project.application.service.serviceassignment.ReadServiceAssignmentService;
-import es.ull.project.application.service.serviceassignment.UpdateServiceAssignmentService;
 import es.ull.project.application.service.vehicle.CreateVehicleService;
 import es.ull.project.application.service.vehicle.DeleteVehicleService;
 import es.ull.project.application.service.vehicle.ReadVehicleService;
 import es.ull.project.application.service.vehicle.UpdateVehicleService;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 /**
  * Configuration class for application services.
  * This class defines all service beans following the hexagonal architecture
@@ -39,14 +37,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ServiceConfiguration {
 
-    /**
-     * Creates a bean for the ExecuteAlgorithmService.
-     *
-     * @param facilityRepository repository used to resolve facilities
-     * @param vehicleRepository repository used to resolve vehicles
-     * @param containerRepository repository used to resolve containers
-     * @return a new ExecuteAlgorithmService instance
-     */
     @Bean
     public ExecuteAlgorithmService executeAlgorithmService(
             FacilityRepository facilityRepository,
@@ -55,253 +45,97 @@ public class ServiceConfiguration {
         return new ExecuteAlgorithmService(facilityRepository, vehicleRepository, containerRepository);
     }
 
-    /**
-     * Creates a bean for the RunAlgorithmService.
-     *
-     * @param algorithmRunner adapter used to run the algorithm process
-     * @return a new RunAlgorithmService instance
-     */
     @Bean
     public RunAlgorithmService runAlgorithmService(AlgorithmRunner algorithmRunner) {
         return new RunAlgorithmService(algorithmRunner);
     }
 
-    /**
-     * Creates a bean for the CreateContainerService.
-     * 
-     * @param repository the container repository
-     * @return a new CreateContainerService instance
-     */
+    @Bean
+    public PersistAlgorithmExecutionResultService persistAlgorithmExecutionResultService(
+            InfrastructurePlanRepository infrastructurePlanRepository,
+            ServiceAssignmentRepository serviceAssignmentRepository,
+            DailyPlanRepository dailyPlanRepository) {
+        return new PersistAlgorithmExecutionResultService(
+                infrastructurePlanRepository,
+                serviceAssignmentRepository,
+                dailyPlanRepository);
+    }
+
     @Bean
     public CreateContainerService createContainerService(ContainerRepository repository) {
         return new CreateContainerService(repository);
     }
 
-    /**
-     * Creates a bean for the ReadContainerService.
-     * 
-     * @param repository the container repository
-     * @return a new ReadContainerService instance
-     */
     @Bean
     public ReadContainerService readContainerService(ContainerRepository repository) {
         return new ReadContainerService(repository);
     }
 
-    /**
-     * Creates a bean for the UpdateContainerService.
-     * 
-     * @param repository the container repository
-     * @return a new UpdateContainerService instance
-     */
     @Bean
     public UpdateContainerService updateContainerService(ContainerRepository repository) {
         return new UpdateContainerService(repository);
     }
 
-    /**
-     * Creates a bean for the DeleteContainerService.
-     * 
-     * @param repository the container repository
-     * @return a new DeleteContainerService instance
-     */
     @Bean
     public DeleteContainerService deleteContainerService(ContainerRepository repository) {
         return new DeleteContainerService(repository);
     }
 
-    /**
-     * Creates a bean for the CreateFacilityService.
-     * 
-     * @param repository the facility repository
-     * @return a new CreateFacilityService instance
-     */
     @Bean
     public CreateFacilityService createFacilityService(FacilityRepository repository) {
         return new CreateFacilityService(repository);
     }
 
-    /**
-     * Creates a bean for the ReadFacilityService.
-     * 
-     * @param repository the facility repository
-     * @return a new ReadFacilityService instance
-     */
     @Bean
     public ReadFacilityService readFacilityService(FacilityRepository repository) {
         return new ReadFacilityService(repository);
     }
 
-    /**
-     * Creates a bean for the UpdateFacilityService.
-     * 
-     * @param repository the facility repository
-     * @return a new UpdateFacilityService instance
-     */
     @Bean
     public UpdateFacilityService updateFacilityService(FacilityRepository repository) {
         return new UpdateFacilityService(repository);
     }
 
-    /**
-     * Creates a bean for the DeleteFacilityService.
-     * 
-     * @param repository the facility repository
-     * @return a new DeleteFacilityService instance
-     */
     @Bean
     public DeleteFacilityService deleteFacilityService(FacilityRepository repository) {
         return new DeleteFacilityService(repository);
     }
 
-    /**
-     * Creates a bean for the CreateVehicleService.
-     * 
-     * @param repository the vehicle repository
-     * @return a new CreateVehicleService instance
-     */
     @Bean
     public CreateVehicleService createVehicleService(VehicleRepository repository) {
         return new CreateVehicleService(repository);
     }
 
-    /**
-     * Creates a bean for the ReadVehicleService.
-     * 
-     * @param repository the vehicle repository
-     * @return a new ReadVehicleService instance
-     */
     @Bean
     public ReadVehicleService readVehicleService(VehicleRepository repository) {
         return new ReadVehicleService(repository);
     }
 
-    /**
-     * Creates a bean for the UpdateVehicleService.
-     * 
-     * @param repository the vehicle repository
-     * @return a new UpdateVehicleService instance
-     */
     @Bean
     public UpdateVehicleService updateVehicleService(VehicleRepository repository) {
         return new UpdateVehicleService(repository);
     }
 
-    /**
-     * Creates a bean for the DeleteVehicleService.
-     * 
-     * @param repository the vehicle repository
-     * @return a new DeleteVehicleService instance
-     */
     @Bean
     public DeleteVehicleService deleteVehicleService(VehicleRepository repository) {
         return new DeleteVehicleService(repository);
     }
 
-    /**
-     * Creates a bean for the CreateInfrastructurePlanService.
-     * 
-     * @param repository the infrastructure plan repository
-     * @param facilityRepository the facility repository
-     * @param serviceAssignmentRepository the service assignment repository
-     * @return a new CreateInfrastructurePlanService instance
-     */
-    @Bean
-    public CreateInfrastructurePlanService createInfrastructurePlanService(
-            InfrastructurePlanRepository repository,
-            FacilityRepository facilityRepository,
-            ServiceAssignmentRepository serviceAssignmentRepository) {
-        return new CreateInfrastructurePlanService(repository, facilityRepository, serviceAssignmentRepository);
-    }
-
-    /**
-     * Creates a bean for the ReadInfrastructurePlanService.
-     * 
-     * @param repository the infrastructure plan repository
-     * @return a new ReadInfrastructurePlanService instance
-     */
     @Bean
     public ReadInfrastructurePlanService readInfrastructurePlanService(InfrastructurePlanRepository repository) {
         return new ReadInfrastructurePlanService(repository);
     }
 
-    /**
-     * Creates a bean for the UpdateInfrastructurePlanService.
-     * 
-     * @param repository the infrastructure plan repository
-     * @param facilityRepository the facility repository
-     * @param serviceAssignmentRepository the service assignment repository
-     * @return a new UpdateInfrastructurePlanService instance
-     */
     @Bean
-    public UpdateInfrastructurePlanService updateInfrastructurePlanService(
+    public DeleteInfrastructurePlanService deleteInfrastructurePlanService(
             InfrastructurePlanRepository repository,
-            FacilityRepository facilityRepository,
+            DailyPlanRepository dailyPlanRepository,
             ServiceAssignmentRepository serviceAssignmentRepository) {
-        return new UpdateInfrastructurePlanService(repository, facilityRepository, serviceAssignmentRepository);
+        return new DeleteInfrastructurePlanService(repository, dailyPlanRepository, serviceAssignmentRepository);
     }
 
-    /**
-     * Creates a bean for the DeleteInfrastructurePlanService.
-     * 
-     * @param repository the infrastructure plan repository
-     * @return a new DeleteInfrastructurePlanService instance
-     */
     @Bean
-    public DeleteInfrastructurePlanService deleteInfrastructurePlanService(InfrastructurePlanRepository repository) {
-        return new DeleteInfrastructurePlanService(repository);
-    }
-
-    /**
-     * Creates a bean for the CreateServiceAssignmentService.
-     * 
-     * @param serviceAssignmentRepository the service assignment repository
-     * @param containerRepository         the container repository
-     * @param facilityRepository          the facility repository
-     * @return a new CreateServiceAssignmentService instance
-     */
-    @Bean
-    public CreateServiceAssignmentService createServiceAssignmentService(
-            ServiceAssignmentRepository serviceAssignmentRepository,
-            ContainerRepository containerRepository,
-            FacilityRepository facilityRepository) {
-        return new CreateServiceAssignmentService(serviceAssignmentRepository, containerRepository, facilityRepository);
-    }
-
-    /**
-     * Creates a bean for the ReadServiceAssignmentService.
-     * 
-     * @param repository the service assignment repository
-     * @return a new ReadServiceAssignmentService instance
-     */
-    @Bean
-    public ReadServiceAssignmentService readServiceAssignmentService(ServiceAssignmentRepository repository) {
-        return new ReadServiceAssignmentService(repository);
-    }
-
-    /**
-     * Creates a bean for the UpdateServiceAssignmentService.
-     * 
-     * @param repository          the service assignment repository
-     * @param containerRepository the container repository
-     * @param facilityRepository  the facility repository
-     * @return a new UpdateServiceAssignmentService instance
-     */
-    @Bean
-    public UpdateServiceAssignmentService updateServiceAssignmentService(ServiceAssignmentRepository repository,
-            ContainerRepository containerRepository,
-            FacilityRepository facilityRepository) {
-        return new UpdateServiceAssignmentService(repository, containerRepository, facilityRepository);
-    }
-
-    /**
-     * Creates a bean for the DeleteServiceAssignmentService.
-     * 
-     * @param repository the service assignment repository
-     * @return a new DeleteServiceAssignmentService instance
-     */
-    @Bean
-    public DeleteServiceAssignmentService deleteServiceAssignmentService(ServiceAssignmentRepository repository) {
-        return new DeleteServiceAssignmentService(repository);
+    public ReadDailyPlanService readDailyPlanService(DailyPlanRepository repository) {
+        return new ReadDailyPlanService(repository);
     }
 }

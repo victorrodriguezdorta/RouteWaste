@@ -216,6 +216,10 @@ export function useAlgorithmExecution() {
       selectedContainerIds: algorithmStore.selectedContainerIds,
       numberOfDays: algorithmStore.extraData.numberOfDays,
       averagePickupTimeMinutes: algorithmStore.extraData.averagePickupTimeMinutes,
+      maxBudget: {
+        amount: algorithmStore.extraData.maxBudgetAmount,
+        currency: 'EUR',
+      },
     };
     
     return JSON.stringify(command, null, 2);
@@ -634,6 +638,13 @@ export function useAlgorithmExecution() {
     }
   });
 
+  const maxBudgetAmountRef = computed({
+    get: () => algorithmStore.extraData.maxBudgetAmount,
+    set: (value: number) => {
+      algorithmStore.setMaxBudgetAmount(value);
+    }
+  });
+
   /**
    * Validate that step 3 has valid extra data
    */
@@ -824,6 +835,7 @@ export function useAlgorithmExecution() {
     // Computed - Step 3
     numberOfDaysRef,
     averagePickupTimeMinutesRef,
+    maxBudgetAmountRef,
     isStep3Valid,
     
     // Methods - Step 2

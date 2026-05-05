@@ -3,11 +3,7 @@ package es.ull.project.adapter.rest.mapper;
 import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
 import es.ull.project.domain.entity.ServiceAssignment;
 
-/**
- * Mapper class to convert ServiceAssignment domain entities to ServiceAssignmentResponseBody DTOs
- * This class handles the transformation between the domain layer and the REST adapter layer,
- * including mapping complete Container and Facility entities using their respective mappers.
- */
+import java.util.stream.Collectors;
 public class ServiceAssignmentResponseMapper {
 
     private static final String UTILITY_CLASS_ERROR_MESSAGE = "Utility class cannot be instantiated";
@@ -33,14 +29,19 @@ public class ServiceAssignmentResponseMapper {
      * @return ServiceAssignmentResponseBody DTO ready to be serialized as JSON
      */
     public static ServiceAssignmentResponseBody toResponseBody(ServiceAssignment assignment) {
+        if (assignment == null) {
+            return null;
+        }
         ServiceAssignmentResponseBody responseBody = new ServiceAssignmentResponseBody();
         responseBody.id = assignment.getId();
-        responseBody.container = ContainerResponseMapper.toResponseBody(assignment.getContainer());
+        responseBody.infrastructurePlanId = assignment.getInfrastructurePlan().getId();
         responseBody.facility = FacilityResponseMapper.toResponseBody(assignment.getFacility());
-        responseBody.wasteDemand = assignment.getWasteDemand();
-        responseBody.distance = assignment.getDistance();
-        responseBody.serviceTime = assignment.getServiceTime();
-        responseBody.transportCost = assignment.getTransportCost();
+        
+        if (assignment.getAssignedContainers() != null) {
+            responseBody.assignedContainers = assignment.getAssignedContainers().stream()
+                    .map(ContainerResponseMapper::toResponseBody)
+                    .collect(Collectors.toList());
+        }
         return responseBody;
     }
 }

@@ -1,10 +1,12 @@
 package com.ull.domain;
 
-import com.ull.domain.entity.Container;
-import com.ull.domain.entity.FacilityWithVehicles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.ull.domain.entity.Container;
+import com.ull.domain.entity.FacilityWithVehicles;
+import com.ull.domain.valueobject.cost.MaximumBudget;
 
 /**
  * Represents the algorithm input problem.
@@ -22,6 +24,7 @@ public class DeliveryPlanningProblem {
 
   private final int averagePickupTimeMinutes;
   private final int numberOfDays;
+  private final MaximumBudget maxBudget;
   private final List<FacilityWithVehicles> facilitiesWithVehicles;
   private final List<Container> containers;
 
@@ -38,12 +41,31 @@ public class DeliveryPlanningProblem {
       int numberOfDays,
       List<FacilityWithVehicles> facilitiesWithVehicles,
       List<Container> containers) {
+    this(averagePickupTimeMinutes, numberOfDays, facilitiesWithVehicles, containers, null);
+  }
+
+  /**
+   * Creates a fully initialised planning problem.
+   *
+   * @param averagePickupTimeMinutes average pickup time at each container stop, in minutes
+   * @param numberOfDays             planning horizon in days
+   * @param facilitiesWithVehicles   facilities paired with their assigned vehicles
+   * @param containers               containers to be collected during the planning horizon
+   * @param maxBudget                maximum budget for the planning horizon
+   */
+  public DeliveryPlanningProblem(
+      int averagePickupTimeMinutes,
+      int numberOfDays,
+      List<FacilityWithVehicles> facilitiesWithVehicles,
+      List<Container> containers,
+      MaximumBudget maxBudget) {
     validateAveragePickupTime(averagePickupTimeMinutes);
     validateNumberOfDays(numberOfDays);
     validateFacilities(facilitiesWithVehicles);
     validateContainers(containers);
     this.averagePickupTimeMinutes = averagePickupTimeMinutes;
     this.numberOfDays = numberOfDays;
+    this.maxBudget = maxBudget;
     this.facilitiesWithVehicles = new ArrayList<>(facilitiesWithVehicles);
     this.containers = new ArrayList<>(containers);
   }
@@ -78,6 +100,10 @@ public class DeliveryPlanningProblem {
 
   public int getNumberOfDays() {
     return this.numberOfDays;
+  }
+
+  public MaximumBudget getMaxBudget() {
+    return this.maxBudget;
   }
 
   /**

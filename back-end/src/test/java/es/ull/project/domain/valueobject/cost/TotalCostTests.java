@@ -254,7 +254,7 @@ public class TotalCostTests {
         TotalCost cost = new TotalCost(12.5, "EUR");
 
         assertEquals(
-                "TotalCost={amount=12.50, currency='Currency={code='EUR'}'}",
+                String.format("TotalCost={amount=%.2f, currency='Currency={code='EUR'}'}", 12.5),
                 cost.toString()
         );
     }

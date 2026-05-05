@@ -362,15 +362,15 @@ class FacilityTests {
         Facility facility = randomFacility();
         
         String expectedValue = String.format(
-            "Facility={id=%s, type=%s, location=%s, storageCapacity=%s, processingCapacity=%s, unloadingTime=%s, openingCost=%s, currentFillingLevel=%s, status=%s}",
+            "Facility={id=%s, type=%s, location=%s, storageCapacity=%s, processingCapacity=%s, unloadingTime=%s, currentFillingLevel=%s, openingCost=%s, status=%s}",
             facility.getId(),
             facility.getFacilityType(),
             facility.getLocation(),
             facility.getStorageCapacity(),
             facility.getProcessingCapacity(),
             facility.getUnloadingTime(),
-            facility.getOpeningFixedCost(),
             facility.getCurrentFillingLevel(),
+            facility.getOpeningFixedCost(),
             facility.getStatus()
         );
         

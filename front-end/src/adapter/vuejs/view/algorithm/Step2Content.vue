@@ -141,7 +141,7 @@
         <!-- JSON Preview -->
         <div class="mt-4">
           <p class="text-caption font-weight-bold mb-2">{{ t('algorithm.execute.step2.jsonPreview') }}</p>
-          <v-card variant="outlined" class="bg-grey-lighten-5">
+          <v-card variant="outlined" class="bg-surface-soft">
             <v-card-text class="pa-3">
               <pre class="text-caption" style="overflow-x: auto; font-size: 11px; line-height: 1.4;">{{ formattedCommandJson }}</pre>
             </v-card-text>

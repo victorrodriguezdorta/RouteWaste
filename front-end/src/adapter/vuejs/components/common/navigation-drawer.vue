@@ -124,6 +124,6 @@ const drawer = computed({
 :deep(.white-select .v-field__outline__start),
 :deep(.white-select .v-field__outline__end),
 :deep(.white-select .v-field__outline__notch) {
-  border-color: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgb(var(--v-theme-surface-border-light)) !important;
 }
 </style>

@@ -244,7 +244,7 @@ public class OpeningFixedCostTests {
         OpeningFixedCost cost = new OpeningFixedCost(99.99, "EUR");
 
         assertEquals(
-                "OpeningFixedCost={amount=99.99, currency='Currency={code='EUR'}'}",
+                String.format("OpeningFixedCost={amount=%.2f, currency='Currency={code='EUR'}'}", 99.99),
                 cost.toString()
         );
     }

@@ -58,6 +58,28 @@
         </div>
       </div>
 
+      <!-- Max Budget -->
+      <div style="margin-bottom: 32px;">
+        <label class="text-body2 font-weight-bold d-block mb-2">
+          {{ t('algorithm.execute.step3.maxBudget') }}
+          <span class="text-error">*</span>
+        </label>
+        <v-text-field
+          v-model.number="maxBudgetAmount"
+          type="number"
+          :placeholder="t('algorithm.execute.step3.maxBudgetPlaceholder')"
+          min="0"
+          variant="outlined"
+          density="compact"
+          hide-details="auto"
+          :error="maxBudgetAmount < 0"
+        />
+        <small class="text-caption">EUR</small>
+        <small v-if="maxBudgetAmount < 0" class="text-error">
+          {{ t('algorithm.execute.step3.maxBudgetError') }}
+        </small>
+      </div>
+
       <!-- Summary Section -->
       <div class="mt-6 pt-4 border-t">
         <p class="text-h6 font-weight-bold mb-4">{{ t('algorithm.execute.step3.finalSummary') }}</p>
@@ -102,6 +124,9 @@
               <p>
                 <strong>{{ t('algorithm.execute.step3.averagePickupTime') }}:</strong> {{ averagePickupTime }} {{ t('algorithm.execute.step3.minutes') }}
               </p>
+              <p>
+                <strong>{{ t('algorithm.execute.step3.maxBudget') }}:</strong> {{ maxBudgetAmount }} EUR
+              </p>
             </div>
           </v-card-text>
         </v-card>
@@ -109,7 +134,7 @@
         <!-- Final JSON Preview -->
         <div class="mt-4">
           <p class="text-caption font-weight-bold mb-2">{{ t('algorithm.execute.step3.jsonPreview') }}</p>
-          <v-card variant="outlined" class="bg-grey-lighten-5">
+          <v-card variant="outlined" class="bg-surface-soft">
             <v-card-text class="pa-3">
               <pre class="text-caption" style="overflow-x: auto; font-size: 11px; line-height: 1.4;">{{ formattedCommandJson }}</pre>
             </v-card-text>
@@ -141,6 +166,7 @@ const {
   formattedCommandJson,
   numberOfDaysRef,
   averagePickupTimeMinutesRef,
+  maxBudgetAmountRef,
 
   // Store reference
   algorithmStore,
@@ -158,6 +184,13 @@ const averagePickupTime = computed({
   get: () => averagePickupTimeMinutesRef.value,
   set: (value: number) => {
     averagePickupTimeMinutesRef.value = value;
+  }
+});
+
+const maxBudgetAmount = computed({
+  get: () => maxBudgetAmountRef.value,
+  set: (value: number) => {
+    maxBudgetAmountRef.value = value;
   }
 });
 

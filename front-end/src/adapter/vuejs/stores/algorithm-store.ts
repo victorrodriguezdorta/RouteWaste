@@ -54,9 +54,11 @@ export const useAlgorithmStore = defineStore('Algorithm', {
     extraData: {
       numberOfDays: 7,
       averagePickupTimeMinutes: 15,
+      maxBudgetAmount: 100,
     } as {
       numberOfDays: number;
       averagePickupTimeMinutes: number;
+      maxBudgetAmount: number;
     },
 
     /**
@@ -211,6 +213,16 @@ export const useAlgorithmStore = defineStore('Algorithm', {
       this.extraData = {
         numberOfDays,
         averagePickupTimeMinutes,
+        maxBudgetAmount: this.extraData?.maxBudgetAmount ?? 100,
+      };
+    },
+
+    setMaxBudgetAmount(amount: number) {
+      // Preserve other extraData fields when updating only the budget
+      this.extraData = {
+        numberOfDays: this.extraData.numberOfDays,
+        averagePickupTimeMinutes: this.extraData.averagePickupTimeMinutes,
+        maxBudgetAmount: amount,
       };
     },
 
@@ -248,6 +260,10 @@ export const useAlgorithmStore = defineStore('Algorithm', {
         selectedContainerIds: this.selectedContainerIds.map(c => new UllUUID(c)),
         numberOfDays: this.extraData.numberOfDays,
         averagePickupTimeMinutes: this.extraData.averagePickupTimeMinutes,
+        maxBudget: {
+          amount: this.extraData.maxBudgetAmount,
+          currency: 'EUR',
+        },
       };
 
       // Execute the algorithm service

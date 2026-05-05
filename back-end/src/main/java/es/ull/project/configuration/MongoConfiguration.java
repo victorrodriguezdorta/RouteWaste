@@ -1,24 +1,5 @@
 package es.ull.project.configuration;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-
-import es.ull.project.adapter.mongodb.reader.ContainerReadingConverter;
-import es.ull.project.adapter.mongodb.reader.FacilityReadingConverter;
-import es.ull.project.adapter.mongodb.reader.InfrastructurePlanReadingConverter;
-import es.ull.project.adapter.mongodb.reader.ServiceAssignmentReadingConverter;
-import es.ull.project.adapter.mongodb.reader.VehicleReadingConverter;
-import es.ull.project.adapter.mongodb.writer.ContainerWritingConverter;
-import es.ull.project.adapter.mongodb.writer.FacilityWritingConverter;
-import es.ull.project.adapter.mongodb.writer.InfrastructurePlanWritingConverter;
-import es.ull.project.adapter.mongodb.writer.ServiceAssignmentWritingConverter;
-import es.ull.project.adapter.mongodb.writer.VehicleWritingConverter;
-import es.ull.project.application.repository.ContainerRepository;
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.application.repository.ServiceAssignmentRepository;
-
 import java.util.Arrays;
 
 import org.bson.UuidRepresentation;
@@ -36,6 +17,27 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.lang.NonNull;
+
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+
+import es.ull.project.adapter.mongodb.reader.ContainerReadingConverter;
+import es.ull.project.adapter.mongodb.reader.DailyPlanReadingConverter;
+import es.ull.project.adapter.mongodb.reader.FacilityReadingConverter;
+import es.ull.project.adapter.mongodb.reader.InfrastructurePlanReadingConverter;
+import es.ull.project.adapter.mongodb.reader.ServiceAssignmentReadingConverter;
+import es.ull.project.adapter.mongodb.reader.VehicleReadingConverter;
+import es.ull.project.adapter.mongodb.writer.ContainerWritingConverter;
+import es.ull.project.adapter.mongodb.writer.DailyPlanWritingConverter;
+import es.ull.project.adapter.mongodb.writer.FacilityWritingConverter;
+import es.ull.project.adapter.mongodb.writer.InfrastructurePlanWritingConverter;
+import es.ull.project.adapter.mongodb.writer.ServiceAssignmentWritingConverter;
+import es.ull.project.adapter.mongodb.writer.VehicleWritingConverter;
+import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.application.repository.ServiceAssignmentRepository;
 
 /**
  * MongoDB configuration class.
@@ -159,6 +161,8 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration {
                 Arrays.asList(
                         new ContainerReadingConverter(this),
                         new ContainerWritingConverter(this),
+                        new DailyPlanReadingConverter(this),
+                        new DailyPlanWritingConverter(this),
                         new FacilityReadingConverter(this),
                         new FacilityWritingConverter(this),
                         new InfrastructurePlanReadingConverter(this),

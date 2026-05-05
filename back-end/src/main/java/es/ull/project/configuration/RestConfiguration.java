@@ -7,20 +7,14 @@ import es.ull.project.adapter.rest.deserialization.container.ContainerPostReques
 import es.ull.project.adapter.rest.deserialization.container.ContainerPutRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.facility.FacilityPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.facility.FacilityPutRequestBodyDeserializer;
-import es.ull.project.adapter.rest.deserialization.infrastructureplan.InfrastructurePlanPostRequestBodyDeserializer;
-import es.ull.project.adapter.rest.deserialization.infrastructureplan.InfrastructurePlanPutRequestBodyDeserializer;
-import es.ull.project.adapter.rest.deserialization.serviceassignment.ServiceAssignmentPostRequestBodyDeserializer;
-import es.ull.project.adapter.rest.deserialization.serviceassignment.ServiceAssignmentPutRequestBodyDeserializer;
+import es.ull.project.adapter.rest.deserialization.facility.FacilityPutRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.vehicle.VehiclePostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.vehicle.VehiclePutRequestBodyDeserializer;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
-import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPostRequestBody;
-import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPutRequestBody;
-import es.ull.project.adapter.rest.request.serviceassignment.ServiceAssignmentPostRequestBody;
-import es.ull.project.adapter.rest.request.serviceassignment.ServiceAssignmentPutRequestBody;
+import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
@@ -86,18 +80,6 @@ public class RestConfiguration {
         module.addDeserializer(
                 FacilityPutRequestBody.class,
                 new FacilityPutRequestBodyDeserializer());
-        module.addDeserializer(
-                InfrastructurePlanPostRequestBody.class,
-                new InfrastructurePlanPostRequestBodyDeserializer());
-        module.addDeserializer(
-                InfrastructurePlanPutRequestBody.class,
-                new InfrastructurePlanPutRequestBodyDeserializer());
-        module.addDeserializer(
-                ServiceAssignmentPostRequestBody.class,
-                new ServiceAssignmentPostRequestBodyDeserializer());
-        module.addDeserializer(
-                ServiceAssignmentPutRequestBody.class,
-                new ServiceAssignmentPutRequestBodyDeserializer());
         module.addSerializer(
                 VehicleResponseBody.class,
                 new VehicleResponseBodySerializer());

@@ -1,11 +1,13 @@
 package com.ull.domain;
 
-import com.ull.domain.entity.DailyPlan;
-import com.ull.domain.entity.FacilityCluster;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.ull.domain.entity.DailyPlan;
+import com.ull.domain.entity.FacilityCluster;
+import com.ull.domain.valueobject.cost.MaximumBudget;
 
 /**
  * Represents the output of the algorithm execution.
@@ -38,6 +40,7 @@ public class DeliveryPlanningSolution {
 
   private Status status;
   private final Instant executedAt;
+  private MaximumBudget maxBudget;
   private final List<FacilityCluster> clusters;
   private final List<DailyPlan> dailyPlans;
 
@@ -73,6 +76,14 @@ public class DeliveryPlanningSolution {
 
   public Instant getExecutedAt() {
     return this.executedAt;
+  }
+
+  public MaximumBudget getMaxBudget() {
+    return this.maxBudget;
+  }
+
+  public void updateMaxBudget(MaximumBudget maxBudget) {
+    this.maxBudget = maxBudget;
   }
 
   // -------------------------------------------------------------------------

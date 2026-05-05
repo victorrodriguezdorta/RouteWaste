@@ -245,7 +245,7 @@ public class MaximumBudgetTests {
         System.out.println(budget.toString());
 
         assertEquals(
-                "MaximumBudget={amount=99.99, currency='Currency={code='EUR'}'}",
+                String.format("MaximumBudget={amount=%.2f, currency='Currency={code='EUR'}'}", 99.99),
                 budget.toString()
         );
     }

@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
+import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.TotalCost;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
@@ -51,6 +53,12 @@ public class InfrastructurePlan {
     private List<ServiceAssignment> serviceAssignments;
 
     /**
+     * Identifiers of the daily plans generated for this infrastructure plan.
+     * It is a computed attribute.
+     */
+    private List<DailyPlan> dailyPlans;
+
+    /**
      * Service policies that must be complied with in the plan.
      * It is a required attribute.
      */
@@ -69,6 +77,36 @@ public class InfrastructurePlan {
     private TotalCost estimatedTotalCost;
 
     /**
+     * Total weight collected as determined by the algorithm.
+     */
+    private CollectedWeightKilograms totalCollectedKilograms;
+
+    /**
+     * Total volume collected as determined by the algorithm.
+     */
+    private CollectedVolumeLiters totalCollectedLiters;
+
+    /**
+     * Total distance of all routes as determined by the algorithm.
+     */
+    private Distance totalDistanceMeters;
+
+    /**
+     * Number of days for the planning period.
+     */
+    private Integer numberOfDays;
+
+    /**
+     * Average pickup time in minutes.
+     */
+    private Integer averagePickupTimeMinutes;
+
+    /**
+     * Timestamp when the algorithm execution was performed (ISO 8601 format).
+     */
+    private String executedAt;
+
+    /**
      * Creates a new InfrastructurePlan.
      *
      * @param id              Plan identifier
@@ -79,16 +117,26 @@ public class InfrastructurePlan {
     public InfrastructurePlan(
             PlanningPeriod period,
             MaximumBudget maxBudget,
-            ServicePolicies servicePolicies) {
+            ServicePolicies servicePolicies,
+            Integer numberOfDays,
+            Integer averagePickupTimeMinutes,
+            String executedAt) {
         validatePeriod(period);
         validateMaxBudget(maxBudget);
         this.id = UUID.randomUUID();
         this.period = period;
         this.maxBudget = maxBudget;
         this.servicePolicies = servicePolicies;
+        this.numberOfDays = numberOfDays;
+        this.averagePickupTimeMinutes = averagePickupTimeMinutes;
+        this.executedAt = executedAt;
         this.selectedFacilities = new ArrayList<>();
         this.serviceAssignments = new ArrayList<>();
+        this.dailyPlans = new ArrayList<>();
         this.estimatedTotalCost = new TotalCost(0.0);
+        this.totalCollectedKilograms = CollectedWeightKilograms.fromKilograms(0.0);
+        this.totalCollectedLiters = CollectedVolumeLiters.fromLiters(0.0);
+        this.totalDistanceMeters = Distance.fromMeters(0.0);
     }
 
     /**
@@ -102,9 +150,16 @@ public class InfrastructurePlan {
         this.period = otherObject.period;
         this.maxBudget = otherObject.maxBudget;
         this.servicePolicies = otherObject.servicePolicies;
+        this.numberOfDays = otherObject.numberOfDays;
+        this.averagePickupTimeMinutes = otherObject.averagePickupTimeMinutes;
+        this.executedAt = otherObject.executedAt;
         this.selectedFacilities = new ArrayList<>(otherObject.selectedFacilities);
         this.serviceAssignments = new ArrayList<>(otherObject.serviceAssignments);
+        this.dailyPlans = new ArrayList<>(otherObject.dailyPlans);
         this.estimatedTotalCost = otherObject.estimatedTotalCost;
+        this.totalCollectedKilograms = otherObject.totalCollectedKilograms;
+        this.totalCollectedLiters = otherObject.totalCollectedLiters;
+        this.totalDistanceMeters = otherObject.totalDistanceMeters;
     }
 
     /**
@@ -115,26 +170,44 @@ public class InfrastructurePlan {
      * @param period             the planning period
      * @param selectedFacilities the list of selected facilities
      * @param serviceAssignments the list of service assignments
+     * @param dailyPlans         the list of daily plan entities
      * @param servicePolicies    the service policies
      * @param maxBudget          the maximum budget allowed
      * @param estimatedTotalCost the estimated total cost
+     * @param numberOfDays       the number of days for planning
+     * @param averagePickupTimeMinutes the average pickup time in minutes
+     * @param executedAt         the timestamp of algorithm execution
      */
     public InfrastructurePlan(UUID id,
             PlanningPeriod period,
             List<Facility> selectedFacilities,
             List<ServiceAssignment> serviceAssignments,
+            List<DailyPlan> dailyPlans,
             ServicePolicies servicePolicies,
             MaximumBudget maxBudget,
-            TotalCost estimatedTotalCost) {
+            TotalCost estimatedTotalCost,
+            CollectedWeightKilograms totalCollectedKilograms,
+            CollectedVolumeLiters totalCollectedLiters,
+            Distance totalDistanceMeters,
+            Integer numberOfDays,
+            Integer averagePickupTimeMinutes,
+            String executedAt) {
         validatePeriod(period);
         validateMaxBudget(maxBudget);
         this.id = id;
         this.period = period;
         this.selectedFacilities = selectedFacilities != null ? new ArrayList<>(selectedFacilities) : new ArrayList<>();
         this.serviceAssignments = serviceAssignments != null ? new ArrayList<>(serviceAssignments) : new ArrayList<>();
+        this.dailyPlans = dailyPlans != null ? new ArrayList<>(dailyPlans) : new ArrayList<>();
         this.servicePolicies = servicePolicies;
         this.maxBudget = maxBudget;
         this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
+        this.totalCollectedKilograms = totalCollectedKilograms != null ? totalCollectedKilograms : CollectedWeightKilograms.fromKilograms(0.0);
+        this.totalCollectedLiters = totalCollectedLiters != null ? totalCollectedLiters : CollectedVolumeLiters.fromLiters(0.0);
+        this.totalDistanceMeters = totalDistanceMeters != null ? totalDistanceMeters : Distance.fromMeters(0.0);
+        this.numberOfDays = numberOfDays;
+        this.averagePickupTimeMinutes = averagePickupTimeMinutes;
+        this.executedAt = executedAt;
     }
 
     /**
@@ -201,6 +274,33 @@ public class InfrastructurePlan {
     }
 
     /**
+     * Adds a daily plan identifier to the plan.
+     *
+     * @param dailyPlanId the daily plan identifier to add
+     */
+    public void addDailyPlan(DailyPlan dailyPlan) {
+        if (dailyPlan != null) {
+            boolean exists = false;
+            for (DailyPlan dp : dailyPlans) {
+                if (dp.getId().equals(dailyPlan.getId())) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                dailyPlans.add(dailyPlan);
+            }
+        }
+    }
+
+    /**
+     * Clears all daily plans from the plan.
+     */
+    public void clearDailyPlans() {
+        dailyPlans.clear();
+    }
+
+    /**
      * Recalculates the total estimated cost of the plan.
      */
     public void recalculateTotalCost() {
@@ -208,9 +308,8 @@ public class InfrastructurePlan {
         for (Facility facility : selectedFacilities) {
             total += facility.getOpeningFixedCost().getAmount();
         }
-        for (ServiceAssignment assignment : serviceAssignments) {
-            total += assignment.getTransportCost().getAmount();
-        }
+        // Transport cost should be updated based on routing, but for now we just 
+        // sum facility costs as routing cost is handled separately or needs to be derived from distance.
         TotalCost newCost = new TotalCost(total);
         if (newCost.greaterThan(this.maxBudget)) {
             throw new IllegalStateException(TOTAL_COST_EXCEEDED);
@@ -285,6 +384,34 @@ public class InfrastructurePlan {
     }
 
     /**
+     * Returns the identifiers of the daily plans associated with this plan.
+     *
+     * @return the daily plan identifiers
+     */
+    /**
+     * Returns the identifiers of the daily plans associated with this plan.
+     * This is a convenience derived from the stored `DailyPlan` entities.
+     *
+     * @return the daily plan identifiers
+     */
+    public List<UUID> getDailyPlanIds() {
+        List<UUID> ids = new ArrayList<>();
+        for (DailyPlan dp : dailyPlans) {
+            ids.add(dp.getId());
+        }
+        return Collections.unmodifiableList(ids);
+    }
+
+    /**
+     * Returns the DailyPlan entities associated with this plan.
+     *
+     * @return an unmodifiable list of DailyPlan entities
+     */
+    public List<DailyPlan> getDailyPlans() {
+        return Collections.unmodifiableList(dailyPlans);
+    }
+
+    /**
      * Returns the maximum budget.
      *
      * @return the maximum budget allowed for this plan
@@ -309,6 +436,36 @@ public class InfrastructurePlan {
      */
     public ServicePolicies getServicePolicies() {
         return servicePolicies;
+    }
+
+    public CollectedWeightKilograms getTotalCollectedKilograms() {
+        return totalCollectedKilograms;
+    }
+
+    public CollectedVolumeLiters getTotalCollectedLiters() {
+        return totalCollectedLiters;
+    }
+
+    public Distance getTotalDistanceMeters() {
+        return totalDistanceMeters;
+    }
+
+    public Integer getNumberOfDays() {
+        return numberOfDays;
+    }
+
+    public Integer getAveragePickupTimeMinutes() {
+        return averagePickupTimeMinutes;
+    }
+
+    public String getExecutedAt() {
+        return executedAt;
+    }
+
+    public void updateAlgorithmMetrics(CollectedWeightKilograms kg, CollectedVolumeLiters liters, Distance distance) {
+        this.totalCollectedKilograms = kg;
+        this.totalCollectedLiters = liters;
+        this.totalDistanceMeters = distance;
     }
 
     /**

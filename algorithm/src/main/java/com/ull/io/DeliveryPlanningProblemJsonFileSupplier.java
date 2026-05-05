@@ -1,17 +1,20 @@
 package com.ull.io;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.ull.domain.DeliveryPlanningProblem;
 import com.ull.domain.entity.Container;
 import com.ull.domain.entity.Facility;
 import com.ull.domain.entity.FacilityWithVehicles;
 import com.ull.domain.entity.Vehicle;
 import com.ull.domain.enumerate.WasteType;
+import com.ull.domain.valueobject.cost.MaximumBudget;
 import com.ull.domain.valueobject.location.Location;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Translates the incoming JSON into a fully typed {@link DeliveryPlanningProblem}.
@@ -20,6 +23,7 @@ import org.json.JSONObject;
  * <ul>
  *   <li>{@code averagePickupTimeMinutes} – int</li>
  *   <li>{@code numberOfDays} – int</li>
+ *   <li>{@code maxBudget} – optional object with {@code amount} and {@code currency}</li>
  *   <li>{@code facilitiesWithVehicles} – array of facility+vehicle groups</li>
  *   <li>{@code selectedContainers} – array of container objects</li>
  * </ul>
@@ -36,6 +40,7 @@ public class DeliveryPlanningProblemJsonFileSupplier {
   public Stream<DeliveryPlanningProblem> get(JSONObject json) {
     int averagePickupTimeMinutes = json.getInt("averagePickupTimeMinutes");
     int numberOfDays = json.getInt("numberOfDays");
+    MaximumBudget maxBudget = parseMaximumBudget(json.optJSONObject("maxBudget"));
 
     List<FacilityWithVehicles> facilitiesWithVehicles =
         parseFacilitiesWithVehicles(json.getJSONArray("facilitiesWithVehicles"));
@@ -47,7 +52,8 @@ public class DeliveryPlanningProblemJsonFileSupplier {
         averagePickupTimeMinutes,
         numberOfDays,
         facilitiesWithVehicles,
-        containers);
+      containers,
+      maxBudget);
 
     return Stream.of(problem);
   }
@@ -116,6 +122,16 @@ public class DeliveryPlanningProblemJsonFileSupplier {
       result.add(parseContainer(array.getJSONObject(i)));
     }
     return result;
+  }
+
+  private MaximumBudget parseMaximumBudget(JSONObject json) {
+    if (json == null) {
+      return null;
+    }
+
+    double amount = json.getDouble("amount");
+    String currency = json.optString("currency", "EUR");
+    return new MaximumBudget(amount, currency);
   }
 
   private Container parseContainer(JSONObject json) {

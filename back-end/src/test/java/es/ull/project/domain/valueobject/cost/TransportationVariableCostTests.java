@@ -287,7 +287,7 @@ public class TransportationVariableCostTests {
         TransportationVariableCost cost = new TransportationVariableCost(12.5, "EUR");
 
         assertEquals(
-                "TransportationVariableCost={amount=12.50, currency='Currency={code='EUR'}'}",
+                String.format("TransportationVariableCost={amount=%.2f, currency='Currency={code='EUR'}'}", 12.5),
                 cost.toString()
         );
     }

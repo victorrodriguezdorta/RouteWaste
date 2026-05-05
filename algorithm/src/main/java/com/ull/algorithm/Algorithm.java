@@ -1,5 +1,8 @@
 package com.ull.algorithm;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import com.ull.domain.DeliveryPlanningProblem;
 import com.ull.domain.DeliveryPlanningSolution;
 import com.ull.domain.entity.Container;
@@ -8,8 +11,6 @@ import com.ull.domain.entity.Facility;
 import com.ull.domain.entity.FacilityCluster;
 import com.ull.domain.entity.FacilityWithVehicles;
 import com.ull.domain.entity.Vehicle;
-import java.time.LocalDate;
-import java.util.List;
 
 /**
  * Entry point for the planning algorithm.
@@ -41,6 +42,7 @@ public class Algorithm {
    */
   public DeliveryPlanningSolution run() {
     DeliveryPlanningSolution solution = new DeliveryPlanningSolution();
+    solution.updateMaxBudget(problem.getMaxBudget());
 
     List<FacilityWithVehicles> facilitiesWithVehicles = problem.getFacilitiesWithVehicles();
     List<Container> containers = problem.getContainers();

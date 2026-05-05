@@ -7,7 +7,7 @@
   >
     <!-- Welcome Message -->
     <div class="mb-12 mt-6 px-4">
-      <p class="text-body-1 text-grey-darken-2 text-center">
+      <p class="text-body-1 text-theme-muted text-center">
         {{ t('selection.welcomeDescription') }}
       </p>
     </div>
@@ -36,7 +36,7 @@
                 </h3>
               </div>
               <div>
-                <p class="text-body-2 text-grey-darken-2 ma-0">
+                <p class="text-body-2 text-theme-muted ma-0">
                   {{ t('selection.types.algorithm.description') }}
                 </p>
               </div>
@@ -65,7 +65,7 @@
         align="center"
         fontWeight="400"
         fontSize="1.25rem"
-        textColor="#757575"
+        textColor="rgb(var(--v-theme-text-muted))"
         :underline="true"
         lineColor="primary"
         :lineOpacity="0.3"
@@ -73,7 +73,7 @@
     </div>
 
     <div class="mb-6 mt-2 px-4">
-      <p class="text-body-1 text-grey-darken-2 text-center">
+      <p class="text-body-1 text-theme-muted text-center">
         {{ t('selection.subtitle') }}
       </p>
     </div>
@@ -93,7 +93,7 @@
           <v-card-title class="text-h4 font-weight-bold mb-4 text-primary">
             {{ t('selection.types.vehicles.title') }}
           </v-card-title>
-          <v-card-text class="text-body-1 text-grey-darken-2 flex-grow-1">
+          <v-card-text class="text-body-1 text-theme-muted flex-grow-1">
             {{ t('selection.types.vehicles.description') }}
           </v-card-text>
           <v-card-actions class="justify-center mt-4">
@@ -125,7 +125,7 @@
           <v-card-title class="text-h4 font-weight-bold mb-4 text-primary">
             {{ t('selection.types.containers.title') }}
           </v-card-title>
-          <v-card-text class="text-body-1 text-grey-darken-2 flex-grow-1">
+          <v-card-text class="text-body-1 text-theme-muted flex-grow-1">
             {{ t('selection.types.containers.description') }}
           </v-card-text>
           <v-card-actions class="justify-center mt-4">
@@ -157,7 +157,7 @@
           <v-card-title class="text-h4 font-weight-bold mb-4 text-primary">
             {{ t('selection.types.facilities.title') }}
           </v-card-title>
-          <v-card-text class="text-body-1 text-grey-darken-2 flex-grow-1">
+          <v-card-text class="text-body-1 text-theme-muted flex-grow-1">
             {{ t('selection.types.facilities.description') }}
           </v-card-text>
           <v-card-actions class="justify-center mt-4">
@@ -203,12 +203,12 @@ const navigateTo = (routeName: string) => {
 <style scoped>
 .selection-card {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(var(--v-theme-neutral-base), 0.05);
 }
 
 .selection-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 12px 24px rgba(var(--v-theme-neutral-base), 0.1) !important;
   border-color: rgba(var(--v-theme-primary), 0.3);
 }
 
@@ -241,12 +241,12 @@ const navigateTo = (routeName: string) => {
 
 .algorithm-card {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(var(--v-theme-neutral-base), 0.05);
 }
 
 .algorithm-card:hover {
   transform: translateX(8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 12px 24px rgba(var(--v-theme-neutral-base), 0.1) !important;
   border-color: rgba(var(--v-theme-primary), 0.3);
 }
 
@@ -256,9 +256,13 @@ const navigateTo = (routeName: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: rgb(var(--v-theme-surface));
   flex-shrink: 0;
   position: relative;
+}
+
+.text-theme-muted {
+  color: rgb(var(--v-theme-text-muted));
 }
 
 .algorithm-image-container::before {

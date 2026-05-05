@@ -31,4 +31,7 @@ public class AlgorithmExecutionResponseBody {
      * Average pickup time received in the request.
      */
     public int averagePickupTimeMinutes;
+
+    /** Optional maximum budget included in the processed payload. */
+    public MaximumBudgetResponseBody maxBudget;
 }

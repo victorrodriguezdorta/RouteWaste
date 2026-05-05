@@ -29,4 +29,7 @@ public class AlgorithmExecutionRequestBody {
      * Average pickup time in minutes.
      */
     public Integer averagePickupTimeMinutes;
+
+    /** Optional maximum budget to be provided to the algorithm. */
+    public MaximumBudgetRequestBody maxBudget;
 }

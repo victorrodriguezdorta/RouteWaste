@@ -81,11 +81,11 @@ watch(locale, (newLocale) => {
 .white-select :deep(.v-field__outline__start),
 .white-select :deep(.v-field__outline__end),
 .white-select :deep(.v-field__outline__notch) {
-  border-color: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgb(var(--v-theme-surface-border-light)) !important;
 }
 
 .white-select :deep(.v-field--focused .v-field__outline__start),
 .white-select :deep(.v-field--focused .v-field__outline__end) {
-  border-color: white !important;
+  border-color: rgb(var(--v-theme-surface)) !important;
 }
 </style>

@@ -2,11 +2,8 @@ package es.ull.project.adapter.rest.response.serviceassignment;
 
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
-import es.ull.project.domain.valueobject.location.Distance;
-import es.ull.project.domain.valueobject.location.ServiceTime;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -28,9 +25,9 @@ public class ServiceAssignmentResponseBody {
     public UUID id;
 
     /**
-     * Complete container entity with all its data
+     * Unique identifier of the parent infrastructure plan
      */
-    public ContainerResponseBody container;
+    public UUID infrastructurePlanId;
 
     /**
      * Complete facility entity with all its data
@@ -38,26 +35,7 @@ public class ServiceAssignmentResponseBody {
     public FacilityResponseBody facility;
 
     /**
-     * Waste demand value object from domain.
-     * The serializer extracts value, quantityUnit, and timeUnit.
+     * List of containers assigned to this facility
      */
-    public WasteDemand wasteDemand;
-
-    /**
-     * Distance value object from domain.
-     * The serializer extracts meters and kilometers.
-     */
-    public Distance distance;
-
-    /**
-     * Service time value object from domain.
-     * The serializer extracts minutes.
-     */
-    public ServiceTime serviceTime;
-
-    /**
-     * Transportation cost value object from domain.
-     * The serializer extracts amount and optional currency.
-     */
-    public TransportationVariableCost transportCost;
+    public List<ContainerResponseBody> assignedContainers;
 }

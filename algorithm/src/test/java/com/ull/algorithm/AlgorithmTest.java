@@ -5,6 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import com.ull.domain.DeliveryPlanningProblem;
 import com.ull.domain.DeliveryPlanningSolution;
 import com.ull.domain.entity.Container;
@@ -14,9 +18,8 @@ import com.ull.domain.entity.FacilityCluster;
 import com.ull.domain.entity.FacilityWithVehicles;
 import com.ull.domain.entity.Vehicle;
 import com.ull.domain.enumerate.WasteType;
+import com.ull.domain.valueobject.cost.MaximumBudget;
 import com.ull.domain.valueobject.location.Location;
-import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class AlgorithmTest {
 
@@ -68,13 +71,14 @@ class AlgorithmTest {
 
     FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-        15, 7, List.of(fwv), List.of(c1, c2));
+      15, 7, List.of(fwv), List.of(c1, c2), new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
     // Status should be SUBOPTIMAL (stub algorithm)
     assertEquals(DeliveryPlanningSolution.Status.SUBOPTIMAL, solution.getStatus());
     assertNotNull(solution.getExecutedAt());
+    assertEquals(new MaximumBudget(5000.0, "EUR"), solution.getMaxBudget());
   }
 
   @Test
@@ -86,7 +90,7 @@ class AlgorithmTest {
 
     FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-        15, 7, List.of(fwv), List.of(c1, c2));
+      15, 7, List.of(fwv), List.of(c1, c2), new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
@@ -107,7 +111,7 @@ class AlgorithmTest {
 
     FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v1, v2));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-        15, 7, List.of(fwv), List.of(c));
+      15, 7, List.of(fwv), List.of(c), new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
@@ -125,7 +129,7 @@ class AlgorithmTest {
   void shouldReturnInfeasibleWhenNoFacilities() {
     Container c = container("container-1", 28.465, -16.263);
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-        15, 7, List.of(), List.of(c));
+      15, 7, List.of(), List.of(c), new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
@@ -140,7 +144,7 @@ class AlgorithmTest {
     Vehicle v = vehicle("vehicle-1", "COLLECTION_TRUCK");
     FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-        15, 7, List.of(fwv), List.of());
+      15, 7, List.of(fwv), List.of(), new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
@@ -159,7 +163,7 @@ class AlgorithmTest {
 
     FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-        15, 7, List.of(fwv), List.of(c1, c2, c3));
+      15, 7, List.of(fwv), List.of(c1, c2, c3), new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
@@ -184,7 +188,7 @@ class AlgorithmTest {
 
     FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-        15, 7, List.of(fwv), List.of(c1, c2));
+      15, 7, List.of(fwv), List.of(c1, c2), new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 

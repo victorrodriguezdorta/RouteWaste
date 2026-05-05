@@ -172,7 +172,7 @@ const openStreetMapLink = computed(() =>
 .location-map__frame-shell {
   overflow: hidden;
   border-radius: 14px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgb(var(--v-theme-border-light));
 }
 
 .location-map__frame {

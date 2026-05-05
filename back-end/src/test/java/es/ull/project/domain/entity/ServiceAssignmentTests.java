@@ -7,6 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import es.ull.project.domain.enumerate.FacilityStatus;
@@ -17,40 +20,22 @@ import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
 import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.UnloadingTime;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
-import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.Location;
-import es.ull.project.domain.valueobject.location.ServiceTime;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
+import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
 class ServiceAssignmentTests {
 
     // Helpers
-    private static WasteDemand randomWasteDemand() {
-        return new WasteDemand(5.0);
-    }
-
     private static ContainerCapacityLiters randomCapacityLiters() {
         return new ContainerCapacityLiters(100.0 + Math.random() * 900.0);
     }
 
     private static DailyWasteDemandLitersPerDay randomDailyDemandLitersPerDay() {
         return new DailyWasteDemandLitersPerDay(5.0 + Math.random() * 45.0);
-    }
-
-    private static Distance randomDistance() {
-        return Distance.fromMeters(2000.0); // 2 km
-    }
-
-    private static ServiceTime randomServiceTime() {
-        return new ServiceTime(15.0); // 15 minutes
-    }
-
-    private static TransportationVariableCost randomTransportCost() {
-        return new TransportationVariableCost(2.5);
     }
 
     private static Location randomLocation() {
@@ -93,93 +78,90 @@ class ServiceAssignmentTests {
             FacilityStatus.random()
         );
     }
+    
+    private static InfrastructurePlan randomInfrastructurePlan() {
+        return new InfrastructurePlan(new PlanningPeriod("2026"), new MaximumBudget(1_000_000.0), new ServicePolicies(5000.0, 60, 100, 1000.0), null, null, null);
+    }
 
     // ========== Constructors ==========
 
     @Test
     void constructor_1_right() {
-        Container container = randomContainer();
+        InfrastructurePlan plan = randomInfrastructurePlan();
         Facility facility = randomFacility();
-        WasteDemand demand = randomWasteDemand();
-        Distance distance = randomDistance();
-        ServiceTime serviceTime = randomServiceTime();
-        TransportationVariableCost cost = randomTransportCost();
+        List<Container> containers = new ArrayList<>();
+        containers.add(randomContainer());
 
-        ServiceAssignment sa = new ServiceAssignment(container, facility, demand, distance, serviceTime, cost);
+        ServiceAssignment sa = new ServiceAssignment(plan, facility, containers);
 
-        assertEquals(container, sa.getContainer());
+        assertEquals(plan.getId(), sa.getInfrastructurePlan().getId());
         assertEquals(facility, sa.getFacility());
-        assertEquals(demand, sa.getWasteDemand());
-        assertEquals(distance, sa.getDistance());
-        assertEquals(serviceTime, sa.getServiceTime());
-        assertEquals(cost, sa.getTransportCost());
+        assertEquals(containers, sa.getAssignedContainers());
         assertNotNull(sa.getId());
     }
 
     @Test
-    void constructor_containerId_undefined() {
-        Container container = null;
+    void constructor_plan_undefined() {
         Facility facility = randomFacility();
+        List<Container> containers = new ArrayList<>();
+        containers.add(randomContainer());
+        
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new ServiceAssignment(container, facility, randomWasteDemand(), randomDistance(), randomServiceTime(), randomTransportCost())
+            () -> new ServiceAssignment(null, facility, containers)
         );
-        assertEquals(ServiceAssignment.CONTAINER_ID_NOT_DEFINED, exception.getMessage());
+        assertEquals(ServiceAssignment.INFRASTRUCTURE_PLAN_NOT_DEFINED, exception.getMessage());
     }
 
     @Test
-    void constructor_facilityId_undefined() {
-        Container container = randomContainer();
-        Facility facility = null;
+    void constructor_facility_undefined() {
+        InfrastructurePlan plan = randomInfrastructurePlan();
+        List<Container> containers = new ArrayList<>();
+        containers.add(randomContainer());
+        
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new ServiceAssignment(container, facility, randomWasteDemand(), randomDistance(), randomServiceTime(), randomTransportCost())
+            () -> new ServiceAssignment(plan, null, containers)
         );
         assertEquals(ServiceAssignment.FACILITY_ID_NOT_DEFINED, exception.getMessage());
     }
 
     @Test
-    void constructor_demand_undefined() {
+    void constructor_containers_undefined() {
+        InfrastructurePlan plan = randomInfrastructurePlan();
+        Facility facility = randomFacility();
+        
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new ServiceAssignment(randomContainer(), randomFacility(), null, randomDistance(), randomServiceTime(), randomTransportCost())
+            () -> new ServiceAssignment(plan, facility, null)
         );
-        assertEquals(ServiceAssignment.DEMAND_NOT_DEFINED, exception.getMessage());
+        assertEquals(ServiceAssignment.CONTAINERS_NOT_DEFINED, exception.getMessage());
     }
-
+    
     @Test
-    void constructor_distance_undefined() {
+    void constructor_containers_empty() {
+        InfrastructurePlan plan = randomInfrastructurePlan();
+        Facility facility = randomFacility();
+        List<Container> containers = new ArrayList<>();
+        
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), null, randomServiceTime(), randomTransportCost())
+            () -> new ServiceAssignment(plan, facility, containers)
         );
-        assertEquals(ServiceAssignment.DISTANCE_NOT_DEFINED, exception.getMessage());
-    }
-
-    @Test
-    void constructor_serviceTime_undefined() {
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), randomDistance(), null, randomTransportCost())
-        );
-        assertEquals(ServiceAssignment.SERVICE_TIME_NOT_DEFINED, exception.getMessage());
-    }
-
-    @Test
-    void constructor_transportCost_undefined() {
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), randomDistance(), randomServiceTime(), null)
-        );
-        assertEquals(ServiceAssignment.TRANSPORT_COST_NOT_DEFINED, exception.getMessage());
+        assertEquals(ServiceAssignment.CONTAINERS_NOT_DEFINED, exception.getMessage());
     }
 
     // ========== equals & hashCode ==========
 
     @Test
     void equalsMethod() {
-        ServiceAssignment sa1 = new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), randomDistance(), randomServiceTime(), randomTransportCost());
-        ServiceAssignment sa2 = new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), randomDistance(), randomServiceTime(), randomTransportCost());
+        InfrastructurePlan plan = randomInfrastructurePlan();
+        Facility facility = randomFacility();
+        List<Container> containers = new ArrayList<>();
+        containers.add(randomContainer());
+        
+        ServiceAssignment sa1 = new ServiceAssignment(plan, facility, containers);
+        ServiceAssignment sa2 = new ServiceAssignment(plan, facility, containers);
 
         assertTrue(sa1.equals(sa1));
         assertFalse(sa1.equals(null));
@@ -189,46 +171,31 @@ class ServiceAssignmentTests {
 
     @Test
     void hashCodeMethod() {
-        ServiceAssignment sa1 = new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), randomDistance(), randomServiceTime(), randomTransportCost());
-        ServiceAssignment sa2 = new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), randomDistance(), randomServiceTime(), randomTransportCost());
+        InfrastructurePlan plan = randomInfrastructurePlan();
+        Facility facility = randomFacility();
+        List<Container> containers = new ArrayList<>();
+        containers.add(randomContainer());
+        
+        ServiceAssignment sa1 = new ServiceAssignment(plan, facility, containers);
+        ServiceAssignment sa2 = new ServiceAssignment(plan, facility, containers);
 
         assertEquals(sa1.hashCode(), sa1.hashCode());
         assertNotEquals(sa1.hashCode(), sa2.hashCode());
-    }
-
-    // ========== validatePolicies (state-related validation) ==========
-
-    @Test
-    void validatePolicies_valid() {
-        ServiceAssignment sa = new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), Distance.fromMeters(100.0), new ServiceTime(5.0), randomTransportCost());
-        ServicePolicies policies = new ServicePolicies(500.0, 60, 10, 1000.0);
-
-        // Should not throw
-        sa.validatePolicies(policies);
-    }
-
-    @Test
-    void validatePolicies_violation_distance() {
-        ServiceAssignment sa = new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), Distance.fromMeters(20000.0), new ServiceTime(5.0), randomTransportCost());
-        // policy with small max distance to force violation (meters)
-        ServicePolicies policies = new ServicePolicies(100.0, 60, 10, 1000.0);
-
-        IllegalStateException exception = assertThrows(
-            IllegalStateException.class,
-            () -> sa.validatePolicies(policies)
-        );
-
-        assertTrue(exception.getMessage().contains(ServiceAssignment.POLICY_VIOLATION));
     }
 
     // ========== toString ==========
 
     @Test
     void toStringMethod() {
-        ServiceAssignment sa = new ServiceAssignment(randomContainer(), randomFacility(), randomWasteDemand(), randomDistance(), randomServiceTime(), randomTransportCost());
+        InfrastructurePlan plan = randomInfrastructurePlan();
+        Facility facility = randomFacility();
+        List<Container> containers = new ArrayList<>();
+        containers.add(randomContainer());
+        
+        ServiceAssignment sa = new ServiceAssignment(plan, facility, containers);
         String expected = String.format(
-            "ServiceAssignment={id=%s, containerId=%s, facilityId=%s, demand=%s, distance=%s, serviceTime=%s, transportCost=%s}",
-            sa.getId(), sa.getContainer().getId(), sa.getFacility().getId(), sa.getWasteDemand(), sa.getDistance(), sa.getServiceTime(), sa.getTransportCost()
+            "ServiceAssignment={id=%s, planId=%s, facilityId=%s, assignedContainers=[%s]}",
+            sa.getId(), sa.getInfrastructurePlan().getId(), sa.getFacility().getId(), sa.getAssignedContainers().get(0).getId()
         );
 
         assertEquals(expected, sa.toString());

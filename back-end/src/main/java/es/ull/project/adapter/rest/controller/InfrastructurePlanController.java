@@ -1,13 +1,13 @@
 package es.ull.project.adapter.rest.controller;
 
+import es.ull.project.adapter.rest.mapper.DailyPlanResponseMapper;
 import es.ull.project.adapter.rest.mapper.InfrastructurePlanResponseMapper;
-import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPostRequestBody;
-import es.ull.project.adapter.rest.request.infrastructureplan.InfrastructurePlanPutRequestBody;
+import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
-import es.ull.project.application.usecase.infrastructureplan.CreateInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.dailyplan.ReadDailyPlanUseCase;
 import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
 import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
-import es.ull.project.application.usecase.infrastructureplan.UpdateInfrastructurePlanUseCase;
+import es.ull.project.domain.entity.DailyPlan;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,9 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,18 +49,11 @@ public class InfrastructurePlanController {
     private ReadInfrastructurePlanUseCase readInfrastructurePlanUseCase;
 
     /**
-     * Use case for creating new infrastructure plans.
+     * Use case for reading daily plan data.
      * Autowired by Spring dependency injection.
      */
     @Autowired
-    private CreateInfrastructurePlanUseCase createInfrastructurePlanUseCase;
-
-    /**
-     * Use case for updating existing infrastructure plans.
-     * Autowired by Spring dependency injection.
-     */
-    @Autowired
-    private UpdateInfrastructurePlanUseCase updateInfrastructurePlanUseCase;
+    private ReadDailyPlanUseCase readDailyPlanUseCase;
 
     /**
      * Use case for deleting infrastructure plans.
@@ -92,7 +82,13 @@ public class InfrastructurePlanController {
     public ResponseEntity<List<InfrastructurePlanResponseBody>> getInfrastructurePlans() {
         List<InfrastructurePlan> plans = this.readInfrastructurePlanUseCase.fetchAll();
         List<InfrastructurePlanResponseBody> responseBodies = plans.stream()
-                .map(InfrastructurePlanResponseMapper::toResponseBody)
+                .map(plan -> {
+                    List<DailyPlan> dailyPlans = readDailyPlanUseCase.findByInfrastructurePlanId(plan.getId());
+                    List<DailyPlanResponseBody> dailyPlanBodies = dailyPlans.stream()
+                            .map(DailyPlanResponseMapper::toResponseBody)
+                            .toList();
+                    return InfrastructurePlanResponseMapper.toResponseBody(plan, dailyPlanBodies);
+                })
                 .toList();
         return new ResponseEntity<>(responseBodies, HttpStatus.OK);
     }
@@ -119,7 +115,11 @@ public class InfrastructurePlanController {
         try {
             UUID planId = UUID.fromString(id);
             InfrastructurePlan plan = this.readInfrastructurePlanUseCase.fetch(planId);
-            InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(plan);
+            List<DailyPlan> dailyPlans = readDailyPlanUseCase.findByInfrastructurePlanId(planId);
+            List<DailyPlanResponseBody> dailyPlanBodies = dailyPlans.stream()
+                    .map(DailyPlanResponseMapper::toResponseBody)
+                    .toList();
+            InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(plan, dailyPlanBodies);
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -128,75 +128,7 @@ public class InfrastructurePlanController {
         }
     }
 
-    /**
-     * POST /infrastructure-plans/
-     * 
-     * Creates a new infrastructure plan with the data provided in the request body.
-     * 
-     * The request body must contain an InfrastructurePlanPostRequestBody DTO with all
-     * required infrastructure plan attributes. The DTO is used instead of the domain entity
-     * to decouple the API contract from the domain model.
-     * 
-     * @param requestBody the infrastructure plan data to create (InfrastructurePlanPostRequestBody DTO)
-     * @return ResponseEntity containing the created infrastructure plan and HTTP 201 (CREATED),
-     *         or HTTP 400 (BAD_REQUEST) if validation fails
-     */
-    @Operation(summary = "Create an infrastructure plan", description = "Creates a new infrastructure plan with the provided data")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Infrastructure plan created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data")
-    })
-    @PostMapping("/")
-    public ResponseEntity<InfrastructurePlanResponseBody> createInfrastructurePlan(
-            @Parameter(description = "Infrastructure plan data") @RequestBody InfrastructurePlanPostRequestBody requestBody) {
-        InfrastructurePlan createdPlan = this.createInfrastructurePlanUseCase.create(
-                requestBody.period,
-                requestBody.maxBudget,
-                requestBody.servicePolicies,
-                requestBody.selectedFacilityIds,
-                requestBody.serviceAssignmentIds
-        );
-        InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(createdPlan);
-        return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
-    }
 
-    /**
-     * PUT /infrastructure-plans/{id}
-     * 
-     * Updates an existing infrastructure plan with the data provided in the request body.
-     * 
-     * The request body must contain an InfrastructurePlanPutRequestBody DTO with all
-     * infrastructure plan attributes to update. All fields in the DTO will be applied
-     * to the infrastructure plan entity.
-     * 
-     * @param id the unique identifier of the infrastructure plan to update (UUID format)
-     * @param requestBody the new infrastructure plan data (InfrastructurePlanPutRequestBody DTO)
-     * @return ResponseEntity containing the updated infrastructure plan and HTTP 200 (OK),
-     *         or HTTP 404 (NOT_FOUND) if the plan does not exist,
-     *         or HTTP 400 (BAD_REQUEST) if validation fails
-     */
-    @Operation(summary = "Update an infrastructure plan", description = "Updates an existing infrastructure plan with the provided data")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Infrastructure plan updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Infrastructure plan not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data")
-    })
-    @PutMapping("/{id}")
-    public ResponseEntity<InfrastructurePlanResponseBody> updateInfrastructurePlan(
-            @Parameter(description = "Infrastructure plan UUID") @PathVariable String id,
-            @Parameter(description = "Updated infrastructure plan data") @RequestBody InfrastructurePlanPutRequestBody requestBody) {
-        UUID planId = UUID.fromString(id);
-        InfrastructurePlan updatedPlan = this.updateInfrastructurePlanUseCase.update(
-                planId,
-                requestBody.period,
-                requestBody.maxBudget,
-                requestBody.servicePolicies,
-                requestBody.selectedFacilityIds,
-                requestBody.serviceAssignmentIds
-        );
-        InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(updatedPlan);
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
-    }
 
     /**
      * DELETE /infrastructure-plans/{id}
@@ -222,7 +154,9 @@ public class InfrastructurePlanController {
             @Parameter(description = "Infrastructure plan UUID") @PathVariable String id) {
         UUID planId = UUID.fromString(id);
         InfrastructurePlan deletedPlan = this.deleteInfrastructurePlanUseCase.delete(planId);
-        InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(deletedPlan);
+        
+        // Return the plan with an empty list of daily plans since they were cascade deleted
+        InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(deletedPlan, List.of());
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 }

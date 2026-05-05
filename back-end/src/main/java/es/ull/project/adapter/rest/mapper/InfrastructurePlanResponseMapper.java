@@ -5,7 +5,9 @@ import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
 
+import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Mapper class to convert InfrastructurePlan domain entities to InfrastructurePlanResponseBody DTOs
@@ -27,10 +29,11 @@ public class InfrastructurePlanResponseMapper {
      * Converts an InfrastructurePlan domain entity to an InfrastructurePlanResponseBody DTO
      * Uses FacilityResponseMapper and ContainerResponseMapper to include complete entity information
      *
-     * @param plan The InfrastructurePlan domain entity to convert
+     * @param plan       The InfrastructurePlan domain entity to convert
+     * @param dailyPlans The associated daily plans mapped to DTOs
      * @return InfrastructurePlanResponseBody DTO ready to be serialized as JSON
      */
-    public static InfrastructurePlanResponseBody toResponseBody(InfrastructurePlan plan) {
+    public static InfrastructurePlanResponseBody toResponseBody(InfrastructurePlan plan, List<DailyPlanResponseBody> dailyPlans) {
         InfrastructurePlanResponseBody responseBody = new InfrastructurePlanResponseBody();
         responseBody.id = plan.getId();
         responseBody.period = plan.getPeriod();
@@ -45,6 +48,19 @@ public class InfrastructurePlanResponseMapper {
         for (ServiceAssignment assignment : plan.getServiceAssignments()) {
             responseBody.serviceAssignments.add(ServiceAssignmentResponseMapper.toResponseBody(assignment));
         }
+        
+        responseBody.dailyPlans = dailyPlans;
+        
+        if (plan.getTotalCollectedKilograms() != null) {
+            responseBody.totalCollectedKilograms = plan.getTotalCollectedKilograms().getValue();
+        }
+        if (plan.getTotalCollectedLiters() != null) {
+            responseBody.totalCollectedLiters = plan.getTotalCollectedLiters().getValue();
+        }
+        if (plan.getTotalDistanceMeters() != null) {
+            responseBody.totalDistanceMeters = plan.getTotalDistanceMeters().getValue();
+        }
+        
         return responseBody;
     }
 }

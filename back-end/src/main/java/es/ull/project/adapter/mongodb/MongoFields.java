@@ -15,6 +15,7 @@ public class MongoFields {
      * Common fields.
      */
     public static final String ID = "_id";
+    public static final String INFRASTRUCTURE_PLAN_ID = "infrastructurePlanId";
 
     /**
      * Container fields.
@@ -71,13 +72,8 @@ public class MongoFields {
     /**
      * ServiceAssignment fields.
      */
-    public static final String CONTAINER_ID = "containerId";
+    public static final String ASSIGNED_CONTAINERS = "assignedContainers";
     public static final String FACILITY_ID = "facilityId";
-    public static final String DISTANCE = "distance";
-    public static final String SERVICE_TIME = "serviceTime";
-    public static final String TRANSPORT_COST = "transportCost";
-    public static final String TRANSPORT_COST_AMOUNT = "amount";
-    public static final String TRANSPORT_COST_CURRENCY = "currency";
 
     /**
      * InfrastructurePlan fields.
@@ -85,6 +81,7 @@ public class MongoFields {
     public static final String PERIOD = "period";
     public static final String SELECTED_FACILITIES = "selectedFacilities";
     public static final String SERVICE_ASSIGNMENTS = "serviceAssignments";
+    public static final String DAILY_PLANS = "dailyPlans";
     public static final String SERVICE_POLICIES = "servicePolicies";
     public static final String MAX_SERVICE_DISTANCE = "maxServiceDistance";
     public static final String MAX_SERVICE_TIME = "maxServiceTime";
@@ -96,6 +93,25 @@ public class MongoFields {
     public static final String ESTIMATED_TOTAL_COST = "estimatedTotalCost";
     public static final String ESTIMATED_TOTAL_COST_AMOUNT = "amount";
     public static final String ESTIMATED_TOTAL_COST_CURRENCY = "currency";
+    public static final String TOTAL_COLLECTED_KILOGRAMS = "totalCollectedKilograms";
+    public static final String TOTAL_COLLECTED_LITERS = "totalCollectedLiters";
+    public static final String TOTAL_DISTANCE_METERS = "totalDistanceMeters";
+    public static final String NUMBER_OF_DAYS = "numberOfDays";
+    public static final String AVERAGE_PICKUP_TIME_MINUTES = "averagePickupTimeMinutes";
+    public static final String EXECUTED_AT = "executedAt";
+
+    /**
+     * DailyPlan fields.
+     */
+    public static final String SERVICE_DATE = "serviceDate";
+    public static final String PLAN_DAY = "planDay";
+    public static final String VEHICLE = "vehicle";
+    public static final String STOPS = "stops";
+    public static final String SEQUENCE = "sequence";
+    public static final String COLLECTED_KILOGRAMS = "collectedKilograms";
+    public static final String COLLECTED_LITERS = "collectedLiters";
+    public static final String DISTANCE_FROM_PREVIOUS_METERS = "distanceFromPreviousMeters";
+    public static final String CUMULATIVE_DISTANCE_METERS = "cumulativeDistanceMeters";
 
     /**
      * Private constructor to prevent instantiation.

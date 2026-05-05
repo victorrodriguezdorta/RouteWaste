@@ -136,7 +136,7 @@
 
       <!-- Vehicles selector for selected facility - Card -->
       <v-card v-if="selectedFacilityForVehicles" class="mt-6" elevation="2">
-        <v-card-title class="text-h6 bg-primary text-white">
+        <v-card-title class="text-h6 bg-primary text-surface">
           Seleccionar Vehículos - {{ selectedFacilityForVehicles?.location }}
         </v-card-title>
 
@@ -253,7 +253,7 @@
         <!-- JSON Preview -->
         <div class="mt-4">
           <p class="text-caption font-weight-bold mb-2">{{ t('algorithm.execute.step1.jsonPreview') }}</p>
-          <v-card variant="outlined" class="bg-grey-lighten-5">
+          <v-card variant="outlined" class="bg-surface-soft">
             <v-card-text class="pa-3">
               <pre class="text-caption" style="overflow-x: auto; font-size: 11px; line-height: 1.4;">{{ formattedCommandJson }}</pre>
             </v-card-text>

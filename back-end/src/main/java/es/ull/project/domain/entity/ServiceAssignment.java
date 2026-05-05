@@ -1,45 +1,36 @@
 package es.ull.project.domain.entity;
 
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
-import es.ull.project.domain.valueobject.location.Distance;
-import es.ull.project.domain.valueobject.location.ServiceTime;
-import es.ull.project.domain.valueobject.policy.ServicePolicies;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * ServiceAssignment
  *
- * Represents an assignment between a container and a facility,
- * including calculated values such as distance, service time and transportation
- * cost.
+ * Represents an assignment between a cluster of containers and a facility.
  *
- * It is an immutable entity except for recalculations triggered by policy
- * validation.
+ * It is an immutable entity.
  */
 public class ServiceAssignment {
 
-    public static final String CONTAINER_ID_NOT_DEFINED = "Container id is not defined";
+    public static final String INFRASTRUCTURE_PLAN_NOT_DEFINED = "Infrastructure plan is not defined";
+    public static final String CONTAINERS_NOT_DEFINED = "Assigned containers are not defined or empty";
     public static final String FACILITY_ID_NOT_DEFINED = "Facility id is not defined";
-    public static final String DEMAND_NOT_DEFINED = "Waste demand is not defined";
-    public static final String DISTANCE_NOT_DEFINED = "Distance is not defined";
-    public static final String SERVICE_TIME_NOT_DEFINED = "Service time is not defined";
-    public static final String TRANSPORT_COST_NOT_DEFINED = "Transportation cost is not defined";
-    public static final String POLICY_VIOLATION = "Service assignment violates service policies";
 
     /**
-     * Unique identifier for the service assignment.
+     * Unique identifier for the service assignment (cluster).
      * It is a computed attribute.
      */
     private final UUID id;
 
     /**
-     * Container being serviced in this assignment.
+     * Parent infrastructure plan this assignment belongs to.
      * It is a required attribute.
      */
-    private final Container container;
+    private final InfrastructurePlan infrastructurePlan;
 
     /**
      * Facility providing the service in this assignment.
@@ -48,53 +39,24 @@ public class ServiceAssignment {
     private final Facility facility;
 
     /**
-     * Waste demand of the container that needs to be serviced.
+     * List of containers assigned to this facility (cluster).
      * It is a required attribute.
      */
-    private final WasteDemand wasteDemand;
+    private final List<Container> assignedContainers;
 
     /**
-     * Distance between the container and the facility.
-     * It is a required attribute.
-     */
-    private final Distance distance;
-
-    /**
-     * Service time required for this assignment.
-     * It is a required attribute.
-     */
-    private final ServiceTime serviceTime;
-
-    /**
-     * Transportation cost for servicing this assignment.
-     * It is a required attribute.
-     */
-    private final TransportationVariableCost transportCost;
-
-    /**
-     * Creates a new service assignment.
+     * Creates a new service assignment (cluster).
      *
-     * @param container     container entity
-     * @param facility      facility entity
-     * @param wasteDemand   waste demand of the container
-     * @param distance      distance between container and facility
-     * @param serviceTime   service time required
-     * @param transportCost transportation cost applied
+     * @param infrastructurePlan the parent infrastructure plan
+     * @param facility           facility entity
+     * @param assignedContainers list of container entities assigned to the facility
      */
-    public ServiceAssignment(Container container,
-            Facility facility,
-            WasteDemand wasteDemand,
-            Distance distance,
-            ServiceTime serviceTime,
-            TransportationVariableCost transportCost) {
-        validate(container, facility, wasteDemand, distance, serviceTime, transportCost);
+    public ServiceAssignment(InfrastructurePlan infrastructurePlan, Facility facility, List<Container> assignedContainers) {
+        validate(infrastructurePlan, facility, assignedContainers);
         this.id = UUID.randomUUID();
-        this.container = container;
+        this.infrastructurePlan = infrastructurePlan;
         this.facility = facility;
-        this.wasteDemand = wasteDemand;
-        this.distance = distance;
-        this.serviceTime = serviceTime;
-        this.transportCost = transportCost;
+        this.assignedContainers = new ArrayList<>(assignedContainers);
     }
 
     /**
@@ -105,98 +67,50 @@ public class ServiceAssignment {
      */
     public ServiceAssignment(ServiceAssignment otherObject) {
         this.id = otherObject.id;
-        this.container = otherObject.container;
-        this.facility = otherObject.facility;
-        this.wasteDemand = otherObject.wasteDemand;
-        this.distance = otherObject.distance;
-        this.serviceTime = otherObject.serviceTime;
-        this.transportCost = otherObject.transportCost;
+        this.infrastructurePlan = otherObject.infrastructurePlan;
+        this.facility = otherObject.facility; // Assumes facility itself is managed elsewhere
+        this.assignedContainers = new ArrayList<>(otherObject.assignedContainers);
     }
 
     /**
      * Restore constructor.
      * Restores a ServiceAssignment from persistence with all its attributes.
      *
-     * @param id            the assignment identifier
-     * @param container     the container entity
-     * @param facility      the facility entity
-     * @param wasteDemand   the waste demand
-     * @param distance      the distance between container and facility
-     * @param serviceTime   the service time required
-     * @param transportCost the transportation cost
+     * @param id                 the assignment identifier
+     * @param infrastructurePlan the parent infrastructure plan
+     * @param facility           the facility entity
+     * @param assignedContainers the list of assigned containers
      */
     public ServiceAssignment(
             UUID id,
-            Container container,
+            InfrastructurePlan infrastructurePlan,
             Facility facility,
-            WasteDemand wasteDemand,
-            Distance distance,
-            ServiceTime serviceTime,
-            TransportationVariableCost transportCost) {
-        validate(container, facility, wasteDemand, distance, serviceTime, transportCost);
+            List<Container> assignedContainers) {
+        validate(infrastructurePlan, facility, assignedContainers);
         this.id = id;
-        this.container = container;
+        this.infrastructurePlan = infrastructurePlan;
         this.facility = facility;
-        this.wasteDemand = wasteDemand;
-        this.distance = distance;
-        this.serviceTime = serviceTime;
-        this.transportCost = transportCost;
+        this.assignedContainers = new ArrayList<>(assignedContainers);
     }
 
     /**
      * Validates that all required parameters are not null.
      *
-     * @param container     the container to validate
-     * @param facility      the facility to validate
-     * @param wasteDemand   the waste demand to validate
-     * @param distance      the distance to validate
-     * @param serviceTime   the service time to validate
-     * @param transportCost the transport cost to validate
-     * @throws IllegalArgumentException if any parameter is null
+     * @param infrastructurePlan the parent infrastructure plan
+     * @param facility           the facility to validate
+     * @param assignedContainers the list of containers to validate
+     * @throws IllegalArgumentException if any parameter is null or empty
      */
-    private void validate(Container container,
-            Facility facility,
-            WasteDemand wasteDemand,
-            Distance distance,
-            ServiceTime serviceTime,
-            TransportationVariableCost transportCost) {
-        if (container == null) {
-            throw new IllegalArgumentException(CONTAINER_ID_NOT_DEFINED);
+    private void validate(InfrastructurePlan infrastructurePlan, Facility facility, List<Container> assignedContainers) {
+        if (infrastructurePlan == null) {
+            throw new IllegalArgumentException(INFRASTRUCTURE_PLAN_NOT_DEFINED);
         }
         if (facility == null) {
             throw new IllegalArgumentException(FACILITY_ID_NOT_DEFINED);
         }
-        if (wasteDemand == null) {
-            throw new IllegalArgumentException(DEMAND_NOT_DEFINED);
+        if (assignedContainers == null || assignedContainers.isEmpty()) {
+            throw new IllegalArgumentException(CONTAINERS_NOT_DEFINED);
         }
-        if (distance == null) {
-            throw new IllegalArgumentException(DISTANCE_NOT_DEFINED);
-        }
-        if (serviceTime == null) {
-            throw new IllegalArgumentException(SERVICE_TIME_NOT_DEFINED);
-        }
-        if (transportCost == null) {
-            throw new IllegalArgumentException(TRANSPORT_COST_NOT_DEFINED);
-        }
-    }
-
-    /**
-     * Validates whether this assignment complies with service policies.
-     *
-     * This method is intended to be called from the InfrastructurePlan aggregate.
-     *
-     * @param policies service policies to validate
-     * @throws IllegalStateException if assignment violates policies
-     */
-    public void validatePolicies(ServicePolicies policies) {
-        if (policies == null) {
-            return;
-        }
-        policies.validateServiceAssignment(
-                this.distance.toMeters(),
-                (int) this.serviceTime.getValue()).ifPresent(errorMessage -> {
-                    throw new IllegalStateException(POLICY_VIOLATION + ": " + errorMessage);
-                });
     }
 
     /**
@@ -209,12 +123,12 @@ public class ServiceAssignment {
     }
 
     /**
-     * Returns the container associated with this assignment.
+     * Returns the parent infrastructure plan.
      *
-     * @return the container
+     * @return the infrastructure plan
      */
-    public Container getContainer() {
-        return container;
+    public InfrastructurePlan getInfrastructurePlan() {
+        return infrastructurePlan;
     }
 
     /**
@@ -227,39 +141,12 @@ public class ServiceAssignment {
     }
 
     /**
-     * Returns the waste demand for this assignment.
+     * Returns the unmodifiable list of containers associated with this assignment.
      *
-     * @return the waste demand
+     * @return the assigned containers
      */
-    public WasteDemand getWasteDemand() {
-        return wasteDemand;
-    }
-
-    /**
-     * Returns the distance between container and facility.
-     *
-     * @return the distance
-     */
-    public Distance getDistance() {
-        return distance;
-    }
-
-    /**
-     * Returns the service time required for this assignment.
-     *
-     * @return the service time
-     */
-    public ServiceTime getServiceTime() {
-        return serviceTime;
-    }
-
-    /**
-     * Returns the transportation cost for this assignment.
-     *
-     * @return the transportation cost
-     */
-    public TransportationVariableCost getTransportCost() {
-        return transportCost;
+    public List<Container> getAssignedContainers() {
+        return Collections.unmodifiableList(assignedContainers);
     }
 
     /**
@@ -297,9 +184,11 @@ public class ServiceAssignment {
      */
     @Override
     public String toString() {
+        List<UUID> containerIds = assignedContainers.stream()
+                .map(Container::getId)
+                .collect(Collectors.toList());
         return String.format(
-                "ServiceAssignment={id=%s, containerId=%s, facilityId=%s, demand=%s, distance=%s, serviceTime=%s, transportCost=%s}",
-                id, container.getId(), facility.getId(), wasteDemand,
-                distance, serviceTime, transportCost);
+                "ServiceAssignment={id=%s, planId=%s, facilityId=%s, assignedContainers=%s}",
+                id, infrastructurePlan.getId(), facility.getId(), containerIds);
     }
 }

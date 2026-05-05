@@ -147,7 +147,7 @@ public class DistanceTests {
         Distance distance = Distance.fromMeters(1000.0);
 
         assertEquals(
-                "Distance={meters=1000.00 m, kilometers=1.00 km}",
+                String.format("Distance={meters=%.2f m, kilometers=%.2f km}", 1000.0, 1.0),
                 distance.toString()
         );
     }

@@ -36,17 +36,26 @@ export class AlgorithmExecutionRequestJson {
    * Average pickup time in minutes for collecting a container
    */
   averagePickupTimeMinutes: number;
+  /**
+   * Optional maximum budget to send to backend
+   */
+  maxBudget?: {
+    amount: number;
+    currency: string;
+  };
 
   constructor(
     facilitiesWithVehicles: FacilityVehicleJson[],
     selectedContainerIds: string[],
     numberOfDays: number,
     averagePickupTimeMinutes: number
+    , maxBudget?: { amount: number; currency: string }
   ) {
     this.facilitiesWithVehicles = facilitiesWithVehicles;
     this.selectedContainerIds = selectedContainerIds;
     this.numberOfDays = numberOfDays;
     this.averagePickupTimeMinutes = averagePickupTimeMinutes;
+    this.maxBudget = maxBudget;
   }
 
   /**
@@ -65,11 +74,14 @@ export class AlgorithmExecutionRequestJson {
 
     const selectedContainerIds = data.selectedContainerIds.map((id) => id.toString());
 
+    const maxBudget = data.maxBudget ? { amount: data.maxBudget.amount, currency: data.maxBudget.currency } : undefined;
+
     return new AlgorithmExecutionRequestJson(
       facilitiesWithVehicles,
       selectedContainerIds,
       data.numberOfDays,
-      data.averagePickupTimeMinutes
+      data.averagePickupTimeMinutes,
+      maxBudget
     );
   }
 }

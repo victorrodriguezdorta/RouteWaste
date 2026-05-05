@@ -1,5 +1,6 @@
 package es.ull.project.adapter.rest.response.infrastructureplan;
 
+import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
 import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
@@ -51,4 +52,24 @@ public class InfrastructurePlanResponseBody {
      * Service policies to comply with (value object)
      */
     public ServicePolicies servicePolicies;
+
+    /**
+     * Daily plans (routes) associated with this infrastructure plan
+     */
+    public List<DailyPlanResponseBody> dailyPlans;
+
+    /**
+     * Total collected kilograms across all routes
+     */
+    public double totalCollectedKilograms;
+
+    /**
+     * Total collected liters across all routes
+     */
+    public double totalCollectedLiters;
+
+    /**
+     * Total distance in meters across all routes
+     */
+    public double totalDistanceMeters;
 }

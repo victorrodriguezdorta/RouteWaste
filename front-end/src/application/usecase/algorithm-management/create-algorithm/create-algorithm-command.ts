@@ -36,4 +36,11 @@ export interface CreateAlgorithmCommand {
    * Average pickup time in minutes for collecting a container
    */
   averagePickupTimeMinutes: number;
+  /**
+   * Optional maximum budget for the algorithm execution. Currency code expected (e.g., 'EUR').
+   */
+  maxBudget?: {
+    amount: number;
+    currency: string;
+  };
 }

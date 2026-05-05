@@ -7,28 +7,28 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
+import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
+import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
 import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
-import es.ull.project.domain.valueobject.demand.WasteDemand;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.Location;
-import es.ull.project.domain.valueobject.location.ServiceTime;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
-
-
 
 class InfrastructurePlanTests {
 
@@ -71,10 +71,10 @@ class InfrastructurePlanTests {
         );
     }
 
-    private static ServiceAssignment randomServiceAssignment(Container container, Facility facility) {
-        // Create a WasteDemand for ServiceAssignment from the Container's daily demand
-        WasteDemand wasteDemand = new WasteDemand(container.getDailyDemandLitersPerDay().getLitersPerDay());
-        return new ServiceAssignment(container, facility, wasteDemand, Distance.fromMeters(1000.0), new ServiceTime(10.0), new TransportationVariableCost(50.0));
+    private static ServiceAssignment randomServiceAssignment(InfrastructurePlan plan, Facility facility) {
+        List<Container> containers = new ArrayList<>();
+        containers.add(randomContainer());
+        return new ServiceAssignment(plan, facility, containers);
     }
 
     // ========== Constructors ==========
@@ -85,7 +85,7 @@ class InfrastructurePlanTests {
         MaximumBudget maxBudget = randomMaxBudget();
         ServicePolicies policies = randomServicePolicies();
 
-        InfrastructurePlan plan = new InfrastructurePlan(period, maxBudget, policies);
+        InfrastructurePlan plan = new InfrastructurePlan(period, maxBudget, policies, null, null, null);
 
         assertEquals(period, plan.getPeriod());
         assertEquals(maxBudget, plan.getMaxBudget());
@@ -102,7 +102,7 @@ class InfrastructurePlanTests {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> new InfrastructurePlan(period, maxBudget, policies)
+                () -> new InfrastructurePlan(period, maxBudget, policies, null, null, null)
         );
 
         assertEquals(InfrastructurePlan.PERIOD_NOT_DEFINED, exception.getMessage());
@@ -116,7 +116,7 @@ class InfrastructurePlanTests {
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> new InfrastructurePlan(period, maxBudget, policies)
+                () -> new InfrastructurePlan(period, maxBudget, policies, null, null, null)
         );
 
         assertEquals(InfrastructurePlan.MAX_BUDGET_NOT_DEFINED, exception.getMessage());
@@ -126,8 +126,8 @@ class InfrastructurePlanTests {
 
     @Test
     void equalsMethod() {
-        InfrastructurePlan p1 = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies());
-        InfrastructurePlan p2 = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies());
+        InfrastructurePlan p1 = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null);
+        InfrastructurePlan p2 = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null);
         InfrastructurePlan p3 = p1;
 
         assertTrue(p1.equals(p1));
@@ -139,8 +139,8 @@ class InfrastructurePlanTests {
 
     @Test
     void hashCodeMethod() {
-        InfrastructurePlan p1 = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies());
-        InfrastructurePlan p2 = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies());
+        InfrastructurePlan p1 = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null);
+        InfrastructurePlan p2 = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null);
 
         assertEquals(p1.hashCode(), p1.hashCode());
         assertNotEquals(p1.hashCode(), p2.hashCode());
@@ -150,11 +150,10 @@ class InfrastructurePlanTests {
 
     @Test
     void addServiceAssignment_valid() {
-        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), new MaximumBudget(1_000_000.0), randomServicePolicies());
+        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), new MaximumBudget(1_000_000.0), randomServicePolicies(), null, null, null);
         Facility facility = randomFacility();
         plan.addFacility(facility);
-        Container container = randomContainer();
-        ServiceAssignment assignment = randomServiceAssignment(container, facility);
+        ServiceAssignment assignment = randomServiceAssignment(plan, facility);
 
         plan.addServiceAssignment(assignment);
 
@@ -164,7 +163,7 @@ class InfrastructurePlanTests {
 
     @Test
     void addServiceAssignment_invalid_null() {
-        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies());
+        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null);
         ServiceAssignment assignment = null;
 
         IllegalArgumentException exc = assertThrows(
@@ -177,7 +176,7 @@ class InfrastructurePlanTests {
     @Test
     void recalculateTotalCost_exceeded() {
         MaximumBudget smallBudget = new MaximumBudget(1.0);
-        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), smallBudget, randomServicePolicies());
+        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), smallBudget, randomServicePolicies(), null, null, null);
         // Facility with large opening cost
         Facility expensive = new Facility(
             FacilityType.random(),
@@ -199,23 +198,36 @@ class InfrastructurePlanTests {
 
     @Test
     void isPlanValid_afterDiscardingFacility_returnsFalse() {
-        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies());
+        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null);
         Facility facility = randomFacility();
         plan.addFacility(facility);
-        Container container = randomContainer();
-        ServiceAssignment assignment = randomServiceAssignment(container, facility);
+        ServiceAssignment assignment = randomServiceAssignment(plan, facility);
         plan.addServiceAssignment(assignment);
 
         facility.updateStatus(FacilityStatus.DISCARDED);
 
         assertFalse(plan.isPlanValid());
     }
+    
+    @Test
+    void updateAlgorithmMetrics_valid() {
+        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null);
+        CollectedWeightKilograms kg = CollectedWeightKilograms.fromKilograms(1000.0);
+        CollectedVolumeLiters liters = CollectedVolumeLiters.fromLiters(5000.0);
+        Distance distance = Distance.fromKilometers(150.0);
+        
+        plan.updateAlgorithmMetrics(kg, liters, distance);
+        
+        assertEquals(kg, plan.getTotalCollectedKilograms());
+        assertEquals(liters, plan.getTotalCollectedLiters());
+        assertEquals(distance, plan.getTotalDistanceMeters());
+    }
 
     // ========== toString ==========
 
     @Test
     void toStringMethod() {
-        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies());
+        InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null);
         String expected = String.format("InfrastructurePlan={id=%s, period=%s, facilities=%s, assignments=%s, totalCost=%s}",
                 plan.getId(), plan.getPeriod(), plan.getSelectedFacilities(), plan.getServiceAssignments(), plan.getEstimatedTotalCost());
 

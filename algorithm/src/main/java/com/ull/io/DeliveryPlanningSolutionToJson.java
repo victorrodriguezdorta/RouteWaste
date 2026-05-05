@@ -1,5 +1,10 @@
 package com.ull.io;
 
+import java.util.function.Function;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.ull.domain.DeliveryPlanningSolution;
 import com.ull.domain.entity.Container;
 import com.ull.domain.entity.DailyPlan;
@@ -7,9 +12,7 @@ import com.ull.domain.entity.DailyPlanStop;
 import com.ull.domain.entity.Facility;
 import com.ull.domain.entity.FacilityCluster;
 import com.ull.domain.entity.Vehicle;
-import java.util.function.Function;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.ull.domain.valueobject.cost.MaximumBudget;
 
 /**
  * Serializes a {@link DeliveryPlanningSolution} into a JSON object ready to be
@@ -65,6 +68,9 @@ public class DeliveryPlanningSolutionToJson
     json.put("totalDistanceMeters", solution.getTotalDistanceMeters());
     json.put("totalCollectedKilograms", solution.getTotalCollectedKilograms());
     json.put("totalCollectedLiters", solution.getTotalCollectedLiters());
+    if (solution.getMaxBudget() != null) {
+      json.put("maxBudget", serializeMaximumBudget(solution.getMaxBudget()));
+    }
     json.put("clusters", serializeClusters(solution));
     json.put("dailyPlans", serializeDailyPlans(solution));
 
@@ -173,6 +179,13 @@ public class DeliveryPlanningSolutionToJson
     json.put("capacityKilograms", vehicle.getCapacityKilograms());
     json.put("capacityLiters", vehicle.getCapacityLiters());
     json.put("costPerKilometer", vehicle.getCostPerKilometer());
+    return json;
+  }
+
+  private JSONObject serializeMaximumBudget(MaximumBudget maxBudget) {
+    JSONObject json = new JSONObject();
+    json.put("amount", maxBudget.getAmount());
+    json.put("currency", maxBudget.getCurrency());
     return json;
   }
 
