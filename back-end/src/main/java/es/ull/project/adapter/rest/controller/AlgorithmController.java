@@ -134,7 +134,7 @@ public class AlgorithmController {
             error.put("details", e.getMessage() != null ? e.getMessage() : "");
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
+        
         JsonNode responseBody;
         try {
             responseBody = this.deserializeAlgorithmResponse(algorithmJson);
