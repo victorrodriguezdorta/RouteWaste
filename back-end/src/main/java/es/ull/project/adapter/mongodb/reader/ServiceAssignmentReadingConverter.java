@@ -1,5 +1,6 @@
 package es.ull.project.adapter.mongodb.reader;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -74,9 +75,9 @@ public class ServiceAssignmentReadingConverter implements Converter<Document, Se
         // Create a shell InfrastructurePlan to avoid infinite recursion loading from Mongo
         InfrastructurePlan infrastructurePlan = new InfrastructurePlan(
             planId,
-            new PlanningPeriod("1"), // Mock valid period
+            new PlanningPeriod(String.valueOf(LocalDate.now().getYear())),
             null, null, null, null,
-            new MaximumBudget(1.0), // Mock valid budget
+            new MaximumBudget(1.0),
             new TotalCost(0.0),
             null, null, null,
             null, null, null

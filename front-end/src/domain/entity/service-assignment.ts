@@ -1,96 +1,164 @@
-import { Container } from './container';
-import { Facility } from './facility';
-import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
-import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
-import { Distance } from '@/domain/valueobject/location/distance';
-import { ServiceTime } from '@/domain/valueobject/location/service-time';
-import { ServicePolicies } from '@/domain/valueobject/policy/service-policies';
+import { Container } from '@/domain/entity/container';
+import { Facility } from '@/domain/entity/facility';
+import { InfrastructurePlan } from '@/domain/entity/infrastructure-plan';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
- * ServiceAssignment
+ * ServiceAssignmentCluster
  *
- * Represents an assignment between a `Container` and a `Facility`.
+ * Represents an assignment between a cluster of containers and a facility.
  *
- * Encapsulates the demand, distance, service time and transport cost for
- * a single service operation. Includes policy validation helpers used
- * by application logic.
+ * This is the backend concept where multiple containers are assigned to a single facility,
+ * forming a service cluster. It is an immutable entity within the InfrastructurePlan aggregate.
  */
 export class ServiceAssignment {
-  /** Unique identifier for this service assignment */
+  /**
+   * Unique identifier for the service assignment (cluster).
+   */
   readonly id: UllUUID;
 
-  /** Source container entity for this assignment */
-  readonly container: Container;
-
-  /** Target facility entity for this assignment */
-  readonly facility: Facility;
-
-  /** Expected waste demand value object for this assignment */
-  readonly wasteDemand: WasteDemand;
-
-  /** Distance value object representing meters between container and facility */
-  readonly distance: Distance;
-
-  /** Service time value object representing minutes for service operation */
-  readonly serviceTime: ServiceTime;
-
-  /** Transportation variable cost value object for this assignment */
-  readonly transportCost: TransportationVariableCost;
+  /**
+   * Parent infrastructure plan this assignment belongs to.
+   */
+  private readonly infrastructurePlan: InfrastructurePlan;
 
   /**
-   * Create a new `ServiceAssignment`.
-   * @param container source container entity
-   * @param facility target facility entity
-   * @param wasteDemand expected waste demand value object
-   * @param distance distance value object (meters)
-   * @param serviceTime service time value object (minutes)
-   * @param transportCost transportation variable cost value object
+   * Facility providing the service in this assignment.
+   */
+  private readonly facility: Facility;
+
+  /**
+   * List of containers assigned to this facility (cluster).
+   */
+  private readonly assignedContainers: Container[];
+
+  /**
+   * Create a new service assignment (cluster).
+   * @param infrastructurePlan the parent infrastructure plan
+   * @param facility facility entity
+   * @param assignedContainers list of container entities assigned to the facility
    * @param id optional explicit id (generated when omitted)
-   * @throws Error when a required argument is missing
+   * @throws Error when required parameters are missing
    */
-  constructor(container: Container, facility: Facility, wasteDemand: WasteDemand, distance: Distance, serviceTime: ServiceTime, transportCost: TransportationVariableCost, id?: UllUUID) {
-    if (!container) throw new Error('Container is not defined');
-    if (!facility) throw new Error('Facility is not defined');
-    if (!wasteDemand) throw new Error('Waste demand is not defined');
-    if (!distance) throw new Error('Distance is not defined');
-    if (!serviceTime) throw new Error('Service time is not defined');
-    if (!transportCost) throw new Error('Transportation cost is not defined');
+  constructor(
+    infrastructurePlan: InfrastructurePlan,
+    facility: Facility,
+    assignedContainers: Container[],
+    id?: UllUUID
+  ) {
+    this.validate(infrastructurePlan, facility, assignedContainers);
     this.id = id ?? UllUUID.random();
-    this.container = container;
+    this.infrastructurePlan = infrastructurePlan;
     this.facility = facility;
-    this.wasteDemand = wasteDemand;
-    this.distance = distance;
-    this.serviceTime = serviceTime;
-    this.transportCost = transportCost;
+    this.assignedContainers = [...assignedContainers];
   }
 
   /**
-   * Validate this assignment against optional `ServicePolicies`.
-   * @param policies optional service policy configuration
-   * @throws Error when a policy violation is detected
+   * Validates that all required parameters are not null.
+   * @throws Error if any parameter is null, undefined, or invalid
    */
-  validatePolicies(policies?: ServicePolicies | null): void {
-    if (!policies) return;
-    const err = policies.validateServiceAssignment(this.distance.toMeters(), this.serviceTime.getValue());
-    if (err) throw new Error('Service assignment violates service policies: ' + err);
+  private validate(
+    infrastructurePlan: InfrastructurePlan | undefined,
+    facility: Facility | undefined,
+    assignedContainers: Container[] | undefined
+  ): void {
+    if (!infrastructurePlan) {
+      throw new Error('Infrastructure plan is not defined');
+    }
+    if (!facility) {
+      throw new Error('Facility is not defined');
+    }
+    if (!assignedContainers || assignedContainers.length === 0) {
+      throw new Error('Assigned containers are not defined or empty');
+    }
   }
 
-  /** Return the identifier for this service assignment.
-   * @returns The unique identifier of this service assignment
+  /**
+   * Get the unique identifier of this service assignment.
+   * @returns the service assignment UUID
    */
-  getServiceAssignmentId(): UllUUID { return this.id; }
+  getId(): UllUUID {
+    return this.id;
+  }
 
   /**
-   * Compare by identity.
-   * @param other Candidate object to compare with this service assignment
-   * @returns True if both assignments have the same identifier, false otherwise
+   * Get the parent infrastructure plan.
+   * @returns the infrastructure plan
    */
-  equals(other: unknown): boolean { if (this === other) return true; if (!(other instanceof ServiceAssignment)) return false; return this.id.equals(other.id); }
+  getInfrastructurePlan(): InfrastructurePlan {
+    return this.infrastructurePlan;
+  }
 
   /**
-   * Human-readable representation useful for debugging.
-   * @returns A string representation of this service assignment
+   * Get the facility associated with this assignment.
+   * @returns the facility
    */
-  toString(): string { return `ServiceAssignment={id=${this.id}, containerId=${this.container.getId()}, facilityId=${this.facility.getId()}, demand=${this.wasteDemand}, distance=${this.distance}, serviceTime=${this.serviceTime}, transportCost=${this.transportCost}}`; }
+  getFacility(): Facility {
+    return this.facility;
+  }
+
+  /**
+   * Get the unmodifiable list of containers associated with this assignment.
+   * @returns a readonly copy of the assigned containers
+   */
+  getAssignedContainers(): ReadonlyArray<Container> {
+    return this.assignedContainers.slice();
+  }
+
+  /**
+   * Get the number of containers in this cluster.
+   * @returns the number of assigned containers
+   */
+  getNumberOfContainers(): number {
+    return this.assignedContainers.length;
+  }
+
+  /**
+   * Check if a container is part of this cluster.
+   * @param container the container to check
+   * @returns true if the container is assigned to this cluster, false otherwise
+   */
+  containsContainer(container: Container): boolean {
+    return this.assignedContainers.some(c => c.equals(container));
+  }
+
+  /**
+   * Compares this service assignment to another object for equality.
+   * Two assignments are equal if they have the same identifier.
+   * @param otherObject the object to compare with
+   * @returns true if the objects are equal, false otherwise
+   */
+  equals(otherObject: unknown): boolean {
+    if (this === otherObject) {
+      return true;
+    }
+    if (!(otherObject instanceof ServiceAssignment)) {
+      return false;
+    }
+    return this.id.equals(otherObject.id);
+  }
+
+  /**
+   * Get the hash code for this object.
+   * @returns A numeric hash code based on the UUID value
+   */
+  hashCode(): number {
+    const idValue = this.id.getValue();
+    let hash = 0;
+    for (let i = 0; i < idValue.length; i++) {
+      const char = idValue.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+  }
+
+  /**
+   * Returns a string representation of this service assignment.
+   * @returns a formatted string with service assignment cluster details
+   */
+  toString(): string {
+    const containerIds = this.assignedContainers.map(c => c.getId());
+    return `ServiceAssignmentCluster={id=${this.id}, planId=${this.infrastructurePlan.getId()}, facilityId=${this.facility.getId()}, assignedContainers=${containerIds}}`;
+  }
 }

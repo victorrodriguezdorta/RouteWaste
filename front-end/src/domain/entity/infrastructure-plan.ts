@@ -1,7 +1,11 @@
+import { DailyPlan } from '@/domain/entity/daily-plan';
 import { Facility } from '@/domain/entity/facility';
 import { ServiceAssignment } from '@/domain/entity/service-assignment';
+import { CollectedVolumeLiters } from '@/domain/valueobject/capacity/collected-volume-liters';
+import { CollectedWeightKilograms } from '@/domain/valueobject/capacity/collected-weight-kilograms';
 import { MaximumBudget } from '@/domain/valueobject/cost/maximum-budget';
 import { TotalCost } from '@/domain/valueobject/cost/total-cost';
+import { Distance } from '@/domain/valueobject/location/distance';
 import { ServicePolicies } from '@/domain/valueobject/policy/service-policies';
 import { PlanningPeriod } from '@/domain/valueobject/time/planning-period';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
@@ -30,6 +34,20 @@ export class InfrastructurePlan {
   private maxBudget: MaximumBudget;
   /** The estimated total cost of this infrastructure plan. */
   private estimatedTotalCost: TotalCost;
+  /** Daily plans generated for this infrastructure plan. */
+  private dailyPlans: DailyPlan[];
+  /** Total weight collected across all daily plans. */
+  private totalCollectedKilograms: CollectedWeightKilograms;
+  /** Total volume collected across all daily plans. */
+  private totalCollectedLiters: CollectedVolumeLiters;
+  /** Total distance traveled across all daily plans. */
+  private totalDistanceMeters: Distance;
+  /** Number of days in the planning horizon. */
+  private numberOfDays?: number | null;
+  /** Average pickup time in minutes. */
+  private averagePickupTimeMinutes?: number | null;
+  /** Timestamp when the algorithm execution was performed (ISO 8601 format). */
+  private executedAt?: string | null;
 
   /**
    * Create a new planning decision.
@@ -48,7 +66,59 @@ export class InfrastructurePlan {
     this.servicePolicies = servicePolicies ?? null;
     this.selectedFacilities = [];
     this.serviceAssignments = [];
+    this.dailyPlans = [];
     this.estimatedTotalCost = new TotalCost(0);
+    this.totalCollectedKilograms = CollectedWeightKilograms.fromKilograms(0);
+    this.totalCollectedLiters = CollectedVolumeLiters.fromLiters(0);
+    this.totalDistanceMeters = Distance.fromMeters(0);
+  }
+
+  /**
+   * Restore constructor for creating an InfrastructurePlan from persistence.
+   * @param id the plan identifier
+   * @param period planning period value object
+   * @param maxBudget maximum budget value object
+   * @param servicePolicies optional service policy configuration
+   * @param dailyPlans optional list of daily plans
+   * @param selectedFacilities optional list of selected facilities
+   * @param serviceAssignments optional list of service assignments
+   * @param estimatedTotalCost optional estimated total cost
+   * @param totalCollectedKilograms optional total collected kilograms
+   * @param totalCollectedLiters optional total collected liters
+   * @param totalDistanceMeters optional total distance meters
+   * @param numberOfDays optional number of days
+   * @param averagePickupTimeMinutes optional average pickup time in minutes
+   * @param executedAt optional execution timestamp
+   * @returns A new InfrastructurePlan instance with all attributes set
+   */
+  static restore(
+    id: UllUUID,
+    period: PlanningPeriod,
+    maxBudget: MaximumBudget,
+    servicePolicies?: ServicePolicies | null,
+    dailyPlans?: DailyPlan[],
+    selectedFacilities?: Facility[],
+    serviceAssignments?: ServiceAssignment[],
+    estimatedTotalCost?: TotalCost,
+    totalCollectedKilograms?: CollectedWeightKilograms,
+    totalCollectedLiters?: CollectedVolumeLiters,
+    totalDistanceMeters?: Distance,
+    numberOfDays?: number,
+    averagePickupTimeMinutes?: number,
+    executedAt?: string
+  ): InfrastructurePlan {
+    const plan = new InfrastructurePlan(period, maxBudget, servicePolicies, id);
+    plan.dailyPlans = dailyPlans ? [...dailyPlans] : [];
+    plan.selectedFacilities = selectedFacilities ? [...selectedFacilities] : [];
+    plan.serviceAssignments = serviceAssignments ? [...serviceAssignments] : [];
+    if (estimatedTotalCost) plan.estimatedTotalCost = estimatedTotalCost;
+    if (totalCollectedKilograms) plan.totalCollectedKilograms = totalCollectedKilograms;
+    if (totalCollectedLiters) plan.totalCollectedLiters = totalCollectedLiters;
+    if (totalDistanceMeters) plan.totalDistanceMeters = totalDistanceMeters;
+    plan.numberOfDays = numberOfDays ?? null;
+    plan.averagePickupTimeMinutes = averagePickupTimeMinutes ?? null;
+    plan.executedAt = executedAt ?? null;
+    return plan;
   }
 
   /**
@@ -105,13 +175,24 @@ export class InfrastructurePlan {
 
   /**
    * Add a service assignment to the plan.
+   * Aggregates daily waste demand from all assigned containers and assigns to facility.
    * Recalculates costs after adding.
    * @param assignment the service assignment to add
    * @throws Error when assignment is null
    */
   addServiceAssignment(assignment: ServiceAssignment): void {
     if (!assignment) throw new Error('Invalid assignment');
-    assignment.facility.assignWasteDemand(assignment.wasteDemand);
+    
+    // Sum daily waste demand from all assigned containers
+    const containers = assignment.getAssignedContainers();
+    let totalDemand = containers[0]?.getDailyDemandLitersPerDay();
+    for (let i = 1; i < containers.length; i++) {
+      const containerDemand = containers[i].getDailyDemandLitersPerDay();
+      totalDemand = totalDemand.add(containerDemand);
+    }
+    
+    // Assign aggregated demand to facility
+    assignment.getFacility().assignWasteDemand(totalDemand);
     this.serviceAssignments.push(assignment);
     this.recalculateTotalCost();
   }
@@ -119,12 +200,14 @@ export class InfrastructurePlan {
   /** Recalculate estimated total cost and validate against budget. */
   recalculateTotalCost(): void {
     let total = 0.0;
+    // Sum opening fixed costs from all selected facilities
     for (const facility of this.selectedFacilities) {
       total += facility.getOpeningFixedCost().getAmount();
     }
-    for (const assignment of this.serviceAssignments) {
-      total += assignment.transportCost.getAmount();
-    }
+    // TODO: Add transport cost calculation per assignment (requires transport cost VO)
+    // for (const assignment of this.serviceAssignments) {
+    //   total += assignment.calculateTransportCost().getAmount();
+    // }
     const newCost = new TotalCost(total);
     if (newCost.getAmount() > this.maxBudget.getAmount()) {
       throw new Error('Total cost exceeds maximum budget');
@@ -138,12 +221,121 @@ export class InfrastructurePlan {
    */
   isPlanValid(): boolean {
     for (const assignment of this.serviceAssignments) {
-      const facility = assignment.facility;
+      const facility = assignment.getFacility();
       if (facility.getStatus() === undefined) return false;
       const totalDemand = facility.getAssignedWasteDemand();
       if (totalDemand.greaterThan(facility.getCapacity())) return false;
     }
     return true;
+  }
+
+  /**
+   * Add a daily plan to this infrastructure plan.
+   * @param dailyPlan the daily plan to add
+   * @throws Error when dailyPlan is null
+   */
+  addDailyPlan(dailyPlan: DailyPlan | undefined): void {
+    if (!dailyPlan) throw new Error('Daily plan is invalid');
+    this.dailyPlans.push(dailyPlan);
+  }
+
+  /**
+   * Clear all daily plans from this infrastructure plan.
+   */
+  clearDailyPlans(): void {
+    this.dailyPlans = [];
+  }
+
+  /**
+   * Get the daily plans associated with this infrastructure plan.
+   * @returns a readonly copy of the daily plans
+   */
+  getDailyPlans(): ReadonlyArray<DailyPlan> {
+    return this.dailyPlans.slice();
+  }
+
+  /**
+   * Get the daily plan identifiers as UUIDs.
+   * @returns an array of daily plan identifiers
+   */
+  getDailyPlanIds(): UllUUID[] {
+    return this.dailyPlans.map(dp => dp.getId());
+  }
+
+  /**
+   * Get the total collected kilograms.
+   * @returns the total collected weight
+   */
+  getTotalCollectedKilograms(): CollectedWeightKilograms {
+    return this.totalCollectedKilograms;
+  }
+
+  /**
+   * Get the total collected liters.
+   * @returns the total collected volume
+   */
+  getTotalCollectedLiters(): CollectedVolumeLiters {
+    return this.totalCollectedLiters;
+  }
+
+  /**
+   * Get the total distance traveled.
+   * @returns the total distance in meters
+   */
+  getTotalDistanceMeters(): Distance {
+    return this.totalDistanceMeters;
+  }
+
+  /**
+   * Get the number of days in the planning horizon.
+   * @returns the number of days or null if not set
+   */
+  getNumberOfDays(): number | null {
+    return this.numberOfDays ?? null;
+  }
+
+  /**
+   * Get the average pickup time in minutes.
+   * @returns the average pickup time or null if not set
+   */
+  getAveragePickupTimeMinutes(): number | null {
+    return this.averagePickupTimeMinutes ?? null;
+  }
+
+  /**
+   * Get the execution timestamp (ISO 8601 format).
+   * @returns the execution timestamp or null if not set
+   */
+  getExecutedAt(): string | null {
+    return this.executedAt ?? null;
+  }
+
+  /**
+   * Update algorithm metrics based on daily plans execution.
+   * @param kilograms total collected weight
+   * @param liters total collected volume
+   * @param distance total distance traveled
+   */
+  updateAlgorithmMetrics(
+    kilograms: CollectedWeightKilograms,
+    liters: CollectedVolumeLiters,
+    distance: Distance
+  ): void {
+    if (kilograms) this.totalCollectedKilograms = kilograms;
+    if (liters) this.totalCollectedLiters = liters;
+    if (distance) this.totalDistanceMeters = distance;
+  }
+
+  /**
+   * Update the algorithm execution metadata.
+   * @param numberOfDays the number of days
+   * @param averagePickupTimeMinutes the average pickup time in minutes
+   * @param executedAt the execution timestamp (ISO 8601)
+   */
+  updateExecutionMetadata(numberOfDays?: number, averagePickupTimeMinutes?: number, executedAt?: string): void {
+    if (numberOfDays !== undefined) this.numberOfDays = numberOfDays;
+    if (averagePickupTimeMinutes !== undefined) this.averagePickupTimeMinutes = averagePickupTimeMinutes;
+    if (executedAt !== undefined) this.executedAt = executedAt;
   }
 
   /**

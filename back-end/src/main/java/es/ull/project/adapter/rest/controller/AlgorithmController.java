@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import es.ull.project.adapter.rest.mapper.AlgorithmExecutionResponseMapper;
 import es.ull.project.adapter.rest.request.algorithm.AlgorithmExecutionRequestBody;
@@ -122,10 +123,46 @@ public class AlgorithmController {
         }
 
         String processedJson = this.serializeProcessedResponse(processedResponseBody);
-        String algorithmJson = this.runAlgorithmUseCase.execute(processedJson);
-        JsonNode responseBody = this.deserializeAlgorithmResponse(algorithmJson);
-        this.persistAlgorithmResult(responseBody, numberOfDays, averagePickupTimeMinutes, providedMaxBudget);
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+        String algorithmJson;
+        try {
+            algorithmJson = this.runAlgorithmUseCase.execute(processedJson);
+        } catch (RuntimeException e) {
+            ObjectNode error = this.objectMapper.createObjectNode();
+            error.put("status", "error");
+            error.put("message", "Failed to send algorithm to runner");
+            error.put("details", e.getMessage() != null ? e.getMessage() : "");
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        JsonNode responseBody;
+        try {
+            responseBody = this.deserializeAlgorithmResponse(algorithmJson);
+        } catch (AlgorithmExecutionException e) {
+            ObjectNode error = this.objectMapper.createObjectNode();
+            error.put("status", "error");
+            error.put("message", "Failed to parse algorithm response");
+            error.put("details", e.getMessage() != null ? e.getMessage() : "");
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        // Persist result and return success with persisted plan id
+        try {
+            es.ull.project.domain.entity.InfrastructurePlan persisted = this.persistAlgorithmExecutionResultUseCase.persist(responseBody, numberOfDays, averagePickupTimeMinutes, providedMaxBudget);
+            ObjectNode success = this.objectMapper.createObjectNode();
+            success.put("status", "success");
+            success.put("message", "Algorithm executed and persisted successfully");
+            if (persisted != null && persisted.getId() != null) {
+                success.put("infrastructurePlanId", persisted.getId().toString());
+            }
+            return new ResponseEntity<>(success, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            ObjectNode error = this.objectMapper.createObjectNode();
+            error.put("status", "error");
+            error.put("message", "Failed to persist the algorithm response");
+            error.put("details", e.getMessage() != null ? e.getMessage() : "");
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**

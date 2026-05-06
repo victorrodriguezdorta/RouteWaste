@@ -1,13 +1,11 @@
+import type { InfrastructurePlanJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-json-response';
+import type { InfrastructurePlanSummaryJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-summary-json-response';
 import { InfrastructurePlanHttpRepository } from '@/adapter/http/infrastructure-plan-http-repository';
 import {
-  CreateInfrastructurePlanService,
   DeleteInfrastructurePlanService,
   GetInfrastructurePlanService,
   ListInfrastructurePlansService,
-  UpdateInfrastructurePlanService,
-  ValidateInfrastructurePlanService
 } from '@/application/service/infrastructure-plan';
-import type { InfrastructurePlan } from '@/domain/entity/infrastructure-plan';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 
@@ -32,11 +30,20 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
    * Defines the reactive state properties that will be managed by this store.
    */
   state: () => ({
-    /** Array of all infrastructure plans retrieved from the backend */
-    infrastructurePlans: [] as InfrastructurePlan[],
+    /** Array of infrastructure plan summaries retrieved from the backend */
+    infrastructurePlans: [] as InfrastructurePlanSummaryJsonResponse[],
+
+    /** Total number of infrastructure plans available on the server */
+    totalInfrastructurePlans: 0,
+
+    /** Current zero-based page index loaded from backend */
+    currentPage: 0,
+
+    /** Current requested page size */
+    rowsPerPage: 10,
     
-    /** Currently selected infrastructure plan (if any) */
-    infrastructurePlan: undefined as InfrastructurePlan | undefined,
+    /** Currently selected infrastructure plan detail (if any) */
+    infrastructurePlan: undefined as InfrastructurePlanJsonResponse | undefined,
     
     /** Repository instance for HTTP communication */
     infrastructurePlanRepository: new InfrastructurePlanHttpRepository(),
@@ -84,12 +91,14 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
    */
   actions: {
     /**
-     * Retrieve all infrastructure plans from the backend with optional pagination
+     * Retrieve all infrastructure plans from the backend with optional pagination and sorting
      * 
      * @param page Optional page number for pagination
      * @param rowsPerPage Optional number of items per page
+     * @param sortBy Optional field to sort by
+     * @param sortOrder Optional sort order ('asc' or 'desc')
      */
-    async getInfrastructurePlans(page?: number, rowsPerPage?: number) {
+    async getInfrastructurePlans(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc') {
       this.loading = true;
       this.infrastructurePlans = [];
       
@@ -97,7 +106,7 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
       const listService = new ListInfrastructurePlansService(this.infrastructurePlanRepository);
       
       // Execute the list operation
-      const result = await listService.execute({ page, pageSize: rowsPerPage });
+      const result = await listService.execute({ page, pageSize: rowsPerPage, sortBy, sortOrder });
       
       // Handle the result using Either pattern
       result.fold(
@@ -108,7 +117,10 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
         },
         data => {
           // Success case: update state with infrastructure plans
-          this.infrastructurePlans = data;
+          this.infrastructurePlans = data.content;
+          this.totalInfrastructurePlans = data.totalElements;
+          this.currentPage = data.page;
+          this.rowsPerPage = data.size;
           this.loading = false;
         }
       );
@@ -145,85 +157,6 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
     },
 
     /**
-     * Register a new infrastructure plan in the system
-     * 
-     * @param plan The Infrastructure Plan entity to create
-     */
-    async registerInfrastructurePlan(plan: InfrastructurePlan) {
-      // Create service instance with repository
-      const createService = new CreateInfrastructurePlanService(this.infrastructurePlanRepository);
-      
-      // Execute the create operation with plan properties
-      const result = await createService.execute({
-        period: plan.getPeriod(),
-        maxBudget: plan.getMaxBudget(),
-        servicePolicies: plan.getServicePolicies()
-      });
-      
-      // Handle the result
-      result.fold(
-        error => {
-          // Error case: handle and notify user
-          this.handleError(error);
-        },
-        data => {
-          // Success case: add to local array and notify
-          this.infrastructurePlans.push(data);
-          this.setNotification(
-            'Success', 
-            'Infrastructure plan added successfully', 
-            'mdi-check', 
-            'success'
-          );
-        }
-      );
-    },
-
-    /**
-     * Update an existing infrastructure plan
-     * 
-     * @param id UUID string of the infrastructure plan to update
-     * @param plan Updated Infrastructure Plan entity with new data
-     */
-    async updateInfrastructurePlan(id: string, plan: InfrastructurePlan) {
-      // Create service instance with repository
-      const updateService = new UpdateInfrastructurePlanService(this.infrastructurePlanRepository);
-      
-      // Convert string id to UllUUID
-      const planId = new UllUUID(id);
-      
-      // Execute the update operation
-      const result = await updateService.execute({ 
-        planId, 
-        updatedFields: {
-          period: plan.getPeriod(),
-          maxBudget: plan.getMaxBudget(),
-          servicePolicies: plan.getServicePolicies()
-        }
-      });
-      
-      // Handle the result
-      result.fold(
-        error => {
-          // Error case: handle and notify user
-          this.handleError(error);
-        },
-        data => {
-          // Success case: update in local array and notify
-          this.infrastructurePlans = this.infrastructurePlans.map(p => 
-            p.getId().equals(data.getId()) ? data : p
-          );
-          this.setNotification(
-            'Success', 
-            'Infrastructure plan updated successfully', 
-            'mdi-check', 
-            'success'
-          );
-        }
-      );
-    },
-
-    /**
      * Delete an infrastructure plan from the system
      * 
      * @param id UUID string of the infrastructure plan to delete
@@ -247,56 +180,12 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
         success => {
           // Success case: remove from local array and notify
           if (success) {
-            this.infrastructurePlans = this.infrastructurePlans.filter(plan => 
-              plan.getId().toString() !== id
-            );
+            this.infrastructurePlans = this.infrastructurePlans.filter(plan => plan.id !== id);
             this.setNotification(
               'Success', 
               'Infrastructure plan deleted successfully', 
               'mdi-check', 
               'success'
-            );
-          }
-        }
-      );
-    },
-
-    /**
-     * Validate an infrastructure plan against business rules
-     * 
-     * @param id UUID string of the infrastructure plan to validate
-     */
-    async validateInfrastructurePlan(id: string) {
-      // Create service instance with repository
-      const validateService = new ValidateInfrastructurePlanService(this.infrastructurePlanRepository);
-      
-      // Convert string id to UllUUID
-      const planId = new UllUUID(id);
-      
-      // Execute the validation operation
-      const result = await validateService.execute({ planId });
-      
-      // Handle the result
-      result.fold(
-        error => {
-          // Error case: handle and notify user
-          this.handleError(error);
-        },
-        isValid => {
-          // Success case: notify validation result
-          if (isValid) {
-            this.setNotification(
-              'Success', 
-              'Infrastructure plan is valid', 
-              'mdi-check', 
-              'success'
-            );
-          } else {
-            this.setNotification(
-              'Warning', 
-              'Infrastructure plan validation failed', 
-              'mdi-alert', 
-              'warning'
             );
           }
         }

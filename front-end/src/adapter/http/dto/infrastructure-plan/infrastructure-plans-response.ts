@@ -1,9 +1,20 @@
-import { InfrastructurePlanJsonResponse } from './infrastructure-plan-json-response';
+import type { InfrastructurePlanSummaryJsonResponse } from './infrastructure-plan-summary-json-response';
 
 /**
- * InfrastructurePlansResponse
- * Alias type for an array of `InfrastructurePlanJsonResponse` objects returned by the backend when listing infrastructure plans. Keeping this alias allows
- * easy extension (e.g. adding pagination metadata) later without changing call
- * sites.
+ * Paginated response returned by the backend when listing infrastructure plans.
  */
-export type InfrastructurePlansResponse = InfrastructurePlanJsonResponse[];
+export interface InfrastructurePlanPageJsonResponse {
+	content: InfrastructurePlanSummaryJsonResponse[];
+	totalElements: number;
+	totalPages: number;
+	page: number;
+	size: number;
+	numberOfElements: number;
+	first: boolean;
+	last: boolean;
+}
+
+/**
+ * Backwards-compatible alias kept for callers that already use this name.
+ */
+export type InfrastructurePlansResponse = InfrastructurePlanPageJsonResponse;

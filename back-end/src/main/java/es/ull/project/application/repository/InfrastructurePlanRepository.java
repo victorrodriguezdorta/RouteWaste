@@ -1,10 +1,13 @@
 package es.ull.project.application.repository;
 
-import es.ull.project.domain.entity.InfrastructurePlan;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import es.ull.project.domain.entity.InfrastructurePlan;
 
 /**
  * Repository interface for InfrastructurePlan aggregates.
@@ -34,6 +37,14 @@ public interface InfrastructurePlanRepository {
      * @return list of infrastructure plans
      */
     public abstract List<InfrastructurePlan> findAll();
+
+    /**
+     * Find all infrastructure plans using pagination and sorting.
+     *
+     * @param pageable pagination and sort information
+     * @return page of infrastructure plans
+     */
+    public abstract Page<InfrastructurePlan> findAll(Pageable pageable);
 
     /**
      * Save or update an infrastructure plan.

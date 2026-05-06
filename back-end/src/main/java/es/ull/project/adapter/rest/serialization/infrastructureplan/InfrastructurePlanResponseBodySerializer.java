@@ -1,14 +1,13 @@
 package es.ull.project.adapter.rest.serialization.infrastructureplan;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
-import es.ull.project.adapter.rest.serialization.facility.FacilityResponseBodySerializer;
-
-import java.io.IOException;
 
 /**
  * Custom JSON serializer for InfrastructurePlanResponseBody
@@ -17,11 +16,13 @@ import java.io.IOException;
  */
 public class InfrastructurePlanResponseBodySerializer extends StdSerializer<InfrastructurePlanResponseBody> {
 
-    private static final String FIELD_SELECTED_FACILITIES = "selectedFacilities";
-    private static final String FIELD_SERVICE_ASSIGNMENTS = "serviceAssignments";
-    private static final String FIELD_ESTIMATED_TOTAL_COST = "estimatedTotalCost";
-
-    private final FacilityResponseBodySerializer facilitySerializer = new FacilityResponseBodySerializer();
+    private static final String FIELD_EXECUTED_AT = "executedAt";
+    private static final String FIELD_TOTAL_COLLECTED_KILOGRAMS = "totalCollectedKilograms";
+    private static final String FIELD_TOTAL_COLLECTED_LITERS = "totalCollectedLiters";
+    private static final String FIELD_TOTAL_DISTANCE_METERS = "totalDistanceMeters";
+    private static final String FIELD_CLUSTERS = "clusters";
+    private static final String FIELD_STATUS = "status";
+    private static final String FIELD_DAILY_PLANS = "dailyPlans";
 
     /**
      * Default constructor for the serializer
@@ -43,44 +44,44 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
     @Override
     public void serialize(InfrastructurePlanResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
-        gen.writeStringField(JsonFields.ID, value.id.toString());
-        gen.writeStringField(JsonFields.PERIOD, value.period.getValue());
-        gen.writeArrayFieldStart(FIELD_SELECTED_FACILITIES);
-        for (var facility : value.selectedFacilities) {
-            facilitySerializer.serialize(facility, gen, provider);
+        
+        // Timestamp and metrics first (matching algorithm output structure)
+        if (value.executedAt != null) {
+            gen.writeStringField(FIELD_EXECUTED_AT, value.executedAt);
         }
-        gen.writeEndArray();
-        gen.writeArrayFieldStart(FIELD_SERVICE_ASSIGNMENTS);
-        for (var assignment : value.serviceAssignments) {
-            gen.writeObject(assignment);
-        }
-        gen.writeEndArray();
+        gen.writeNumberField(FIELD_TOTAL_COLLECTED_KILOGRAMS, value.totalCollectedKilograms);
+        gen.writeNumberField(FIELD_TOTAL_COLLECTED_LITERS, value.totalCollectedLiters);
+        
+        // maxBudget with currency
         gen.writeObjectFieldStart(JsonFields.MAX_BUDGET);
         gen.writeNumberField(JsonFields.AMOUNT, value.maxBudget.getAmount());
         if (value.maxBudget.getCurrency().isPresent()) {
             gen.writeStringField(JsonFields.CURRENCY, value.maxBudget.getCurrency().get().getCode());
         }
         gen.writeEndObject();
-        gen.writeObjectFieldStart(FIELD_ESTIMATED_TOTAL_COST);
-        gen.writeNumberField(JsonFields.AMOUNT, value.estimatedTotalCost.getAmount());
-        if (value.estimatedTotalCost.getCurrency().isPresent()) {
-            gen.writeStringField(JsonFields.CURRENCY, value.estimatedTotalCost.getCurrency().get().getCode());
+        
+        gen.writeNumberField(FIELD_TOTAL_DISTANCE_METERS, value.totalDistanceMeters);
+        
+        // clusters as serviceAssignments (with full objects)
+        gen.writeArrayFieldStart(FIELD_CLUSTERS);
+        for (var assignment : value.serviceAssignments) {
+            gen.writeObject(assignment);
         }
-        gen.writeEndObject();
-        gen.writeObjectFieldStart(JsonFields.SERVICE_POLICIES);
-        if (value.servicePolicies.getMaxServiceDistance().isPresent()) {
-            gen.writeNumberField(JsonFields.MAX_SERVICE_DISTANCE, value.servicePolicies.getMaxServiceDistance().get());
+        gen.writeEndArray();
+        
+        if (value.status != null) {
+            gen.writeStringField(FIELD_STATUS, value.status);
         }
-        if (value.servicePolicies.getMaxServiceTime().isPresent()) {
-            gen.writeNumberField(JsonFields.MAX_SERVICE_TIME, value.servicePolicies.getMaxServiceTime().get());
+        
+        // daily plans array (with full nested objects)
+        if (value.dailyPlans != null && !value.dailyPlans.isEmpty()) {
+            gen.writeArrayFieldStart(FIELD_DAILY_PLANS);
+            for (var dp : value.dailyPlans) {
+                gen.writeObject(dp);
+            }
+            gen.writeEndArray();
         }
-        if (value.servicePolicies.getMaxInfrastructureCount().isPresent()) {
-            gen.writeNumberField(JsonFields.MAX_INFRASTRUCTURE_COUNT, value.servicePolicies.getMaxInfrastructureCount().get());
-        }
-        if (value.servicePolicies.getMaxEmissions().isPresent()) {
-            gen.writeNumberField(JsonFields.MAX_EMISSIONS, value.servicePolicies.getMaxEmissions().get());
-        }
-        gen.writeEndObject();
+        
         gen.writeEndObject();
     }
 }

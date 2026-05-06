@@ -2,14 +2,14 @@
   <v-container fluid>
     <!-- Notification snackbar for user feedback -->
     <v-snackbar
-      v-model="algorithmNotification.flag"
-      :color="algorithmNotification.color"
-      :timeout="algorithmNotification.timeout"
+      v-model="infrastructurePlanNotification.flag"
+      :color="infrastructurePlanNotification.color"
+      :timeout="infrastructurePlanNotification.timeout"
       location="top"
     >
-      <v-icon class="mr-2">{{ algorithmNotification.icon }}</v-icon>
-      <strong>{{ algorithmNotification.title }}</strong>
-      <p class="mb-0">{{ algorithmNotification.msg }}</p>
+      <v-icon class="mr-2">{{ infrastructurePlanNotification.icon }}</v-icon>
+      <strong>{{ infrastructurePlanNotification.title }}</strong>
+      <p class="mb-0">{{ infrastructurePlanNotification.msg }}</p>
     </v-snackbar>
 
     <CrudLayout
@@ -32,11 +32,11 @@
       <!-- Algorithms data table -->
       <v-data-table-server
         :headers="headers"
-        :items="algorithmItems"
+        :items="infrastructureItems"
         :loading="loading"
-        :items-length="totalAlgorithms"
+        :items-length="totalInfrastructurePlans"
         v-model:page="tablePage"
-        :items-per-page="itemsPerPage"
+        :items-per-page="rowsPerPage"
         :items-per-page-options="[
           { value: 5, title: '5' },
           { value: 10, title: '10' },
@@ -48,10 +48,46 @@
         hover
         class="elevation-2"
       >
-        <!-- Empty state when no algorithms exist -->
+        <template v-slot:item.executedAt="{ item }">
+          {{ item.executedAt }}
+        </template>
+
+        <template v-slot:item.estimatedTotalCost="{ item }">
+          {{ item.estimatedTotalCost }}
+        </template>
+
+        <template v-slot:item.numberOfDays="{ item }">
+          {{ item.numberOfDays }}
+        </template>
+
+        <template v-slot:item.averagePickupTimeMinutes="{ item }">
+          {{ item.averagePickupTimeMinutes }}
+        </template>
+
+        <template v-slot:item.actions="{ item }">
+          <ButtonTooltip
+            text=""
+            icon="mdi-eye"
+            :tooltip="t('algorithm.list.table.tooltips.view')"
+            color="info"
+            size="small"
+            variant="text"
+            :eventclick="() => showItem(item.id)"
+          />
+          <ButtonTooltip
+            text=""
+            icon="mdi-delete"
+            :tooltip="t('algorithm.list.table.tooltips.delete')"
+            color="error"
+            size="small"
+            variant="text"
+            :eventclick="() => deleteItem(item.id)"
+          />
+        </template>
+
         <template v-slot:no-data>
           <v-alert type="info" variant="tonal" class="ma-4">
-            {{ t('algorithm.list.table.noData') }}
+            {{ t('infrastructurePlan.list.table.noData') || t('algorithm.list.table.noData') }}
             <ButtonTooltip 
               color="primary" 
               variant="text" 
@@ -65,6 +101,17 @@
         </template>
       </v-data-table-server>
     </CrudLayout>
+    <ErrorMessage
+      :model-value="dialogDelete"
+      :title="t('algorithm.list.deleteDialog.title')"
+      :error-message="t('algorithm.list.deleteDialog.message')"
+      :reason="''"
+      :cancel-text="t('common.buttons.cancel')"
+      :retry-text="t('common.buttons.delete')"
+      @update:model-value="dialogDelete = $event"
+      @cancel="dialogDelete = false"
+      @retry="confirmDelete"
+    />
   </v-container>
 </template>
 
@@ -77,45 +124,53 @@
  * Uses Vuetify data table with pagination structure ready for future data.
  */
 
-import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip, ErrorMessage } from '@ull-tfg/ull-tfg-vue';
+import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CrudLayout from '../../components/common/CrudLayout.vue';
 import router from '../../router/router';
+import { useInfrastructurePlanStore } from '../../stores/infrastructure-plan-store';
 
 // Vue I18n composable for translations
 const { t } = useI18n();
 
-// Local component state
+// Infrastructure plan store
+const infrastructurePlanStore = useInfrastructurePlanStore();
+const { infrastructurePlans, infrastructurePlanNotification, loading, totalInfrastructurePlans, currentPage, rowsPerPage } = storeToRefs(infrastructurePlanStore);
+
+// Local pagination / table state
 const tablePage = ref(1);
-const itemsPerPage = ref(10);
-const loading = ref(false);
-const totalAlgorithms = ref(0);
-const isNavigating = ref(false);
+const currentSortBy = ref<string | undefined>(undefined);
+const currentSortOrder = ref<'asc' | 'desc'>('asc');
+const dialogDelete = ref(false);
+const selectedPlanId = ref('');
 
-// Notification state
-const algorithmNotification = ref({
-  flag: false,
-  color: 'info',
-  timeout: 3000,
-  icon: 'mdi-information',
-  title: '',
-  msg: '',
-});
-
-// Table column headers configuration
+// Table headers for infrastructure plan summary
 const headers = computed(() => [
   {
-    title: t('algorithm.list.table.headers.name'),
+    title: t('infrastructurePlan.list.table.headers.executedAt') || 'Executed At',
     align: 'start' as const,
     sortable: true,
-    key: 'name',
+    key: 'executedAt',
   },
   {
-    title: t('algorithm.list.table.headers.description'),
+    title: t('infrastructurePlan.list.table.headers.estimatedTotalCost') || 'Estimated Cost',
     align: 'start' as const,
-    sortable: false,
-    key: 'description',
+    sortable: true,
+    key: 'estimatedTotalCost',
+  },
+  {
+    title: t('infrastructurePlan.list.table.headers.numberOfDays') || 'Days',
+    align: 'center' as const,
+    sortable: true,
+    key: 'numberOfDays',
+  },
+  {
+    title: t('infrastructurePlan.list.table.headers.averagePickupTimeMinutes') || 'Avg Pickup (min)',
+    align: 'center' as const,
+    sortable: true,
+    key: 'averagePickupTimeMinutes',
   },
   {
     title: t('algorithm.list.table.headers.actions'),
@@ -125,41 +180,70 @@ const headers = computed(() => [
   },
 ]);
 
-/**
- * Computed table items - empty for now as entities don't exist yet
- * @returns Empty array (no algorithms available)
- */
-const algorithmItems = computed(() => {
-  return [];
+const infrastructureItems = computed(() => {
+  return infrastructurePlans.value.map((plan) => {
+    return {
+      id: plan.id,
+      executedAt: plan.executedAt ? new Date(plan.executedAt).toLocaleString() : '-',
+      estimatedTotalCost: plan.estimatedTotalCost ? `${plan.estimatedTotalCost.amount} ${plan.estimatedTotalCost.currency}` : '-',
+      numberOfDays: plan.numberOfDays ?? '-',
+      averagePickupTimeMinutes: plan.averagePickupTimeMinutes ?? '-',
+    };
+  });
 });
 
-/**
- * Load algorithms when component mounts
- */
 onMounted(async () => {
-  // Placeholder for future algorithm loading
-  // await loadAlgorithms(0, itemsPerPage.value);
+  await loadPlans(currentPage.value, rowsPerPage.value);
+  tablePage.value = currentPage.value + 1;
 });
 
-/**
- * Handle pagination and sort changes from Vuetify table
- */
-const onTableOptionsUpdate = async (_options: { page: number; itemsPerPage: number; sortBy: { key: string; order: 'asc' | 'desc' }[] }) => {
-  // Placeholder for future implementation
+const loadPlans = async (page: number, size: number, sortBy?: string, sortOrder?: 'asc' | 'desc') => {
+  currentSortBy.value = sortBy;
+  currentSortOrder.value = sortOrder ?? 'asc';
+  await infrastructurePlanStore.getInfrastructurePlans(page, size, sortBy, sortOrder);
 };
 
-/**
- * Navigate to algorithm execution view
- */
-const runAlgorithm = async () => {
-  isNavigating.value = true;
+const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: number; sortBy: { key: string; order: 'asc' | 'desc' }[] }) => {
+  const requestedSize = options.itemsPerPage;
+  if (requestedSize <= 0) return;
 
+  const requestedPage = Math.max(options.page - 1, 0);
+  const newSortBy = options.sortBy[0]?.key;
+  const newSortOrder = options.sortBy[0]?.order ?? 'asc';
+
+  currentSortBy.value = newSortBy;
+  currentSortOrder.value = newSortOrder;
+
+  await loadPlans(requestedPage, requestedSize, newSortBy, newSortOrder);
+  tablePage.value = currentPage.value + 1;
+};
+
+const runAlgorithm = async () => {
   try {
     await router.push({ name: 'ExecuteAlgorithm' });
   } catch (error) {
     console.error('Failed to open algorithm stepper:', error);
-    isNavigating.value = false;
   }
+};
+
+const showItem = (itemId: string) => {
+  router.push({ name: 'ShowInfrastructurePlan', params: { id: itemId } });
+};
+
+const deleteItem = (itemId: string) => {
+  selectedPlanId.value = itemId;
+  dialogDelete.value = true;
+};
+
+const confirmDelete = async () => {
+  await infrastructurePlanStore.deleteInfrastructurePlan(selectedPlanId.value);
+  await loadPlans(currentPage.value, rowsPerPage.value, currentSortBy.value, currentSortOrder.value);
+  if (infrastructurePlans.value.length === 0 && currentPage.value > 0) {
+    await loadPlans(currentPage.value - 1, rowsPerPage.value, currentSortBy.value, currentSortOrder.value);
+    tablePage.value = currentPage.value + 1;
+  }
+  dialogDelete.value = false;
+  selectedPlanId.value = '';
 };
 </script>
 

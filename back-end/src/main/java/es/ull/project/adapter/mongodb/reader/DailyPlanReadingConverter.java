@@ -62,7 +62,7 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
         UUID planId = infrastructurePlanDocument != null ? (UUID) infrastructurePlanDocument.get(MongoFields.ID) : null;
         InfrastructurePlan infrastructurePlan = new InfrastructurePlan(
                 planId,
-                new PlanningPeriod("1"),
+            new PlanningPeriod(String.valueOf(LocalDate.now().getYear())),
                 null,
                 null,
                 null,

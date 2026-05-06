@@ -1,12 +1,15 @@
 package es.ull.project.application.service.infrastructureplan;
 
-import es.ull.project.application.repository.InfrastructurePlanRepository;
-import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
-import es.ull.project.domain.entity.InfrastructurePlan;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import es.ull.project.application.repository.InfrastructurePlanRepository;
+import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
+import es.ull.project.domain.entity.InfrastructurePlan;
 
 /**
  * Service responsible for reading infrastructure plan data from the system.
@@ -37,6 +40,17 @@ public class ReadInfrastructurePlanService implements ReadInfrastructurePlanUseC
     @Override
     public InfrastructurePlan fetch(UUID id) {
         return this.repository.findById(id).orElseThrow(() -> new NoSuchElementException("InfrastructurePlan not found"));
+    }
+
+    /**
+     * Retrieves infrastructure plans using pagination.
+     *
+     * @param pageable pagination and sort information
+     * @return a page containing infrastructure plans
+     */
+    @Override
+    public Page<InfrastructurePlan> fetchAll(Pageable pageable) {
+        return this.repository.findAll(pageable);
     }
 
     /**

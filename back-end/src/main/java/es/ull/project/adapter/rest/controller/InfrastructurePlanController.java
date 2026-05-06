@@ -1,8 +1,30 @@
 package es.ull.project.adapter.rest.controller;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import es.ull.project.adapter.mongodb.mapper.InfrastructurePlanFieldMapper;
 import es.ull.project.adapter.rest.mapper.DailyPlanResponseMapper;
+import es.ull.project.adapter.rest.mapper.InfrastructurePlanListResponseMapper;
 import es.ull.project.adapter.rest.mapper.InfrastructurePlanResponseMapper;
 import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
+import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanListResponseBody;
+import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanPageResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
 import es.ull.project.application.usecase.dailyplan.ReadDailyPlanUseCase;
 import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
@@ -13,95 +35,94 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * InfrastructurePlanController
- * 
- * REST controller that handles HTTP requests for InfrastructurePlan resources.
- * This controller exposes RESTful endpoints following REST architectural principles
- * to create, read, update, and delete infrastructure plans in the system.
- * 
- * The controller uses Data Transfer Objects (DTOs) instead of domain entities
- * to avoid tight coupling and facilitate data validation.
- * 
- * Base path: defined in ApiRoutes.INFRASTRUCTURE_PLANS
+ *
+ * REST controller for InfrastructurePlan resources.
  */
 @RestController
 @RequestMapping(ApiRoutes.INFRASTRUCTURE_PLANS)
 public class InfrastructurePlanController {
 
-    /**
-     * Use case for reading infrastructure plan data.
-     * Autowired by Spring dependency injection.
-     */
+    private static final int ZERO = 0;
+
     @Autowired
     private ReadInfrastructurePlanUseCase readInfrastructurePlanUseCase;
 
-    /**
-     * Use case for reading daily plan data.
-     * Autowired by Spring dependency injection.
-     */
     @Autowired
     private ReadDailyPlanUseCase readDailyPlanUseCase;
 
-    /**
-     * Use case for deleting infrastructure plans.
-     * Autowired by Spring dependency injection.
-     */
     @Autowired
     private DeleteInfrastructurePlanUseCase deleteInfrastructurePlanUseCase;
 
     /**
      * GET /infrastructure-plans/
-     * 
-     * Retrieves all infrastructure plans in the system.
-     * 
-     * This endpoint returns a list of all available infrastructure plans without pagination.
-     * The plans are returned as InfrastructurePlanResponseBody DTOs serialized to JSON.
-     * 
-     * @return ResponseEntity containing a list of all infrastructure plans and HTTP 200 (OK) status
      */
-    @Operation(summary = "Get all infrastructure plans", description = "Retrieves a list of all infrastructure plans")
+    @Operation(summary = "Get all infrastructure plans", description = "Retrieves a paginated lightweight list of all infrastructure plans")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Infrastructure plans retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    @GetMapping("/")
-    public ResponseEntity<List<InfrastructurePlanResponseBody>> getInfrastructurePlans() {
-        List<InfrastructurePlan> plans = this.readInfrastructurePlanUseCase.fetchAll();
-        List<InfrastructurePlanResponseBody> responseBodies = plans.stream()
-                .map(plan -> {
-                    List<DailyPlan> dailyPlans = readDailyPlanUseCase.findByInfrastructurePlanId(plan.getId());
-                    List<DailyPlanResponseBody> dailyPlanBodies = dailyPlans.stream()
-                            .map(DailyPlanResponseMapper::toResponseBody)
-                            .toList();
-                    return InfrastructurePlanResponseMapper.toResponseBody(plan, dailyPlanBodies);
-                })
+    @GetMapping
+    public ResponseEntity<InfrastructurePlanPageResponseBody> getInfrastructurePlans(
+            @Parameter(description = "Zero-based page index") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Number of elements per page") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Field to sort by (id, executedAt, estimatedTotalCost, numberOfDays, averagePickupTimeMinutes)")
+            @RequestParam(required = false) String sortBy,
+            @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        if (page < ZERO || size <= ZERO) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (sortBy != null && !sortBy.isBlank() && !InfrastructurePlanFieldMapper.isValidField(sortBy)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, buildSort(sortBy, sortOrder));
+        Page<InfrastructurePlan> infrastructurePlanPage = this.readInfrastructurePlanUseCase.fetchAll(pageable);
+        return buildSuccessResponse(infrastructurePlanPage);
+    }
+
+    private Sort buildSort(String sortBy, String sortOrder) {
+        if (sortBy == null || sortBy.isBlank()) {
+            return Sort.unsorted();
+        }
+
+        String mongoField = InfrastructurePlanFieldMapper.toMongoField(sortBy);
+        if (mongoField == null) {
+            return Sort.unsorted();
+        }
+
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder)
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        return Sort.by(direction, mongoField);
+    }
+
+    private ResponseEntity<InfrastructurePlanPageResponseBody> buildSuccessResponse(Page<InfrastructurePlan> infrastructurePlanPage) {
+        List<InfrastructurePlanListResponseBody> responseBodies = infrastructurePlanPage.getContent().stream()
+                .map(InfrastructurePlanListResponseMapper::toResponseBody)
                 .toList();
-        return new ResponseEntity<>(responseBodies, HttpStatus.OK);
+
+        InfrastructurePlanPageResponseBody response = new InfrastructurePlanPageResponseBody();
+        response.content = responseBodies;
+        response.totalElements = infrastructurePlanPage.getTotalElements();
+        response.totalPages = infrastructurePlanPage.getTotalPages();
+        response.page = infrastructurePlanPage.getNumber();
+        response.size = infrastructurePlanPage.getSize();
+        response.numberOfElements = infrastructurePlanPage.getNumberOfElements();
+        response.first = infrastructurePlanPage.isFirst();
+        response.last = infrastructurePlanPage.isLast();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
      * GET /infrastructure-plans/{id}
-     * 
-     * Retrieves a specific infrastructure plan by its unique identifier.
-     * 
-     * @param id the unique identifier of the infrastructure plan (UUID format)
-     * @return ResponseEntity containing the infrastructure plan and HTTP 200 (OK) if found,
-     *         or HTTP 404 (NOT_FOUND) if the plan does not exist,
-     *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
     @Operation(summary = "Get infrastructure plan by ID", description = "Retrieves a specific infrastructure plan by its unique identifier")
     @ApiResponses(value = {
@@ -128,20 +149,8 @@ public class InfrastructurePlanController {
         }
     }
 
-
-
     /**
      * DELETE /infrastructure-plans/{id}
-     * 
-     * Deletes an infrastructure plan by its unique identifier.
-     * 
-     * Upon successful deletion, the deleted infrastructure plan entity is returned
-     * in the response body for confirmation purposes.
-     * 
-     * @param id the unique identifier of the infrastructure plan to delete (UUID format)
-     * @return ResponseEntity containing the deleted infrastructure plan and HTTP 200 (OK),
-     *         or HTTP 404 (NOT_FOUND) if the plan does not exist,
-     *         or HTTP 400 (BAD_REQUEST) if the ID format is invalid
      */
     @Operation(summary = "Delete an infrastructure plan", description = "Deletes an infrastructure plan by its unique identifier")
     @ApiResponses(value = {
@@ -154,8 +163,6 @@ public class InfrastructurePlanController {
             @Parameter(description = "Infrastructure plan UUID") @PathVariable String id) {
         UUID planId = UUID.fromString(id);
         InfrastructurePlan deletedPlan = this.deleteInfrastructurePlanUseCase.delete(planId);
-        
-        // Return the plan with an empty list of daily plans since they were cascade deleted
         InfrastructurePlanResponseBody responseBody = InfrastructurePlanResponseMapper.toResponseBody(deletedPlan, List.of());
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }

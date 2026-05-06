@@ -131,15 +131,15 @@ export class Facility {
   getId(): UllUUID { return this.id; }
 
   /**
-   * Assign additional waste demand to the facility.
-   * @param demand demand value object to add
-   * @throws Error when facility is discarded or capacity would be exceeded
+   * Assign additional daily waste demand to the facility (liters/day).
+   * Mirrors backend behavior: updates the `currentFillingLevel` VO.
+   * @param demand daily demand value object to add
+   * @throws Error when facility is discarded
    */
-  assignWasteDemand(demand: WasteDemand): void {
+  assignWasteDemand(demand: DailyWasteDemandLitersPerDay): void {
     if (facilityStatusIsDiscarded(this.status)) throw new Error('Facility is discarded and cannot receive assignments');
-    const newTotal = this.assignedWasteDemand.add(demand);
-    if (newTotal.greaterThan(this.capacity)) throw new Error('Facility capacity exceeded');
-    this.assignedWasteDemand = newTotal;
+    const newTotal = this.currentFillingLevel.add(demand);
+    this.currentFillingLevel = newTotal;
   }
 
 

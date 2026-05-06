@@ -1,5 +1,9 @@
 package es.ull.project.configuration;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
@@ -7,30 +11,26 @@ import es.ull.project.adapter.rest.deserialization.container.ContainerPostReques
 import es.ull.project.adapter.rest.deserialization.container.ContainerPutRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.facility.FacilityPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.facility.FacilityPutRequestBodyDeserializer;
-import es.ull.project.adapter.rest.deserialization.facility.FacilityPutRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.vehicle.VehiclePostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.vehicle.VehiclePutRequestBodyDeserializer;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
-import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
+import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanListResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
 import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
 import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
 import es.ull.project.adapter.rest.serialization.container.ContainerResponseBodySerializer;
 import es.ull.project.adapter.rest.serialization.facility.FacilityResponseBodySerializer;
+import es.ull.project.adapter.rest.serialization.infrastructureplan.InfrastructurePlanListResponseBodySerializer;
 import es.ull.project.adapter.rest.serialization.infrastructureplan.InfrastructurePlanResponseBodySerializer;
 import es.ull.project.adapter.rest.serialization.serviceassignment.ServiceAssignmentResponseBodySerializer;
 import es.ull.project.adapter.rest.serialization.vehicle.VehicleResponseBodySerializer;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 /**
  * RestConfiguration
@@ -92,6 +92,9 @@ public class RestConfiguration {
         module.addSerializer(
                 InfrastructurePlanResponseBody.class,
                 new InfrastructurePlanResponseBodySerializer());
+        module.addSerializer(
+                InfrastructurePlanListResponseBody.class,
+                new InfrastructurePlanListResponseBodySerializer());
         module.addSerializer(
                 ServiceAssignmentResponseBody.class,
                 new ServiceAssignmentResponseBodySerializer());

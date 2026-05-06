@@ -1,18 +1,21 @@
 package es.ull.project.adapter.mongodb.repository;
 
-import es.ull.project.application.repository.InfrastructurePlanRepository;
-import es.ull.project.domain.entity.InfrastructurePlan;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+
+import es.ull.project.application.repository.InfrastructurePlanRepository;
+import es.ull.project.domain.entity.InfrastructurePlan;
 
 /**
  * MongoDB implementation of the InfrastructurePlanRepository interface.
@@ -62,6 +65,20 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
     @Override
     public List<InfrastructurePlan> findAll() {
         return this.mongoTemplate.findAll(InfrastructurePlan.class, COLLECTION_NAME);
+    }
+
+    /**
+     * Find all infrastructure plans using pagination and sorting.
+     *
+     * @param pageable pagination and sort information
+     * @return page of infrastructure plans
+     */
+    @Override
+    public Page<InfrastructurePlan> findAll(Pageable pageable) {
+        Query dataQuery = new Query().with(pageable);
+        List<InfrastructurePlan> infrastructurePlans = this.mongoTemplate.find(dataQuery, InfrastructurePlan.class, COLLECTION_NAME);
+        long total = this.mongoTemplate.count(new Query(), InfrastructurePlan.class, COLLECTION_NAME);
+        return new PageImpl<>(infrastructurePlans, pageable, total);
     }
 
     /**

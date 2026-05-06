@@ -1,26 +1,21 @@
-import { InfrastructurePlanJsonResponse } from './dto/infrastructure-plan/infrastructure-plan-json-response';
-import { InfrastructurePlanPostJsonRequest } from './dto/infrastructure-plan/infrastructure-plan-post-json-request';
-import { InfrastructurePlanPutJsonRequest } from './dto/infrastructure-plan/infrastructure-plan-put-json-request';
 import type { InfrastructurePlanRepository } from '@/application/repository/infrastructure-plan-repository';
-import type { CreateInfrastructurePlanCommand, CreateInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/create-infrastructure-plan/create-infrastructure-plan-use-case';
 import type { DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/delete-infrastructure-plan/delete-infrastructure-plan-use-case';
 import type { GetInfrastructurePlanCommand, GetInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-use-case';
 import type { ListInfrastructurePlansCommand, ListInfrastructurePlansResult } from '@/application/usecase/infrastructure-plan-management/list-infrastructure-plans/list-infrastructure-plans-use-case';
-import type { UpdateInfrastructurePlanCommand, UpdateInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/update-infrastructure-plan/update-infrastructure-plan-use-case';
-import type { ValidateInfrastructurePlanCommand, ValidateInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/validate-infrastructure-plan/validate-infrastructure-plan-use-case';
 import {
   type ApiError,
   type DataError,
   Either,
   http,
 } from '@ull-tfg/ull-tfg-typescript';
+import type { InfrastructurePlanJsonResponse } from './dto/infrastructure-plan/infrastructure-plan-json-response';
+import type { InfrastructurePlansResponse } from './dto/infrastructure-plan/infrastructure-plans-response';
 
 /**
  * HTTP repository implementation for InfrastructurePlan entity.
  * 
  * Manages HTTP interactions with the backend API for infrastructure plan-related operations.
- * Implements the InfrastructurePlanRepository interface and handles CRUD operations through
- * RESTful API calls.
+ * Implements the InfrastructurePlanRepository interface and handles list/detail/delete calls.
  */
 export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepository {
   /**
@@ -48,19 +43,24 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
   }
   
   /**
-   * Retrieve a list of infrastructure plans with optional pagination.
+   * Retrieve a list of infrastructure plans with optional pagination, sorting.
    * 
-   * @param command Optional pagination parameters (page, pageSize).
+   * @param command Optional pagination, sort parameters (page, pageSize, sortBy, sortOrder).
    * @returns Either a DataError or a list of InfrastructurePlan entities.
    */
   public async list(
     command?: ListInfrastructurePlansCommand
   ): Promise<Either<DataError, ListInfrastructurePlansResult>> {
     let url = this.API_URL;
+    const requestedPage = command?.page ?? 0;
+    const requestedSize = command?.pageSize ?? 10;
+
+    // The backend now returns a paginated summary response, so page and size are always sent.
+    url += `?page=${requestedPage}&size=${requestedSize}`;
     
-    // Build query parameters for pagination
-    if (command?.page !== undefined && command?.pageSize !== undefined) {
-      url += `?page=${command.page}&size=${command.pageSize}`;
+    // Add sort parameters
+    if (command?.sortBy) {
+      url += `&sortBy=${encodeURIComponent(command.sortBy)}&sortOrder=${command.sortOrder ?? 'asc'}`;
     }
 
     return new Promise((resolve, reject) => {
@@ -68,15 +68,8 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
         .get(url, this.headers)
         .then(response => {
           if (response.ok) {
-            response.json().then((data: InfrastructurePlanJsonResponse[]) => {
-              const convertedData: ListInfrastructurePlansResult = [];
-              
-              // Transform each JSON response to domain entity
-              data.forEach(plan => {
-                convertedData.push(InfrastructurePlanJsonResponse.toInfrastructurePlan(plan));
-              });
-              
-              resolve(Either.right(convertedData));
+            response.json().then((data: InfrastructurePlansResponse) => {
+              resolve(Either.right(data));
             });
           } else {
             response.json().then((data: ApiError) => {
@@ -107,75 +100,11 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
         .then(response => {
           if (response.ok) {
             response.json().then((data: InfrastructurePlanJsonResponse) => {
-              resolve(Either.right(InfrastructurePlanJsonResponse.toInfrastructurePlan(data)));
+              resolve(Either.right(data));
             });
           } else {
             response.json().then((data: ApiError) => {
               reject(Either.left(data));
-            });
-          }
-        })
-        .catch((error: any) => {
-          resolve(Either.left({ kind: 'UnexpectedError', message: error }));
-        });
-    });
-  }
-
-  /**
-   * Create a new infrastructure plan in the system.
-   * 
-   * @param command Data required to create the infrastructure plan.
-   * @returns Either a DataError or the created InfrastructurePlan entity.
-   */
-  public async create(
-    command: CreateInfrastructurePlanCommand
-  ): Promise<Either<DataError, CreateInfrastructurePlanResult>> {
-    const body = InfrastructurePlanPostJsonRequest.toRequest(command);
-
-    return new Promise((resolve, reject) => {
-      http
-        .post(this.API_URL, body, this.headers)
-        .then(response => {
-          if (response.ok) {
-            response.json().then((data: InfrastructurePlanJsonResponse) => {
-              resolve(Either.right(InfrastructurePlanJsonResponse.toInfrastructurePlan(data)));
-            });
-          } else {
-            response.json().then((data: ApiError) => {
-              reject(Either.left(data));
-            });
-          }
-        })
-        .catch((error: any) => {
-          resolve(Either.left({ kind: 'UnexpectedError', message: error }));
-        });
-    });
-  }
-
-  /**
-   * Update an existing infrastructure plan.
-   * 
-   * @param command Data required to update the infrastructure plan (including id).
-   * @returns Either a DataError or the updated InfrastructurePlan entity.
-   */
-  public async update(
-    command: UpdateInfrastructurePlanCommand
-  ): Promise<Either<DataError, UpdateInfrastructurePlanResult>> {
-    const url = `${this.API_URL}/${command.planId.toString()}`;
-    const body = InfrastructurePlanPutJsonRequest.toRequest(command);
-
-    return new Promise((resolve) => {
-      http
-        .put(url, body, this.headers)
-        .then(response => {
-          if (response.ok) {
-            response.json().then((data: InfrastructurePlanJsonResponse) => {
-              resolve(Either.right(InfrastructurePlanJsonResponse.toInfrastructurePlan(data)));
-            });
-          } else {
-            response.json().then((data: ApiError) => {
-              data.kind = 'ApiError';
-              resolve(Either.left(data));
             });
           }
         })
@@ -202,38 +131,6 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
         .then(response => {
           if (response.ok) {
             resolve(Either.right(true));
-          } else {
-            response.json().then((data: ApiError) => {
-              data.kind = 'ApiError';
-              resolve(Either.left(data));
-            });
-          }
-        })
-        .catch((error: any) => {
-          resolve(Either.left({ kind: 'UnexpectedError', message: error }));
-        });
-    });
-  }
-
-  /**
-   * Validate an infrastructure plan.
-   * 
-   * @param command Data containing the id of the plan to validate.
-   * @returns Either a DataError or a validation result.
-   */
-  public async validate(
-    command: ValidateInfrastructurePlanCommand
-  ): Promise<Either<DataError, ValidateInfrastructurePlanResult>> {
-    const url = `${this.API_URL}/${command.planId.toString()}/validate`;
-
-    return new Promise((resolve) => {
-      http
-        .post(url, {}, this.headers)
-        .then(response => {
-          if (response.ok) {
-            response.json().then((data: ValidateInfrastructurePlanResult) => {
-              resolve(Either.right(data));
-            });
           } else {
             response.json().then((data: ApiError) => {
               data.kind = 'ApiError';

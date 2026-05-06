@@ -13,6 +13,5 @@ export * from './algorithm-store';
 export * from './container-store';
 export * from './facility-store';
 export * from './infrastructure-plan-store';
-export * from './service-assignment-store';
 export * from './vehicle-store';
 

@@ -11,6 +11,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -204,6 +207,15 @@ class PersistAlgorithmExecutionResultServiceTests {
         @Override
         public List<InfrastructurePlan> findAll() {
             return fetchAll();
+        }
+
+        @Override
+        public Page<InfrastructurePlan> findAll(Pageable pageable) {
+          List<InfrastructurePlan> plans = new ArrayList<>(saved.values());
+          int start = (int) pageable.getOffset();
+          int end = Math.min(start + pageable.getPageSize(), plans.size());
+          List<InfrastructurePlan> pageContent = start >= plans.size() ? List.of() : plans.subList(start, end);
+          return new PageImpl<>(pageContent, pageable, plans.size());
         }
 
         @Override

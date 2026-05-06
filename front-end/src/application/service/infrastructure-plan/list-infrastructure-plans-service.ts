@@ -33,8 +33,7 @@ export class ListInfrastructurePlansService implements ListInfrastructurePlansUs
          * @param command Parámetros opcionales de paginación.
          * @returns Un objeto Either que contiene un DataError o un array de entidades InfrastructurePlan.
          */
-        const page = command?.page;
-        const pageSize = command?.pageSize;
-        return this.infrastructurePlanRepository.list({ page, pageSize });
+        // Forward all received parameters (pagination + sorting) to the repository
+        return this.infrastructurePlanRepository.list(command);
     }
 }

@@ -1,4 +1,4 @@
-import { InfrastructurePlan } from '@/domain/entity/infrastructure-plan';
+import type { InfrastructurePlanJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-json-response';
 
 // Result type for the use case
-export type GetInfrastructurePlanResult = InfrastructurePlan;
+export type GetInfrastructurePlanResult = InfrastructurePlanJsonResponse;

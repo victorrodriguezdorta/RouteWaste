@@ -335,6 +335,27 @@
       }
     }
   },
+  "infrastructurePlan": {
+    "list": {
+      "table": {
+        "headers": {
+          "executedAt": "Fecha de Ejecución",
+          "estimatedTotalCost": "Costo Total Estimado",
+          "numberOfDays": "Número de Días",
+          "averagePickupTimeMinutes": "Tiempo Promedio de Recogida (min)"
+        },
+        "tooltips": {
+          "view": "Ver detalles",
+          "delete": "Eliminar"
+        },
+        "noData": "No hay planes de infraestructura disponibles."
+      },
+      "deleteDialog": {
+        "title": "Confirmar Eliminación",
+        "message": "¿Está seguro que desea eliminar este plan de infraestructura? Esta acción no se puede deshacer."
+      }
+    }
+  },
   "algorithm": {
     "list": {
       "title": "Algoritmos",
@@ -345,8 +366,16 @@
           "description": "Descripción",
           "actions": "Acciones"
         },
+        "tooltips": {
+          "view": "Ver detalles",
+          "delete": "Eliminar"
+        },
         "noData": "No hay algoritmos disponibles.",
         "runFirst": "Ejecutar algoritmo"
+      },
+      "deleteDialog": {
+        "title": "Confirmar Eliminación",
+        "message": "¿Está seguro que desea eliminar este algoritmo? Esta acción no se puede deshacer."
       }
     },
     "execute": {

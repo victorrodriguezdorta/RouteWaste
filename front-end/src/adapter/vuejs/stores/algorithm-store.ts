@@ -305,6 +305,7 @@ export const useAlgorithmStore = defineStore('Algorithm', {
       this.extraData = {
         numberOfDays: 7,
         averagePickupTimeMinutes: 15,
+        maxBudgetAmount: 100,
       };
       this.executionResult = undefined;
     },
