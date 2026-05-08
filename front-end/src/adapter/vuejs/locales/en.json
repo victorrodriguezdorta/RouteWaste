@@ -386,6 +386,20 @@
           "vehiclesTitle": "Vehicles",
           "vehiclesHint": "Select vehicles to display their route on the map.",
           "noVehicles": "No vehicles for the selected facilities."
+        },
+        "route": {
+          "title": "Vehicle route",
+          "noRoutes": "Select a vehicle to see its route details.",
+          "noStops": "There are no defined stops for this route.",
+          "vehicleLabel": "Vehicle",
+          "facilityLabel": "Facility",
+          "totalDistanceLabel": "Total distance",
+          "stopLabel": "Stop {sequence}",
+          "containerLabel": "Container",
+          "collectedKilogramsLabel": "Collected kg",
+          "collectedLitersLabel": "Collected liters",
+          "distanceFromPreviousLabel": "Distance from previous",
+          "cumulativeDistanceLabel": "Cumulative distance"
         }
       }
     }

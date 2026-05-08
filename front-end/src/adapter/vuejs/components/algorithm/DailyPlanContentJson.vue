@@ -20,22 +20,36 @@
             <div
               v-for="facility in selectableFacilities"
               :key="facility.id"
-              class="selector-row"
+              class="entity-action-row mb-2"
             >
-              <v-btn
-                color="accent"
-                :variant="isFacilitySelected(facility.id) ? 'flat' : 'tonal'"
-                class="selector-btn"
-                @click="toggleFacilitySelection(facility.id)"
-              >
-                {{ facilityLabel(facility) }}
-              </v-btn>
-              <v-btn
-                icon="mdi-eye"
+              <v-checkbox
+                :model-value="isFacilitySelected(facility.id)"
                 color="primary"
-                variant="text"
-                :title="t('infrastructurePlan.show.daily.content.viewFacility')"
-                @click="goToFacility(facility.id)"
+                density="compact"
+                hide-details
+                class="entity-checkbox"
+                @update:model-value="toggleFacilitySelection(facility.id)"
+              />
+              <ButtonTooltip
+                :text="facilityButtonLabel(facility)"
+                :tooltip="facilityTooltip(facility)"
+                icon=""
+                size="small"
+                variant="flat"
+                color="white"
+                class="entity-button flex-grow-1"
+                :class="{ 'entity-button-selected': isFacilitySelected(facility.id) }"
+                :eventclick="() => toggleFacilitySelection(facility.id)"
+              />
+              <ButtonTooltip
+                text=""
+                :tooltip="viewTooltip"
+                icon="mdi-eye"
+                size="small"
+                variant="flat"
+                color="white"
+                class="entity-view-button"
+                :eventclick="() => openFacility(facility.id)"
               />
             </div>
           </v-card-text>
@@ -53,6 +67,8 @@
             <div ref="mapContainer" class="daily-map" />
           </v-card-text>
         </v-card>
+
+        <DailyPlanRouteTimeline :routes="selectedVehicleRoutes" />
       </v-col>
 
       <v-col cols="12" md="2">
@@ -74,22 +90,36 @@
             <div
               v-for="route in selectableVehicleRoutes"
               :key="route.key"
-              class="selector-row"
+              class="entity-action-row mb-2"
             >
-              <v-btn
-                color="accent"
-                :variant="isVehicleSelected(route.key) ? 'flat' : 'tonal'"
-                class="selector-btn"
-                @click="toggleVehicleSelection(route.key)"
-              >
-                {{ vehicleRouteLabel(route) }}
-              </v-btn>
-              <v-btn
-                icon="mdi-eye"
+              <v-checkbox
+                :model-value="isVehicleRouteSelected(route.key)"
                 color="primary"
-                variant="text"
-                :title="t('infrastructurePlan.show.daily.content.viewVehicle')"
-                @click="goToVehicle(route.vehicleId)"
+                density="compact"
+                hide-details
+                class="entity-checkbox"
+                @update:model-value="toggleVehicleRouteSelection(route.key)"
+              />
+              <ButtonTooltip
+                :text="vehicleButtonLabel(route.vehicleId)"
+                :tooltip="route.vehicleId"
+                icon=""
+                size="small"
+                variant="flat"
+                color="white"
+                class="entity-button flex-grow-1"
+                :class="{ 'entity-button-selected': isVehicleRouteSelected(route.key) }"
+                :eventclick="() => toggleVehicleRouteSelection(route.key)"
+              />
+              <ButtonTooltip
+                text=""
+                :tooltip="viewTooltip"
+                icon="mdi-eye"
+                size="small"
+                variant="flat"
+                color="white"
+                class="entity-view-button"
+                :eventclick="() => openVehicle(route.vehicleId)"
               />
             </div>
           </v-card-text>
@@ -113,9 +143,11 @@
 </template>
 
 <script lang="ts" setup>
+import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import DailyPlanRouteTimeline from './DailyPlanRouteTimeline.vue';
+import router from '../../router/router';
 
 interface DailyPlanLike {
   id?: string;
@@ -181,7 +213,10 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const router = useRouter();
+const viewTooltip = computed(() => {
+  const translated = t('algorithm.list.table.tooltips.view');
+  return translated === 'algorithm.list.table.tooltips.view' ? 'View details' : translated;
+});
 const mapContainer = ref<HTMLDivElement | null>(null);
 const mapInstance = ref<LeafletMap | null>(null);
 const markersLayer = ref<LeafletLayerGroup | null>(null);
@@ -224,6 +259,11 @@ const selectableVehicleRoutes = computed<VehicleRouteOption[]>(() => {
   });
 
   return Array.from(deduped.values());
+});
+
+const selectedVehicleRoutes = computed<VehicleRouteOption[]>(() => {
+  const selectedKeys = new Set(selectedVehicleRouteKeys.value);
+  return selectableVehicleRoutes.value.filter((route) => selectedKeys.has(route.key));
 });
 
 const jsonContent = computed(() => {
@@ -290,52 +330,70 @@ onUnmounted(() => {
   markersLayer.value = null;
 });
 
-function facilityLabel(facility: FacilityLike): string {
-  const type = facility.facilityType ? ` (${facility.facilityType})` : '';
-  return `${facility.id ?? '-'}${type}`;
+function facilityButtonLabel(facility: FacilityLike): string {
+  return formatFacilityType(facility.facilityType);
 }
 
-function vehicleRouteLabel(route: VehicleRouteOption): string {
-  return `${route.vehicleId} (${route.facilityId})`;
+function facilityTooltip(facility: FacilityLike): string {
+  const facilityType = formatFacilityType(facility.facilityType);
+  const facilityId = facility.id ?? '-';
+  return `${facilityType} (${facilityId})`;
 }
 
-function isFacilitySelected(id: string | undefined): boolean {
-  return typeof id === 'string' && selectedFacilityIds.value.includes(id);
+function vehicleButtonLabel(vehicleId: string): string {
+  return truncateIdentifier(vehicleId, 8);
 }
 
-function toggleFacilitySelection(id: string | undefined): void {
-  if (typeof id !== 'string' || id.length === 0) return;
-  const set = new Set(selectedFacilityIds.value);
-  if (set.has(id)) {
-    set.delete(id);
-  } else {
-    set.add(id);
+function truncateIdentifier(value: string, visibleCharacters: number): string {
+  if (value.length <= visibleCharacters) {
+    return value;
   }
-  selectedFacilityIds.value = Array.from(set);
+  return `${value.slice(0, visibleCharacters)}...`;
 }
 
-function isVehicleSelected(key: string): boolean {
-  return selectedVehicleRouteKeys.value.includes(key);
-}
-
-function toggleVehicleSelection(key: string): void {
-  const set = new Set(selectedVehicleRouteKeys.value);
-  if (set.has(key)) {
-    set.delete(key);
-  } else {
-    set.add(key);
+function formatFacilityType(value?: string): string {
+  if (!value) {
+    return '-';
   }
-  selectedVehicleRouteKeys.value = Array.from(set);
+
+  return value
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
-function goToFacility(id: string | undefined): void {
-  if (!id) return;
-  void router.push({ name: 'ShowFacility', params: { id } });
+function isFacilitySelected(facilityId: string): boolean {
+  return selectedFacilityIds.value.includes(facilityId);
 }
 
-function goToVehicle(id: string | undefined): void {
-  if (!id) return;
-  void router.push({ name: 'ShowVehicle', params: { id } });
+function isVehicleRouteSelected(routeKey: string): boolean {
+  return selectedVehicleRouteKeys.value.includes(routeKey);
+}
+
+function toggleFacilitySelection(facilityId: string): void {
+  if (isFacilitySelected(facilityId)) {
+    selectedFacilityIds.value = selectedFacilityIds.value.filter((id) => id !== facilityId);
+    return;
+  }
+
+  selectedFacilityIds.value = [...selectedFacilityIds.value, facilityId];
+}
+
+function toggleVehicleRouteSelection(routeKey: string): void {
+  if (isVehicleRouteSelected(routeKey)) {
+    selectedVehicleRouteKeys.value = selectedVehicleRouteKeys.value.filter((key) => key !== routeKey);
+    return;
+  }
+
+  selectedVehicleRouteKeys.value = [...selectedVehicleRouteKeys.value, routeKey];
+}
+
+function openFacility(facilityId: string): void {
+  void router.push({ name: 'ShowFacility', params: { id: facilityId } });
+}
+
+function openVehicle(vehicleId: string): void {
+  void router.push({ name: 'ShowVehicle', params: { id: vehicleId } });
 }
 
 function hasCoordinates(location: unknown): location is { latitude: number; longitude: number } {
@@ -561,11 +619,46 @@ function renderMarkers(): void {
   border-radius: 12px;
 }
 
+.selector-card {
+  background: rgb(var(--v-theme-surface-border-light));
+}
+
 .daily-map {
   width: 100%;
   height: 420px;
   border-radius: 10px;
   overflow: hidden;
+}
+
+.entity-action-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.entity-checkbox {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.entity-button,
+.entity-view-button {
+  background: #ffffff !important;
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.entity-button {
+  justify-content: flex-start;
+  text-transform: none;
+  padding-inline-start: 0 !important;
+}
+
+.entity-button-selected {
+  box-shadow: inset 0 0 0 2px rgb(var(--v-theme-primary));
+}
+
+.entity-button :deep(.v-btn__content) {
+  margin-left: -0.35rem;
 }
 
 .json-block {

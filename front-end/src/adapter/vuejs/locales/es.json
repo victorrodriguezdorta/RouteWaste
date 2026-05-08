@@ -386,6 +386,20 @@
           "vehiclesTitle": "Vehículos",
           "vehiclesHint": "Selecciona los vehículos para mostrar su ruta sobre el mapa.",
           "noVehicles": "No hay vehículos para los facilities seleccionados."
+        },
+        "route": {
+          "title": "Ruta del vehículo",
+          "noRoutes": "Selecciona un vehículo para ver el detalle de su ruta.",
+          "noStops": "No hay paradas definidas para esta ruta.",
+          "vehicleLabel": "Vehículo",
+          "facilityLabel": "Facility",
+          "totalDistanceLabel": "Distancia total",
+          "stopLabel": "Parada {sequence}",
+          "containerLabel": "Contenedor",
+          "collectedKilogramsLabel": "Kg recogidos",
+          "collectedLitersLabel": "Litros recogidos",
+          "distanceFromPreviousLabel": "Distancia desde la anterior",
+          "cumulativeDistanceLabel": "Distancia acumulada"
         }
       }
     }
