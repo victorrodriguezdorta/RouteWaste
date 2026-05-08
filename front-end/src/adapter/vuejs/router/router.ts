@@ -94,6 +94,12 @@ const routes: RouteRecordRaw[] = [
         name: 'ExecuteAlgorithm',
         component: () => import('../view/algorithm/execute-algorithm.vue'),
     },
+    {
+        path: '/algorithm/:id',
+        name: 'ShowInfrastructurePlan',
+        component: () => import('../view/algorithm/show-infrastructure-plan.vue'),
+        props: true,
+    },
 ];
 
 const router: Router = createRouter({

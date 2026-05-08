@@ -354,6 +354,33 @@
         "title": "Confirmar Eliminación",
         "message": "¿Está seguro que desea eliminar este plan de infraestructura? Esta acción no se puede deshacer."
       }
+    },
+    "show": {
+      "generalInfo": {
+        "title": "Información General",
+        "fields": {
+          "id": "ID del Plan",
+          "executedAt": "Fecha de Ejecución",
+          "status": "Estado",
+          "totalCollectedKilograms": "Total Recogido (kg)",
+          "totalCollectedLiters": "Total Recogido (L)",
+          "totalDistanceMeters": "Distancia Total (m)",
+          "maxBudget": "Presupuesto Máximo",
+          "facilityCount": "Número de Instalaciones",
+          "dailyPlanCount": "Planes Diarios",
+          "numberOfDays": "Número de Días"
+        }
+      },
+      "daily": {
+        "navigator": {
+          "title": "Navegación por Día",
+          "dayLabel": "Día {current}/{total}",
+          "serviceDate": "Fecha de servicio"
+        },
+        "content": {
+          "title": "JSON del día"
+        }
+      }
     }
   },
   "algorithm": {

@@ -354,6 +354,33 @@
         "title": "Confirm Deletion",
         "message": "Are you sure you want to delete this infrastructure plan? This action cannot be undone."
       }
+    },
+    "show": {
+      "generalInfo": {
+        "title": "General Information",
+        "fields": {
+          "id": "Plan ID",
+          "executedAt": "Executed At",
+          "status": "Status",
+          "totalCollectedKilograms": "Total Collected (kg)",
+          "totalCollectedLiters": "Total Collected (L)",
+          "totalDistanceMeters": "Total Distance (m)",
+          "maxBudget": "Maximum Budget",
+          "facilityCount": "Number of Facilities",
+          "dailyPlanCount": "Daily Plans",
+          "numberOfDays": "Number of Days"
+        }
+      },
+      "daily": {
+        "navigator": {
+          "title": "Day Navigation",
+          "dayLabel": "Day {current}/{total}",
+          "serviceDate": "Service date"
+        },
+        "content": {
+          "title": "Day JSON"
+        }
+      }
     }
   },
   "algorithm": {
