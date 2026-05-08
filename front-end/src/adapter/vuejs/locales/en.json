@@ -378,7 +378,11 @@
           "serviceDate": "Service date"
         },
         "content": {
-          "title": "Day JSON"
+          "title": "Day JSON",
+          "mapTitle": "Day map",
+          "selectorTitle": "Facilities",
+          "selectorHint": "Select one or more facilities to display their points and associated containers on the map.",
+          "noFacilities": "No facilities available for this day."
         }
       }
     }
