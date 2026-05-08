@@ -35,6 +35,11 @@ public class DailyPlanResponseBody {
     public ServiceDate serviceDate;
 
     /**
+     * The day number within the planning horizon.
+     */
+    public Integer planDay;
+
+    /**
      * Unique identifier of the vehicle assigned to this daily plan.
      */
     public UUID vehicleId;

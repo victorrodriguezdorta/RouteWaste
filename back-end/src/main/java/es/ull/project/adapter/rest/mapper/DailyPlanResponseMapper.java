@@ -34,6 +34,7 @@ public class DailyPlanResponseMapper {
         response.infrastructurePlanId = entity.getInfrastructurePlan().getId();
         response.facilityId = entity.getFacility().getId();
         response.serviceDate = new ServiceDate(entity.getServiceDate());
+        response.planDay = entity.getPlanDay();
         response.vehicleId = entity.getVehicle().getId();
         response.totalCollectedKilograms = entity.getTotalCollectedKilograms();
         response.totalCollectedLiters = entity.getTotalCollectedLiters();
