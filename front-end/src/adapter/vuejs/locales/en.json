@@ -382,7 +382,10 @@
           "mapTitle": "Day map",
           "selectorTitle": "Facilities",
           "selectorHint": "Select one or more facilities to display their points and associated containers on the map.",
-          "noFacilities": "No facilities available for this day."
+          "noFacilities": "No facilities available for this day.",
+          "vehiclesTitle": "Vehicles",
+          "vehiclesHint": "Select vehicles to display their route on the map.",
+          "noVehicles": "No vehicles for the selected facilities."
         }
       }
     }

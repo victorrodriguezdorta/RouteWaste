@@ -382,7 +382,10 @@
           "mapTitle": "Mapa del día",
           "selectorTitle": "Facilities",
           "selectorHint": "Selecciona uno o varios facilities para mostrar en el mapa sus puntos y contenedores asociados.",
-          "noFacilities": "No hay facilities disponibles para este día."
+          "noFacilities": "No hay facilities disponibles para este día.",
+          "vehiclesTitle": "Vehículos",
+          "vehiclesHint": "Selecciona los vehículos para mostrar su ruta sobre el mapa.",
+          "noVehicles": "No hay vehículos para los facilities seleccionados."
         }
       }
     }
