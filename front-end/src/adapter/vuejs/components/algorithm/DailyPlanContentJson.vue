@@ -58,9 +58,38 @@
 
       <v-col cols="12" md="8">
         <v-card variant="flat" class="map-card">
-          <v-card-title class="d-flex align-center ga-2">
-            <v-icon icon="mdi-map" color="primary" />
-            <span>{{ t('infrastructurePlan.show.daily.content.mapTitle') }}</span>
+          <v-card-title class="map-card__header">
+            <div class="d-flex align-center ga-2">
+              <v-icon icon="mdi-map" color="primary" />
+              <span>{{ t('infrastructurePlan.show.daily.content.mapTitle') }}</span>
+            </div>
+
+            <div class="navigator-controller">
+              <v-btn
+                icon="mdi-chevron-left"
+                variant="text"
+                color="white"
+                :disabled="!canGoPrevious"
+                @click="emit('go-previous')"
+              />
+
+              <div class="navigator-controller__title">
+                <v-icon icon="mdi-calendar-range" color="white" />
+                <span>{{ serviceDate ?? '-' }}</span>
+              </div>
+
+              <div class="day-indicator">
+                {{ t('infrastructurePlan.show.daily.navigator.dayLabel', { current: currentDay, total: totalDays }) }}
+              </div>
+
+              <v-btn
+                icon="mdi-chevron-right"
+                variant="text"
+                color="white"
+                :disabled="!canGoNext"
+                @click="emit('go-next')"
+              />
+            </div>
           </v-card-title>
           <v-divider />
           <v-card-text>
@@ -210,6 +239,15 @@ const props = defineProps<{
   serviceDate?: string;
   dailyPlans: DailyPlanLike[];
   facilities: FacilityLike[];
+  currentDay: number;
+  totalDays: number;
+  canGoPrevious: boolean;
+  canGoNext: boolean;
+}>();
+
+const emit = defineEmits<{
+  (event: 'go-previous'): void;
+  (event: 'go-next'): void;
 }>();
 
 const { t } = useI18n();
@@ -630,6 +668,40 @@ function renderMarkers(): void {
   overflow: hidden;
 }
 
+.map-card__header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.navigator-controller {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgb(var(--v-theme-primary));
+  border-radius: 999px;
+  color: #ffffff;
+  padding: 8px 12px;
+}
+
+.navigator-controller__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.day-indicator {
+  color: #ffffff;
+  font-weight: 600;
+  min-width: 120px;
+  text-align: center;
+}
+
 .entity-action-row {
   display: flex;
   align-items: center;
@@ -697,6 +769,17 @@ function renderMarkers(): void {
 @media (max-width: 960px) {
   .daily-map {
     height: 320px;
+  }
+
+  .map-card__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .navigator-controller {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
   }
 }
 </style>

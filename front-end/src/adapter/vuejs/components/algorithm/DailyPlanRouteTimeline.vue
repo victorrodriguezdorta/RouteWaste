@@ -13,71 +13,74 @@
       </div>
 
       <div v-else class="route-list">
-        <section
+        <v-card
           v-for="route in normalizedRoutes"
           :key="route.key"
+          variant="flat"
           class="route-section"
         >
-          <div class="route-section__header">
-            <div>
-              <div class="route-section__title">
-                {{ t('infrastructurePlan.show.daily.route.vehicleLabel') }}: {{ route.vehicleId }}
+          <v-card-text>
+            <div class="route-section__header">
+              <div>
+                <div class="route-section__title">
+                  {{ t('infrastructurePlan.show.daily.route.vehicleLabel') }}: {{ route.vehicleId }}
+                </div>
+                <div class="route-section__meta">
+                  {{ t('infrastructurePlan.show.daily.route.facilityLabel') }}: {{ route.facilityId }}
+                </div>
               </div>
-              <div class="route-section__meta">
-                {{ t('infrastructurePlan.show.daily.route.facilityLabel') }}: {{ route.facilityId }}
+              <div class="route-section__summary">
+                {{ t('infrastructurePlan.show.daily.route.totalDistanceLabel') }}: {{ formatMeters(route.totalDistanceMeters) }}
               </div>
             </div>
-            <div class="route-section__summary">
-              {{ t('infrastructurePlan.show.daily.route.totalDistanceLabel') }}: {{ formatMeters(route.totalDistanceMeters) }}
+
+            <div v-if="route.stops.length === 0" class="text-body-2 text-medium-emphasis">
+              {{ t('infrastructurePlan.show.daily.route.noStops') }}
             </div>
-          </div>
 
-          <div v-if="route.stops.length === 0" class="text-body-2 text-medium-emphasis">
-            {{ t('infrastructurePlan.show.daily.route.noStops') }}
-          </div>
+            <div v-else class="route-stops">
+              <article
+                v-for="stop in route.stops"
+                :key="`${route.key}-${stop.sequence}-${stop.containerId}`"
+                class="route-stop"
+              >
+                <div class="route-stop__marker">
+                  <span class="route-stop__dot" />
+                </div>
 
-          <div v-else class="route-stops">
-            <article
-              v-for="stop in route.stops"
-              :key="`${route.key}-${stop.sequence}-${stop.containerId}`"
-              class="route-stop"
-            >
-              <div class="route-stop__marker">
-                <span class="route-stop__dot" />
-              </div>
-
-              <div class="route-stop__content">
-                <div class="route-stop__header">
-                  <span class="route-stop__title">
-                    {{ t('infrastructurePlan.show.daily.route.stopLabel', { sequence: stop.sequence }) }}
-                  </span>
-                  <div class="route-stop__container-row">
-                    <span class="route-stop__container">
-                      {{ t('infrastructurePlan.show.daily.route.containerLabel') }}: {{ stop.containerId }}
+                <div class="route-stop__content">
+                  <div class="route-stop__header">
+                    <span class="route-stop__title">
+                      {{ t('infrastructurePlan.show.daily.route.stopLabel', { sequence: stop.sequence }) }}
                     </span>
-                    <ButtonTooltip
-                      text=""
-                      :tooltip="viewTooltip"
-                      icon="mdi-eye"
-                      size="small"
-                      variant="flat"
-                      color="white"
-                      class="route-stop__view-button"
-                      :eventclick="() => openContainer(stop.containerId)"
-                    />
+                    <div class="route-stop__container-row">
+                      <span class="route-stop__container">
+                        {{ t('infrastructurePlan.show.daily.route.containerLabel') }}: {{ stop.containerId }}
+                      </span>
+                      <ButtonTooltip
+                        text=""
+                        :tooltip="viewTooltip"
+                        icon="mdi-eye"
+                        size="small"
+                        variant="flat"
+                        color="white"
+                        class="route-stop__view-button"
+                        :eventclick="() => openContainer(stop.containerId)"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="route-stop__metrics">
+                    <span>{{ t('infrastructurePlan.show.daily.route.collectedKilogramsLabel') }}: {{ formatNumber(stop.collectedKilograms) }}</span>
+                    <span>{{ t('infrastructurePlan.show.daily.route.collectedLitersLabel') }}: {{ formatNumber(stop.collectedLiters) }}</span>
+                    <span>{{ t('infrastructurePlan.show.daily.route.distanceFromPreviousLabel') }}: {{ formatMeters(stop.distanceFromPreviousMeters) }}</span>
+                    <span>{{ t('infrastructurePlan.show.daily.route.cumulativeDistanceLabel') }}: {{ formatMeters(stop.cumulativeDistanceMeters) }}</span>
                   </div>
                 </div>
-
-                <div class="route-stop__metrics">
-                  <span>{{ t('infrastructurePlan.show.daily.route.collectedKilogramsLabel') }}: {{ formatNumber(stop.collectedKilograms) }}</span>
-                  <span>{{ t('infrastructurePlan.show.daily.route.collectedLitersLabel') }}: {{ formatNumber(stop.collectedLiters) }}</span>
-                  <span>{{ t('infrastructurePlan.show.daily.route.distanceFromPreviousLabel') }}: {{ formatMeters(stop.distanceFromPreviousMeters) }}</span>
-                  <span>{{ t('infrastructurePlan.show.daily.route.cumulativeDistanceLabel') }}: {{ formatMeters(stop.cumulativeDistanceMeters) }}</span>
-                </div>
-              </div>
-            </article>
-          </div>
-        </section>
+              </article>
+            </div>
+          </v-card-text>
+        </v-card>
       </div>
     </v-card-text>
   </v-card>
@@ -234,9 +237,9 @@ function openContainer(containerId: string): void {
 }
 
 .route-section {
-  background: rgb(var(--v-theme-surface-border-light));
+  border: 1px solid rgba(0, 0, 0, 0.24);
   border-radius: 12px;
-  padding: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .route-section__header {
@@ -300,6 +303,7 @@ function openContainer(containerId: string): void {
 
 .route-stop__content {
   background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   border-radius: 10px;
   padding: 12px 14px;
 }

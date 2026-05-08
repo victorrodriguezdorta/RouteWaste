@@ -1,44 +1,17 @@
 <template>
   <div class="daily-plans-navigator mt-4">
-    <div class="navigator-header">
-      <div class="navigator-controller">
-        <v-btn
-          icon="mdi-chevron-left"
-          variant="text"
-          color="white"
-          :disabled="!canGoPrevious"
-          @click="goPrevious"
-        />
-
-        <div class="navigator-controller__title">
-          <v-icon icon="mdi-calendar-range" color="white" />
-          <span>{{ t('infrastructurePlan.show.daily.navigator.title') }}</span>
-        </div>
-
-        <div class="day-indicator">
-          {{ t('infrastructurePlan.show.daily.navigator.dayLabel', { current: currentDay, total: totalDays }) }}
-        </div>
-
-        <v-btn
-          icon="mdi-chevron-right"
-          variant="text"
-          color="white"
-          :disabled="!canGoNext"
-          @click="goNext"
-        />
-      </div>
-
-      <div class="navigator-service-date">
-        {{ t('infrastructurePlan.show.daily.navigator.serviceDate') }}: {{ selectedServiceDate ?? '-' }}
-      </div>
-    </div>
-
     <div class="navigator-content">
       <DailyPlanContentJson
         :plan-day="currentDay"
         :service-date="selectedServiceDate"
         :daily-plans="dailyPlansForCurrentDay"
         :facilities="facilitiesForCurrentDay"
+        :current-day="currentDay"
+        :total-days="totalDays"
+        :can-go-previous="canGoPrevious"
+        :can-go-next="canGoNext"
+        @go-previous="goPrevious"
+        @go-next="goNext"
       />
     </div>
   </div>
@@ -46,7 +19,6 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
 import DailyPlanContentJson from './DailyPlanContentJson.vue';
 
 interface DailyPlanLike {
@@ -80,8 +52,6 @@ interface InfrastructurePlanLike {
 const props = defineProps<{
   plan?: unknown;
 }>();
-
-const { t } = useI18n();
 
 const currentDay = ref(1);
 
@@ -176,57 +146,9 @@ function getServiceDate(value: unknown): string | undefined {
 .daily-plans-navigator {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-
-.navigator-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.navigator-controller {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgb(var(--v-theme-primary));
-  border-radius: 999px;
-  color: #ffffff;
-  padding: 8px 12px;
-}
-
-.navigator-controller__title {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #ffffff;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.day-indicator {
-  color: #ffffff;
-  font-weight: 600;
-  min-width: 120px;
-  text-align: center;
-}
-
-.navigator-service-date {
-  color: rgb(var(--v-theme-primary));
-  font-size: 0.95rem;
-  font-weight: 500;
 }
 
 .navigator-content {
   width: 100%;
-}
-
-@media (max-width: 700px) {
-  .navigator-controller {
-    flex-wrap: wrap;
-    justify-content: center;
-    border-radius: 20px;
-  }
 }
 </style>
