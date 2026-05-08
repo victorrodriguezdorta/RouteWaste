@@ -1,16 +1,18 @@
 package es.ull.project.adapter.mongodb.repository;
 
-import es.ull.project.application.repository.DailyPlanRepository;
-import es.ull.project.domain.entity.DailyPlan;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+
+import es.ull.project.application.repository.DailyPlanRepository;
+import es.ull.project.domain.entity.DailyPlan;
 
 /**
  * MongoDB implementation of the DailyPlanRepository interface.
@@ -25,7 +27,6 @@ public class DailyPlanMongoRepository implements DailyPlanRepository {
     public static final String COLLECTION_NAME = "daily_plans";
     private static final String FIELD_ID = "id";
     private static final String FIELD_INFRASTRUCTURE_PLAN_ID = "infrastructurePlanId";
-    private static final String FIELD_INFRASTRUCTURE_PLAN_NESTED_ID = "infrastructurePlan._id";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -84,7 +85,7 @@ public class DailyPlanMongoRepository implements DailyPlanRepository {
         if (infrastructurePlanId == null) {
             return List.of();
         }
-        Query query = new Query(Criteria.where(FIELD_INFRASTRUCTURE_PLAN_NESTED_ID).is(infrastructurePlanId));
+        Query query = new Query(Criteria.where(FIELD_INFRASTRUCTURE_PLAN_ID).is(infrastructurePlanId));
         return this.mongoTemplate.find(query, DailyPlan.class, COLLECTION_NAME);
     }
 }

@@ -228,8 +228,8 @@ public class ServiceConfiguration {
      * @return configured {@link ReadInfrastructurePlanService} instance
      */
     @Bean
-    public ReadInfrastructurePlanService readInfrastructurePlanService(InfrastructurePlanRepository repository) {
-        return new ReadInfrastructurePlanService(repository);
+    public ReadInfrastructurePlanService readInfrastructurePlanService(InfrastructurePlanRepository repository, DailyPlanRepository dailyPlanRepository) {
+        return new ReadInfrastructurePlanService(repository, dailyPlanRepository);
     }
 
     /**
