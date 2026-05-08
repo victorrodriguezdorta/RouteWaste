@@ -41,8 +41,8 @@ public class VehicleResponseBodySerializer extends StdSerializer<VehicleResponse
         gen.writeObjectFieldStart("capacityKilograms");
         gen.writeNumberField("Kilograms", value.capacityKilograms.getKilograms());
         gen.writeEndObject();
-        gen.writeObjectFieldStart("CapacityLiters");
-        gen.writeNumberField("liters", value.CapacityLiters.getLiters());
+        gen.writeObjectFieldStart("capacityLiters");
+        gen.writeNumberField("liters", value.capacityLiters.getLiters());
         gen.writeEndObject();
         gen.writeObjectFieldStart(JsonFields.COST_PER_KILOMETER);
         gen.writeNumberField(JsonFields.AMOUNT, value.costPerKilometer.getAmount());

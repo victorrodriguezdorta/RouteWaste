@@ -11,7 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import es.ull.project.adapter.mongodb.query.FacilitySearchCriteria;
+import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
@@ -26,8 +26,14 @@ public class InMemoryFacilityRepository implements FacilityRepository {
 
     private static final String FIELD_FACILITY_TYPE = "facilityType";
     private static final String FIELD_STATUS = "status";
+    private static final String FIELD_LOCATION = "location";
     private static final String FIELD_LOCATION_POSTAL_ADDRESS = "location.postalAddress";
     private static final String FIELD_CAPACITY_VALUE = "capacity.value";
+    private static final String FIELD_STORAGE_CAPACITY = "storageCapacity";
+    private static final String FIELD_PROCESSING_CAPACITY = "processingCapacity";
+    private static final String FIELD_UNLOADING_TIME = "unloadingTime";
+    private static final String FIELD_OPENING_FIXED_COST = "openingFixedCost";
+    private static final String FIELD_CURRENT_FILLING_LEVEL = "currentFillingLevel";
 
     private final Map<UUID, Facility> store = new LinkedHashMap<>();
 
@@ -167,20 +173,16 @@ public class InMemoryFacilityRepository implements FacilityRepository {
     @Override
     public Page<Facility> findAll(Pageable pageable, FacilitySearchCriteria criteria) {
         List<Facility> allFacilities = new ArrayList<>(store.values());
-        
-        // Apply criteria filters
         if (criteria != null && criteria.hasCriteria()) {
             allFacilities = allFacilities.stream()
                     .filter(f -> criteria.getFacilityType() == null || f.getFacilityType() == criteria.getFacilityType())
                     .filter(f -> criteria.getStatus() == null || f.getStatus() == criteria.getStatus())
-                    .filter(f -> criteria.getLocationPostalAddress() == null || 
+                    .filter(f -> criteria.getLocationPostalAddress() == null ||
                             (f.getLocation() != null && f.getLocation().getPostalAddress() != null &&
                              f.getLocation().getPostalAddress().toLowerCase()
                                 .contains(criteria.getLocationPostalAddress().toLowerCase())))
                     .toList();
         }
-        
-        // Apply sorting
         if (!pageable.getSort().isEmpty()) {
             allFacilities = new ArrayList<>(allFacilities);
             allFacilities.sort((f1, f2) -> {
@@ -188,34 +190,34 @@ public class InMemoryFacilityRepository implements FacilityRepository {
                     int cmp = ZERO;
                     String property = order.getProperty();
                     switch (property) {
-                        case "facilityType" -> cmp = f1.getFacilityType().compareTo(f2.getFacilityType());
-                        case "status" -> cmp = f1.getStatus().compareTo(f2.getStatus());
-                        case "location" -> {
+                        case FIELD_FACILITY_TYPE -> cmp = f1.getFacilityType().compareTo(f2.getFacilityType());
+                        case FIELD_STATUS -> cmp = f1.getStatus().compareTo(f2.getStatus());
+                        case FIELD_LOCATION -> {
                             String loc1 = f1.getLocation() != null ? f1.getLocation().getPostalAddress() : "";
                             String loc2 = f2.getLocation() != null ? f2.getLocation().getPostalAddress() : "";
                             cmp = loc1.compareTo(loc2);
                         }
-                        case "storageCapacity" -> {
+                        case FIELD_STORAGE_CAPACITY -> {
                             double cap1 = f1.getStorageCapacity() != null ? f1.getStorageCapacity().getKilograms() : 0.0;
                             double cap2 = f2.getStorageCapacity() != null ? f2.getStorageCapacity().getKilograms() : 0.0;
                             cmp = Double.compare(cap1, cap2);
                         }
-                        case "processingCapacity" -> {
+                        case FIELD_PROCESSING_CAPACITY -> {
                             double proc1 = f1.getProcessingCapacity() != null ? f1.getProcessingCapacity().getKilogramsPerDay() : 0.0;
                             double proc2 = f2.getProcessingCapacity() != null ? f2.getProcessingCapacity().getKilogramsPerDay() : 0.0;
                             cmp = Double.compare(proc1, proc2);
                         }
-                        case "unloadingTime" -> {
+                        case FIELD_UNLOADING_TIME -> {
                             int time1 = f1.getUnloadingTime() != null ? f1.getUnloadingTime().getMinutes() : 0;
                             int time2 = f2.getUnloadingTime() != null ? f2.getUnloadingTime().getMinutes() : 0;
                             cmp = Integer.compare(time1, time2);
                         }
-                        case "openingFixedCost" -> {
+                        case FIELD_OPENING_FIXED_COST -> {
                             double cost1 = f1.getOpeningFixedCost() != null ? f1.getOpeningFixedCost().getAmount() : 0.0;
                             double cost2 = f2.getOpeningFixedCost() != null ? f2.getOpeningFixedCost().getAmount() : 0.0;
                             cmp = Double.compare(cost1, cost2);
                         }
-                        case "currentFillingLevel" -> {
+                        case FIELD_CURRENT_FILLING_LEVEL -> {
                             double fill1 = f1.getCurrentFillingLevel() != null ? f1.getCurrentFillingLevel().getLitersPerDay() : 0.0;
                             double fill2 = f2.getCurrentFillingLevel() != null ? f2.getCurrentFillingLevel().getLitersPerDay() : 0.0;
                             cmp = Double.compare(fill1, fill2);
@@ -228,8 +230,6 @@ public class InMemoryFacilityRepository implements FacilityRepository {
                 return ZERO;
             });
         }
-        
-        // Apply pagination
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), allFacilities.size());
         List<Facility> pageContent;

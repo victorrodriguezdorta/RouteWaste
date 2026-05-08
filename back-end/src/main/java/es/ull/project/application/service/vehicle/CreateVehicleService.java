@@ -31,13 +31,13 @@ public class CreateVehicleService implements CreateVehicleUseCase {
      *
      * @param vehicleType the type of vehicle to create
      * @param capacityKilograms the transport capacity in kilograms
-     * @param CapacityLiters the transport capacity in liters
+     * @param capacityLiters the transport capacity in liters
      * @param costPerKilometer the transportation cost per kilometer
      * @return the newly created and persisted vehicle
      */
     @Override
-    public Vehicle create(VehicleType vehicleType, VehicleCapacityKilograms capacityKilograms, VehicleCapacityLiters CapacityLiters, TransportationVariableCost costPerKilometer) {
-        Vehicle newVehicle = new Vehicle(vehicleType, capacityKilograms, CapacityLiters, costPerKilometer);
+    public Vehicle create(VehicleType vehicleType, VehicleCapacityKilograms capacityKilograms, VehicleCapacityLiters capacityLiters, TransportationVariableCost costPerKilometer) {
+        Vehicle newVehicle = new Vehicle(vehicleType, capacityKilograms, capacityLiters, costPerKilometer);
         Vehicle saved = this.repository.save(newVehicle);
         return saved;
     }

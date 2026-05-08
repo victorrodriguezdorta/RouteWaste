@@ -1,12 +1,11 @@
 package es.ull.project.domain.entity;
 
-import java.util.Objects;
-import java.util.UUID;
-
 import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Vehicle
@@ -45,7 +44,7 @@ public class Vehicle {
      * Transport capacity of the vehicle in liters.
      * It is a required attribute.
      */
-    private VehicleCapacityLiters CapacityLiters;
+    private VehicleCapacityLiters capacityLiters;
 
     /**
      * Cost per kilometer of operation.
@@ -58,22 +57,22 @@ public class Vehicle {
      *
      * @param vehicleType       the type of vehicle
      * @param capacityKilograms the capacity of the vehicle in kilograms
-     * @param CapacityLiters    the capacity of the vehicle in liters
+     * @param capacityLiters    the capacity of the vehicle in liters
      * @param costPerKilometer  the cost per kilometer of operation
      */
     public Vehicle(
             VehicleType vehicleType,
             VehicleCapacityKilograms capacityKilograms,
-            VehicleCapacityLiters CapacityLiters,
+            VehicleCapacityLiters capacityLiters,
             TransportationVariableCost costPerKilometer) {
         validateVehicleType(vehicleType);
         validateCapacityKilograms(capacityKilograms);
-        validateCapacityLiters(CapacityLiters);
+        validateCapacityLiters(capacityLiters);
         validateCost(costPerKilometer);
         this.id = UUID.randomUUID();
         this.vehicleType = vehicleType;
         this.capacityKilograms = capacityKilograms;
-        this.CapacityLiters = CapacityLiters;
+        this.capacityLiters = capacityLiters;
         this.costPerKilometer = costPerKilometer;
     }
 
@@ -87,7 +86,7 @@ public class Vehicle {
         this.id = otherObject.id;
         this.vehicleType = otherObject.vehicleType;
         this.capacityKilograms = otherObject.capacityKilograms;
-        this.CapacityLiters = otherObject.CapacityLiters;
+        this.capacityLiters = otherObject.capacityLiters;
         this.costPerKilometer = otherObject.costPerKilometer;
     }
 
@@ -98,22 +97,22 @@ public class Vehicle {
      * @param id                the vehicle identifier
      * @param vehicleType       the type of vehicle
      * @param capacityKilograms the capacity in kilograms
-     * @param CapacityLiters    the capacity in liters
+     * @param capacityLiters    the capacity in liters
      * @param costPerKilometer  the cost per kilometer
      */
     public Vehicle(UUID id,
             VehicleType vehicleType,
             VehicleCapacityKilograms capacityKilograms,
-            VehicleCapacityLiters CapacityLiters,
+            VehicleCapacityLiters capacityLiters,
             TransportationVariableCost costPerKilometer) {
         validateVehicleType(vehicleType);
         validateCapacityKilograms(capacityKilograms);
-        validateCapacityLiters(CapacityLiters);
+        validateCapacityLiters(capacityLiters);
         validateCost(costPerKilometer);
         this.id = id;
         this.vehicleType = vehicleType;
         this.capacityKilograms = capacityKilograms;
-        this.CapacityLiters = CapacityLiters;
+        this.capacityLiters = capacityLiters;
         this.costPerKilometer = costPerKilometer;
     }
 
@@ -218,7 +217,7 @@ public class Vehicle {
      * @return the transport capacity in liters
      */
     public VehicleCapacityLiters getCapacityLiters() {
-        return this.CapacityLiters;
+        return this.capacityLiters;
     }
 
     /**
@@ -228,7 +227,7 @@ public class Vehicle {
      */
     public void updateCapacityLiters(VehicleCapacityLiters capacity) {
         validateCapacityLiters(capacity);
-        this.CapacityLiters = capacity;
+        this.capacityLiters = capacity;
     }
 
     /**
@@ -286,11 +285,11 @@ public class Vehicle {
     @Override
     public String toString() {
         return String.format(
-                "Vehicle={id=%s, type=%s, capacityKilograms=%s, CapacityLiters=%s, costPerKm=%s}",
+                "Vehicle={id=%s, type=%s, capacityKilograms=%s, capacityLiters=%s, costPerKm=%s}",
                 this.id,
                 this.vehicleType,
                 this.capacityKilograms,
-                this.CapacityLiters,
+                this.capacityLiters,
                 this.costPerKilometer);
     }
 }

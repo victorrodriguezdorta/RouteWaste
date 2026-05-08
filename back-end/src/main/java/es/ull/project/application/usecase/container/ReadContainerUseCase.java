@@ -1,15 +1,13 @@
 package es.ull.project.application.usecase.container;
 
+import es.ull.project.application.query.ContainerSearchCriteria;
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
 import java.util.List;
 import java.util.UUID;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
-
-import es.ull.project.adapter.mongodb.query.ContainerSearchCriteria;
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.enumerate.WasteType;
 
 /**
  * Use case for reading containers.

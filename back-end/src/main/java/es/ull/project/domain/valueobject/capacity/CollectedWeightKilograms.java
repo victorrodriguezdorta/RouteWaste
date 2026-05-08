@@ -16,6 +16,7 @@ public final class CollectedWeightKilograms {
 
     /**
      * Weight in kilograms.
+     * It is a required attribute.
      */
     private final double kilograms;
 
@@ -60,6 +61,12 @@ public final class CollectedWeightKilograms {
         return kilograms;
     }
 
+    /**
+     * Checks equality based on the kilograms value.
+     *
+     * @param otherObject the object to compare with
+     * @return {@code true} if the other object is a CollectedWeightKilograms with the same value
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
@@ -69,14 +76,24 @@ public final class CollectedWeightKilograms {
             return false;
         }
         CollectedWeightKilograms other = (CollectedWeightKilograms) otherObject;
-        return Double.compare(other.kilograms, kilograms) == 0;
+        return Double.compare(other.kilograms, kilograms) == (int) ZERO;
     }
 
+    /**
+     * Returns a hash code based on the kilograms value.
+     *
+     * @return hash code for this instance
+     */
     @Override
     public int hashCode() {
         return Objects.hash(kilograms);
     }
 
+    /**
+     * Returns a human-readable string representation of this value object.
+     *
+     * @return string representation including the kilograms value
+     */
     @Override
     public String toString() {
         return String.format("CollectedWeightKilograms={%.2f kg}", kilograms);

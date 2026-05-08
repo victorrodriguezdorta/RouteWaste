@@ -68,7 +68,7 @@ public class ServiceAssignment {
     public ServiceAssignment(ServiceAssignment otherObject) {
         this.id = otherObject.id;
         this.infrastructurePlan = otherObject.infrastructurePlan;
-        this.facility = otherObject.facility; // Assumes facility itself is managed elsewhere
+        this.facility = otherObject.facility;
         this.assignedContainers = new ArrayList<>(otherObject.assignedContainers);
     }
 

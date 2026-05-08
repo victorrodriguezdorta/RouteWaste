@@ -10,6 +10,9 @@ public class InfrastructurePlanListResponseMapper {
 
     private static final String UTILITY_CLASS_EXCEPTION_MESSAGE = "Utility class cannot be instantiated";
 
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
     private InfrastructurePlanListResponseMapper() {
         throw new UnsupportedOperationException(UTILITY_CLASS_EXCEPTION_MESSAGE);
     }

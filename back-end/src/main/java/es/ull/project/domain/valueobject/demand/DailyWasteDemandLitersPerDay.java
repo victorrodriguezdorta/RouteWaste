@@ -43,6 +43,7 @@ public final class DailyWasteDemandLitersPerDay {
      *
      * @return Demand value in liters per day
      */
+    @com.fasterxml.jackson.annotation.JsonValue
     public double getLitersPerDay() {
         return this.litersPerDay;
     }

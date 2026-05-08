@@ -5,9 +5,10 @@ import es.ull.project.domain.enumerate.WasteType;
 /**
  * Encapsulates search criteria for Container queries.
  * Supports dynamic filtering by multiple attributes.
- * 
+ *
  * This class allows building flexible queries without changing the repository
  * or controller code. Criteria can be easily added or removed.
+ * Instances are created via {@link ContainerSearchCriteriaBuilder}.
  */
 public class ContainerSearchCriteria {
 
@@ -19,43 +20,81 @@ public class ContainerSearchCriteria {
     private Integer maxDailyDemand;
     private String locationPostalAddress;
 
-    // Private constructor for builder pattern
-    private ContainerSearchCriteria() {}
+    /**
+     * Private constructor enforcing use of {@link ContainerSearchCriteriaBuilder}.
+     */
+    ContainerSearchCriteria() {}
 
-    // Getters
+    /**
+     * Returns the waste type filter criterion.
+     *
+     * @return the {@link WasteType} to filter by, or {@code null} if not set
+     */
     public WasteType getWasteType() {
         return wasteType;
     }
 
+    /**
+     * Returns the service zone filter criterion.
+     *
+     * @return the service zone string to filter by, or {@code null} if not set
+     */
     public String getServiceZone() {
         return serviceZone;
     }
 
+    /**
+     * Returns the minimum capacity filter criterion in liters.
+     *
+     * @return the minimum capacity in liters, or {@code null} if not set
+     */
     public Integer getMinCapacityLiters() {
         return minCapacityLiters;
     }
 
+    /**
+     * Returns the maximum capacity filter criterion in liters.
+     *
+     * @return the maximum capacity in liters, or {@code null} if not set
+     */
     public Integer getMaxCapacityLiters() {
         return maxCapacityLiters;
     }
 
+    /**
+     * Returns the minimum daily demand filter criterion.
+     *
+     * @return the minimum daily demand, or {@code null} if not set
+     */
     public Integer getMinDailyDemand() {
         return minDailyDemand;
     }
 
+    /**
+     * Returns the maximum daily demand filter criterion.
+     *
+     * @return the maximum daily demand, or {@code null} if not set
+     */
     public Integer getMaxDailyDemand() {
         return maxDailyDemand;
     }
 
+    /**
+     * Returns the location postal address filter criterion.
+     *
+     * @return the postal address substring to filter by, or {@code null} if not set
+     */
     public String getLocationPostalAddress() {
         return locationPostalAddress;
     }
 
     /**
-     * Check if any criteria is set.
+     * Checks whether any search criterion has been set.
+     *
+     * @return {@code true} if at least one criterion is non-null, {@code false} otherwise
      */
     public boolean hasCriteria() {
-        return wasteType != null 
+        return wasteType != null
             || serviceZone != null
             || minCapacityLiters != null
             || maxCapacityLiters != null
@@ -65,62 +104,65 @@ public class ContainerSearchCriteria {
     }
 
     /**
-     * Builder pattern for constructing search criteria.
+     * Sets the waste type criterion (package-private, called by builder).
+     *
+     * @param wasteType the waste type to filter by
      */
-    public static class Builder {
-        private WasteType wasteType;
-        private String serviceZone;
-        private Integer minCapacityLiters;
-        private Integer maxCapacityLiters;
-        private Integer minDailyDemand;
-        private Integer maxDailyDemand;
-        private String locationPostalAddress;
+    void setWasteType(WasteType wasteType) {
+        this.wasteType = wasteType;
+    }
 
-        public Builder withWasteType(WasteType wasteType) {
-            this.wasteType = wasteType;
-            return this;
-        }
+    /**
+     * Sets the service zone criterion (package-private, called by builder).
+     *
+     * @param serviceZone the service zone to filter by
+     */
+    void setServiceZone(String serviceZone) {
+        this.serviceZone = serviceZone;
+    }
 
-        public Builder withServiceZone(String serviceZone) {
-            this.serviceZone = serviceZone == null || serviceZone.isBlank() ? null : serviceZone;
-            return this;
-        }
+    /**
+     * Sets the minimum capacity criterion in liters (package-private, called by builder).
+     *
+     * @param minCapacityLiters the minimum capacity in liters
+     */
+    void setMinCapacityLiters(Integer minCapacityLiters) {
+        this.minCapacityLiters = minCapacityLiters;
+    }
 
-        public Builder withMinCapacityLiters(Integer minCapacity) {
-            this.minCapacityLiters = minCapacity;
-            return this;
-        }
+    /**
+     * Sets the maximum capacity criterion in liters (package-private, called by builder).
+     *
+     * @param maxCapacityLiters the maximum capacity in liters
+     */
+    void setMaxCapacityLiters(Integer maxCapacityLiters) {
+        this.maxCapacityLiters = maxCapacityLiters;
+    }
 
-        public Builder withMaxCapacityLiters(Integer maxCapacity) {
-            this.maxCapacityLiters = maxCapacity;
-            return this;
-        }
+    /**
+     * Sets the minimum daily demand criterion (package-private, called by builder).
+     *
+     * @param minDailyDemand the minimum daily demand
+     */
+    void setMinDailyDemand(Integer minDailyDemand) {
+        this.minDailyDemand = minDailyDemand;
+    }
 
-        public Builder withMinDailyDemand(Integer minDemand) {
-            this.minDailyDemand = minDemand;
-            return this;
-        }
+    /**
+     * Sets the maximum daily demand criterion (package-private, called by builder).
+     *
+     * @param maxDailyDemand the maximum daily demand
+     */
+    void setMaxDailyDemand(Integer maxDailyDemand) {
+        this.maxDailyDemand = maxDailyDemand;
+    }
 
-        public Builder withMaxDailyDemand(Integer maxDemand) {
-            this.maxDailyDemand = maxDemand;
-            return this;
-        }
-
-        public Builder withLocationPostalAddress(String postalAddress) {
-            this.locationPostalAddress = postalAddress == null || postalAddress.isBlank() ? null : postalAddress;
-            return this;
-        }
-
-        public ContainerSearchCriteria build() {
-            ContainerSearchCriteria criteria = new ContainerSearchCriteria();
-            criteria.wasteType = this.wasteType;
-            criteria.serviceZone = this.serviceZone;
-            criteria.minCapacityLiters = this.minCapacityLiters;
-            criteria.maxCapacityLiters = this.maxCapacityLiters;
-            criteria.minDailyDemand = this.minDailyDemand;
-            criteria.maxDailyDemand = this.maxDailyDemand;
-            criteria.locationPostalAddress = this.locationPostalAddress;
-            return criteria;
-        }
+    /**
+     * Sets the location postal address criterion (package-private, called by builder).
+     *
+     * @param locationPostalAddress the postal address substring to filter by
+     */
+    void setLocationPostalAddress(String locationPostalAddress) {
+        this.locationPostalAddress = locationPostalAddress;
     }
 }

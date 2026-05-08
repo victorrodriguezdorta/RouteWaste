@@ -22,18 +22,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.ull.project.adapter.mongodb.mapper.ContainerFieldMapper;
-import es.ull.project.adapter.mongodb.query.ContainerSearchCriteria;
+import es.ull.project.adapter.mongodb.query.ContainerSearchCriteriaBuilder;
 import es.ull.project.adapter.rest.mapper.ContainerResponseMapper;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
 import es.ull.project.adapter.rest.response.container.ContainerPageResponseBody;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
+import es.ull.project.application.query.ContainerSearchCriteria;
 import es.ull.project.application.usecase.container.CreateContainerUseCase;
 import es.ull.project.application.usecase.container.DeleteContainerUseCase;
 import es.ull.project.application.usecase.container.ReadContainerUseCase;
 import es.ull.project.application.usecase.container.UpdateContainerUseCase;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.WasteType;
+import es.ull.project.domain.valueobject.page.NumberOfElements;
+import es.ull.project.domain.valueobject.page.PageFlag;
+import es.ull.project.domain.valueobject.page.PageNumber;
+import es.ull.project.domain.valueobject.page.PageSize;
+import es.ull.project.domain.valueobject.page.TotalElements;
+import es.ull.project.domain.valueobject.page.TotalPages;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -123,21 +130,13 @@ public class ContainerController {
             @Parameter(description = "Minimum daily demand") @RequestParam(required = false) Integer minDemand,
             @Parameter(description = "Maximum daily demand") @RequestParam(required = false) Integer maxDemand,
             @Parameter(description = "Filter by location (postal address)") @RequestParam(required = false) String location) {
-        
-        // Validate pagination parameters
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        // Build sort configuration
         Sort sort = buildSort(sortBy, sortOrder);
-
-        // Validate sort field if provided
         if (sortBy != null && !sortBy.isBlank() && !ContainerFieldMapper.isValidField(sortBy)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        // Validate waste type if provided
         WasteType wasteTypeFilter = null;
         if (wasteType != null && !wasteType.isBlank()) {
             try {
@@ -146,9 +145,7 @@ public class ContainerController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-
-        // Build search criteria
-        ContainerSearchCriteria criteria = new ContainerSearchCriteria.Builder()
+        ContainerSearchCriteria criteria = new ContainerSearchCriteriaBuilder()
                 .withWasteType(wasteTypeFilter)
                 .withServiceZone(serviceZone)
                 .withMinCapacityLiters(minCapacity)
@@ -157,12 +154,8 @@ public class ContainerController {
                 .withMaxDailyDemand(maxDemand)
                 .withLocationPostalAddress(location)
                 .build();
-
-        // Execute query
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Container> containerPage = this.readContainerUseCase.fetchAll(pageable, criteria);
-
-        // Map and return response
         return buildSuccessResponse(containerPage);
     }
 
@@ -178,16 +171,13 @@ public class ContainerController {
         if (sortBy == null || sortBy.isBlank()) {
             return Sort.unsorted();
         }
-
         String mongoField = ContainerFieldMapper.toMongoField(sortBy);
         if (mongoField == null) {
             return Sort.unsorted();
         }
-
-        Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder) 
-                ? Sort.Direction.DESC 
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder)
+                ? Sort.Direction.DESC
                 : Sort.Direction.ASC;
-        
         return Sort.by(direction, mongoField);
     }
 
@@ -201,17 +191,15 @@ public class ContainerController {
         List<ContainerResponseBody> responseBodies = containerPage.getContent().stream()
                 .map(ContainerResponseMapper::toResponseBody)
                 .toList();
-        
         ContainerPageResponseBody response = new ContainerPageResponseBody();
         response.content = responseBodies;
-        response.totalElements = containerPage.getTotalElements();
-        response.totalPages = containerPage.getTotalPages();
-        response.page = containerPage.getNumber();
-        response.size = containerPage.getSize();
-        response.numberOfElements = containerPage.getNumberOfElements();
-        response.first = containerPage.isFirst();
-        response.last = containerPage.isLast();
-        
+        response.totalElements = new TotalElements(containerPage.getTotalElements());
+        response.totalPages = new TotalPages(containerPage.getTotalPages());
+        response.page = new PageNumber(containerPage.getNumber());
+        response.size = new PageSize(containerPage.getSize());
+        response.numberOfElements = new NumberOfElements(containerPage.getNumberOfElements());
+        response.first = new PageFlag(containerPage.isFirst());
+        response.last = new PageFlag(containerPage.isLast());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

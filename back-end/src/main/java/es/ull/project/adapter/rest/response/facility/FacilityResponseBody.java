@@ -5,10 +5,9 @@ import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
 import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.UnloadingTime;
-import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
-
 import java.util.UUID;
 
 /**

@@ -23,7 +23,7 @@ export class VehicleJsonResponse {
     Kilograms: number;
   };
   /** Capacity in liters. */
-  CapacityLiters: {
+  capacityLiters: {
     liters: number;
   };
   /** Cost per kilometer encoded as primitives. */
@@ -36,21 +36,21 @@ export class VehicleJsonResponse {
    * Create a JSON representation instance.
    * @param id resource id
    * @param capacityKilograms capacity in kilograms 
-   * @param CapacityLiters capacity in liters
+   * @param capacityLiters capacity in liters
    * @param costPerKilometer cost pieces (amount and optional currency code)
    * @param vehicleType optional vehicle type string
    */
   constructor(
     id: string,
     capacityKilograms: { Kilograms: number },
-    CapacityLiters: { liters: number },
+    capacityLiters: { liters: number },
     costPerKilometer: { amount: number; currency?: string },
     vehicleType?: string
   ) {
     this.id = id;
     this.vehicleType = vehicleType;
     this.capacityKilograms = capacityKilograms;
-    this.CapacityLiters = CapacityLiters;
+    this.capacityLiters = capacityLiters;
     this.costPerKilometer = costPerKilometer;
   }
 
@@ -64,7 +64,7 @@ export class VehicleJsonResponse {
   public static toVehicle(data: VehicleJsonResponse): Vehicle {
     const id = new UllUUID(data.id);
     const capacityKg = new VehicleCapacityKilograms(data.capacityKilograms.Kilograms);
-    const capacityL = new VehicleCapacityLiters(data.CapacityLiters.liters);
+    const capacityL = new VehicleCapacityLiters(data.capacityLiters.liters);
     const cost = new TransportationVariableCost(data.costPerKilometer.amount, data.costPerKilometer.currency);
     const vehicleType = data.vehicleType ? vehicleTypeFromString(data.vehicleType) : undefined;
 

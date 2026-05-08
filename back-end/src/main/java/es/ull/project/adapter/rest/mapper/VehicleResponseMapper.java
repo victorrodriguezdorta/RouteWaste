@@ -30,7 +30,7 @@ public class VehicleResponseMapper {
         responseBody.id = vehicle.getId();
         responseBody.vehicleType = vehicle.getVehicleType();
         responseBody.capacityKilograms = vehicle.getCapacityKilograms();
-        responseBody.CapacityLiters = vehicle.getCapacityLiters();
+        responseBody.capacityLiters = vehicle.getCapacityLiters();
         responseBody.costPerKilometer = vehicle.getCostPerKilometer();
         return responseBody;
     }

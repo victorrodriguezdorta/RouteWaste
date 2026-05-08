@@ -1,13 +1,11 @@
 package es.ull.project.adapter.rest.serialization.facility;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
+import java.io.IOException;
 
 /**
  * Custom JSON serializer for FacilityResponseBody

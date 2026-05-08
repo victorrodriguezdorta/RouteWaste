@@ -36,7 +36,7 @@ public class VehiclePutRequestBody {
      * Transport capacity of the vehicle in liters.
      * Required field.
      */
-    public VehicleCapacityLiters CapacityLiters;
+    public VehicleCapacityLiters capacityLiters;
 
     /**
      * Cost per kilometer of operation.
@@ -52,10 +52,10 @@ public class VehiclePutRequestBody {
     @Override
     public String toString() {
         return String.format(
-                "VehiclePutRequestBody={vehicleType=%s, capacityKilograms=%s, CapacityLiters=%s, costPerKilometer=%s}",
+                "VehiclePutRequestBody={vehicleType=%s, capacityKilograms=%s, capacityLiters=%s, costPerKilometer=%s}",
                 this.vehicleType,
                 this.capacityKilograms,
-                this.CapacityLiters,
+                this.capacityLiters,
                 this.costPerKilometer);
     }
 }

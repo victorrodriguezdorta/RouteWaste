@@ -1,9 +1,10 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import es.ull.project.application.repository.InfrastructurePlanRepository;
+import es.ull.project.domain.entity.InfrastructurePlan;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -13,9 +14,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-
-import es.ull.project.application.repository.InfrastructurePlanRepository;
-import es.ull.project.domain.entity.InfrastructurePlan;
 
 /**
  * MongoDB implementation of the InfrastructurePlanRepository interface.

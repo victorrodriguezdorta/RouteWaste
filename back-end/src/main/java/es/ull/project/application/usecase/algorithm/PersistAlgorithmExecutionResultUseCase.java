@@ -1,8 +1,10 @@
 package es.ull.project.application.usecase.algorithm;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
 
 /**
  * Use case for persisting the algorithm execution result.
@@ -18,5 +20,9 @@ public interface PersistAlgorithmExecutionResultUseCase {
      * @param providedMaxBudget optional maximum budget provided in the request
      * @return the persisted infrastructure plan
      */
-    InfrastructurePlan persist(JsonNode algorithmResponse, Integer numberOfDays, Integer averagePickupTimeMinutes, es.ull.project.domain.valueobject.cost.MaximumBudget providedMaxBudget);
+    InfrastructurePlan persist(
+            AlgorithmJsonPayload algorithmResponse,
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes,
+            MaximumBudget providedMaxBudget);
 }

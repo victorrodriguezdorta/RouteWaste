@@ -1,8 +1,5 @@
 package es.ull.project.domain.entity;
 
-import java.util.Objects;
-import java.util.UUID;
-
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
@@ -11,6 +8,8 @@ import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Facility
@@ -34,6 +33,9 @@ public class Facility {
     public static final String STATUS_NOT_DEFINED = "Facility status is not defined";
     public static final String FACILITY_DISCARDED = "Facility is discarded and cannot receive assignments";
     public static final String STORAGE_CAPACITY_EXCEEDED = "Facility storage capacity exceeded";
+    private static final String ERROR_PROCESSING_AMOUNT_NEGATIVE = "Processing amount cannot be negative";
+    private static final String ERROR_WASTE_AMOUNT_NEGATIVE = "Waste amount cannot be negative";
+    private static final int ZERO = 0;
 
     /**
      * Identifier of the facility.
@@ -300,11 +302,9 @@ public class Facility {
      * @param processingAmount Amount to process in kilograms
      */
     public void processWaste(double processingAmount) {
-        if (processingAmount < 0) {
-            throw new IllegalArgumentException("Processing amount cannot be negative");
+        if (processingAmount < ZERO) {
+            throw new IllegalArgumentException(ERROR_PROCESSING_AMOUNT_NEGATIVE);
         }
-        // Note: Processing affects the filling level indirectly
-        // The actual relationship between kilograms and liters per day depends on business logic
     }
 
     /**
@@ -317,11 +317,9 @@ public class Facility {
         if (this.status.isDiscarded()) {
             throw new IllegalStateException(FACILITY_DISCARDED);
         }
-        if (wasteAmountInKilograms < 0) {
-            throw new IllegalArgumentException("Waste amount cannot be negative");
+        if (wasteAmountInKilograms < ZERO) {
+            throw new IllegalArgumentException(ERROR_WASTE_AMOUNT_NEGATIVE);
         }
-        // Check if storage capacity is exceeded
-        // Note: Conversion from kg to liters per day depends on business rules
     }
 
     /**

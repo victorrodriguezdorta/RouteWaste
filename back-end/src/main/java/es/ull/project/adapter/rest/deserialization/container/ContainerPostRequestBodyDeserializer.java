@@ -1,14 +1,9 @@
 package es.ull.project.adapter.rest.deserialization.container;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.exception.FieldError;
 import es.ull.project.adapter.rest.exception.ValidationException;
@@ -18,6 +13,9 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ContainerPostRequestBodyDeserializer
@@ -32,6 +30,9 @@ import es.ull.project.domain.valueobject.location.Location;
  * by extracting their constituent parts from the JSON structure.
  */
 public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<ContainerPostRequestBody> {
+
+    private static final String FIELD_LITERS = "liters";
+    private static final String FIELD_LITERS_PER_DAY = "litersPerDay";
 
     /**
      * Deserializes JSON content into a ContainerPostRequestBody object.
@@ -173,13 +174,10 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
         try {
             JsonNode capacityNode = rootNode.get(JsonFields.CAPACITY_LITERS);
             double liters;
-            
             if (capacityNode.isNumber()) {
-                // Simple number format
                 liters = capacityNode.asDouble();
-            } else if (capacityNode.isObject() && capacityNode.has("liters")) {
-                // Nested object format {liters: number}
-                liters = capacityNode.get("liters").asDouble();
+            } else if (capacityNode.isObject() && capacityNode.has(FIELD_LITERS)) {
+                liters = capacityNode.get(FIELD_LITERS).asDouble();
             } else {
                 errors.add(new FieldError(JsonFields.CAPACITY_LITERS, "Must be a valid number or object with 'liters' field"));
                 return null;
@@ -207,13 +205,10 @@ public class ContainerPostRequestBodyDeserializer extends JsonDeserializer<Conta
         try {
             JsonNode demandNode = rootNode.get(JsonFields.DAILY_DEMAND_LITERS_PER_DAY);
             double litersPerDay;
-            
             if (demandNode.isNumber()) {
-                // Simple number format
                 litersPerDay = demandNode.asDouble();
-            } else if (demandNode.isObject() && demandNode.has("litersPerDay")) {
-                // Nested object format {litersPerDay: number}
-                litersPerDay = demandNode.get("litersPerDay").asDouble();
+            } else if (demandNode.isObject() && demandNode.has(FIELD_LITERS_PER_DAY)) {
+                litersPerDay = demandNode.get(FIELD_LITERS_PER_DAY).asDouble();
             } else {
                 errors.add(new FieldError(JsonFields.DAILY_DEMAND_LITERS_PER_DAY, "Must be a valid number or object with 'litersPerDay' field"));
                 return null;

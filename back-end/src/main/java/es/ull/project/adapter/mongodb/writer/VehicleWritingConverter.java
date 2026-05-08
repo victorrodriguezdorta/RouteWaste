@@ -1,17 +1,16 @@
 package es.ull.project.adapter.mongodb.writer;
 
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.lang.NonNull;
-
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.configuration.MongoConfiguration;
-import es.ull.project.domain.entity.Vehicle;
-import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
-import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 
 /**
  * VehicleWritingConverter
@@ -48,24 +47,19 @@ public class VehicleWritingConverter implements Converter<Vehicle, Document> {
         Document document = new Document();
         document.put(MongoFields.ID, vehicle.getId());
         document.put(MongoFields.VEHICLE_TYPE, vehicle.getVehicleType().toString());
-        
-        // Convert capacity in kilograms
         VehicleCapacityKilograms capacityKg = vehicle.getCapacityKilograms();
         Document capacityKgDocument = new Document();
         capacityKgDocument.put(MongoFields.CAPACITY_Kilograms_VALUE, capacityKg.getKilograms());
         document.put(MongoFields.CAPACITY_Kilograms, capacityKgDocument);
-        
-        // Convert capacity in liters
         VehicleCapacityLiters capacityL = vehicle.getCapacityLiters();
         Document capacityLDocument = new Document();
         capacityLDocument.put(MongoFields.CAPACITY_liters_VALUE, capacityL.getLiters());
         document.put(MongoFields.CAPACITY_liters, capacityLDocument);
-        
         Document costDocument = new Document();
-        costDocument.put(MongoFields.COST_PER_KILOMETER_AMOUNT, 
+        costDocument.put(MongoFields.COST_PER_KILOMETER_AMOUNT,
             vehicle.getCostPerKilometer().getAmount());
         vehicle.getCostPerKilometer().getCurrency().ifPresent(currency ->
-            costDocument.put(MongoFields.COST_PER_KILOMETER_CURRENCY, 
+            costDocument.put(MongoFields.COST_PER_KILOMETER_CURRENCY,
                 currency.getCode())
         );
         document.put(MongoFields.COST_PER_KILOMETER, costDocument);

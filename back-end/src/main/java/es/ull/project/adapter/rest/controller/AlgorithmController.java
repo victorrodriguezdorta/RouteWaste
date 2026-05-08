@@ -27,6 +27,9 @@ import es.ull.project.application.usecase.algorithm.AlgorithmExecutionSelection;
 import es.ull.project.application.usecase.algorithm.ExecuteAlgorithmUseCase;
 import es.ull.project.application.usecase.algorithm.PersistAlgorithmExecutionResultUseCase;
 import es.ull.project.application.usecase.algorithm.RunAlgorithmUseCase;
+import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,6 +46,30 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @RestController
 @RequestMapping(ApiRoutes.ALGORITHMS)
 public class AlgorithmController {
+
+    private static final int ZERO = 0;
+    private static final String KEY_STATUS = "status";
+    private static final String KEY_MESSAGE = "message";
+    private static final String KEY_DETAILS = "details";
+    private static final String KEY_PLAN_ID = "infrastructurePlanId";
+    private static final String STATUS_ERROR = "error";
+    private static final String STATUS_SUCCESS = "success";
+    private static final String MSG_RUNNER_FAILED = "Failed to send algorithm to runner";
+    private static final String MSG_PARSE_FAILED = "Failed to parse algorithm response";
+    private static final String MSG_PERSIST_FAILED = "Failed to persist the algorithm response";
+    private static final String MSG_PERSIST_SUCCESS = "Algorithm executed and persisted successfully";
+    private static final String ERR_SERIALIZE = "Failed to serialize the processed algorithm payload";
+    private static final String ERR_PARSE = "Failed to parse the algorithm response";
+    private static final String ERR_PERSIST = "Failed to persist the algorithm response";
+    private static final String ERR_NO_FACILITIES = "facilitiesWithVehicles is required";
+    private static final String ERR_NO_SELECTION = "Each facility selection must be defined";
+    private static final String ERR_NO_IDS = "A required identifier list is missing";
+    private static final String FIELD_NUMBER_OF_DAYS = "numberOfDays";
+    private static final String FIELD_AVERAGE_PICKUP = "averagePickupTimeMinutes";
+    private static final String FIELD_FACILITY_ID = "facilityId";
+    private static final String FIELD_IDENTIFIER = "identifier";
+    private static final String DEFAULT_CURRENCY = "EUR";
+    private static final String EMPTY_STRING = "";
 
     /**
      * Use case for executing the algorithm request flow.
@@ -94,87 +121,77 @@ public class AlgorithmController {
             @Parameter(description = "Algorithm execution request data") @RequestBody AlgorithmExecutionRequestBody requestBody) {
         List<AlgorithmExecutionSelection> facilitiesWithVehicles = this.mapFacilitySelections(
                 requestBody.facilitiesWithVehicles);
-        List<UUID> selectedContainerIds = this.mapUuidList(requestBody.selectedContainerIds);
-
-        Integer numberOfDays = this.requirePositiveInteger(requestBody.numberOfDays, "numberOfDays");
-        Integer averagePickupTimeMinutes = this.requirePositiveInteger(requestBody.averagePickupTimeMinutes, "averagePickupTimeMinutes");
-
+        List<UUID> selectedContainerIds = requestBody.selectedContainerIds != null
+                ? requestBody.selectedContainerIds
+                : this.emptyOrThrow();
+        NumberOfDays numberOfDaysVo = new NumberOfDays(this.requirePositiveInteger(requestBody.numberOfDays, FIELD_NUMBER_OF_DAYS));
+        AveragePickupTimeMinutes averagePickupTimeMinutesVo = new AveragePickupTimeMinutes(this.requirePositiveInteger(requestBody.averagePickupTimeMinutes, FIELD_AVERAGE_PICKUP));
         MaximumBudget providedMaxBudget = null;
         if (requestBody.maxBudget != null && requestBody.maxBudget.amount != null) {
-            if (requestBody.maxBudget.currency != null && !requestBody.maxBudget.currency.isBlank()) {
-                providedMaxBudget = new MaximumBudget(requestBody.maxBudget.amount, requestBody.maxBudget.currency);
-            } else {
-                providedMaxBudget = new MaximumBudget(requestBody.maxBudget.amount);
-            }
+            providedMaxBudget = requestBody.maxBudget.amount;
         }
-
         AlgorithmExecutionResult result = this.executeAlgorithmUseCase.execute(
                 facilitiesWithVehicles,
                 selectedContainerIds,
-                numberOfDays,
-                averagePickupTimeMinutes);
-
+                numberOfDaysVo,
+                averagePickupTimeMinutesVo);
         AlgorithmExecutionResponseBody processedResponseBody = AlgorithmExecutionResponseMapper.toResponseBody(result);
         if (providedMaxBudget != null) {
             MaximumBudgetResponseBody maxBudgetResponse = new MaximumBudgetResponseBody();
             maxBudgetResponse.amount = providedMaxBudget.getAmount();
-            maxBudgetResponse.currency = providedMaxBudget.getCurrency().map(c -> c.getCode()).orElse("EUR");
+            maxBudgetResponse.currency = providedMaxBudget.getCurrency().map(c -> c.getCode()).orElse(DEFAULT_CURRENCY);
             processedResponseBody.maxBudget = maxBudgetResponse;
         }
-
         String processedJson = this.serializeProcessedResponse(processedResponseBody);
-
-        String algorithmJson;
+        AlgorithmJsonPayload algorithmJsonPayload;
         try {
-            algorithmJson = this.runAlgorithmUseCase.execute(processedJson);
+            algorithmJsonPayload = this.runAlgorithmUseCase.execute(new AlgorithmJsonPayload(processedJson));
         } catch (RuntimeException e) {
             ObjectNode error = this.objectMapper.createObjectNode();
-            error.put("status", "error");
-            error.put("message", "Failed to send algorithm to runner");
-            error.put("details", e.getMessage() != null ? e.getMessage() : "");
+            error.put(KEY_STATUS, STATUS_ERROR);
+            error.put(KEY_MESSAGE, MSG_RUNNER_FAILED);
+            error.put(KEY_DETAILS, e.getMessage() != null ? e.getMessage() : EMPTY_STRING);
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
         JsonNode responseBody;
         try {
-            responseBody = this.deserializeAlgorithmResponse(algorithmJson);
+            responseBody = this.deserializeAlgorithmResponse(algorithmJsonPayload.getJson());
         } catch (AlgorithmExecutionException e) {
             ObjectNode error = this.objectMapper.createObjectNode();
-            error.put("status", "error");
-            error.put("message", "Failed to parse algorithm response");
-            error.put("details", e.getMessage() != null ? e.getMessage() : "");
+            error.put(KEY_STATUS, STATUS_ERROR);
+            error.put(KEY_MESSAGE, MSG_PARSE_FAILED);
+            error.put(KEY_DETAILS, e.getMessage() != null ? e.getMessage() : EMPTY_STRING);
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        // Persist result and return success with persisted plan id
         try {
-            es.ull.project.domain.entity.InfrastructurePlan persisted = this.persistAlgorithmExecutionResultUseCase.persist(responseBody, numberOfDays, averagePickupTimeMinutes, providedMaxBudget);
+            es.ull.project.domain.entity.InfrastructurePlan persisted = this.persistAlgorithmExecutionResultUseCase.persist(algorithmJsonPayload, numberOfDaysVo, averagePickupTimeMinutesVo, providedMaxBudget);
             ObjectNode success = this.objectMapper.createObjectNode();
-            success.put("status", "success");
-            success.put("message", "Algorithm executed and persisted successfully");
+            success.put(KEY_STATUS, STATUS_SUCCESS);
+            success.put(KEY_MESSAGE, MSG_PERSIST_SUCCESS);
             if (persisted != null && persisted.getId() != null) {
-                success.put("infrastructurePlanId", persisted.getId().toString());
+                success.put(KEY_PLAN_ID, persisted.getId().toString());
             }
             return new ResponseEntity<>(success, HttpStatus.OK);
         } catch (RuntimeException e) {
             ObjectNode error = this.objectMapper.createObjectNode();
-            error.put("status", "error");
-            error.put("message", "Failed to persist the algorithm response");
-            error.put("details", e.getMessage() != null ? e.getMessage() : "");
+            error.put(KEY_STATUS, STATUS_ERROR);
+            error.put(KEY_MESSAGE, MSG_PERSIST_FAILED);
+            error.put(KEY_DETAILS, e.getMessage() != null ? e.getMessage() : EMPTY_STRING);
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     /**
-      * Serializes the processed response body before sending it to the algorithm.
-      *
-      * @return serialized JSON string
-      */
+     * Serializes the processed response body before sending it to the algorithm.
+     *
+     * @param processedResponseBody the response body to serialize
+     * @return serialized JSON string
+     */
     private String serializeProcessedResponse(AlgorithmExecutionResponseBody processedResponseBody) {
         try {
             return this.objectMapper.writeValueAsString(processedResponseBody);
         } catch (JsonProcessingException e) {
-            throw new AlgorithmExecutionException("Failed to serialize the processed algorithm payload", e);
+            throw new AlgorithmExecutionException(ERR_SERIALIZE, e);
         }
     }
 
@@ -188,30 +205,36 @@ public class AlgorithmController {
         try {
             return this.objectMapper.readTree(algorithmJson);
         } catch (JsonProcessingException e) {
-            throw new AlgorithmExecutionException("Failed to parse the algorithm response", e);
+            throw new AlgorithmExecutionException(ERR_PARSE, e);
         }
     }
 
     /**
      * Persists the algorithm JSON as an infrastructure plan aggregate.
      *
-     * @param responseBody raw algorithm response
-     * @param numberOfDays number of days for the planning period
+     * @param responseBody             raw algorithm response
+     * @param numberOfDays             number of days for the planning period
      * @param averagePickupTimeMinutes average pickup time in minutes
+     * @param providedMaxBudget        the optional maximum budget constraint
      */
-    private void persistAlgorithmResult(JsonNode responseBody, Integer numberOfDays, Integer averagePickupTimeMinutes, MaximumBudget providedMaxBudget) {
+    private void persistAlgorithmResult(AlgorithmJsonPayload responseBody, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget) {
         try {
             this.persistAlgorithmExecutionResultUseCase.persist(responseBody, numberOfDays, averagePickupTimeMinutes, providedMaxBudget);
         } catch (RuntimeException e) {
-            throw new AlgorithmExecutionException("Failed to persist the algorithm response", e);
+            throw new AlgorithmExecutionException(ERR_PERSIST, e);
         }
     }
+    /**
+     * Maps a list of facility selection request bodies into domain selection objects.
+     *
+     * @param requestSelections list of facility selection request bodies
+     * @return list of mapped algorithm execution selections
+     */
     private List<AlgorithmExecutionSelection> mapFacilitySelections(
             List<FacilityVehiclesSelectionRequestBody> requestSelections) {
         if (requestSelections == null) {
-            throw new IllegalArgumentException("facilitiesWithVehicles is required");
+            throw new IllegalArgumentException(ERR_NO_FACILITIES);
         }
-
         return requestSelections.stream()
                 .map(this::mapFacilitySelection)
                 .toList();
@@ -225,28 +248,34 @@ public class AlgorithmController {
      */
     private AlgorithmExecutionSelection mapFacilitySelection(FacilityVehiclesSelectionRequestBody requestSelection) {
         if (requestSelection == null) {
-            throw new IllegalArgumentException("Each facility selection must be defined");
+            throw new IllegalArgumentException(ERR_NO_SELECTION);
         }
-
         return new AlgorithmExecutionSelection(
-                this.parseUuid(requestSelection.facilityId, "facilityId"),
-                this.mapUuidList(requestSelection.selectedVehicleIds));
+                this.requireNonNull(requestSelection.facilityId, FIELD_FACILITY_ID),
+                requestSelection.selectedVehicleIds != null ? requestSelection.selectedVehicleIds : this.emptyOrThrow());
     }
 
     /**
-     * Maps a list of string identifiers into UUID values.
+     * Requires that a UUID value is non-null.
      *
-     * @param identifiers identifiers to map
-     * @return mapped UUID list
+     * @param value     UUID value to validate
+     * @param fieldName logical field name used for validation messages
+     * @return the validated UUID
      */
-    private List<UUID> mapUuidList(List<String> identifiers) {
-        if (identifiers == null) {
-            throw new IllegalArgumentException("A required identifier list is missing");
+    private UUID requireNonNull(UUID value, String fieldName) {
+        if (value == null) {
+            throw new IllegalArgumentException(fieldName + " is required");
         }
+        return value;
+    }
 
-        return identifiers.stream()
-                .map(identifier -> this.parseUuid(identifier, "identifier"))
-                .toList();
+    /**
+     * Returns an empty list or throws when identifiers are null.
+     *
+     * @return empty UUID list
+     */
+    private List<UUID> emptyOrThrow() {
+        throw new IllegalArgumentException(ERR_NO_IDS);
     }
 
     /**
@@ -274,7 +303,7 @@ public class AlgorithmController {
         if (value == null) {
             throw new IllegalArgumentException(fieldName + " is required");
         }
-        if (value <= 0) {
+        if (value <= ZERO) {
             throw new IllegalArgumentException(fieldName + " must be greater than zero");
         }
         return value;

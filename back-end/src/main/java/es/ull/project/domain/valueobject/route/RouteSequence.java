@@ -59,6 +59,12 @@ public final class RouteSequence {
         return value;
     }
 
+    /**
+     * Compares this RouteSequence to another object for equality.
+     *
+     * @param otherObject the object to compare with
+     * @return {@code true} if the other object is a RouteSequence with the same sequence value
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
@@ -71,11 +77,21 @@ public final class RouteSequence {
         return value == other.value;
     }
 
+    /**
+     * Returns a hash code for this RouteSequence based on its sequence value.
+     *
+     * @return the hash code
+     */
     @Override
     public int hashCode() {
         return Objects.hash(value);
     }
 
+    /**
+     * Returns a human-readable string representation of this RouteSequence.
+     *
+     * @return a string in the format {@code RouteSequence={n}}
+     */
     @Override
     public String toString() {
         return String.format("RouteSequence={%d}", value);

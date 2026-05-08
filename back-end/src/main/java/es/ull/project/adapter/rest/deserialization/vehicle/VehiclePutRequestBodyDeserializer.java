@@ -45,12 +45,12 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
         try {
             VehicleType vehicleType = parseVehicleType(rootNode);
             VehicleCapacityKilograms capacityKilograms = parseCapacityKilograms(rootNode);
-            VehicleCapacityLiters CapacityLiters = parseCapacityLiters(rootNode);
+            VehicleCapacityLiters capacityLiters = parseCapacityLiters(rootNode);
             TransportationVariableCost costPerKilometer = parseCost(rootNode);
             VehiclePutRequestBody requestBody = new VehiclePutRequestBody();
             requestBody.vehicleType = vehicleType;
             requestBody.capacityKilograms = capacityKilograms;
-            requestBody.CapacityLiters = CapacityLiters;
+            requestBody.capacityLiters = capacityLiters;
             requestBody.costPerKilometer = costPerKilometer;
             return requestBody;
         } catch (Exception e) {

@@ -1,8 +1,10 @@
 package es.ull.project.adapter.rest;
 
-import es.ull.project.application.exception.AlgorithmExecutionException;
 import es.ull.project.adapter.rest.exception.ValidationException;
 import es.ull.project.adapter.rest.response.ErrorResponse;
+import es.ull.project.application.exception.AlgorithmExecutionException;
+import es.ull.project.domain.valueobject.error.ErrorCode;
+import es.ull.project.domain.valueobject.error.ErrorMessage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -13,19 +15,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
 /**
  * GlobalExceptionHandler
- * 
+ *
  * Global exception handler for the REST API.
- * This class uses Spring's @ControllerAdvice to intercept exceptions thrown
+ * This class uses Spring's {@code @ControllerAdvice} to intercept exceptions thrown
  * by controllers and convert them into clean, user-friendly error responses
  * without exposing internal stack traces or implementation details.
- * 
+ *
  * It handles common exception types like:
  * - Deserialization errors (malformed JSON, missing required fields)
  * - Validation errors (illegal arguments)
  * - Entity not found errors
- * 
+ *
  * All error responses follow a consistent format with HTTP status codes
  * and clear error messages.
  */
@@ -36,15 +39,17 @@ public class GlobalExceptionHandler {
     private static final String ERROR_KEY = "error";
     private static final String MSG_RESOURCE_NOT_FOUND = "Resource not found";
     private static final String MSG_INTERNAL_ERROR = "An internal error occurred. Please try again later.";
+    private static final String VALIDATION_ERROR_CODE = "ValidationError";
+    private static final String VALIDATION_FAILED_MESSAGE = "Validation failed";
 
     /**
      * Handles deserialization errors when the request body cannot be parsed.
      * This typically occurs when:
      * - JSON syntax is invalid
      * - Required fields are missing
-     * - Field values don't match expected types
+     * - Field values do not match expected types
      * - Custom validation in deserializers fails
-     * 
+     *
      * @param ex the HttpMessageNotReadableException thrown by Jackson
      * @return ResponseEntity with error message and HTTP 400 (BAD_REQUEST)
      */
@@ -60,15 +65,15 @@ public class GlobalExceptionHandler {
      * Handles validation errors with detailed field-level error information.
      * This provides structured feedback about all validation failures,
      * allowing clients to display comprehensive error messages.
-     * 
+     *
      * @param ex the ValidationException containing multiple field errors
      * @return ResponseEntity with structured error response and HTTP 400 (BAD_REQUEST)
      */
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.error = "ValidationError";
-        errorResponse.message = "Validation failed";
+        errorResponse.error = new ErrorCode(VALIDATION_ERROR_CODE);
+        errorResponse.message = new ErrorMessage(VALIDATION_FAILED_MESSAGE);
         errorResponse.details = ex.getErrors();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
@@ -77,19 +82,20 @@ public class GlobalExceptionHandler {
      * Handles validation errors and illegal arguments.
      * This typically occurs when:
      * - Business rule validation fails
-     * - Referenced entities (by ID) don't exist
+     * - Referenced entities (by ID) do not exist
      * - Invalid values are provided for domain objects
-     * 
+     *
      * @param ex the IllegalArgumentException thrown by services or domain entities
      * @return ResponseEntity with error message and HTTP 400 (BAD_REQUEST)
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleValidationError(IllegalArgumentException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.error = "ValidationError";
-        errorResponse.message = ex.getMessage();
+        errorResponse.error = new ErrorCode(VALIDATION_ERROR_CODE);
+        String rawMessage = ex.getMessage();
+        errorResponse.message = new ErrorMessage(rawMessage != null && !rawMessage.isBlank() ? rawMessage : VALIDATION_FAILED_MESSAGE);
         errorResponse.details = new java.util.ArrayList<>();
-        es.ull.project.adapter.rest.exception.FieldError fieldError = 
+        es.ull.project.adapter.rest.exception.FieldError fieldError =
             new es.ull.project.adapter.rest.exception.FieldError("general", ex.getMessage());
         errorResponse.details.add(fieldError);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -101,7 +107,7 @@ public class GlobalExceptionHandler {
      * - Business invariant violations (e.g., facility capacity exceeded)
      * - Operations on entities in invalid states (e.g., discarded facilities)
      * - Domain logic constraints are violated
-     * 
+     *
      * @param ex the IllegalStateException thrown by domain entities
      * @return ResponseEntity with error message and HTTP 400 (BAD_REQUEST)
      */
@@ -131,7 +137,7 @@ public class GlobalExceptionHandler {
      * This typically occurs when:
      * - A GET/PUT/DELETE request references a non-existent ID
      * - A repository lookup returns empty
-     * 
+     *
      * @param ex the NoSuchElementException thrown by services
      * @return ResponseEntity with error message and HTTP 404 (NOT_FOUND)
      */
@@ -146,7 +152,7 @@ public class GlobalExceptionHandler {
      * Handles any other unexpected exceptions.
      * This is a catch-all handler that prevents internal error details
      * from being exposed to clients.
-     * 
+     *
      * @param ex the generic Exception
      * @return ResponseEntity with generic error message and HTTP 500 (INTERNAL_SERVER_ERROR)
      */
@@ -163,7 +169,7 @@ public class GlobalExceptionHandler {
      * This method traverses the exception chain to find the original
      * cause and its message, which typically contains the most relevant
      * error information for the user.
-     * 
+     *
      * @param ex the exception to extract the root cause from
      * @return the message from the root cause, or the original message if no cause exists
      */

@@ -8,8 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 
-import es.ull.project.adapter.mongodb.query.ContainerSearchCriteria;
-import es.ull.project.adapter.mongodb.repository.ContainerMongoRepository;
+import es.ull.project.application.query.ContainerSearchCriteria;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.usecase.container.ReadContainerUseCase;
 import es.ull.project.domain.entity.Container;
@@ -83,10 +82,6 @@ public class ReadContainerService implements ReadContainerUseCase {
      */
     @Override
     public Page<Container> fetchAll(@NonNull Pageable pageable, @NonNull ContainerSearchCriteria criteria) {
-        if (repository instanceof ContainerMongoRepository mongoRepository) {
-            return mongoRepository.findAll(pageable, criteria);
-        }
-        // Fallback for non-MongoDB implementations
-        return this.repository.findAll(pageable);
+        return this.repository.findAll(pageable, criteria);
     }
 }

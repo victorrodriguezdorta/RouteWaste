@@ -1,12 +1,11 @@
 package es.ull.project.adapter.rest.response.container;
 
-import java.util.UUID;
-
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import java.util.UUID;
 /**
  * Data Transfer Object representing a Container response
  * This class is used to send Container data in HTTP responses

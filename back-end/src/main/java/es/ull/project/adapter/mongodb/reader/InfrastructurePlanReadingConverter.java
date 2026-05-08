@@ -1,17 +1,5 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.ReadingConverter;
-import org.springframework.lang.NonNull;
-
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Facility;
@@ -25,6 +13,16 @@ import es.ull.project.domain.valueobject.cost.TotalCost;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * InfrastructurePlanReadingConverter
@@ -39,6 +37,7 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
 
     private static final String ERROR_FACILITY_NOT_FOUND = "Facility with id '%s' not found when loading InfrastructurePlan";
     private static final String ERROR_SERVICE_ASSIGNMENT_NOT_FOUND = "ServiceAssignment with id '%s' not found when loading InfrastructurePlan";
+    private static final String ERROR_DAILY_PLAN_NOT_FOUND = "DailyPlan with id '%s' not found when loading InfrastructurePlan";
 
     private final MongoConfiguration mongoConfiguration;
 
@@ -91,11 +90,19 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
             }
         }
         List<?> dailyPlanIdsList = document.get(MongoFields.DAILY_PLANS, List.class);
-        // Domain model now stores DailyPlan entities; when reading from Mongo we
-        // only have the stored IDs. We don't have the DailyPlan repository here
-        // so populate an empty list of DailyPlan entities; callers may load them
-        // via DailyPlanRepository if required.
         List<es.ull.project.domain.entity.DailyPlan> dailyPlans = new ArrayList<>();
+        if (dailyPlanIdsList != null) {
+            for (Object idObj : dailyPlanIdsList) {
+                UUID dailyPlanId = (UUID) idObj;
+                Optional<es.ull.project.domain.entity.DailyPlan> optionalDailyPlan = 
+                    mongoConfiguration.dailyPlanRepository().findById(dailyPlanId);
+                if (optionalDailyPlan.isPresent()) {
+                    dailyPlans.add(optionalDailyPlan.get());
+                } else {
+                    throw new IllegalStateException(String.format(ERROR_DAILY_PLAN_NOT_FOUND, dailyPlanId));
+                }
+            }
+        }
         ServicePolicies servicePolicies = null;
         Document policiesDocument = document.get(MongoFields.SERVICE_POLICIES, Document.class);
         if (policiesDocument != null) {
@@ -136,11 +143,9 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
         Integer numberOfDays = document.getInteger(MongoFields.NUMBER_OF_DAYS);
         Integer averagePickupTimeMinutes = document.getInteger(MongoFields.AVERAGE_PICKUP_TIME_MINUTES);
         String executedAt = document.getString(MongoFields.EXECUTED_AT);
-        
         CollectedWeightKilograms kg = totalKilograms != null ? CollectedWeightKilograms.fromKilograms(totalKilograms) : null;
         CollectedVolumeLiters liters = totalLiters != null ? CollectedVolumeLiters.fromLiters(totalLiters) : null;
         Distance distance = totalDistance != null ? Distance.fromMeters(totalDistance) : null;
-
         InfrastructurePlan plan = new InfrastructurePlan(
             id,
             period,
@@ -157,11 +162,9 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
             averagePickupTimeMinutes,
             executedAt
         );
-        
         if (kg != null && liters != null && distance != null) {
             plan.updateAlgorithmMetrics(kg, liters, distance);
         }
-        
         return plan;
     }
 }

@@ -1,5 +1,11 @@
 package es.ull.project.adapter.rest.response.container;
 
+import es.ull.project.domain.valueobject.page.NumberOfElements;
+import es.ull.project.domain.valueobject.page.PageFlag;
+import es.ull.project.domain.valueobject.page.PageNumber;
+import es.ull.project.domain.valueobject.page.PageSize;
+import es.ull.project.domain.valueobject.page.TotalElements;
+import es.ull.project.domain.valueobject.page.TotalPages;
 import java.util.List;
 
 /**
@@ -15,35 +21,35 @@ public class ContainerPageResponseBody {
     /**
      * Total number of containers available.
      */
-    public long totalElements;
+    public TotalElements totalElements;
 
     /**
      * Total number of pages available.
      */
-    public int totalPages;
+    public TotalPages totalPages;
 
     /**
      * Current page index (0-based).
      */
-    public int page;
+    public PageNumber page;
 
     /**
      * Requested page size.
      */
-    public int size;
+    public PageSize size;
 
     /**
      * Number of elements returned in current page.
      */
-    public int numberOfElements;
+    public NumberOfElements numberOfElements;
 
     /**
      * True when current page is the first one.
      */
-    public boolean first;
+    public PageFlag first;
 
     /**
      * True when current page is the last one.
      */
-    public boolean last;
+    public PageFlag last;
 }

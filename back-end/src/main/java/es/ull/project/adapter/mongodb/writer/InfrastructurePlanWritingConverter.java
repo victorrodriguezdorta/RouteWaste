@@ -1,21 +1,19 @@
 package es.ull.project.adapter.mongodb.writer;
 
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.entity.ServiceAssignment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.lang.NonNull;
-
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.configuration.MongoConfiguration;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.entity.InfrastructurePlan;
-import es.ull.project.domain.entity.ServiceAssignment;
 
 /**
  * InfrastructurePlanWritingConverter
@@ -94,7 +92,6 @@ public class InfrastructurePlanWritingConverter implements Converter<Infrastruct
             totalCostDocument.put(MongoFields.ESTIMATED_TOTAL_COST_CURRENCY, currency.getCode())
         );
         document.put(MongoFields.ESTIMATED_TOTAL_COST, totalCostDocument);
-        
         if (plan.getTotalCollectedKilograms() != null) {
             document.put(MongoFields.TOTAL_COLLECTED_KILOGRAMS, plan.getTotalCollectedKilograms().getValue());
         }
@@ -113,7 +110,6 @@ public class InfrastructurePlanWritingConverter implements Converter<Infrastruct
         if (plan.getExecutedAt() != null) {
             document.put(MongoFields.EXECUTED_AT, plan.getExecutedAt());
         }
-        
         return document;
     }
 }

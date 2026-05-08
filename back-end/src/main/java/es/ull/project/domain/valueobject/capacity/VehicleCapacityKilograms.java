@@ -23,19 +23,19 @@ public final class VehicleCapacityKilograms {
      * Capacity value in kilograms.
      * It is a required attribute and always measured in kilograms.
      */
-    private final double Kilograms;
+    private final double kilograms;
 
     /**
      * Creates a new VehicleCapacityKilograms.
      *
-     * @param Kilograms Capacity value in kilograms (must be ≥ 0)
-     * @throws IllegalArgumentException if Kilograms is negative
+     * @param kilograms Capacity value in kilograms (must be ≥ 0)
+     * @throws IllegalArgumentException if kilograms is negative
      */
-    public VehicleCapacityKilograms(double Kilograms) {
-        if (Kilograms < ZERO) {
+    public VehicleCapacityKilograms(double kilograms) {
+        if (kilograms < ZERO) {
             throw new IllegalArgumentException(ERROR_CAPACITY_NEGATIVE);
         }
-        this.Kilograms = Kilograms;
+        this.kilograms = kilograms;
     }
 
     /**
@@ -43,8 +43,9 @@ public final class VehicleCapacityKilograms {
      *
      * @return Capacity value in kilograms
      */
+    @com.fasterxml.jackson.annotation.JsonValue
     public double getKilograms() {
-        return this.Kilograms;
+        return this.kilograms;
     }
 
     /**
@@ -69,7 +70,7 @@ public final class VehicleCapacityKilograms {
         if (other == null) {
             throw new IllegalArgumentException(ERROR_OTHER_CAPACITY_NULL);
         }
-        return this.Kilograms > other.Kilograms;
+        return this.kilograms > other.kilograms;
     }
 
     /**
@@ -83,7 +84,7 @@ public final class VehicleCapacityKilograms {
         if (other == null) {
             throw new IllegalArgumentException(ERROR_OTHER_CAPACITY_NULL);
         }
-        return this.Kilograms >= other.Kilograms;
+        return this.kilograms >= other.kilograms;
     }
 
     /**
@@ -97,7 +98,7 @@ public final class VehicleCapacityKilograms {
         if (other == null) {
             throw new IllegalArgumentException(ERROR_OTHER_CAPACITY_NULL);
         }
-        return this.Kilograms < other.Kilograms;
+        return this.kilograms < other.kilograms;
     }
 
     /**
@@ -115,7 +116,7 @@ public final class VehicleCapacityKilograms {
             return false;
         }
         VehicleCapacityKilograms other = (VehicleCapacityKilograms) otherObject;
-        return Double.compare(this.Kilograms, other.Kilograms) == ZERO;
+        return Double.compare(this.kilograms, other.kilograms) == ZERO;
     }
 
     /**
@@ -125,7 +126,7 @@ public final class VehicleCapacityKilograms {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(Kilograms);
+        return Objects.hash(kilograms);
     }
 
     /**
@@ -135,6 +136,6 @@ public final class VehicleCapacityKilograms {
      */
     @Override
     public String toString() {
-        return String.format("VehicleCapacityKilograms={Kilograms=%s}", this.Kilograms);
+        return String.format("VehicleCapacityKilograms={kilograms=%s}", this.kilograms);
     }
 }

@@ -1,6 +1,7 @@
 package es.ull.project.adapter.rest.request.algorithm;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * FacilityVehiclesSelectionRequestBody
@@ -13,10 +14,10 @@ public class FacilityVehiclesSelectionRequestBody {
     /**
      * Facility identifier received from the frontend.
      */
-    public String facilityId;
+    public UUID facilityId;
 
     /**
      * Vehicle identifiers associated with the facility.
      */
-    public List<String> selectedVehicleIds;
+    public List<UUID> selectedVehicleIds;
 }

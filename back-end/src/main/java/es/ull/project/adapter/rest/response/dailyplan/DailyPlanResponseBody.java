@@ -1,23 +1,61 @@
 package es.ull.project.adapter.rest.response.dailyplan;
 
-import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
-import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
+import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
+import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
+import es.ull.project.domain.valueobject.location.Distance;
+import es.ull.project.domain.valueobject.time.ServiceDate;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * DailyPlanResponseBody
- * 
+ *
  * Data Transfer Object representing a Daily Plan.
  */
 public class DailyPlanResponseBody {
+
+    /**
+     * Unique identifier of the daily plan.
+     */
     public UUID id;
+
+    /**
+     * Unique identifier of the parent infrastructure plan.
+     */
     public UUID infrastructurePlanId;
-    public FacilityResponseBody facility;
-    public String serviceDate;
-    public VehicleResponseBody vehicle;
-    public double totalCollectedKilograms;
-    public double totalCollectedLiters;
-    public double totalDistanceMeters;
+
+    /**
+     * Unique identifier of the facility associated with this daily plan.
+     */
+    public UUID facilityId;
+
+    /**
+     * The calendar date on which this daily plan is scheduled.
+     */
+    public ServiceDate serviceDate;
+
+    /**
+     * Unique identifier of the vehicle assigned to this daily plan.
+     */
+    public UUID vehicleId;
+
+    /**
+     * Total weight of waste collected across all stops (value object).
+     */
+    public CollectedWeightKilograms totalCollectedKilograms;
+
+    /**
+     * Total volume of waste collected across all stops (value object).
+     */
+    public CollectedVolumeLiters totalCollectedLiters;
+
+    /**
+     * Total distance traveled across all stops in meters (value object).
+     */
+    public Distance totalDistanceMeters;
+
+    /**
+     * Ordered list of stops in this daily plan.
+     */
     public List<StopResponseBody> stops;
 }

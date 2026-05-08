@@ -1,10 +1,16 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.application.query.FacilitySearchCriteria;
+import es.ull.project.adapter.mongodb.query.FacilitySearchCriteriaBuilder;
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -15,13 +21,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
-
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.adapter.mongodb.query.FacilitySearchCriteria;
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
 
 /**
  * MongoDB implementation of the FacilityRepository interface.
@@ -36,6 +35,7 @@ public class FacilityMongoRepository implements FacilityRepository {
 
     public static final String COLLECTION_NAME = "facilities";
     private static final String FIELD_ID = "id";
+    private static final String FIELD_LOCATION_POSTAL_ADDRESS = "location.postalAddress";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -121,7 +121,7 @@ public class FacilityMongoRepository implements FacilityRepository {
      */
     @Override
     public Page<Facility> findAll(@NonNull Pageable pageable, FacilityType type, FacilityStatus status) {
-        FacilitySearchCriteria criteria = new FacilitySearchCriteria.Builder()
+        FacilitySearchCriteria criteria = new FacilitySearchCriteriaBuilder()
                 .withFacilityType(type)
                 .withStatus(status)
                 .build();
@@ -139,20 +139,15 @@ public class FacilityMongoRepository implements FacilityRepository {
     public Page<Facility> findAll(@NonNull Pageable pageable, @NonNull FacilitySearchCriteria criteria) {
         Query dataQuery = new Query();
         Query countQuery = new Query();
-
-        // Build criteria list
         List<Criteria> criterias = buildSearchCriterias(criteria);
-        
         if (!criterias.isEmpty()) {
             Criteria combinedCriteria = new Criteria().andOperator(criterias.toArray(new Criteria[0]));
             dataQuery.addCriteria(combinedCriteria);
             countQuery.addCriteria(combinedCriteria);
         }
-
         dataQuery.with(pageable);
         List<Facility> facilities = this.mongoTemplate.find(dataQuery, Facility.class, COLLECTION_NAME);
         long total = this.mongoTemplate.count(countQuery, Facility.class, COLLECTION_NAME);
-        
         return new PageImpl<>(facilities, pageable, total);
     }
 
@@ -165,20 +160,16 @@ public class FacilityMongoRepository implements FacilityRepository {
      */
     private List<Criteria> buildSearchCriterias(@NonNull FacilitySearchCriteria criteria) {
         List<Criteria> criterias = new ArrayList<>();
-
         if (criteria.getFacilityType() != null) {
             criterias.add(Criteria.where(MongoFields.FACILITY_TYPE).is(criteria.getFacilityType()));
         }
-
         if (criteria.getStatus() != null) {
             criterias.add(Criteria.where(MongoFields.STATUS).is(criteria.getStatus()));
         }
-
         if (criteria.getLocationPostalAddress() != null) {
-            criterias.add(Criteria.where("location.postalAddress")
-                    .regex(criteria.getLocationPostalAddress(), "i")); // Case-insensitive
+            criterias.add(Criteria.where(FIELD_LOCATION_POSTAL_ADDRESS)
+                    .regex(criteria.getLocationPostalAddress(), "i"));
         }
-
         return criterias;
     }
 }

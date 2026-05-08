@@ -42,11 +42,22 @@ public class DeliveryPlanningProblemJsonFileSupplier {
     int numberOfDays = json.getInt("numberOfDays");
     MaximumBudget maxBudget = parseMaximumBudget(json.optJSONObject("maxBudget"));
 
+    // Support explicit error when incoming JSON uses ID-only shorthand
+    // (e.g. "facilitiesWithVehicles" entries with "facilityId" or
+    // top-level "selectedContainerIds"). Those formats must be expanded by
+    // the backend before invoking the algorithm since the algorithm needs
+    // full objects (including coordinates) to compute distances.
+    if (json.has("selectedContainerIds") || containsFacilityIdOnly(json)) {
+      throw new IllegalArgumentException(
+        "Input JSON uses ID-only shorthand (selectedContainerIds or facilityId). "
+          + "The algorithm requires fully expanded objects: 'selectedContainers' and 'facilitiesWithVehicles' with full 'facility' and 'selectedVehicles' objects.");
+    }
+
     List<FacilityWithVehicles> facilitiesWithVehicles =
-        parseFacilitiesWithVehicles(json.getJSONArray("facilitiesWithVehicles"));
+      parseFacilitiesWithVehicles(json.getJSONArray("facilitiesWithVehicles"));
 
     List<Container> containers =
-        parseContainers(json.getJSONArray("selectedContainers"));
+      parseContainers(json.getJSONArray("selectedContainers"));
 
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
         averagePickupTimeMinutes,
@@ -56,6 +67,29 @@ public class DeliveryPlanningProblemJsonFileSupplier {
       maxBudget);
 
     return Stream.of(problem);
+  }
+
+  /**
+   * Returns true if the incoming JSON contains facilitiesWithVehicles entries
+   * that use the ID-only shorthand ("facilityId") instead of a full
+   * "facility" object.
+   */
+  private boolean containsFacilityIdOnly(JSONObject json) {
+    if (!json.has("facilitiesWithVehicles")) {
+      return false;
+    }
+    try {
+      org.json.JSONArray array = json.getJSONArray("facilitiesWithVehicles");
+      for (int i = 0; i < array.length(); i++) {
+        org.json.JSONObject entry = array.getJSONObject(i);
+        if (entry.has("facilityId") && !entry.has("facility")) {
+          return true;
+        }
+      }
+    } catch (Exception e) {
+      // If any error occurs while peeking, assume it's not the id-only format
+    }
+    return false;
   }
 
   // -------------------------------------------------------------------------
@@ -80,11 +114,11 @@ public class DeliveryPlanningProblemJsonFileSupplier {
 
     Location location = parseLocation(json.getJSONObject("location"));
 
-    double storageCapacity = json.getJSONObject("storageCapacity").getDouble("value");
-    double processingCapacity = json.getJSONObject("processingCapacity").getDouble("value");
-    int unloadingTime = json.getJSONObject("unloadingTime").getInt("timeValue");
-    double openingFixedCost = json.getJSONObject("openingFixedCost").getDouble("amount");
-    double currentFillingLevel = json.getJSONObject("currentFillingLevel").getDouble("wasteDemandValue");
+    double storageCapacity = readDoubleFlexible(json, "storageCapacity", "value");
+    double processingCapacity = readDoubleFlexible(json, "processingCapacity", "value");
+    int unloadingTime = readIntFlexible(json, "unloadingTime", "timeValue");
+    double openingFixedCost = readDoubleFlexible(json, "openingFixedCost", "amount");
+    double currentFillingLevel = readDoubleFlexible(json, "currentFillingLevel", "wasteDemandValue");
 
     return new Facility(
         id,
@@ -109,9 +143,9 @@ public class DeliveryPlanningProblemJsonFileSupplier {
   private Vehicle parseVehicle(JSONObject json) {
     String id = json.getString("id");
     String vehicleType = json.getString("vehicleType");
-    double capacityKilograms = json.getJSONObject("capacityKilograms").getDouble("Kilograms");
-    double capacityLiters = json.getJSONObject("CapacityLiters").getDouble("liters");
-    double costPerKilometer = json.getJSONObject("costPerKilometer").getDouble("amount");
+    double capacityKilograms = readDoubleFlexible(json, "capacityKilograms", "Kilograms");
+    double capacityLiters = readDoubleFlexible(json, "capacityLiters", "liters");
+    double costPerKilometer = readDoubleFlexible(json, "costPerKilometer", "amount");
 
     return new Vehicle(id, vehicleType, capacityKilograms, capacityLiters, costPerKilometer);
   }
@@ -136,14 +170,17 @@ public class DeliveryPlanningProblemJsonFileSupplier {
 
   private Container parseContainer(JSONObject json) {
     String id = json.getString("id");
-    String serviceZone = json.getString("serviceZone");
+    String serviceZone = json.optString("serviceZone", null);
+    if (serviceZone != null && serviceZone.isBlank()) {
+      serviceZone = null;
+    }
 
     WasteType wasteType = WasteType.valueOf(json.getString("wasteType"));
     Location location = parseLocation(json.getJSONObject("location"));
 
-    double capacityLiters = json.getJSONObject("capacityLiters").getDouble("liters");
+    double capacityLiters = readDoubleFlexible(json, "capacityLiters", "liters");
     double dailyDemandLitersPerDay =
-        json.getJSONObject("dailyDemandLitersPerDay").getDouble("litersPerDay");
+      readDoubleFlexible(json, "dailyDemandLitersPerDay", "litersPerDay");
 
     return new Container(id, location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone);
   }
@@ -154,5 +191,27 @@ public class DeliveryPlanningProblemJsonFileSupplier {
     String postalAddress = json.getString("postalAddress");
     String gisReference = json.getString("gisReference");
     return new Location(latitude, longitude, postalAddress, gisReference);
+  }
+
+  private double readDoubleFlexible(JSONObject json, String fieldName, String nestedField) {
+    Object value = json.get(fieldName);
+    if (value instanceof JSONObject objectValue) {
+      return objectValue.getDouble(nestedField);
+    }
+    if (value instanceof Number numberValue) {
+      return numberValue.doubleValue();
+    }
+    throw new IllegalArgumentException("Invalid numeric field: " + fieldName);
+  }
+
+  private int readIntFlexible(JSONObject json, String fieldName, String nestedField) {
+    Object value = json.get(fieldName);
+    if (value instanceof JSONObject objectValue) {
+      return objectValue.getInt(nestedField);
+    }
+    if (value instanceof Number numberValue) {
+      return numberValue.intValue();
+    }
+    throw new IllegalArgumentException("Invalid integer field: " + fieldName);
   }
 }

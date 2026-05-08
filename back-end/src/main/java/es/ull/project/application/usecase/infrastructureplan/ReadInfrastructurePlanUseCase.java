@@ -1,12 +1,10 @@
 package es.ull.project.application.usecase.infrastructureplan;
 
+import es.ull.project.domain.entity.InfrastructurePlan;
 import java.util.List;
 import java.util.UUID;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import es.ull.project.domain.entity.InfrastructurePlan;
 
 /**
  * Use case for reading infrastructure plans.

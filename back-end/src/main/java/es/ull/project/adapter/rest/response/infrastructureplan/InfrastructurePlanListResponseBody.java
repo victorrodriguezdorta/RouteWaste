@@ -1,8 +1,7 @@
 package es.ull.project.adapter.rest.response.infrastructureplan;
 
-import java.util.UUID;
-
 import es.ull.project.domain.valueobject.cost.TotalCost;
+import java.util.UUID;
 
 /**
  * Data Transfer Object representing the lightweight InfrastructurePlan list response.

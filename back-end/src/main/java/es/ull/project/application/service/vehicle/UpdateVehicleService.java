@@ -1,8 +1,5 @@
 package es.ull.project.application.service.vehicle;
 
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
 import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
@@ -10,6 +7,8 @@ import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 /**
  * Service responsible for updating existing vehicles in the system.

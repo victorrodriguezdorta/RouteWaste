@@ -15,9 +15,9 @@ public interface CreateVehicleUseCase {
      *
      * @param vehicleType        the type of vehicle
      * @param capacityKilograms the transport capacity in kilograms
-     * @param CapacityLiters     the transport capacity in liters
+     * @param capacityLiters    the transport capacity in liters
      * @param costPerKilometer   the cost per kilometer for transportation
      * @return the created vehicle
      */
-    Vehicle create(VehicleType vehicleType, VehicleCapacityKilograms capacityKilograms, VehicleCapacityLiters CapacityLiters, TransportationVariableCost costPerKilometer);
+    Vehicle create(VehicleType vehicleType, VehicleCapacityKilograms capacityKilograms, VehicleCapacityLiters capacityLiters, TransportationVariableCost costPerKilometer);
 }

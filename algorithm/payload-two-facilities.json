@@ -1,0 +1,48 @@
+﻿{
+  "facilitiesWithVehicles": [
+    {
+      "facility": {
+        "id": "ce3d2863-eabe-4c6c-a31b-1c3b3ea72038",
+        "facilityType": "TRANSFER_STATION",
+        "location": {"latitude": 28.47, "longitude": -16.25, "postalAddress": "A", "gisReference": "GA"},
+        "storageCapacity": {"value": 5000.0},
+        "processingCapacity": {"value": 2000.0},
+        "unloadingTime": {"timeValue": 30},
+        "openingFixedCost": {"amount": 50000.0, "currency": "EUR"},
+        "status": "OPEN",
+        "currentFillingLevel": {"wasteDemandValue": 0.0}
+      },
+      "selectedVehicles": [
+        {"id": "21703654-95aa-4620-9668-a429fa4b2cf8", "vehicleType": "SUPPORT_VEHICLE", "capacityKilograms": {"Kilograms": 88.0}, "capacityLiters": {"liters": 88.0}, "costPerKilometer": {"amount": 0.03, "currency": "EUR"}}
+      ]
+    },
+    {
+      "facility": {
+        "id": "9fd52582-a3a2-4ce5-8578-e90625d2579d",
+        "facilityType": "TRANSFER_STATION",
+        "location": {"latitude": 28.47, "longitude": -16.25, "postalAddress": "B", "gisReference": "GB"},
+        "storageCapacity": {"value": 5000.0},
+        "processingCapacity": {"value": 2000.0},
+        "unloadingTime": {"timeValue": 30},
+        "openingFixedCost": {"amount": 50000.0, "currency": "EUR"},
+        "status": "OPEN",
+        "currentFillingLevel": {"wasteDemandValue": 0.0}
+      },
+      "selectedVehicles": [
+        {"id": "882d413c-18c7-4a66-90ad-fa62f7600b02", "vehicleType": "COLLECTION_TRUCK", "capacityKilograms": {"Kilograms": 0.0}, "capacityLiters": {"liters": 0.0}, "costPerKilometer": {"amount": 0.03, "currency": "EUR"}}
+      ]
+    }
+  ],
+  "selectedContainers": [
+    {
+      "id": "2dd7627e-f357-42e1-b257-2cf1160440d3",
+      "location": {"latitude": 28.465837, "longitude": -16.263835, "postalAddress": "C", "gisReference": "GC"},
+      "wasteType": "ORGANIC",
+      "capacityLiters": {"liters": 76.0},
+      "dailyDemandLitersPerDay": {"litersPerDay": 67.0}
+    }
+  ],
+  "numberOfDays": 1,
+  "averagePickupTimeMinutes": 15,
+  "maxBudget": {"amount": 3333333.0, "currency": "EUR"}
+}

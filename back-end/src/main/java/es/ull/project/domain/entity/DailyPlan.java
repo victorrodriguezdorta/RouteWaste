@@ -1,15 +1,14 @@
 package es.ull.project.domain.entity;
 
+import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
+import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
+import es.ull.project.domain.valueobject.location.Distance;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
-import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
-import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
-import es.ull.project.domain.valueobject.location.Distance;
 
 /**
  * DailyPlan
@@ -77,6 +76,17 @@ public class DailyPlan {
     /**
      * Restore constructor.
      * Restores a DailyPlan from persistence with all its attributes.
+     *
+     * @param id                      the unique identifier of the daily plan
+     * @param infrastructurePlan      the parent infrastructure plan
+     * @param facility                the facility where the route starts/ends
+     * @param serviceDate             the date when the service is executed
+     * @param planDay                 the planning day within the execution horizon
+     * @param vehicle                 the vehicle assigned to the route
+     * @param totalCollectedKilograms total weight collected
+     * @param totalCollectedLiters    total volume collected
+     * @param totalDistanceMeters     total distance of the route
+     * @param stops                   list of stops in the route
      */
     public DailyPlan(UUID id,
                      InfrastructurePlan infrastructurePlan,
@@ -101,6 +111,18 @@ public class DailyPlan {
         this.stops = stops != null ? new ArrayList<>(stops) : new ArrayList<>();
     }
 
+    /**
+     * Validates that all required parameters are non-null.
+     *
+     * @param infrastructurePlan      the parent infrastructure plan
+     * @param facility                the facility where the route starts/ends
+     * @param serviceDate             the service date
+     * @param vehicle                 the assigned vehicle
+     * @param totalCollectedKilograms total weight collected
+     * @param totalCollectedLiters    total volume collected
+     * @param totalDistanceMeters     total route distance
+     * @throws IllegalArgumentException if any required parameter is null
+     */
     private void validate(InfrastructurePlan infrastructurePlan, Facility facility, LocalDate serviceDate, Vehicle vehicle,
                           CollectedWeightKilograms totalCollectedKilograms, CollectedVolumeLiters totalCollectedLiters,
                           Distance totalDistanceMeters) {
@@ -127,6 +149,12 @@ public class DailyPlan {
         }
     }
 
+    /**
+     * Adds a stop to this daily plan's route.
+     *
+     * @param stop the stop to add
+     * @throws IllegalArgumentException if stop is null
+     */
     public void addStop(Stop stop) {
         if (stop == null) {
             throw new IllegalArgumentException(INVALID_STOP);
@@ -134,46 +162,102 @@ public class DailyPlan {
         this.stops.add(stop);
     }
 
+    /**
+     * Returns the unique identifier of this daily plan.
+     *
+     * @return the daily plan UUID
+     */
     public UUID getId() {
         return id;
     }
 
+    /**
+     * Returns the parent infrastructure plan.
+     *
+     * @return the infrastructure plan
+     */
     public InfrastructurePlan getInfrastructurePlan() {
         return infrastructurePlan;
     }
 
+    /**
+     * Returns the facility where this route starts and ends.
+     *
+     * @return the facility
+     */
     public Facility getFacility() {
         return facility;
     }
 
+    /**
+     * Returns the date when the service is executed.
+     *
+     * @return the service date
+     */
     public LocalDate getServiceDate() {
         return serviceDate;
     }
 
+    /**
+     * Returns the planning day within the execution horizon.
+     *
+     * @return the plan day number
+     */
     public Integer getPlanDay() {
         return planDay;
     }
 
+    /**
+     * Returns the vehicle assigned to this daily plan.
+     *
+     * @return the vehicle
+     */
     public Vehicle getVehicle() {
         return vehicle;
     }
 
+    /**
+     * Returns the total weight collected during this route.
+     *
+     * @return total collected kilograms
+     */
     public CollectedWeightKilograms getTotalCollectedKilograms() {
         return totalCollectedKilograms;
     }
 
+    /**
+     * Returns the total volume collected during this route.
+     *
+     * @return total collected liters
+     */
     public CollectedVolumeLiters getTotalCollectedLiters() {
         return totalCollectedLiters;
     }
 
+    /**
+     * Returns the total distance of the route in meters.
+     *
+     * @return total distance in meters
+     */
     public Distance getTotalDistanceMeters() {
         return totalDistanceMeters;
     }
 
+    /**
+     * Returns an unmodifiable view of the stops in this daily plan.
+     *
+     * @return unmodifiable list of stops
+     */
     public List<Stop> getStops() {
         return Collections.unmodifiableList(stops);
     }
 
+    /**
+     * Compares this daily plan to another object for equality based on the unique identifier.
+     *
+     * @param otherObject the object to compare with
+     * @return {@code true} if the objects have the same id, {@code false} otherwise
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
@@ -186,11 +270,21 @@ public class DailyPlan {
         return Objects.equals(this.id, other.id);
     }
 
+    /**
+     * Returns a hash code value for this daily plan based on the unique identifier.
+     *
+     * @return hash code value
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
 
+    /**
+     * Returns a string representation of this daily plan.
+     *
+     * @return a formatted string with key daily plan attributes
+     */
     @Override
     public String toString() {
         return String.format("DailyPlan={id=%s, planId=%s, facilityId=%s, date=%s, planDay=%s, vehicle=%s, distance=%s}",

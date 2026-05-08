@@ -1,8 +1,7 @@
 package es.ull.project.adapter.rest.response.algorithm;
 
-import java.util.List;
-
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
+import java.util.List;
 
 /**
  * AlgorithmExecutionResponseBody
@@ -32,6 +31,9 @@ public class AlgorithmExecutionResponseBody {
      */
     public int averagePickupTimeMinutes;
 
-    /** Optional maximum budget included in the processed payload. */
+    /**
+     * Optional maximum budget included in the processed payload.
+     * This field is populated only when the client provides a budget constraint.
+     */
     public MaximumBudgetResponseBody maxBudget;
 }

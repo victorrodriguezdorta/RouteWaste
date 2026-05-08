@@ -1,13 +1,12 @@
 package es.ull.project.adapter.rest.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Mapper class to convert InfrastructurePlan domain entities to InfrastructurePlanResponseBody DTOs
@@ -48,10 +47,10 @@ public class InfrastructurePlanResponseMapper {
         for (ServiceAssignment assignment : plan.getServiceAssignments()) {
             responseBody.serviceAssignments.add(ServiceAssignmentResponseMapper.toResponseBody(assignment));
         }
-        
         responseBody.dailyPlans = dailyPlans;
+        responseBody.numberOfDays = plan.getNumberOfDays();
+        responseBody.averagePickupTimeMinutes = plan.getAveragePickupTimeMinutes();
         responseBody.executedAt = plan.getExecutedAt();
-        // compute a basic status: if estimated cost exceeds budget mark as OVERBUDGET, otherwise SUBOPTIMAL as default
         try {
             if (plan.getEstimatedTotalCost() != null && plan.getMaxBudget() != null && plan.getEstimatedTotalCost().greaterThan(plan.getMaxBudget())) {
                 responseBody.status = "OVERBUDGET";
@@ -61,7 +60,6 @@ public class InfrastructurePlanResponseMapper {
         } catch (Exception e) {
             responseBody.status = null;
         }
-        
         if (plan.getTotalCollectedKilograms() != null) {
             responseBody.totalCollectedKilograms = plan.getTotalCollectedKilograms().getValue();
         }
@@ -71,7 +69,6 @@ public class InfrastructurePlanResponseMapper {
         if (plan.getTotalDistanceMeters() != null) {
             responseBody.totalDistanceMeters = plan.getTotalDistanceMeters().getValue();
         }
-        
         return responseBody;
     }
 }

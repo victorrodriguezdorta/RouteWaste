@@ -1,7 +1,5 @@
 package es.ull.project.adapter.rest.mapper;
 
-import java.util.List;
-
 import es.ull.project.adapter.rest.response.algorithm.AlgorithmExecutionResponseBody;
 import es.ull.project.adapter.rest.response.algorithm.AlgorithmFacilityVehiclesResponseBody;
 import es.ull.project.application.usecase.algorithm.AlgorithmExecutionResult;

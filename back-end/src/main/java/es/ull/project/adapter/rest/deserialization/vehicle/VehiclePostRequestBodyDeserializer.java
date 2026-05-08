@@ -49,7 +49,7 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
         List<FieldError> errors = new ArrayList<>();
         VehicleType vehicleType = parseVehicleType(rootNode, errors);
         VehicleCapacityKilograms capacityKilograms = parseCapacityKilograms(rootNode, errors);
-        VehicleCapacityLiters CapacityLiters = parseCapacityLiters(rootNode, errors);
+        VehicleCapacityLiters capacityLiters = parseCapacityLiters(rootNode, errors);
         TransportationVariableCost costPerKilometer = parseCost(rootNode, errors);
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
@@ -57,7 +57,7 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
         VehiclePostRequestBody requestBody = new VehiclePostRequestBody();
         requestBody.vehicleType = vehicleType;
         requestBody.capacityKilograms = capacityKilograms;
-        requestBody.CapacityLiters = CapacityLiters;
+        requestBody.capacityLiters = capacityLiters;
         requestBody.costPerKilometer = costPerKilometer;
         return requestBody;
     }

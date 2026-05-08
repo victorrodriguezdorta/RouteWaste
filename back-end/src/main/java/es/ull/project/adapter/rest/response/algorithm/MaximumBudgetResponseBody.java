@@ -8,9 +8,13 @@ package es.ull.project.adapter.rest.response.algorithm;
  */
 public class MaximumBudgetResponseBody {
 
-    /** Numeric amount of the maximum budget. */
+    /**
+     * Numeric amount of the maximum budget.
+     */
     public Double amount;
 
-    /** ISO 4217 currency code (e.g. "EUR"). */
+    /**
+     * ISO 4217 currency code (e.g. "EUR").
+     */
     public String currency;
 }

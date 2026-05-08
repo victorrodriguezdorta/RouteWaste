@@ -2,8 +2,8 @@ package es.ull.project.adapter.rest.mapper;
 
 import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
 import es.ull.project.domain.entity.ServiceAssignment;
-
 import java.util.stream.Collectors;
+
 public class ServiceAssignmentResponseMapper {
 
     private static final String UTILITY_CLASS_ERROR_MESSAGE = "Utility class cannot be instantiated";
@@ -35,8 +35,7 @@ public class ServiceAssignmentResponseMapper {
         ServiceAssignmentResponseBody responseBody = new ServiceAssignmentResponseBody();
         responseBody.id = assignment.getId();
         responseBody.infrastructurePlanId = assignment.getInfrastructurePlan().getId();
-        responseBody.facility = FacilityResponseMapper.toResponseBody(assignment.getFacility());
-        
+        responseBody.facilityId = assignment.getFacility().getId();
         if (assignment.getAssignedContainers() != null) {
             responseBody.assignedContainers = assignment.getAssignedContainers().stream()
                     .map(ContainerResponseMapper::toResponseBody)

@@ -15,33 +15,62 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import es.ull.project.application.query.ContainerSearchCriteria;
+import es.ull.project.application.query.FacilitySearchCriteria;
+import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.DailyPlanRepository;
+import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
+import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.DailyPlan;
+import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
+import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.enumerate.ServiceZone;
+import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.enumerate.WasteType;
+import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
+import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
+import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.UnloadingTime;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
+import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
+import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
+import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.location.Location;
 
 class PersistAlgorithmExecutionResultServiceTests {
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void persistAlgorithmResponse_createsPlanAssignmentsAndDailyPlans() throws Exception {
         InMemoryInfrastructurePlanRepository infrastructurePlanRepository = new InMemoryInfrastructurePlanRepository();
         InMemoryServiceAssignmentRepository serviceAssignmentRepository = new InMemoryServiceAssignmentRepository();
         InMemoryDailyPlanRepository dailyPlanRepository = new InMemoryDailyPlanRepository();
+        InMemoryFacilityRepository facilityRepository = new InMemoryFacilityRepository();
+        InMemoryContainerRepository containerRepository = new InMemoryContainerRepository();
+        InMemoryVehicleRepository vehicleRepository = new InMemoryVehicleRepository();
+
+        seedInfrastructureEntities(facilityRepository, containerRepository, vehicleRepository);
 
         PersistAlgorithmExecutionResultService service = new PersistAlgorithmExecutionResultService(
                 infrastructurePlanRepository,
                 serviceAssignmentRepository,
-                dailyPlanRepository);
+          dailyPlanRepository,
+          facilityRepository,
+          containerRepository,
+          vehicleRepository);
 
-        JsonNode response = objectMapper.readTree(sampleAlgorithmJson());
-        InfrastructurePlan plan = service.persist(response, 7, 15, null);
+        AlgorithmJsonPayload payload = new AlgorithmJsonPayload(sampleAlgorithmJson());
+        InfrastructurePlan plan = service.persist(payload, new NumberOfDays(7), new AveragePickupTimeMinutes(15), null);
 
         assertNotNull(plan);
         assertEquals(1, plan.getSelectedFacilities().size());
@@ -65,6 +94,52 @@ class PersistAlgorithmExecutionResultServiceTests {
         assertEquals(UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"), firstDailyPlan.getFacility().getId());
         assertEquals(UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"), firstDailyPlan.getStops().get(0).getContainer().getId());
     }
+
+        private void seedInfrastructureEntities(
+          InMemoryFacilityRepository facilityRepository,
+          InMemoryContainerRepository containerRepository,
+          InMemoryVehicleRepository vehicleRepository) {
+      facilityRepository.save(new Facility(
+        UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"),
+        FacilityType.TRANSFER_STATION,
+        new Location(28.47, -16.25, "Calle Principal 123, Las Palmas", "GIS-REF-001"),
+        new StorageCapacityKilograms(1000.0),
+        new ProcessingCapacityKilogramsPerDay(1000.0),
+        new UnloadingTime(10),
+        new OpeningFixedCost(100.0),
+        FacilityStatus.OPEN,
+        new DailyWasteDemandLitersPerDay(0.0)));
+
+      containerRepository.save(new Container(
+        UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"),
+        new Location(28.465837, -16.263835, "Calle random", "123414"),
+        WasteType.ORGANIC,
+        new ContainerCapacityLiters(1000.0),
+        new DailyWasteDemandLitersPerDay(100.0),
+        ServiceZone.DISTRICT));
+
+      containerRepository.save(new Container(
+        UUID.fromString("374ae62c-1e31-4210-88d3-dbefa4320a72"),
+        new Location(28.462808, -16.264503, "adf", "afdsa"),
+        WasteType.ORGANIC,
+        new ContainerCapacityLiters(1000.0),
+        new DailyWasteDemandLitersPerDay(100.0),
+        ServiceZone.DISTRICT));
+
+      vehicleRepository.save(new Vehicle(
+        UUID.fromString("21703654-95aa-4620-9668-a429fa4b2cf8"),
+        VehicleType.SUPPORT_VEHICLE,
+        new VehicleCapacityKilograms(88),
+        new VehicleCapacityLiters(88),
+        new TransportationVariableCost(0.03)));
+
+      vehicleRepository.save(new Vehicle(
+        UUID.fromString("882d413c-18c7-4a66-90ad-fa62f7600b02"),
+        VehicleType.COLLECTION_TRUCK,
+        new VehicleCapacityKilograms(88),
+        new VehicleCapacityLiters(88),
+        new TransportationVariableCost(0.03)));
+        }
 
     private String sampleAlgorithmJson() {
         return """
@@ -294,4 +369,140 @@ class PersistAlgorithmExecutionResultServiceTests {
             return plans;
         }
     }
+
+      private static final class InMemoryFacilityRepository implements FacilityRepository {
+        private final Map<UUID, Facility> saved = new LinkedHashMap<>();
+
+        @Override
+        public void delete(Facility entity) {
+          if (entity != null) {
+            saved.remove(entity.getId());
+          }
+        }
+
+        @Override
+        public List<Facility> fetchAll() {
+          return new ArrayList<>(saved.values());
+        }
+
+        @Override
+        public List<Facility> findAll() {
+          return fetchAll();
+        }
+
+        @Override
+        public Facility save(Facility entity) {
+          saved.put(entity.getId(), entity);
+          return entity;
+        }
+
+        @Override
+        public Optional<Facility> findById(UUID id) {
+          return Optional.ofNullable(saved.get(id));
+        }
+
+        @Override
+        public Page<Facility> findAll(Pageable pageable) {
+          return new PageImpl<>(fetchAll(), pageable, saved.size());
+        }
+
+        @Override
+        public Page<Facility> findAll(Pageable pageable, FacilityType type, FacilityStatus status) {
+          return new PageImpl<>(fetchAll(), pageable, saved.size());
+        }
+
+        @Override
+        public Page<Facility> findAll(Pageable pageable, FacilitySearchCriteria criteria) {
+          return new PageImpl<>(fetchAll(), pageable, saved.size());
+        }
+      }
+
+      private static final class InMemoryContainerRepository implements ContainerRepository {
+        private final Map<UUID, Container> saved = new LinkedHashMap<>();
+
+        @Override
+        public void delete(Container entity) {
+          if (entity != null) {
+            saved.remove(entity.getId());
+          }
+        }
+
+        @Override
+        public List<Container> fetchAll() {
+          return new ArrayList<>(saved.values());
+        }
+
+        @Override
+        public List<Container> findAll() {
+          return fetchAll();
+        }
+
+        @Override
+        public Page<Container> findAll(Pageable pageable) {
+          return new PageImpl<>(fetchAll(), pageable, saved.size());
+        }
+
+        @Override
+        public Page<Container> findAll(Pageable pageable, WasteType wasteType) {
+          return new PageImpl<>(fetchAll(), pageable, saved.size());
+        }
+
+        @Override
+        public Container save(Container entity) {
+          saved.put(entity.getId(), entity);
+          return entity;
+        }
+
+        @Override
+        public Optional<Container> findById(UUID id) {
+          return Optional.ofNullable(saved.get(id));
+        }
+
+        @Override
+        public Page<Container> findAll(Pageable pageable, ContainerSearchCriteria criteria) {
+          return new PageImpl<>(fetchAll(), pageable, saved.size());
+        }
+      }
+
+      private static final class InMemoryVehicleRepository implements VehicleRepository {
+        private final Map<UUID, Vehicle> saved = new LinkedHashMap<>();
+
+        @Override
+        public void delete(Vehicle entity) {
+          if (entity != null) {
+            saved.remove(entity.getId());
+          }
+        }
+
+        @Override
+        public List<Vehicle> fetchAll() {
+          return new ArrayList<>(saved.values());
+        }
+
+        @Override
+        public List<Vehicle> findAll() {
+          return fetchAll();
+        }
+
+        @Override
+        public Page<Vehicle> findAll(Pageable pageable) {
+          return new PageImpl<>(fetchAll(), pageable, saved.size());
+        }
+
+        @Override
+        public Page<Vehicle> findAll(Pageable pageable, VehicleType vehicleType) {
+          return new PageImpl<>(fetchAll(), pageable, saved.size());
+        }
+
+        @Override
+        public Vehicle save(Vehicle entity) {
+          saved.put(entity.getId(), entity);
+          return entity;
+        }
+
+        @Override
+        public Optional<Vehicle> findById(UUID id) {
+          return Optional.ofNullable(saved.get(id));
+        }
+      }
 }

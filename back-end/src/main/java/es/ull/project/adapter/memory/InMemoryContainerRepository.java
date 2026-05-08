@@ -1,17 +1,21 @@
 package es.ull.project.adapter.memory;
 
-import es.ull.project.application.repository.ContainerRepository;
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.enumerate.WasteType;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+
+import es.ull.project.application.query.ContainerSearchCriteria;
+import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
 
 /**
  * Simple in-memory implementation of {@link ContainerRepository} used for tests
@@ -62,7 +66,7 @@ public class InMemoryContainerRepository implements ContainerRepository {
      */
     @Override
     public Page<Container> findAll(Pageable pageable) {
-        return this.findAll(pageable, null);
+        return this.findAll(pageable, (WasteType) null);
     }
 
     /**
@@ -107,5 +111,48 @@ public class InMemoryContainerRepository implements ContainerRepository {
     @Override
     public Optional<Container> findById(UUID id) {
         return Optional.ofNullable(store.get(id));
+    }
+
+    /**
+     * Finds containers with advanced search criteria and pagination.
+     * Supports filtering by multiple attributes dynamically.
+     *
+     * @param pageable pagination and sort information
+     * @param criteria search criteria with optional filters
+     * @return page of matching containers
+     */
+    @Override
+    public Page<Container> findAll(@NonNull Pageable pageable, @NonNull ContainerSearchCriteria criteria) {
+        List<Container> filtered = store.values().stream()
+                .filter(container -> {
+                    if (criteria.getWasteType() != null && container.getWasteType() != criteria.getWasteType()) {
+                        return false;
+                    }
+                    if (criteria.getServiceZone() != null && !criteria.getServiceZone().equals(container.getServiceZone())) {
+                        return false;
+                    }
+                    if (criteria.getLocationPostalAddress() != null 
+                            && (container.getLocation() == null || !container.getLocation().getPostalAddress().contains(criteria.getLocationPostalAddress()))) {
+                        return false;
+                    }
+                    if (criteria.getMinCapacityLiters() != null && container.getCapacityLiters().getLiters() < criteria.getMinCapacityLiters()) {
+                        return false;
+                    }
+                    if (criteria.getMaxCapacityLiters() != null && container.getCapacityLiters().getLiters() > criteria.getMaxCapacityLiters()) {
+                        return false;
+                    }
+                    if (criteria.getMinDailyDemand() != null && container.getDailyDemandLitersPerDay().getLitersPerDay() < criteria.getMinDailyDemand()) {
+                        return false;
+                    }
+                    if (criteria.getMaxDailyDemand() != null && container.getDailyDemandLitersPerDay().getLitersPerDay() > criteria.getMaxDailyDemand()) {
+                        return false;
+                    }
+                    return true;
+                })
+                .toList();
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filtered.size());
+        List<Container> pageContent = start >= filtered.size() ? List.of() : filtered.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, filtered.size());
     }
 }

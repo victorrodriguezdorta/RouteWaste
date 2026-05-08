@@ -1,9 +1,5 @@
 package es.ull.project.application.service.algorithm;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.VehicleRepository;
@@ -14,6 +10,11 @@ import es.ull.project.application.usecase.algorithm.ResolvedFacilityVehiclesSele
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 /**
  * Service implementation for algorithm execution.
@@ -21,6 +22,12 @@ import es.ull.project.domain.entity.Vehicle;
  * and returns the full persisted data without running the final algorithm yet.
  */
 public class ExecuteAlgorithmService implements ExecuteAlgorithmUseCase {
+
+    private static final int ZERO = 0;
+
+    private static final String ERR_NO_FACILITY = "At least one facility with vehicles must be selected";
+    private static final String ERR_NO_CONTAINER = "At least one container must be selected";
+    private static final String ERR_NO_VEHICLE = "Each selected facility must include at least one vehicle";
 
     private final FacilityRepository facilityRepository;
     private final VehicleRepository vehicleRepository;
@@ -55,24 +62,21 @@ public class ExecuteAlgorithmService implements ExecuteAlgorithmUseCase {
     public AlgorithmExecutionResult execute(
             List<AlgorithmExecutionSelection> facilitiesWithVehicles,
             List<UUID> selectedContainerIds,
-            int numberOfDays,
-            int averagePickupTimeMinutes) {
-        this.validateRequest(facilitiesWithVehicles, selectedContainerIds, numberOfDays, averagePickupTimeMinutes);
-
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes) {
+        this.validateRequest(facilitiesWithVehicles, selectedContainerIds);
         List<ResolvedFacilityVehiclesSelection> resolvedFacilitiesWithVehicles =
                 facilitiesWithVehicles.stream()
                         .map(this::resolveFacilityVehiclesSelection)
                         .toList();
-
         List<Container> resolvedContainers = selectedContainerIds.stream()
                 .map(this::resolveContainer)
                 .toList();
-
         return new AlgorithmExecutionResult(
                 resolvedFacilitiesWithVehicles,
                 resolvedContainers,
-                numberOfDays,
-                averagePickupTimeMinutes);
+                numberOfDays.getValue(),
+                averagePickupTimeMinutes.getValue());
     }
 
     /**
@@ -85,20 +89,12 @@ public class ExecuteAlgorithmService implements ExecuteAlgorithmUseCase {
      */
     private void validateRequest(
             List<AlgorithmExecutionSelection> facilitiesWithVehicles,
-            List<UUID> selectedContainerIds,
-            int numberOfDays,
-            int averagePickupTimeMinutes) {
+            List<UUID> selectedContainerIds) {
         if (facilitiesWithVehicles == null || facilitiesWithVehicles.isEmpty()) {
-            throw new IllegalArgumentException("At least one facility with vehicles must be selected");
+            throw new IllegalArgumentException(ERR_NO_FACILITY);
         }
         if (selectedContainerIds == null || selectedContainerIds.isEmpty()) {
-            throw new IllegalArgumentException("At least one container must be selected");
-        }
-        if (numberOfDays <= 0) {
-            throw new IllegalArgumentException("The number of days must be greater than zero");
-        }
-        if (averagePickupTimeMinutes <= 0) {
-            throw new IllegalArgumentException("The average pickup time must be greater than zero");
+            throw new IllegalArgumentException(ERR_NO_CONTAINER);
         }
     }
 
@@ -111,14 +107,12 @@ public class ExecuteAlgorithmService implements ExecuteAlgorithmUseCase {
     private ResolvedFacilityVehiclesSelection resolveFacilityVehiclesSelection(
             AlgorithmExecutionSelection selection) {
         if (selection.getSelectedVehicleIds().isEmpty()) {
-            throw new IllegalArgumentException("Each selected facility must include at least one vehicle");
+            throw new IllegalArgumentException(ERR_NO_VEHICLE);
         }
-
         Facility facility = this.resolveFacility(selection.getFacilityId());
         List<Vehicle> vehicles = selection.getSelectedVehicleIds().stream()
                 .map(this::resolveVehicle)
                 .toList();
-
         return new ResolvedFacilityVehiclesSelection(facility, vehicles);
     }
 

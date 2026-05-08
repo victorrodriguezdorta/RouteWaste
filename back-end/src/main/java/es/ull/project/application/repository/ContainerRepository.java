@@ -1,13 +1,15 @@
 package es.ull.project.application.repository;
 
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.enumerate.WasteType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
 
 /**
  * Repository interface for the Container aggregate.
@@ -71,4 +73,14 @@ public interface ContainerRepository {
      * @return optional containing the container when found
      */
     public abstract Optional<Container> findById(UUID id);
+
+    /**
+     * Find containers with advanced search criteria and pagination.
+     * Supports filtering by multiple attributes dynamically.
+     *
+     * @param pageable pagination and sort information
+     * @param criteria search criteria with optional filters
+     * @return page of matching containers
+     */
+    public abstract Page<Container> findAll(@NonNull Pageable pageable, @NonNull es.ull.project.application.query.ContainerSearchCriteria criteria);
 }

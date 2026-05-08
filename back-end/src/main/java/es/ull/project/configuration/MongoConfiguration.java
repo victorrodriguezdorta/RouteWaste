@@ -1,7 +1,27 @@
 package es.ull.project.configuration;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import es.ull.project.adapter.mongodb.reader.ContainerReadingConverter;
+import es.ull.project.adapter.mongodb.reader.DailyPlanReadingConverter;
+import es.ull.project.adapter.mongodb.reader.FacilityReadingConverter;
+import es.ull.project.adapter.mongodb.reader.InfrastructurePlanReadingConverter;
+import es.ull.project.adapter.mongodb.reader.ServiceAssignmentReadingConverter;
+import es.ull.project.adapter.mongodb.reader.VehicleReadingConverter;
+import es.ull.project.adapter.mongodb.writer.ContainerWritingConverter;
+import es.ull.project.adapter.mongodb.writer.DailyPlanWritingConverter;
+import es.ull.project.adapter.mongodb.writer.FacilityWritingConverter;
+import es.ull.project.adapter.mongodb.writer.InfrastructurePlanWritingConverter;
+import es.ull.project.adapter.mongodb.writer.ServiceAssignmentWritingConverter;
+import es.ull.project.adapter.mongodb.writer.VehicleWritingConverter;
+import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.application.repository.DailyPlanRepository;
+import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.application.repository.ServiceAssignmentRepository;
+import es.ull.project.application.repository.VehicleRepository;
 import java.util.Arrays;
-
 import org.bson.UuidRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,27 +37,6 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.lang.NonNull;
-
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-
-import es.ull.project.adapter.mongodb.reader.ContainerReadingConverter;
-import es.ull.project.adapter.mongodb.reader.DailyPlanReadingConverter;
-import es.ull.project.adapter.mongodb.reader.FacilityReadingConverter;
-import es.ull.project.adapter.mongodb.reader.InfrastructurePlanReadingConverter;
-import es.ull.project.adapter.mongodb.reader.ServiceAssignmentReadingConverter;
-import es.ull.project.adapter.mongodb.reader.VehicleReadingConverter;
-import es.ull.project.adapter.mongodb.writer.ContainerWritingConverter;
-import es.ull.project.adapter.mongodb.writer.DailyPlanWritingConverter;
-import es.ull.project.adapter.mongodb.writer.FacilityWritingConverter;
-import es.ull.project.adapter.mongodb.writer.InfrastructurePlanWritingConverter;
-import es.ull.project.adapter.mongodb.writer.ServiceAssignmentWritingConverter;
-import es.ull.project.adapter.mongodb.writer.VehicleWritingConverter;
-import es.ull.project.application.repository.ContainerRepository;
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.application.repository.ServiceAssignmentRepository;
 
 /**
  * MongoDB configuration class.
@@ -69,6 +68,14 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration {
     @Autowired
     private ServiceAssignmentRepository serviceAssignmentRepository;
 
+    @Lazy
+    @Autowired
+    private VehicleRepository vehicleRepository;
+
+    @Lazy
+    @Autowired
+    private DailyPlanRepository dailyPlanRepository;
+
     /**
      * Returns the ContainerRepository instance.
      *
@@ -94,6 +101,24 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration {
      */
     public ServiceAssignmentRepository serviceAssignmentRepository() {
         return this.serviceAssignmentRepository;
+    }
+
+    /**
+     * Returns the VehicleRepository instance.
+     *
+     * @return VehicleRepository
+     */
+    public VehicleRepository vehicleRepository() {
+        return this.vehicleRepository;
+    }
+
+    /**
+     * Returns the DailyPlanRepository instance.
+     *
+     * @return DailyPlanRepository
+     */
+    public DailyPlanRepository dailyPlanRepository() {
+        return this.dailyPlanRepository;
     }
 
     /**

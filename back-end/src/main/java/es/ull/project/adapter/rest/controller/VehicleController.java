@@ -33,6 +33,12 @@ import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.valueobject.page.NumberOfElements;
+import es.ull.project.domain.valueobject.page.PageFlag;
+import es.ull.project.domain.valueobject.page.PageNumber;
+import es.ull.project.domain.valueobject.page.PageSize;
+import es.ull.project.domain.valueobject.page.TotalElements;
+import es.ull.project.domain.valueobject.page.TotalPages;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -177,13 +183,13 @@ public class VehicleController {
                 .toList();
         VehiclePageResponseBody response = new VehiclePageResponseBody();
         response.content = responseBodies;
-        response.totalElements = vehiclePage.getTotalElements();
-        response.totalPages = vehiclePage.getTotalPages();
-        response.page = vehiclePage.getNumber();
-        response.size = vehiclePage.getSize();
-        response.numberOfElements = vehiclePage.getNumberOfElements();
-        response.first = vehiclePage.isFirst();
-        response.last = vehiclePage.isLast();
+        response.totalElements = new TotalElements(vehiclePage.getTotalElements());
+        response.totalPages = new TotalPages(vehiclePage.getTotalPages());
+        response.page = new PageNumber(vehiclePage.getNumber());
+        response.size = new PageSize(vehiclePage.getSize());
+        response.numberOfElements = new NumberOfElements(vehiclePage.getNumberOfElements());
+        response.first = new PageFlag(vehiclePage.isFirst());
+        response.last = new PageFlag(vehiclePage.isLast());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -242,7 +248,7 @@ public class VehicleController {
         Vehicle createdVehicle = this.createVehicleUseCase.create(
                 requestBody.vehicleType,
                 requestBody.capacityKilograms,
-                requestBody.CapacityLiters,
+                requestBody.capacityLiters,
                 requestBody.costPerKilometer
         );
         VehicleResponseBody responseBody = VehicleResponseMapper.toResponseBody(createdVehicle);
@@ -280,7 +286,7 @@ public class VehicleController {
                     vehicleId,
                     requestBody.vehicleType,
                     requestBody.capacityKilograms,
-                    requestBody.CapacityLiters,
+                    requestBody.capacityLiters,
                     requestBody.costPerKilometer
             );
             VehicleResponseBody responseBody = VehicleResponseMapper.toResponseBody(updatedVehicle);

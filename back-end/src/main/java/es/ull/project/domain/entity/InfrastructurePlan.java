@@ -1,11 +1,5 @@
 package es.ull.project.domain.entity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
@@ -14,6 +8,11 @@ import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * InfrastructurePlan
@@ -27,6 +26,7 @@ public class InfrastructurePlan {
     public static final String MAX_BUDGET_NOT_DEFINED = "Maximum budget is not defined";
     public static final String TOTAL_COST_EXCEEDED = "Total cost exceeds maximum budget";
     public static final String INVALID_ASSIGNMENT = "Service assignment is invalid";
+    private static final int ZERO = 0;
 
     /**
      * Unique identifier for the infrastructure plan.
@@ -109,10 +109,12 @@ public class InfrastructurePlan {
     /**
      * Creates a new InfrastructurePlan.
      *
-     * @param id              Plan identifier
-     * @param period          Planning period
-     * @param maxBudget       Maximum budget allowed
-     * @param servicePolicies Service policies to comply with
+     * @param period                   Planning period
+     * @param maxBudget                Maximum budget allowed
+     * @param servicePolicies          Service policies to comply with
+     * @param numberOfDays             Number of days in the planning horizon
+     * @param averagePickupTimeMinutes Average pickup time in minutes
+     * @param executedAt               Timestamp of algorithm execution (ISO 8601)
      */
     public InfrastructurePlan(
             PlanningPeriod period,
@@ -274,9 +276,9 @@ public class InfrastructurePlan {
     }
 
     /**
-     * Adds a daily plan identifier to the plan.
+     * Adds a daily plan entity to this infrastructure plan.
      *
-     * @param dailyPlanId the daily plan identifier to add
+     * @param dailyPlan the daily plan to add; ignored if {@code null} or already present
      */
     public void addDailyPlan(DailyPlan dailyPlan) {
         if (dailyPlan != null) {
@@ -308,8 +310,6 @@ public class InfrastructurePlan {
         for (Facility facility : selectedFacilities) {
             total += facility.getOpeningFixedCost().getAmount();
         }
-        // Transport cost should be updated based on routing, but for now we just 
-        // sum facility costs as routing cost is handled separately or needs to be derived from distance.
         TotalCost newCost = new TotalCost(total);
         if (newCost.greaterThan(this.maxBudget)) {
             throw new IllegalStateException(TOTAL_COST_EXCEEDED);
@@ -325,21 +325,13 @@ public class InfrastructurePlan {
     public boolean isPlanValid() {
         for (ServiceAssignment assignment : serviceAssignments) {
             Facility facility = assignment.getFacility();
-            
-            // Check if facility is not discarded
             if (facility.getStatus().isDiscarded()) {
                 return false;
             }
-            
-            // Check if current filling level is valid (not negative)
             DailyWasteDemandLitersPerDay currentFillingLevel = facility.getCurrentFillingLevel();
-            if (currentFillingLevel.getLitersPerDay() < 0) {
+            if (currentFillingLevel.getLitersPerDay() < ZERO) {
                 return false;
             }
-            
-            // Check if current filling level doesn't exceed a reasonable limit
-            // relative to storage capacity (this is a business logic decision)
-            // For now, we validate that storage capacity is sufficient
             if (facility.getStorageCapacity() == null) {
                 return false;
             }
@@ -385,14 +377,9 @@ public class InfrastructurePlan {
 
     /**
      * Returns the identifiers of the daily plans associated with this plan.
+     * This is a convenience derived from the stored {@link DailyPlan} entities.
      *
-     * @return the daily plan identifiers
-     */
-    /**
-     * Returns the identifiers of the daily plans associated with this plan.
-     * This is a convenience derived from the stored `DailyPlan` entities.
-     *
-     * @return the daily plan identifiers
+     * @return an unmodifiable list of daily plan UUIDs
      */
     public List<UUID> getDailyPlanIds() {
         List<UUID> ids = new ArrayList<>();
@@ -438,30 +425,67 @@ public class InfrastructurePlan {
         return servicePolicies;
     }
 
+    /**
+     * Returns the total collected weight determined by the algorithm.
+     *
+     * @return the total collected weight in kilograms
+     */
     public CollectedWeightKilograms getTotalCollectedKilograms() {
         return totalCollectedKilograms;
     }
 
+    /**
+     * Returns the total collected volume determined by the algorithm.
+     *
+     * @return the total collected volume in liters
+     */
     public CollectedVolumeLiters getTotalCollectedLiters() {
         return totalCollectedLiters;
     }
 
+    /**
+     * Returns the total route distance determined by the algorithm.
+     *
+     * @return the total distance in meters
+     */
     public Distance getTotalDistanceMeters() {
         return totalDistanceMeters;
     }
 
+    /**
+     * Returns the number of days in the planning horizon.
+     *
+     * @return the number of days
+     */
     public Integer getNumberOfDays() {
         return numberOfDays;
     }
 
+    /**
+     * Returns the average pickup time in minutes.
+     *
+     * @return the average pickup time in minutes
+     */
     public Integer getAveragePickupTimeMinutes() {
         return averagePickupTimeMinutes;
     }
 
+    /**
+     * Returns the timestamp when the algorithm was executed.
+     *
+     * @return the execution timestamp in ISO 8601 format
+     */
     public String getExecutedAt() {
         return executedAt;
     }
 
+    /**
+     * Updates the algorithm-computed totals for collected weight, volume, and distance.
+     *
+     * @param kg       the total collected weight in kilograms
+     * @param liters   the total collected volume in liters
+     * @param distance the total route distance in meters
+     */
     public void updateAlgorithmMetrics(CollectedWeightKilograms kg, CollectedVolumeLiters liters, Distance distance) {
         this.totalCollectedKilograms = kg;
         this.totalCollectedLiters = liters;

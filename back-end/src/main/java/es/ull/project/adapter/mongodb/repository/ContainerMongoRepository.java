@@ -1,10 +1,13 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import es.ull.project.application.query.ContainerSearchCriteria;
+import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -15,11 +18,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
-
-import es.ull.project.adapter.mongodb.query.ContainerSearchCriteria;
-import es.ull.project.application.repository.ContainerRepository;
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.enumerate.WasteType;
 
 /**
  * MongoDB implementation of the ContainerRepository interface.
@@ -35,6 +33,11 @@ public class ContainerMongoRepository implements ContainerRepository {
     public static final String COLLECTION_NAME = "containers";
     private static final String FIELD_ID = "id";
     private static final String FIELD_WASTE_TYPE = "wasteType";
+    private static final String FIELD_SERVICE_ZONE = "serviceZone";
+    private static final String FIELD_LOCATION_POSTAL_ADDRESS = "location.postalAddress";
+    private static final String FIELD_CAPACITY_LITERS_VALUE = "capacityLiters.liters";
+    private static final String FIELD_DAILY_DEMAND_VALUE = "dailyDemandLitersPerDay.litersPerDay";
+    private static final String REGEX_CASE_INSENSITIVE = "i";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -146,20 +149,15 @@ public class ContainerMongoRepository implements ContainerRepository {
     public Page<Container> findAll(@NonNull Pageable pageable, @NonNull ContainerSearchCriteria criteria) {
         Query dataQuery = new Query();
         Query countQuery = new Query();
-
-        // Build criteria list
         List<Criteria> criterias = buildSearchCriterias(criteria);
-        
         if (!criterias.isEmpty()) {
             Criteria combinedCriteria = new Criteria().andOperator(criterias.toArray(new Criteria[0]));
             dataQuery.addCriteria(combinedCriteria);
             countQuery.addCriteria(combinedCriteria);
         }
-
         dataQuery.with(pageable);
         List<Container> containers = this.mongoTemplate.find(dataQuery, Container.class, COLLECTION_NAME);
         long total = this.mongoTemplate.count(countQuery, Container.class, COLLECTION_NAME);
-        
         return new PageImpl<>(containers, pageable, total);
     }
 
@@ -172,38 +170,30 @@ public class ContainerMongoRepository implements ContainerRepository {
      */
     private List<Criteria> buildSearchCriterias(@NonNull ContainerSearchCriteria criteria) {
         List<Criteria> criterias = new ArrayList<>();
-
         if (criteria.getWasteType() != null) {
             criterias.add(Criteria.where(FIELD_WASTE_TYPE).is(criteria.getWasteType()));
         }
-
         if (criteria.getServiceZone() != null) {
-            criterias.add(Criteria.where("serviceZone").is(criteria.getServiceZone()));
+            criterias.add(Criteria.where(FIELD_SERVICE_ZONE).is(criteria.getServiceZone()));
         }
-
         if (criteria.getLocationPostalAddress() != null) {
-            criterias.add(Criteria.where("location.postalAddress")
-                    .regex(criteria.getLocationPostalAddress(), "i")); // Case-insensitive
+            criterias.add(Criteria.where(FIELD_LOCATION_POSTAL_ADDRESS)
+                    .regex(criteria.getLocationPostalAddress(), REGEX_CASE_INSENSITIVE));
         }
-
         if (criteria.getMinCapacityLiters() != null) {
-            criterias.add(Criteria.where("capacityLiters.liters").gte(criteria.getMinCapacityLiters()));
+            criterias.add(Criteria.where(FIELD_CAPACITY_LITERS_VALUE).gte(criteria.getMinCapacityLiters()));
         }
-
         if (criteria.getMaxCapacityLiters() != null) {
-            criterias.add(Criteria.where("capacityLiters.liters").lte(criteria.getMaxCapacityLiters()));
+            criterias.add(Criteria.where(FIELD_CAPACITY_LITERS_VALUE).lte(criteria.getMaxCapacityLiters()));
         }
-
         if (criteria.getMinDailyDemand() != null) {
-            criterias.add(Criteria.where("dailyDemandLitersPerDay.litersPerDay")
+            criterias.add(Criteria.where(FIELD_DAILY_DEMAND_VALUE)
                     .gte(criteria.getMinDailyDemand()));
         }
-
         if (criteria.getMaxDailyDemand() != null) {
-            criterias.add(Criteria.where("dailyDemandLitersPerDay.litersPerDay")
+            criterias.add(Criteria.where(FIELD_DAILY_DEMAND_VALUE)
                     .lte(criteria.getMaxDailyDemand()));
         }
-
         return criterias;
     }
 }

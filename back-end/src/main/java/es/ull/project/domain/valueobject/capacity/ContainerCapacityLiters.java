@@ -43,6 +43,7 @@ public final class ContainerCapacityLiters {
      *
      * @return Capacity value in liters
      */
+    @com.fasterxml.jackson.annotation.JsonValue
     public double getLiters() {
         return this.liters;
     }

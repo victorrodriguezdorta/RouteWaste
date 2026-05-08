@@ -8,7 +8,6 @@ import es.ull.project.domain.entity.DailyPlan;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
 import java.util.List;
-
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -51,24 +50,18 @@ public class DeleteInfrastructurePlanService implements DeleteInfrastructurePlan
     public InfrastructurePlan delete(UUID id) {
         InfrastructurePlan existing = this.repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("InfrastructurePlan not found"));
-
-        // Cascade delete all daily plans associated with this infrastructure plan
         List<DailyPlan> dailyPlans = dailyPlanRepository.findByInfrastructurePlanId(id);
         if (dailyPlans != null) {
             for (DailyPlan dp : dailyPlans) {
                 dailyPlanRepository.delete(dp);
             }
         }
-
-        // Cascade delete all service assignments (clusters) associated with this plan
         List<ServiceAssignment> assignments = existing.getServiceAssignments();
         if (assignments != null) {
             for (ServiceAssignment sa : assignments) {
                 serviceAssignmentRepository.delete(sa);
             }
         }
-
-        // Delete the parent infrastructure plan
         this.repository.delete(existing);
         return existing;
     }

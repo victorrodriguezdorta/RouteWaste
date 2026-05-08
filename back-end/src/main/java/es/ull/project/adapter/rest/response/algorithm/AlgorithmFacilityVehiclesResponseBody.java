@@ -14,7 +14,7 @@ import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
 public class AlgorithmFacilityVehiclesResponseBody {
 
     /**
-     * Resolved facility data.
+     * Fully resolved facility.
      */
     public FacilityResponseBody facility;
 

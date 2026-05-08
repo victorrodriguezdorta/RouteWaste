@@ -1,6 +1,7 @@
 package es.ull.project.adapter.rest.request.algorithm;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * AlgorithmExecutionRequestBody
@@ -18,7 +19,7 @@ public class AlgorithmExecutionRequestBody {
     /**
      * Selected container identifiers.
      */
-    public List<String> selectedContainerIds;
+    public List<UUID> selectedContainerIds;
 
     /**
      * Number of planning days.
@@ -30,6 +31,8 @@ public class AlgorithmExecutionRequestBody {
      */
     public Integer averagePickupTimeMinutes;
 
-    /** Optional maximum budget to be provided to the algorithm. */
+    /**
+     * Optional maximum budget to be provided to the algorithm.
+     */
     public MaximumBudgetRequestBody maxBudget;
 }

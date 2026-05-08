@@ -1,5 +1,7 @@
 package es.ull.project.application.usecase.algorithm;
 
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +23,6 @@ public interface ExecuteAlgorithmUseCase {
     AlgorithmExecutionResult execute(
             List<AlgorithmExecutionSelection> facilitiesWithVehicles,
             List<UUID> selectedContainerIds,
-            int numberOfDays,
-            int averagePickupTimeMinutes);
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes);
 }

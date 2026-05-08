@@ -1,8 +1,7 @@
 package es.ull.project.application.usecase.algorithm;
 
-import java.util.List;
-
 import es.ull.project.domain.entity.Container;
+import java.util.List;
 
 /**
  * AlgorithmExecutionResult

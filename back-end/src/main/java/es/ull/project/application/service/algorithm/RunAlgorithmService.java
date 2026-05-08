@@ -2,6 +2,7 @@ package es.ull.project.application.service.algorithm;
 
 import es.ull.project.application.port.algorithm.AlgorithmRunner;
 import es.ull.project.application.usecase.algorithm.RunAlgorithmUseCase;
+import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 
 /**
  * Service implementation for running the external algorithm process.
@@ -23,10 +24,11 @@ public class RunAlgorithmService implements RunAlgorithmUseCase {
      * Executes the algorithm process with the provided JSON payload.
      *
      * @param processedJson JSON payload to send to the algorithm
-     * @return raw JSON returned by the algorithm
+     * @return raw JSON returned by the algorithm wrapped in a value object
      */
     @Override
-    public String execute(String processedJson) {
-        return this.algorithmRunner.run(processedJson);
+    public AlgorithmJsonPayload execute(AlgorithmJsonPayload processedJson) {
+        String result = this.algorithmRunner.run(processedJson.getJson());
+        return new AlgorithmJsonPayload(result);
     }
 }

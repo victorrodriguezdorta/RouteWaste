@@ -16,6 +16,7 @@ public final class CollectedVolumeLiters {
 
     /**
      * Volume in liters.
+     * It is a required attribute.
      */
     private final double liters;
 
@@ -60,6 +61,12 @@ public final class CollectedVolumeLiters {
         return liters;
     }
 
+    /**
+     * Checks equality based on the liters value.
+     *
+     * @param otherObject the object to compare with
+     * @return {@code true} if the other object is a CollectedVolumeLiters with the same value
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
@@ -69,14 +76,24 @@ public final class CollectedVolumeLiters {
             return false;
         }
         CollectedVolumeLiters other = (CollectedVolumeLiters) otherObject;
-        return Double.compare(other.liters, liters) == 0;
+        return Double.compare(other.liters, liters) == (int) ZERO;
     }
 
+    /**
+     * Returns a hash code based on the liters value.
+     *
+     * @return hash code for this instance
+     */
     @Override
     public int hashCode() {
         return Objects.hash(liters);
     }
 
+    /**
+     * Returns a human-readable string representation of this value object.
+     *
+     * @return string representation including the liters value
+     */
     @Override
     public String toString() {
         return String.format("CollectedVolumeLiters={%.2f L}", liters);

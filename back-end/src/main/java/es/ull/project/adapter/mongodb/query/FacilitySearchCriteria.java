@@ -6,9 +6,10 @@ import es.ull.project.domain.enumerate.FacilityType;
 /**
  * Encapsulates search criteria for Facility queries.
  * Supports dynamic filtering by multiple attributes.
- * 
+ *
  * This class allows building flexible queries without changing the repository
  * or controller code. Criteria can be easily added or removed.
+ * Instances are created via {@link FacilitySearchCriteriaBuilder}.
  */
 public class FacilitySearchCriteria {
 
@@ -16,60 +17,73 @@ public class FacilitySearchCriteria {
     private FacilityStatus status;
     private String locationPostalAddress;
 
-    // Private constructor for builder pattern
-    private FacilitySearchCriteria() {}
+    /**
+     * Package-private constructor enforcing use of {@link FacilitySearchCriteriaBuilder}.
+     */
+    FacilitySearchCriteria() {}
 
-    // Getters
+    /**
+     * Returns the facility type filter criterion.
+     *
+     * @return the {@link FacilityType} to filter by, or {@code null} if not set
+     */
     public FacilityType getFacilityType() {
         return facilityType;
     }
 
+    /**
+     * Returns the facility status filter criterion.
+     *
+     * @return the {@link FacilityStatus} to filter by, or {@code null} if not set
+     */
     public FacilityStatus getStatus() {
         return status;
     }
 
+    /**
+     * Returns the location postal address filter criterion.
+     *
+     * @return the postal address substring to filter by, or {@code null} if not set
+     */
     public String getLocationPostalAddress() {
         return locationPostalAddress;
     }
 
     /**
-     * Check if any criteria is set.
+     * Checks whether any search criterion has been set.
+     *
+     * @return {@code true} if at least one criterion is non-null, {@code false} otherwise
      */
     public boolean hasCriteria() {
-        return facilityType != null 
+        return facilityType != null
             || status != null
             || locationPostalAddress != null;
     }
 
     /**
-     * Builder pattern for constructing search criteria.
+     * Sets the facility type criterion (package-private, called by builder).
+     *
+     * @param facilityType the facility type to filter by
      */
-    public static class Builder {
-        private FacilityType facilityType;
-        private FacilityStatus status;
-        private String locationPostalAddress;
+    void setFacilityType(FacilityType facilityType) {
+        this.facilityType = facilityType;
+    }
 
-        public Builder withFacilityType(FacilityType facilityType) {
-            this.facilityType = facilityType;
-            return this;
-        }
+    /**
+     * Sets the facility status criterion (package-private, called by builder).
+     *
+     * @param status the facility status to filter by
+     */
+    void setStatus(FacilityStatus status) {
+        this.status = status;
+    }
 
-        public Builder withStatus(FacilityStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public Builder withLocationPostalAddress(String postalAddress) {
-            this.locationPostalAddress = postalAddress == null || postalAddress.isBlank() ? null : postalAddress;
-            return this;
-        }
-
-        public FacilitySearchCriteria build() {
-            FacilitySearchCriteria criteria = new FacilitySearchCriteria();
-            criteria.facilityType = this.facilityType;
-            criteria.status = this.status;
-            criteria.locationPostalAddress = this.locationPostalAddress;
-            return criteria;
-        }
+    /**
+     * Sets the location postal address criterion (package-private, called by builder).
+     *
+     * @param locationPostalAddress the postal address substring to filter by
+     */
+    void setLocationPostalAddress(String locationPostalAddress) {
+        this.locationPostalAddress = locationPostalAddress;
     }
 }

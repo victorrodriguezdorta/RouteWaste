@@ -116,6 +116,7 @@ public final class TransportationVariableCost {
      *
      * @return Amount as a double value.
      */
+    @com.fasterxml.jackson.annotation.JsonValue
     public double getAmount() {
         return this.amount.doubleValue();
     }

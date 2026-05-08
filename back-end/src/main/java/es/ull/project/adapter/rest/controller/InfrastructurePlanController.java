@@ -31,6 +31,12 @@ import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructur
 import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
 import es.ull.project.domain.entity.DailyPlan;
 import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.valueobject.page.NumberOfElements;
+import es.ull.project.domain.valueobject.page.PageFlag;
+import es.ull.project.domain.valueobject.page.PageNumber;
+import es.ull.project.domain.valueobject.page.PageSize;
+import es.ull.project.domain.valueobject.page.TotalElements;
+import es.ull.project.domain.valueobject.page.TotalPages;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,6 +64,13 @@ public class InfrastructurePlanController {
 
     /**
      * GET /infrastructure-plans/
+     *
+     * @param page      zero-based page index
+     * @param size      number of elements per page
+     * @param sortBy    field to sort by (id, executedAt, estimatedTotalCost, numberOfDays, averagePickupTimeMinutes)
+     * @param sortOrder sort direction: asc or desc
+     * @return a paginated response containing lightweight infrastructure plan summaries,
+     *         or a 400 Bad Request if the pagination or sort parameters are invalid
      */
     @Operation(summary = "Get all infrastructure plans", description = "Retrieves a paginated lightweight list of all infrastructure plans")
     @ApiResponses(value = {
@@ -72,57 +85,68 @@ public class InfrastructurePlanController {
             @Parameter(description = "Field to sort by (id, executedAt, estimatedTotalCost, numberOfDays, averagePickupTimeMinutes)")
             @RequestParam(required = false) String sortBy,
             @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder) {
-
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
         if (sortBy != null && !sortBy.isBlank() && !InfrastructurePlanFieldMapper.isValidField(sortBy)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
         Pageable pageable = PageRequest.of(page, size, buildSort(sortBy, sortOrder));
         Page<InfrastructurePlan> infrastructurePlanPage = this.readInfrastructurePlanUseCase.fetchAll(pageable);
         return buildSuccessResponse(infrastructurePlanPage);
     }
 
+    /**
+     * Builds a {@link Sort} instance from the given API field name and sort direction.
+     *
+     * <p>Returns {@link Sort#unsorted()} when the field name is blank or cannot be mapped
+     * to a MongoDB field path.
+     *
+     * @param sortBy    the public API field name to sort by
+     * @param sortOrder the sort direction string; {@code "desc"} maps to descending, anything else to ascending
+     * @return the resolved {@link Sort}, or {@link Sort#unsorted()} if the field is invalid
+     */
     private Sort buildSort(String sortBy, String sortOrder) {
         if (sortBy == null || sortBy.isBlank()) {
             return Sort.unsorted();
         }
-
         String mongoField = InfrastructurePlanFieldMapper.toMongoField(sortBy);
         if (mongoField == null) {
             return Sort.unsorted();
         }
-
         Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder)
                 ? Sort.Direction.DESC
                 : Sort.Direction.ASC;
-
         return Sort.by(direction, mongoField);
     }
 
+    /**
+     * Wraps a {@link Page} of {@link InfrastructurePlan} entities into a paginated HTTP response.
+     *
+     * @param infrastructurePlanPage the page of infrastructure plans returned by the use case
+     * @return a 200 OK {@link ResponseEntity} containing the populated {@link InfrastructurePlanPageResponseBody}
+     */
     private ResponseEntity<InfrastructurePlanPageResponseBody> buildSuccessResponse(Page<InfrastructurePlan> infrastructurePlanPage) {
         List<InfrastructurePlanListResponseBody> responseBodies = infrastructurePlanPage.getContent().stream()
                 .map(InfrastructurePlanListResponseMapper::toResponseBody)
                 .toList();
-
         InfrastructurePlanPageResponseBody response = new InfrastructurePlanPageResponseBody();
         response.content = responseBodies;
-        response.totalElements = infrastructurePlanPage.getTotalElements();
-        response.totalPages = infrastructurePlanPage.getTotalPages();
-        response.page = infrastructurePlanPage.getNumber();
-        response.size = infrastructurePlanPage.getSize();
-        response.numberOfElements = infrastructurePlanPage.getNumberOfElements();
-        response.first = infrastructurePlanPage.isFirst();
-        response.last = infrastructurePlanPage.isLast();
-
+        response.totalElements = new TotalElements(infrastructurePlanPage.getTotalElements());
+        response.totalPages = new TotalPages(infrastructurePlanPage.getTotalPages());
+        response.page = new PageNumber(infrastructurePlanPage.getNumber());
+        response.size = new PageSize(infrastructurePlanPage.getSize());
+        response.numberOfElements = new NumberOfElements(infrastructurePlanPage.getNumberOfElements());
+        response.first = new PageFlag(infrastructurePlanPage.isFirst());
+        response.last = new PageFlag(infrastructurePlanPage.isLast());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
      * GET /infrastructure-plans/{id}
+     *
+     * @param id the string representation of the infrastructure plan UUID
+     * @return a 200 OK response with the plan details, 404 if not found, or 400 if the ID format is invalid
      */
     @Operation(summary = "Get infrastructure plan by ID", description = "Retrieves a specific infrastructure plan by its unique identifier")
     @ApiResponses(value = {
@@ -151,6 +175,9 @@ public class InfrastructurePlanController {
 
     /**
      * DELETE /infrastructure-plans/{id}
+     *
+     * @param id the string representation of the infrastructure plan UUID to delete
+     * @return a 200 OK response with the deleted plan details, or 400 if the ID format is invalid
      */
     @Operation(summary = "Delete an infrastructure plan", description = "Deletes an infrastructure plan by its unique identifier")
     @ApiResponses(value = {

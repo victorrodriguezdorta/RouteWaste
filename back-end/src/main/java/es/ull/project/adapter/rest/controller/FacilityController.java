@@ -22,12 +22,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.ull.project.adapter.mongodb.mapper.FacilityFieldMapper;
-import es.ull.project.adapter.mongodb.query.FacilitySearchCriteria;
+import es.ull.project.adapter.mongodb.query.FacilitySearchCriteriaBuilder;
 import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
 import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
 import es.ull.project.adapter.rest.response.facility.FacilityPageResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
+import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
 import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
 import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
@@ -151,7 +152,7 @@ public class FacilityController {
         }
 
         // Build search criteria
-        FacilitySearchCriteria criteria = new FacilitySearchCriteria.Builder()
+        FacilitySearchCriteria criteria = new FacilitySearchCriteriaBuilder()
                 .withFacilityType(facilityTypeFilter)
                 .withStatus(statusFilter)
                 .withLocationPostalAddress(location)
