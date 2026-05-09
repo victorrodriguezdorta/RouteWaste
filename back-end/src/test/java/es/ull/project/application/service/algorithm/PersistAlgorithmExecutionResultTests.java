@@ -48,6 +48,7 @@ import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
+import es.ull.project.domain.valueobject.time.PlanDay;
 
 class PersistAlgorithmExecutionResultTests {
 
@@ -91,7 +92,7 @@ class PersistAlgorithmExecutionResultTests {
 
         DailyPlan firstDailyPlan = dailyPlanRepository.saved.values().iterator().next();
         assertEquals(2, firstDailyPlan.getStops().size());
-        assertEquals(Integer.valueOf(1), firstDailyPlan.getPlanDay());
+        assertEquals(new PlanDay(1), firstDailyPlan.getPlanDay());
         assertEquals(UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"), firstDailyPlan.getFacility().getId());
         assertEquals(UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"), firstDailyPlan.getStops().get(0).getContainer().getId());
     }
