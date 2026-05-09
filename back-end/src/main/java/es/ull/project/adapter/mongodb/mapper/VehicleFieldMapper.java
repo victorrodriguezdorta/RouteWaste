@@ -14,73 +14,119 @@ import java.util.Map;
  */
 public class VehicleFieldMapper {
 
-    /** MongoDB field name for the vehicle identifier. */
+    /**
+     * MongoDB field name for the vehicle identifier.
+     */
     private static final String FIELD_ID = "id";
 
-    /** API field name for vehicle type (frontend alias). */
+    /**
+     * API field name for vehicle type (frontend alias).
+     */
     private static final String FIELD_TYPE = "type";
 
-    /** API field name for vehicle type (camelCase). */
+    /**
+     * API field name for vehicle type (camelCase).
+     */
     private static final String FIELD_VEHICLE_TYPE = "vehicleType";
 
-    /** API field name for vehicle type (snake_case). */
+    /**
+     * API field name for vehicle type (snake_case).
+     */
     private static final String FIELD_VEHICLE_TYPE_SNAKE = "vehicle_type";
 
-    /** API field name for capacity in kilograms (camelCase). */
+    /**
+     * API field name for capacity in kilograms (camelCase).
+     */
     private static final String FIELD_CAPACITY_KILOGRAMS = "capacityKilograms";
 
-    /** API field name for capacity in kilograms (snake_case). */
+    /**
+     * API field name for capacity in kilograms (snake_case).
+     */
     private static final String FIELD_CAPACITY_KG = "capacity_kg";
 
-    /** API field name for capacity in kilograms (short alias). */
+    /**
+     * API field name for capacity in kilograms (short alias).
+     */
     private static final String FIELD_KG = "kg";
 
-    /** API field name for capacity in kilograms (long alias). */
+    /**
+     * API field name for capacity in kilograms (long alias).
+     */
     private static final String FIELD_KILOGRAMS = "kilograms";
 
-    /** API field name for capacity in liters (exact backend name). */
+    /**
+     * API field name for capacity in liters (exact backend name).
+     */
     private static final String FIELD_CAPACITY_LITERS_UPPER = "CapacityLiters";
 
-    /** API field name for capacity in liters (camelCase). */
+    /**
+     * API field name for capacity in liters (camelCase).
+     */
     private static final String FIELD_CAPACITY_LITERS = "capacityLiters";
 
-    /** API field name for capacity in liters (snake_case). */
+    /**
+     * API field name for capacity in liters (snake_case).
+     */
     private static final String FIELD_CAPACITY_LITERS_SNAKE = "capacity_liters";
 
-    /** API field name for capacity in liters (short alias). */
+    /**
+     * API field name for capacity in liters (short alias).
+     */
     private static final String FIELD_LITERS = "liters";
 
-    /** API field name for cost per kilometer (short alias). */
+    /**
+     * API field name for cost per kilometer (short alias).
+     */
     private static final String FIELD_COST = "cost";
 
-    /** API field name for cost per kilometer (camelCase). */
+    /**
+     * API field name for cost per kilometer (camelCase).
+     */
     private static final String FIELD_COST_PER_KILOMETER = "costPerKilometer";
 
-    /** API field name for cost per kilometer (snake_case). */
+    /**
+     * API field name for cost per kilometer (snake_case).
+     */
     private static final String FIELD_COST_PER_KM = "cost_per_km";
 
-    /** API field name for the creation timestamp. */
+    /**
+     * API field name for the creation timestamp.
+     */
     private static final String FIELD_CREATED_AT = "createdAt";
 
-    /** API field name for the last update timestamp. */
+    /**
+     * API field name for the last update timestamp.
+     */
     private static final String FIELD_UPDATED_AT = "updatedAt";
 
-    /** MongoDB path for the vehicle type field. */
+    /**
+     * MongoDB path for the vehicle type field.
+     */
     private static final String MONGO_VEHICLE_TYPE = "vehicleType";
 
-    /** MongoDB path for the capacity in kilograms nested field. */
+    /**
+     * MongoDB path for the capacity in kilograms nested field.
+     */
     private static final String MONGO_CAPACITY_KILOGRAMS = "capacityKilograms.Kilograms";
 
-    /** MongoDB path for the capacity in liters nested field. */
+    /**
+     * MongoDB path for the capacity in liters nested field.
+     */
     private static final String MONGO_CAPACITY_LITERS = "CapacityLiters.liters";
 
-    /** MongoDB path for the cost per kilometer nested field. */
+    /**
+     * MongoDB path for the cost per kilometer nested field.
+     */
     private static final String MONGO_COST_PER_KILOMETER = "costPerKilometer.amount";
 
-    /** MongoDB path for the creation timestamp field. */
+    /**
+     * MongoDB path for the creation timestamp field.
+     */
     private static final String MONGO_CREATED_AT = "createdAt";
 
-    /** MongoDB path for the last update timestamp field. */
+    /**
+     * MongoDB path for the last update timestamp field.
+     */
     private static final String MONGO_UPDATED_AT = "updatedAt";
 
     private static final Map<String, String> FIELD_MAPPING = new HashMap<>();
@@ -97,6 +143,7 @@ public class VehicleFieldMapper {
      * Private constructor to prevent instantiation of this utility class.
      */
     private VehicleFieldMapper() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated.");
     }
 
     /**

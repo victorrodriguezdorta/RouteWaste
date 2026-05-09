@@ -111,12 +111,18 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
     private java.util.Comparator<InfrastructurePlan> buildComparator(String property) {
         return switch (property) {
             case FIELD_ID_MONGO, FIELD_ID -> java.util.Comparator.comparing(InfrastructurePlan::getId, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
-            case FIELD_EXECUTED_AT -> java.util.Comparator.comparing(InfrastructurePlan::getExecutedAt, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+            case FIELD_EXECUTED_AT -> java.util.Comparator.comparing(
+                    plan -> plan.getExecutedAt() != null ? plan.getExecutedAt().getTimestamp() : null,
+                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             case FIELD_ESTIMATED_TOTAL_COST -> java.util.Comparator.comparing(
                     plan -> plan.getEstimatedTotalCost() != null ? plan.getEstimatedTotalCost().getAmount() : null,
                     java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
-            case FIELD_NUMBER_OF_DAYS -> java.util.Comparator.comparing(InfrastructurePlan::getNumberOfDays, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
-            case FIELD_AVERAGE_PICKUP_TIME -> java.util.Comparator.comparing(InfrastructurePlan::getAveragePickupTimeMinutes, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+            case FIELD_NUMBER_OF_DAYS -> java.util.Comparator.comparing(
+                    plan -> plan.getNumberOfDays() != null ? plan.getNumberOfDays().getValue() : null,
+                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+            case FIELD_AVERAGE_PICKUP_TIME -> java.util.Comparator.comparing(
+                    plan -> plan.getAveragePickupTimeMinutes() != null ? plan.getAveragePickupTimeMinutes().getValue() : null,
+                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             default -> null;
         };
     }

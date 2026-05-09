@@ -41,6 +41,8 @@ import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.route.RouteSequence;
+import es.ull.project.domain.valueobject.time.ExecutedAt;
+import es.ull.project.domain.valueobject.time.PlanDay;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
 /**
@@ -191,9 +193,9 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 				resolvePlanningPeriod(algorithmResponse),
 				effectiveMaxBudget,
 				null,
-				numberOfDays.getValue(),
-				averagePickupTimeMinutes.getValue(),
-				executedAt);
+				numberOfDays,
+				averagePickupTimeMinutes,
+				executedAt != null ? new ExecutedAt(executedAt) : null);
 		Map<UUID, Facility> facilitiesById = new LinkedHashMap<>();
 		Map<UUID, Container> containersById = new LinkedHashMap<>();
 		List<ServiceAssignment> serviceAssignments = new ArrayList<>();
@@ -233,7 +235,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 				}
 				Vehicle vehicle = resolveVehicle(dailyPlanNode.get(FIELD_VEHICLE));
 				LocalDate serviceDate = LocalDate.parse(dailyPlanNode.path(FIELD_SERVICE_DATE).asText());
-				Integer planDay = dailyPlanNode.hasNonNull(FIELD_PLAN_DAY) ? dailyPlanNode.get(FIELD_PLAN_DAY).asInt() : null;
+				PlanDay planDay = dailyPlanNode.hasNonNull(FIELD_PLAN_DAY) ? new PlanDay(dailyPlanNode.get(FIELD_PLAN_DAY).asInt()) : null;
 				CollectedWeightKilograms totalCollectedKilograms = CollectedWeightKilograms.fromKilograms(
 						dailyPlanNode.path(FIELD_TOTAL_COLLECTED_KILOGRAMS).asDouble(0.0));
 				CollectedVolumeLiters totalCollectedLiters = CollectedVolumeLiters.fromLiters(

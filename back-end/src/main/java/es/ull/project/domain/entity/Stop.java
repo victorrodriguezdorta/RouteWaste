@@ -22,6 +22,7 @@ public class Stop {
     public static final String COLLECTED_LITERS_NOT_DEFINED = "Collected liters is not defined";
     public static final String DISTANCE_PREVIOUS_NOT_DEFINED = "Distance from previous is not defined";
     public static final String CUMULATIVE_DISTANCE_NOT_DEFINED = "Cumulative distance is not defined";
+    public static final String STOP_TO_COPY_NULL = "Stop to copy must not be null";
 
     /**
      * Route sequence position of this stop within the daily plan route.
@@ -60,7 +61,7 @@ public class Stop {
     private final Distance cumulativeDistanceMeters;
 
     /**
-     * Restore constructor.
+     * Creates a new Stop.
      *
      * @param sequence                   The sequence number in the route.
      * @param container                  The container visited.
@@ -87,18 +88,18 @@ public class Stop {
     /**
      * Copy constructor.
      *
-     * @param other the Stop instance to copy; must not be null
+     * @param otherObject the Stop instance to copy; must not be null
      */
-    public Stop(Stop other) {
-        if (other == null) {
-            throw new IllegalArgumentException("Stop to copy must not be null");
+    public Stop(Stop otherObject) {
+        if (otherObject == null) {
+            throw new IllegalArgumentException(STOP_TO_COPY_NULL);
         }
-        this.sequence = other.sequence;
-        this.container = other.container;
-        this.collectedKilograms = other.collectedKilograms;
-        this.collectedLiters = other.collectedLiters;
-        this.distanceFromPreviousMeters = other.distanceFromPreviousMeters;
-        this.cumulativeDistanceMeters = other.cumulativeDistanceMeters;
+        this.sequence = otherObject.sequence;
+        this.container = otherObject.container;
+        this.collectedKilograms = otherObject.collectedKilograms;
+        this.collectedLiters = otherObject.collectedLiters;
+        this.distanceFromPreviousMeters = otherObject.distanceFromPreviousMeters;
+        this.cumulativeDistanceMeters = otherObject.cumulativeDistanceMeters;
     }
 
     /**

@@ -15,6 +15,7 @@ public final class RouteSequence {
 
     /**
      * The sequence number.
+     * It is a required attribute.
      */
     private final int value;
 

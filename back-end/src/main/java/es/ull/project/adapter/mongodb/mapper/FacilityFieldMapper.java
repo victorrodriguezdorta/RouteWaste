@@ -14,61 +14,99 @@ import java.util.Map;
  */
 public class FacilityFieldMapper {
 
-    /** MongoDB field name for the facility identifier. */
+    /**
+     * MongoDB field name for the facility identifier.
+     */
     private static final String FIELD_ID = "id";
 
-    /** API field name for facility type (short alias). */
+    /**
+     * API field name for facility type (short alias).
+     */
     private static final String FIELD_TYPE = "type";
 
-    /** API and MongoDB field name for the facility type. */
+    /**
+     * API and MongoDB field name for the facility type.
+     */
     private static final String FIELD_FACILITY_TYPE = "facilityType";
 
-    /** API and MongoDB field name for the facility status. */
+    /**
+     * API and MongoDB field name for the facility status.
+     */
     private static final String FIELD_STATUS = "status";
 
-    /** API and MongoDB field name for the creation timestamp. */
+    /**
+     * API and MongoDB field name for the creation timestamp.
+     */
     private static final String FIELD_CREATED_AT = "createdAt";
 
-    /** API and MongoDB field name for the last update timestamp. */
+    /**
+     * API and MongoDB field name for the last update timestamp.
+     */
     private static final String FIELD_UPDATED_AT = "updatedAt";
 
-    /** API field name for location (short alias). */
+    /**
+     * API field name for location (short alias).
+     */
     private static final String FIELD_LOCATION = "location";
 
-    /** API field name for location postal address. */
+    /**
+     * API field name for location postal address.
+     */
     private static final String FIELD_POSTAL_ADDRESS = "postalAddress";
 
-    /** API field name for location latitude. */
+    /**
+     * API field name for location latitude.
+     */
     private static final String FIELD_LATITUDE = "latitude";
 
-    /** API field name for location longitude. */
+    /**
+     * API field name for location longitude.
+     */
     private static final String FIELD_LONGITUDE = "longitude";
 
-    /** API and MongoDB field name for the storage capacity. */
+    /**
+     * API and MongoDB field name for the storage capacity.
+     */
     private static final String FIELD_STORAGE_CAPACITY = "storageCapacity";
 
-    /** API and MongoDB field name for the processing capacity. */
+    /**
+     * API and MongoDB field name for the processing capacity.
+     */
     private static final String FIELD_PROCESSING_CAPACITY = "processingCapacity";
 
-    /** API and MongoDB field name for the unloading time. */
+    /**
+     * API and MongoDB field name for the unloading time.
+     */
     private static final String FIELD_UNLOADING_TIME = "unloadingTime";
 
-    /** API field name for the opening fixed cost (short alias). */
+    /**
+     * API field name for the opening fixed cost (short alias).
+     */
     private static final String FIELD_OPENING_COST = "openingCost";
 
-    /** API and MongoDB field name for the current filling level. */
+    /**
+     * API and MongoDB field name for the current filling level.
+     */
     private static final String FIELD_CURRENT_FILLING_LEVEL = "currentFillingLevel";
 
-    /** MongoDB path for the location postal address nested field. */
+    /**
+     * MongoDB path for the location postal address nested field.
+     */
     private static final String MONGO_LOCATION_POSTAL_ADDRESS = "location.postalAddress";
 
-    /** MongoDB path for the location latitude nested field. */
+    /**
+     * MongoDB path for the location latitude nested field.
+     */
     private static final String MONGO_LOCATION_LATITUDE = "location.latitude";
 
-    /** MongoDB path for the location longitude nested field. */
+    /**
+     * MongoDB path for the location longitude nested field.
+     */
     private static final String MONGO_LOCATION_LONGITUDE = "location.longitude";
 
-    /** MongoDB field name for the opening fixed cost. */
+    /**
+     * MongoDB field name for the opening fixed cost.
+     */
     private static final String MONGO_OPENING_FIXED_COST = "openingFixedCost";
 
     private static final Map<String, String> FIELD_MAPPING = new HashMap<>();
@@ -83,6 +121,7 @@ public class FacilityFieldMapper {
      * Private constructor to prevent instantiation of this utility class.
      */
     private FacilityFieldMapper() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated.");
     }
 
     /**

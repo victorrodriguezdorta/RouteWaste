@@ -88,7 +88,7 @@ public class Facility {
 
     /**
      * Current filling level of the facility in liters per day.
-     * It is a computed attribute that updates when trucks are received.
+     * It is a computed attribute.
      */
     private DailyWasteDemandLitersPerDay currentFillingLevel;
 

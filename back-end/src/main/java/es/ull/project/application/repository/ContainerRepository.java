@@ -1,5 +1,8 @@
 package es.ull.project.application.repository;
 
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.WasteType;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -7,9 +10,6 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
-
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.enumerate.WasteType;
 
 /**
  * Repository interface for the Container aggregate.

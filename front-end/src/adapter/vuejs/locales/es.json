@@ -365,6 +365,8 @@
           "totalCollectedKilograms": "Total Recogido (kg)",
           "totalCollectedLiters": "Total Recogido (L)",
           "totalDistanceMeters": "Distancia Total (m)",
+          "averagePickupTimeMinutes": "Tiempo Promedio de Recogida (min)",
+          "estimatedTotalCost": "Costo Total Estimado",
           "maxBudget": "Presupuesto Máximo",
           "facilityCount": "Número de Instalaciones",
           "dailyPlanCount": "Planes Diarios",

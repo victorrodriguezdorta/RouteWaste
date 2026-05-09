@@ -21,7 +21,7 @@ public final class ContainerCapacityLiters {
     /**
      * Required.
      * Capacity value in liters.
-     * It is a required attribute and always measured in liters.
+     * It is a required attribute.
      */
     private final double liters;
 

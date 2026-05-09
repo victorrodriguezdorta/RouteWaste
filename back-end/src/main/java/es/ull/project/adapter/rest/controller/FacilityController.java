@@ -1,5 +1,26 @@
 package es.ull.project.adapter.rest.controller;
 
+import es.ull.project.adapter.mongodb.mapper.FacilityFieldMapper;
+import es.ull.project.adapter.mongodb.query.FacilitySearchCriteriaBuilder;
+import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
+import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
+import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
+import es.ull.project.adapter.rest.response.facility.FacilityPageResponseBody;
+import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
+import es.ull.project.application.query.FacilitySearchCriteria;
+import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
+import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
+import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
+import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.enumerate.FacilityStatus;
+import es.ull.project.domain.enumerate.FacilityType;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -20,26 +41,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import es.ull.project.adapter.mongodb.mapper.FacilityFieldMapper;
-import es.ull.project.adapter.mongodb.query.FacilitySearchCriteriaBuilder;
-import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
-import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
-import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
-import es.ull.project.adapter.rest.response.facility.FacilityPageResponseBody;
-import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
-import es.ull.project.application.query.FacilitySearchCriteria;
-import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
-import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
-import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
-import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 /**
  * FacilityController
@@ -117,21 +118,13 @@ public class FacilityController {
             @Parameter(description = "Filter by facility type") @RequestParam(required = false) String facilityType,
             @Parameter(description = "Filter by facility status") @RequestParam(required = false) String status,
             @Parameter(description = "Filter by location (postal address)") @RequestParam(required = false) String location) {
-        
-        // Validate pagination parameters
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        // Build sort configuration
         Sort sort = buildSort(sortBy, sortOrder);
-
-        // Validate sort field if provided
         if (sortBy != null && !sortBy.isBlank() && !FacilityFieldMapper.isValidField(sortBy)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        // Validate facility type if provided
         FacilityType facilityTypeFilter = null;
         if (facilityType != null && !facilityType.isBlank()) {
             try {
@@ -140,8 +133,6 @@ public class FacilityController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-
-        // Validate status if provided
         FacilityStatus statusFilter = null;
         if (status != null && !status.isBlank()) {
             try {
@@ -150,19 +141,13 @@ public class FacilityController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-
-        // Build search criteria
         FacilitySearchCriteria criteria = new FacilitySearchCriteriaBuilder()
                 .withFacilityType(facilityTypeFilter)
                 .withStatus(statusFilter)
                 .withLocationPostalAddress(location)
                 .build();
-
-        // Execute query
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Facility> facilityPage = this.readFacilityUseCase.fetchAll(pageable, criteria);
-
-        // Map and return response
         return buildSuccessResponse(facilityPage);
     }
 
@@ -178,16 +163,13 @@ public class FacilityController {
         if (sortBy == null || sortBy.isBlank()) {
             return Sort.unsorted();
         }
-
         String mongoField = FacilityFieldMapper.toMongoField(sortBy);
         if (mongoField == null) {
             return Sort.unsorted();
         }
-
         Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder) 
                 ? Sort.Direction.DESC 
                 : Sort.Direction.ASC;
-        
         return Sort.by(direction, mongoField);
     }
 
@@ -201,7 +183,6 @@ public class FacilityController {
         List<FacilityResponseBody> responseBodies = facilityPage.getContent().stream()
                 .map(FacilityResponseMapper::toResponseBody)
                 .toList();
-        
         FacilityPageResponseBody response = new FacilityPageResponseBody();
         response.content = responseBodies;
         response.totalElements = facilityPage.getTotalElements();
@@ -211,7 +192,6 @@ public class FacilityController {
         response.numberOfElements = facilityPage.getNumberOfElements();
         response.first = facilityPage.isFirst();
         response.last = facilityPage.isLast();
-        
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -21,7 +21,7 @@ public final class UnloadingTime {
     /**
      * Required.
      * Unloading time value in minutes.
-     * It is a required attribute and always measured in minutes.
+     * It is a required attribute.
      */
     private final int minutes;
 

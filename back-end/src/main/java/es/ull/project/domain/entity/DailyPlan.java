@@ -3,6 +3,7 @@ package es.ull.project.domain.entity;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.location.Distance;
+import es.ull.project.domain.valueobject.time.PlanDay;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,15 +28,55 @@ public class DailyPlan {
     public static final String TOTAL_DISTANCE_NOT_DEFINED = "Total distance is not defined";
     public static final String INVALID_STOP = "Stop is invalid";
 
+    /**
+     * Unique identifier for the daily plan.
+     * It is a computed attribute.
+     */
     private final UUID id;
+
+    /**
+     * The parent infrastructure plan.
+     */
     private final InfrastructurePlan infrastructurePlan;
+
+    /**
+     * The facility where the route starts and ends.
+     */
     private final Facility facility;
+
+    /**
+     * The date when the service is executed.
+     */
     private final LocalDate serviceDate;
-    private final Integer planDay;
+
+    /**
+     * The planning day within the execution horizon.
+     */
+    private final PlanDay planDay;
+
+    /**
+     * The vehicle assigned to the route.
+     */
     private final Vehicle vehicle;
+
+    /**
+     * Total weight collected.
+     */
     private final CollectedWeightKilograms totalCollectedKilograms;
+
+    /**
+     * Total volume collected.
+     */
     private final CollectedVolumeLiters totalCollectedLiters;
+
+    /**
+     * Total distance of the route.
+     */
     private final Distance totalDistanceMeters;
+
+    /**
+     * List of stops in the route.
+     */
     private final List<Stop> stops;
 
     /**
@@ -54,7 +95,7 @@ public class DailyPlan {
     public DailyPlan(InfrastructurePlan infrastructurePlan,
                      Facility facility,
                      LocalDate serviceDate,
-                     Integer planDay,
+                     PlanDay planDay,
                      Vehicle vehicle,
                      CollectedWeightKilograms totalCollectedKilograms,
                      CollectedVolumeLiters totalCollectedLiters,
@@ -71,6 +112,25 @@ public class DailyPlan {
         this.totalCollectedLiters = totalCollectedLiters;
         this.totalDistanceMeters = totalDistanceMeters;
         this.stops = stops != null ? new ArrayList<>(stops) : new ArrayList<>();
+    }
+
+    /**
+     * Copy constructor.
+     * Creates a new DailyPlan as a copy of another DailyPlan.
+     *
+     * @param otherObject the DailyPlan to copy
+     */
+    public DailyPlan(DailyPlan otherObject) {
+        this.id = otherObject.id;
+        this.infrastructurePlan = otherObject.infrastructurePlan;
+        this.facility = otherObject.facility;
+        this.serviceDate = otherObject.serviceDate;
+        this.planDay = otherObject.planDay;
+        this.vehicle = otherObject.vehicle;
+        this.totalCollectedKilograms = otherObject.totalCollectedKilograms;
+        this.totalCollectedLiters = otherObject.totalCollectedLiters;
+        this.totalDistanceMeters = otherObject.totalDistanceMeters;
+        this.stops = new ArrayList<>(otherObject.stops);
     }
 
     /**
@@ -92,7 +152,7 @@ public class DailyPlan {
                      InfrastructurePlan infrastructurePlan,
                      Facility facility,
                      LocalDate serviceDate,
-                     Integer planDay,
+                     PlanDay planDay,
                      Vehicle vehicle,
                      CollectedWeightKilograms totalCollectedKilograms,
                      CollectedVolumeLiters totalCollectedLiters,
@@ -203,7 +263,7 @@ public class DailyPlan {
      *
      * @return the plan day number
      */
-    public Integer getPlanDay() {
+    public PlanDay getPlanDay() {
         return planDay;
     }
 

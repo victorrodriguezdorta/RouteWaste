@@ -28,6 +28,7 @@ import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.Location;
 import es.ull.project.domain.valueobject.route.RouteSequence;
+import es.ull.project.domain.valueobject.time.PlanDay;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -90,7 +91,7 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
         Facility facility = mongoConfiguration.facilityRepository().findById(facilityId)
                 .orElseThrow(() -> new IllegalStateException(String.format(ERR_FACILITY_SNAPSHOT, facilityId)));
         LocalDate serviceDate = LocalDate.parse(document.getString(MongoFields.SERVICE_DATE));
-        Integer planDay = document.containsKey(MongoFields.PLAN_DAY) ? document.getInteger(MongoFields.PLAN_DAY) : null;
+        PlanDay planDay = document.containsKey(MongoFields.PLAN_DAY) && document.getInteger(MongoFields.PLAN_DAY) != null ? new PlanDay(document.getInteger(MongoFields.PLAN_DAY)) : null;
         UUID vehicleId = (UUID) document.get(MongoFields.VEHICLE);
         Vehicle vehicle = mongoConfiguration.vehicleRepository().findById(vehicleId)
                 .orElseThrow(() -> new IllegalStateException(String.format(ERR_VEHICLE_SNAPSHOT, vehicleId)));

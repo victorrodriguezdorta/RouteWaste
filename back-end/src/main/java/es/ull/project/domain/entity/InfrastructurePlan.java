@@ -6,7 +6,10 @@ import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.TotalCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Distance;
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
+import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,33 +81,39 @@ public class InfrastructurePlan {
 
     /**
      * Total weight collected as determined by the algorithm.
+     * It is a computed attribute.
      */
     private CollectedWeightKilograms totalCollectedKilograms;
 
     /**
      * Total volume collected as determined by the algorithm.
+     * It is a computed attribute.
      */
     private CollectedVolumeLiters totalCollectedLiters;
 
     /**
      * Total distance of all routes as determined by the algorithm.
+     * It is a computed attribute.
      */
     private Distance totalDistanceMeters;
 
     /**
      * Number of days for the planning period.
+     * It is an optional attribute.
      */
-    private Integer numberOfDays;
+    private NumberOfDays numberOfDays;
 
     /**
      * Average pickup time in minutes.
+     * It is an optional attribute.
      */
-    private Integer averagePickupTimeMinutes;
+    private AveragePickupTimeMinutes averagePickupTimeMinutes;
 
     /**
      * Timestamp when the algorithm execution was performed (ISO 8601 format).
+     * It is an optional attribute.
      */
-    private String executedAt;
+    private ExecutedAt executedAt;
 
     /**
      * Creates a new InfrastructurePlan.
@@ -120,9 +129,9 @@ public class InfrastructurePlan {
             PlanningPeriod period,
             MaximumBudget maxBudget,
             ServicePolicies servicePolicies,
-            Integer numberOfDays,
-            Integer averagePickupTimeMinutes,
-            String executedAt) {
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes,
+            ExecutedAt executedAt) {
         validatePeriod(period);
         validateMaxBudget(maxBudget);
         this.id = UUID.randomUUID();
@@ -176,6 +185,9 @@ public class InfrastructurePlan {
      * @param servicePolicies    the service policies
      * @param maxBudget          the maximum budget allowed
      * @param estimatedTotalCost the estimated total cost
+     * @param totalCollectedKilograms the total collected weight in kilograms
+     * @param totalCollectedLiters the total collected volume in liters
+     * @param totalDistanceMeters the total distance in meters
      * @param numberOfDays       the number of days for planning
      * @param averagePickupTimeMinutes the average pickup time in minutes
      * @param executedAt         the timestamp of algorithm execution
@@ -191,9 +203,9 @@ public class InfrastructurePlan {
             CollectedWeightKilograms totalCollectedKilograms,
             CollectedVolumeLiters totalCollectedLiters,
             Distance totalDistanceMeters,
-            Integer numberOfDays,
-            Integer averagePickupTimeMinutes,
-            String executedAt) {
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes,
+            ExecutedAt executedAt) {
         validatePeriod(period);
         validateMaxBudget(maxBudget);
         this.id = id;
@@ -457,7 +469,7 @@ public class InfrastructurePlan {
      *
      * @return the number of days
      */
-    public Integer getNumberOfDays() {
+    public NumberOfDays getNumberOfDays() {
         return numberOfDays;
     }
 
@@ -466,7 +478,7 @@ public class InfrastructurePlan {
      *
      * @return the average pickup time in minutes
      */
-    public Integer getAveragePickupTimeMinutes() {
+    public AveragePickupTimeMinutes getAveragePickupTimeMinutes() {
         return averagePickupTimeMinutes;
     }
 
@@ -475,7 +487,7 @@ public class InfrastructurePlan {
      *
      * @return the execution timestamp in ISO 8601 format
      */
-    public String getExecutedAt() {
+    public ExecutedAt getExecutedAt() {
         return executedAt;
     }
 

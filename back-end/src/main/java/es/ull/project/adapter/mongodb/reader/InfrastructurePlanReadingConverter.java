@@ -140,12 +140,15 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
         Double totalKilograms = document.getDouble(MongoFields.TOTAL_COLLECTED_KILOGRAMS);
         Double totalLiters = document.getDouble(MongoFields.TOTAL_COLLECTED_LITERS);
         Double totalDistance = document.getDouble(MongoFields.TOTAL_DISTANCE_METERS);
-        Integer numberOfDays = document.getInteger(MongoFields.NUMBER_OF_DAYS);
-        Integer averagePickupTimeMinutes = document.getInteger(MongoFields.AVERAGE_PICKUP_TIME_MINUTES);
-        String executedAt = document.getString(MongoFields.EXECUTED_AT);
+        Integer numberOfDaysRaw = document.getInteger(MongoFields.NUMBER_OF_DAYS);
+        Integer averagePickupTimeMinutesRaw = document.getInteger(MongoFields.AVERAGE_PICKUP_TIME_MINUTES);
+        String executedAtRaw = document.getString(MongoFields.EXECUTED_AT);
         CollectedWeightKilograms kg = totalKilograms != null ? CollectedWeightKilograms.fromKilograms(totalKilograms) : null;
         CollectedVolumeLiters liters = totalLiters != null ? CollectedVolumeLiters.fromLiters(totalLiters) : null;
         Distance distance = totalDistance != null ? Distance.fromMeters(totalDistance) : null;
+        es.ull.project.domain.valueobject.algorithm.NumberOfDays numberOfDays = numberOfDaysRaw != null ? new es.ull.project.domain.valueobject.algorithm.NumberOfDays(numberOfDaysRaw) : null;
+        es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes averagePickupTimeMinutes = averagePickupTimeMinutesRaw != null ? new es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes(averagePickupTimeMinutesRaw) : null;
+        es.ull.project.domain.valueobject.time.ExecutedAt executedAt = executedAtRaw != null ? new es.ull.project.domain.valueobject.time.ExecutedAt(executedAtRaw) : null;
         InfrastructurePlan plan = new InfrastructurePlan(
             id,
             period,

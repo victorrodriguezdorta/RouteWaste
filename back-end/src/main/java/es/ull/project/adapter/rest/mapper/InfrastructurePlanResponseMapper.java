@@ -48,9 +48,9 @@ public class InfrastructurePlanResponseMapper {
             responseBody.serviceAssignments.add(ServiceAssignmentResponseMapper.toResponseBody(assignment));
         }
         responseBody.dailyPlans = dailyPlans;
-        responseBody.numberOfDays = plan.getNumberOfDays();
-        responseBody.averagePickupTimeMinutes = plan.getAveragePickupTimeMinutes();
-        responseBody.executedAt = plan.getExecutedAt();
+        responseBody.numberOfDays = plan.getNumberOfDays() != null ? plan.getNumberOfDays().getValue() : null;
+        responseBody.averagePickupTimeMinutes = plan.getAveragePickupTimeMinutes() != null ? plan.getAveragePickupTimeMinutes().getValue() : null;
+        responseBody.executedAt = plan.getExecutedAt() != null ? plan.getExecutedAt().getTimestamp() : null;
         try {
             if (plan.getEstimatedTotalCost() != null && plan.getMaxBudget() != null && plan.getEstimatedTotalCost().greaterThan(plan.getMaxBudget())) {
                 responseBody.status = "OVERBUDGET";

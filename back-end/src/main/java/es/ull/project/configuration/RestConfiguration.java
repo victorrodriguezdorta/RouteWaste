@@ -2,9 +2,6 @@ package es.ull.project.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import es.ull.project.adapter.rest.deserialization.container.ContainerPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.container.ContainerPutRequestBodyDeserializer;
@@ -30,6 +27,10 @@ import es.ull.project.adapter.rest.serialization.infrastructureplan.Infrastructu
 import es.ull.project.adapter.rest.serialization.infrastructureplan.InfrastructurePlanResponseBodySerializer;
 import es.ull.project.adapter.rest.serialization.serviceassignment.ServiceAssignmentResponseBodySerializer;
 import es.ull.project.adapter.rest.serialization.vehicle.VehicleResponseBodySerializer;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 /**
  * RestConfiguration

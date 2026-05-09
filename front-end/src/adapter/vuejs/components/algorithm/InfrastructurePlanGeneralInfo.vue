@@ -75,6 +75,26 @@
 
           <v-col cols="12" md="4">
             <v-text-field
+              :model-value="formatNumber(generalInfo.averagePickupTimeMinutes, 'min')"
+              :label="t('infrastructurePlan.show.generalInfo.fields.averagePickupTimeMinutes')"
+              prepend-icon="mdi-timer-outline"
+              variant="outlined"
+              readonly
+            />
+          </v-col>
+
+          <v-col cols="12" md="4">
+            <v-text-field
+              :model-value="formatMoney(generalInfo.estimatedTotalCostAmount, generalInfo.estimatedTotalCostCurrency)"
+              :label="t('infrastructurePlan.show.generalInfo.fields.estimatedTotalCost')"
+              prepend-icon="mdi-cash"
+              variant="outlined"
+              readonly
+            />
+          </v-col>
+
+          <v-col cols="12" md="4">
+            <v-text-field
               :model-value="formatMoney(generalInfo.maxBudgetAmount, generalInfo.maxBudgetCurrency)"
               :label="t('infrastructurePlan.show.generalInfo.fields.maxBudget')"
               prepend-icon="mdi-cash-multiple"
@@ -129,11 +149,15 @@ interface InfrastructurePlanLike {
   totalCollectedKilograms?: number;
   totalCollectedLiters?: number;
   totalDistanceMeters?: number;
+  averagePickupTimeMinutes?: number;
+  estimatedTotalCost?: { amount?: number; currency?: string };
   maxBudget?: { amount?: number; currency?: string };
   metrics?: {
     totalCollectedKilograms?: number;
     totalCollectedLiters?: number;
     totalDistanceMeters?: number;
+    averagePickupTimeMinutes?: number;
+    estimatedTotalCost?: { amount?: number; currency?: string };
     maxBudget?: { amount?: number; currency?: string };
   };
   dailyPlans?: unknown[];
@@ -166,12 +190,17 @@ const generalInfo = computed(() => {
         : '-');
 
   const maxBudgetSource = (plan.maxBudget ?? metrics.maxBudget ?? {}) as Record<string, any>;
+  const estimatedTotalCostSource = (plan.estimatedTotalCost ?? metrics.estimatedTotalCost ?? {}) as Record<string, any>;
 
   return {
     status,
     totalCollectedKilograms: asNumber(plan.totalCollectedKilograms) ?? asNumber(metrics.totalCollectedKilograms),
     totalCollectedLiters: asNumber(plan.totalCollectedLiters) ?? asNumber(metrics.totalCollectedLiters),
     totalDistanceMeters: asNumber(plan.totalDistanceMeters) ?? asNumber(metrics.totalDistanceMeters),
+    averagePickupTimeMinutes: asNumber(plan.averagePickupTimeMinutes) ?? asNumber(metrics.averagePickupTimeMinutes),
+    estimatedTotalCostAmount: asNumber(estimatedTotalCostSource.amount),
+    estimatedTotalCostCurrency:
+      typeof estimatedTotalCostSource.currency === 'string' ? estimatedTotalCostSource.currency : undefined,
     maxBudgetAmount: asNumber(maxBudgetSource.amount),
     maxBudgetCurrency: typeof maxBudgetSource.currency === 'string' ? maxBudgetSource.currency : undefined,
   };

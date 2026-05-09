@@ -1,7 +1,5 @@
 package es.ull.project.adapter.rest.serialization.vehicle;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -9,12 +7,19 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import es.ull.project.adapter.rest.deserialization.JsonFields;
 import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
 
+import java.io.IOException;
+
 /**
  * Custom JSON serializer for VehicleResponseBody
  * This serializer manually controls how Vehicle response data is converted to JSON format
  * It follows the Jackson serialization pattern using JsonGenerator
  */
 public class VehicleResponseBodySerializer extends StdSerializer<VehicleResponseBody> {
+
+    private static final String FIELD_CAPACITY_KILOGRAMS = "capacityKilograms";
+    private static final String FIELD_KILOGRAMS = "Kilograms";
+    private static final String FIELD_CAPACITY_LITERS = "capacityLiters";
+    private static final String FIELD_LITERS = "liters";
 
     /**
      * Default constructor for the serializer
@@ -38,11 +43,11 @@ public class VehicleResponseBodySerializer extends StdSerializer<VehicleResponse
         gen.writeStartObject();
         gen.writeStringField(JsonFields.ID, value.id.toString());
         gen.writeStringField(JsonFields.VEHICLE_TYPE, value.vehicleType.name());
-        gen.writeObjectFieldStart("capacityKilograms");
-        gen.writeNumberField("Kilograms", value.capacityKilograms.getKilograms());
+        gen.writeObjectFieldStart(FIELD_CAPACITY_KILOGRAMS);
+        gen.writeNumberField(FIELD_KILOGRAMS, value.capacityKilograms.getKilograms());
         gen.writeEndObject();
-        gen.writeObjectFieldStart("capacityLiters");
-        gen.writeNumberField("liters", value.capacityLiters.getLiters());
+        gen.writeObjectFieldStart(FIELD_CAPACITY_LITERS);
+        gen.writeNumberField(FIELD_LITERS, value.capacityLiters.getLiters());
         gen.writeEndObject();
         gen.writeObjectFieldStart(JsonFields.COST_PER_KILOMETER);
         gen.writeNumberField(JsonFields.AMOUNT, value.costPerKilometer.getAmount());

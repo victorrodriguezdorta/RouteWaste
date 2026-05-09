@@ -99,46 +99,60 @@ class PersistAlgorithmExecutionResultServiceTests {
           InMemoryFacilityRepository facilityRepository,
           InMemoryContainerRepository containerRepository,
           InMemoryVehicleRepository vehicleRepository) {
-      facilityRepository.save(new Facility(
-        UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"),
+      Facility facility = new Facility(
         FacilityType.TRANSFER_STATION,
         new Location(28.47, -16.25, "Calle Principal 123, Las Palmas", "GIS-REF-001"),
         new StorageCapacityKilograms(1000.0),
         new ProcessingCapacityKilogramsPerDay(1000.0),
         new UnloadingTime(10),
         new OpeningFixedCost(100.0),
-        FacilityStatus.OPEN,
-        new DailyWasteDemandLitersPerDay(0.0)));
+        FacilityStatus.OPEN);
+      setEntityId(facility, UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"));
+      facilityRepository.save(facility);
 
-      containerRepository.save(new Container(
-        UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"),
+      Container container1 = new Container(
         new Location(28.465837, -16.263835, "Calle random", "123414"),
         WasteType.ORGANIC,
         new ContainerCapacityLiters(1000.0),
         new DailyWasteDemandLitersPerDay(100.0),
-        ServiceZone.DISTRICT));
+        ServiceZone.DISTRICT);
+      setEntityId(container1, UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"));
+      containerRepository.save(container1);
 
-      containerRepository.save(new Container(
-        UUID.fromString("374ae62c-1e31-4210-88d3-dbefa4320a72"),
+      Container container2 = new Container(
         new Location(28.462808, -16.264503, "adf", "afdsa"),
         WasteType.ORGANIC,
         new ContainerCapacityLiters(1000.0),
         new DailyWasteDemandLitersPerDay(100.0),
-        ServiceZone.DISTRICT));
+        ServiceZone.DISTRICT);
+      setEntityId(container2, UUID.fromString("374ae62c-1e31-4210-88d3-dbefa4320a72"));
+      containerRepository.save(container2);
 
-      vehicleRepository.save(new Vehicle(
-        UUID.fromString("21703654-95aa-4620-9668-a429fa4b2cf8"),
+      Vehicle vehicle1 = new Vehicle(
         VehicleType.SUPPORT_VEHICLE,
         new VehicleCapacityKilograms(88),
         new VehicleCapacityLiters(88),
-        new TransportationVariableCost(0.03)));
+        new TransportationVariableCost(0.03));
+      setEntityId(vehicle1, UUID.fromString("21703654-95aa-4620-9668-a429fa4b2cf8"));
+      vehicleRepository.save(vehicle1);
 
-      vehicleRepository.save(new Vehicle(
-        UUID.fromString("882d413c-18c7-4a66-90ad-fa62f7600b02"),
+      Vehicle vehicle2 = new Vehicle(
         VehicleType.COLLECTION_TRUCK,
         new VehicleCapacityKilograms(88),
         new VehicleCapacityLiters(88),
-        new TransportationVariableCost(0.03)));
+        new TransportationVariableCost(0.03));
+      setEntityId(vehicle2, UUID.fromString("882d413c-18c7-4a66-90ad-fa62f7600b02"));
+      vehicleRepository.save(vehicle2);
+        }
+
+        private void setEntityId(Object entity, UUID id) {
+            try {
+                java.lang.reflect.Field idField = entity.getClass().getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(entity, id);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
     private String sampleAlgorithmJson() {

@@ -21,7 +21,7 @@ public final class ProcessingCapacityKilogramsPerDay {
     /**
      * Required.
      * Processing capacity value in kilograms per day.
-     * It is a required attribute and always measured in kilograms per day.
+     * It is a required attribute.
      */
     private final double kilogramsPerDay;
 

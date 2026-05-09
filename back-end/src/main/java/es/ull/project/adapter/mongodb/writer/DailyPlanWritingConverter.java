@@ -55,7 +55,7 @@ public class DailyPlanWritingConverter implements Converter<DailyPlan, Document>
         document.put(MongoFields.FACILITY_ID, dailyPlan.getFacility().getId());
         document.put(MongoFields.SERVICE_DATE, dailyPlan.getServiceDate().toString());
         if (dailyPlan.getPlanDay() != null) {
-            document.put(MongoFields.PLAN_DAY, dailyPlan.getPlanDay());
+            document.put(MongoFields.PLAN_DAY, dailyPlan.getPlanDay().getDay());
         }
         document.put(MongoFields.VEHICLE, dailyPlan.getVehicle().getId());
         document.put(MongoFields.TOTAL_COLLECTED_KILOGRAMS, dailyPlan.getTotalCollectedKilograms().getValue());

@@ -1,8 +1,8 @@
 package es.ull.project.adapter.mongodb.repository;
 
 import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.adapter.mongodb.query.FacilitySearchCriteriaBuilder;
+import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
@@ -36,6 +36,7 @@ public class FacilityMongoRepository implements FacilityRepository {
     public static final String COLLECTION_NAME = "facilities";
     private static final String FIELD_ID = "id";
     private static final String FIELD_LOCATION_POSTAL_ADDRESS = "location.postalAddress";
+    private static final String CASE_INSENSITIVE_REGEX_FLAG = "i";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -168,7 +169,7 @@ public class FacilityMongoRepository implements FacilityRepository {
         }
         if (criteria.getLocationPostalAddress() != null) {
             criterias.add(Criteria.where(FIELD_LOCATION_POSTAL_ADDRESS)
-                    .regex(criteria.getLocationPostalAddress(), "i"));
+                    .regex(criteria.getLocationPostalAddress(), CASE_INSENSITIVE_REGEX_FLAG));
         }
         return criterias;
     }

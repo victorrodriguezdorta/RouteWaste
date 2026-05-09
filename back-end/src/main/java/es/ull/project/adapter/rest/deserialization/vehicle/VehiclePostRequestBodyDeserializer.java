@@ -1,9 +1,5 @@
 package es.ull.project.adapter.rest.deserialization.vehicle;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -19,6 +15,10 @@ import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * VehiclePostRequestBodyDeserializer
  * 
@@ -33,6 +33,11 @@ import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
  * parts from the JSON structure.
  */
 public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<VehiclePostRequestBody> {
+
+    private static final String CAPACITY_KILOGRAMS_FIELD = "capacityKilograms";
+    private static final String KILOGRAMS_FIELD = "Kilograms";
+    private static final String CAPACITY_LITERS_FIELD = "CapacityLiters";
+    private static final String LITERS_FIELD = "liters";
 
     /**
      * Deserializes JSON content into a VehiclePostRequestBody object.
@@ -96,35 +101,35 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
      * @return the parsed VehicleCapacityKilograms value object, or null if validation fails
      */
     private VehicleCapacityKilograms parseCapacityKilograms(JsonNode rootNode, List<FieldError> errors) {
-        if (!rootNode.has("capacityKilograms")) {
-            errors.add(new FieldError("capacityKilograms", "Field is required"));
+        if (!rootNode.has(CAPACITY_KILOGRAMS_FIELD)) {
+            errors.add(new FieldError(CAPACITY_KILOGRAMS_FIELD, "Field is required"));
             return null;
         }
-        JsonNode capacityNode = rootNode.get("capacityKilograms");
+        JsonNode capacityNode = rootNode.get(CAPACITY_KILOGRAMS_FIELD);
         if (capacityNode.isNull()) {
-            errors.add(new FieldError("capacityKilograms", "Must be a non-null value"));
+            errors.add(new FieldError(CAPACITY_KILOGRAMS_FIELD, "Must be a non-null value"));
             return null;
         }
         Double Kilograms = null;
         if (capacityNode.isNumber()) {
             Kilograms = capacityNode.asDouble();
-        } else if (capacityNode.isObject() && capacityNode.has("Kilograms")) {
+        } else if (capacityNode.isObject() && capacityNode.has(KILOGRAMS_FIELD)) {
             try {
-                Kilograms = capacityNode.get("Kilograms").asDouble();
+                Kilograms = capacityNode.get(KILOGRAMS_FIELD).asDouble();
             } catch (Exception e) {
                 errors.add(new FieldError(
-                    "capacityKilograms.Kilograms",
+                    CAPACITY_KILOGRAMS_FIELD + "." + KILOGRAMS_FIELD,
                     "Must be a valid number"
                 ));
             }
         } else {
-            errors.add(new FieldError("capacityKilograms", "Must be a number or object with 'Kilograms' field"));
+            errors.add(new FieldError(CAPACITY_KILOGRAMS_FIELD, "Must be a number or object with 'Kilograms' field"));
         }
         if (Kilograms != null) {
             try {
                 return new VehicleCapacityKilograms(Kilograms);
             } catch (Exception e) {
-                errors.add(new FieldError("capacityKilograms", "Invalid capacity: " + e.getMessage()));
+                errors.add(new FieldError(CAPACITY_KILOGRAMS_FIELD, "Invalid capacity: " + e.getMessage()));
                 return null;
             }
         }
@@ -139,35 +144,35 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
      * @return the parsed VehicleCapacityLiters value object, or null if validation fails
      */
     private VehicleCapacityLiters parseCapacityLiters(JsonNode rootNode, List<FieldError> errors) {
-        if (!rootNode.has("CapacityLiters")) {
-            errors.add(new FieldError("CapacityLiters", "Field is required"));
+        if (!rootNode.has(CAPACITY_LITERS_FIELD)) {
+            errors.add(new FieldError(CAPACITY_LITERS_FIELD, "Field is required"));
             return null;
         }
-        JsonNode capacityNode = rootNode.get("CapacityLiters");
+        JsonNode capacityNode = rootNode.get(CAPACITY_LITERS_FIELD);
         if (capacityNode.isNull()) {
-            errors.add(new FieldError("CapacityLiters", "Must be a non-null value"));
+            errors.add(new FieldError(CAPACITY_LITERS_FIELD, "Must be a non-null value"));
             return null;
         }
         Double liters = null;
         if (capacityNode.isNumber()) {
             liters = capacityNode.asDouble();
-        } else if (capacityNode.isObject() && capacityNode.has("liters")) {
+        } else if (capacityNode.isObject() && capacityNode.has(LITERS_FIELD)) {
             try {
-                liters = capacityNode.get("liters").asDouble();
+                liters = capacityNode.get(LITERS_FIELD).asDouble();
             } catch (Exception e) {
                 errors.add(new FieldError(
-                    "CapacityLiters.liters",
+                    CAPACITY_LITERS_FIELD + "." + LITERS_FIELD,
                     "Must be a valid number"
                 ));
             }
         } else {
-            errors.add(new FieldError("CapacityLiters", "Must be a number or object with 'liters' field"));
+            errors.add(new FieldError(CAPACITY_LITERS_FIELD, "Must be a number or object with 'liters' field"));
         }
         if (liters != null) {
             try {
                 return new VehicleCapacityLiters(liters);
             } catch (Exception e) {
-                errors.add(new FieldError("CapacityLiters", "Invalid capacity: " + e.getMessage()));
+                errors.add(new FieldError(CAPACITY_LITERS_FIELD, "Invalid capacity: " + e.getMessage()));
                 return null;
             }
         }

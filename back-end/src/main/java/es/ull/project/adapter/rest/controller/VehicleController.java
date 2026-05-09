@@ -1,26 +1,5 @@
 package es.ull.project.adapter.rest.controller;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import es.ull.project.adapter.mongodb.mapper.VehicleFieldMapper;
 import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
@@ -43,6 +22,27 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * VehicleController
@@ -114,21 +114,13 @@ public class VehicleController {
             @Parameter(description = "Field to sort by (e.g., vehicleType, capacityKilograms, CapacityLiters, cost, etc.)") @RequestParam(required = false) String sortBy,
             @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder,
             @Parameter(description = "Filter by vehicle type") @RequestParam(required = false) String vehicleType) {
-        
-        // Validate pagination parameters
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        // Validate sort field if provided
         if (sortBy != null && !sortBy.isBlank() && !VehicleFieldMapper.isValidField(sortBy)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        // Build sort configuration
         Sort sort = buildSort(sortBy, sortOrder);
-
-        // Validate and filter by vehicle type if provided
         VehicleType vehicleTypeFilter = null;
         if (vehicleType != null && !vehicleType.isBlank()) {
             try {
@@ -137,12 +129,8 @@ public class VehicleController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-
-        // Fetch paginated vehicles with sorting and filtering
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Vehicle> vehiclePage = this.readVehicleUseCase.fetchAll(pageable, vehicleTypeFilter);
-
-        // Build and return response
         return buildSuccessResponse(vehiclePage);
     }
 
@@ -158,16 +146,13 @@ public class VehicleController {
         if (sortBy == null || sortBy.isBlank()) {
             return Sort.unsorted();
         }
-
         String mongoField = VehicleFieldMapper.toMongoField(sortBy);
         if (mongoField == null) {
             return Sort.unsorted();
         }
-
         Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder) 
                 ? Sort.Direction.DESC 
                 : Sort.Direction.ASC;
-        
         return Sort.by(direction, mongoField);
     }
 
