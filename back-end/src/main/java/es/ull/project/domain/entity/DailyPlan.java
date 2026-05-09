@@ -36,46 +36,55 @@ public class DailyPlan {
 
     /**
      * The parent infrastructure plan.
+     * It is a required attribute.
      */
     private final InfrastructurePlan infrastructurePlan;
 
     /**
      * The facility where the route starts and ends.
+     * It is a required attribute.
      */
     private final Facility facility;
 
     /**
      * The date when the service is executed.
+     * It is a required attribute.
      */
     private final LocalDate serviceDate;
 
     /**
      * The planning day within the execution horizon.
+     * It is an optional attribute.
      */
     private final PlanDay planDay;
 
     /**
      * The vehicle assigned to the route.
+     * It is a required attribute.
      */
     private final Vehicle vehicle;
 
     /**
      * Total weight collected.
+     * It is a computed attribute.
      */
     private final CollectedWeightKilograms totalCollectedKilograms;
 
     /**
      * Total volume collected.
+     * It is a computed attribute.
      */
     private final CollectedVolumeLiters totalCollectedLiters;
 
     /**
      * Total distance of the route.
+     * It is a computed attribute.
      */
     private final Distance totalDistanceMeters;
 
     /**
      * List of stops in the route.
+     * It is a computed attribute.
      */
     private final List<Stop> stops;
 

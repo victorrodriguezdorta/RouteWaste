@@ -3,7 +3,7 @@ package es.ull.project.domain.entity;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class DailyPlanTest {
+class DailyPlanTests {
 
     @Test
     void testDailyPlanCreation() {

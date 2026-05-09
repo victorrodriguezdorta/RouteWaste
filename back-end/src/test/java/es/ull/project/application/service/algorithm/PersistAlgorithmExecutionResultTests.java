@@ -47,8 +47,9 @@ import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.time.ExecutedAt;
 
-class PersistAlgorithmExecutionResultServiceTests {
+class PersistAlgorithmExecutionResultTests {
 
     @Test
     void persistAlgorithmResponse_createsPlanAssignmentsAndDailyPlans() throws Exception {
@@ -77,9 +78,9 @@ class PersistAlgorithmExecutionResultServiceTests {
         assertEquals(1, plan.getServiceAssignments().size());
         assertEquals(2, plan.getDailyPlanIds().size());
         assertEquals("2026", plan.getPeriod().getValue());
-        assertEquals(Integer.valueOf(7), plan.getNumberOfDays());
-        assertEquals(Integer.valueOf(15), plan.getAveragePickupTimeMinutes());
-        assertEquals("2026-04-29T10:30:32.420542549Z", plan.getExecutedAt());
+        assertEquals(new NumberOfDays(7), plan.getNumberOfDays().get());
+        assertEquals(new AveragePickupTimeMinutes(15), plan.getAveragePickupTimeMinutes().get());
+        assertEquals(new ExecutedAt("2026-04-29T10:30:32.420542549Z"), plan.getExecutedAt().get());
         assertEquals(1, infrastructurePlanRepository.saved.size());
         assertEquals(1, serviceAssignmentRepository.saved.size());
         assertEquals(2, dailyPlanRepository.saved.size());

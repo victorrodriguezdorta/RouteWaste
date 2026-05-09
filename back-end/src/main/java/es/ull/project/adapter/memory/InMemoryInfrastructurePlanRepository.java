@@ -112,16 +112,16 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
         return switch (property) {
             case FIELD_ID_MONGO, FIELD_ID -> java.util.Comparator.comparing(InfrastructurePlan::getId, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             case FIELD_EXECUTED_AT -> java.util.Comparator.comparing(
-                    plan -> plan.getExecutedAt() != null ? plan.getExecutedAt().getTimestamp() : null,
+                    plan -> plan.getExecutedAt().isPresent() ? plan.getExecutedAt().get().getTimestamp() : null,
                     java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             case FIELD_ESTIMATED_TOTAL_COST -> java.util.Comparator.comparing(
                     plan -> plan.getEstimatedTotalCost() != null ? plan.getEstimatedTotalCost().getAmount() : null,
                     java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             case FIELD_NUMBER_OF_DAYS -> java.util.Comparator.comparing(
-                    plan -> plan.getNumberOfDays() != null ? plan.getNumberOfDays().getValue() : null,
+                    plan -> plan.getNumberOfDays().isPresent() ? plan.getNumberOfDays().get().getValue() : null,
                     java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             case FIELD_AVERAGE_PICKUP_TIME -> java.util.Comparator.comparing(
-                    plan -> plan.getAveragePickupTimeMinutes() != null ? plan.getAveragePickupTimeMinutes().getValue() : null,
+                    plan -> plan.getAveragePickupTimeMinutes().isPresent() ? plan.getAveragePickupTimeMinutes().get().getValue() : null,
                     java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             default -> null;
         };

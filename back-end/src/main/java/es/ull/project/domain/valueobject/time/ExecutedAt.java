@@ -15,6 +15,9 @@ public class ExecutedAt {
     public static final String EXECUTED_AT_NULL = "Execution time must not be null";
     public static final String EXECUTED_AT_INVALID = "Execution time must be a valid ISO-8601 format";
 
+    /**
+     * The execution timestamp in ISO-8601 string format.
+     */
     private final String timestamp;
 
     /**

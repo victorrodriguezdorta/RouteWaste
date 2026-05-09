@@ -16,7 +16,7 @@ class AveragePickupTimeMinutesTests {
     @Test
     void givenNegativeAveragePickupTime_whenInstantiating_thenThrowsException() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> new AveragePickupTimeMinutes(-1));
-        assertThat(exception.getMessage()).isEqualTo("Average pickup time cannot be negative");
+        assertThat(exception.getMessage()).isEqualTo("Average pickup time in minutes cannot be negative");
     }
 
     @Test

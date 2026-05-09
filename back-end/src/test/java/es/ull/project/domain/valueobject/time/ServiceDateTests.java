@@ -18,7 +18,7 @@ class ServiceDateTests {
     @Test
     void givenNullServiceDate_whenInstantiating_thenThrowsException() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> new ServiceDate(null));
-        assertThat(exception.getMessage()).isEqualTo("Service date cannot be null");
+        assertThat(exception.getMessage()).isEqualTo("Service date must not be null");
     }
 
     @Test

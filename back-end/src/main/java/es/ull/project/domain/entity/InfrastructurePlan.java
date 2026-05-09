@@ -1,13 +1,13 @@
 package es.ull.project.domain.entity;
 
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.TotalCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Distance;
-import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
-import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -469,8 +470,8 @@ public class InfrastructurePlan {
      *
      * @return the number of days
      */
-    public NumberOfDays getNumberOfDays() {
-        return numberOfDays;
+    public Optional<NumberOfDays> getNumberOfDays() {
+        return Optional.ofNullable(numberOfDays);
     }
 
     /**
@@ -478,8 +479,8 @@ public class InfrastructurePlan {
      *
      * @return the average pickup time in minutes
      */
-    public AveragePickupTimeMinutes getAveragePickupTimeMinutes() {
-        return averagePickupTimeMinutes;
+    public Optional<AveragePickupTimeMinutes> getAveragePickupTimeMinutes() {
+        return Optional.ofNullable(averagePickupTimeMinutes);
     }
 
     /**
@@ -487,8 +488,8 @@ public class InfrastructurePlan {
      *
      * @return the execution timestamp in ISO 8601 format
      */
-    public ExecutedAt getExecutedAt() {
-        return executedAt;
+    public Optional<ExecutedAt> getExecutedAt() {
+        return Optional.ofNullable(executedAt);
     }
 
     /**

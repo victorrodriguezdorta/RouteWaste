@@ -9,6 +9,9 @@ import java.util.Objects;
  */
 public class PlanDay {
 
+    /**
+     * The day number.
+     */
     private final Integer day;
 
     /**

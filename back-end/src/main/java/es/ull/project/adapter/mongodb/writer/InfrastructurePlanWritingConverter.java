@@ -101,15 +101,15 @@ public class InfrastructurePlanWritingConverter implements Converter<Infrastruct
         if (plan.getTotalDistanceMeters() != null) {
             document.put(MongoFields.TOTAL_DISTANCE_METERS, plan.getTotalDistanceMeters().getValue());
         }
-        if (plan.getNumberOfDays() != null) {
-            document.put(MongoFields.NUMBER_OF_DAYS, plan.getNumberOfDays().getValue());
-        }
-        if (plan.getAveragePickupTimeMinutes() != null) {
-            document.put(MongoFields.AVERAGE_PICKUP_TIME_MINUTES, plan.getAveragePickupTimeMinutes().getValue());
-        }
-        if (plan.getExecutedAt() != null) {
-            document.put(MongoFields.EXECUTED_AT, plan.getExecutedAt().getTimestamp());
-        }
+        plan.getNumberOfDays().ifPresent(numberOfDays -> 
+            document.put(MongoFields.NUMBER_OF_DAYS, numberOfDays.getValue())
+        );
+        plan.getAveragePickupTimeMinutes().ifPresent(averagePickupTimeMinutes -> 
+            document.put(MongoFields.AVERAGE_PICKUP_TIME_MINUTES, averagePickupTimeMinutes.getValue())
+        );
+        plan.getExecutedAt().ifPresent(executedAt -> 
+            document.put(MongoFields.EXECUTED_AT, executedAt.getTimestamp())
+        );
         return document;
     }
 }

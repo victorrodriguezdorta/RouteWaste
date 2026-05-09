@@ -16,13 +16,13 @@ class AlgorithmJsonPayloadTests {
     @Test
     void givenNullPayload_whenInstantiating_thenThrowsException() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> new AlgorithmJsonPayload(null));
-        assertThat(exception.getMessage()).isEqualTo("JSON payload must not be null or blank");
+        assertThat(exception.getMessage()).isEqualTo("Algorithm JSON payload must not be null or blank");
     }
 
     @Test
     void givenBlankPayload_whenInstantiating_thenThrowsException() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> new AlgorithmJsonPayload("   "));
-        assertThat(exception.getMessage()).isEqualTo("JSON payload must not be null or blank");
+        assertThat(exception.getMessage()).isEqualTo("Algorithm JSON payload must not be null or blank");
     }
 
     @Test

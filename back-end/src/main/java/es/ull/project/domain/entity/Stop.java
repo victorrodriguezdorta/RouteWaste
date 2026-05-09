@@ -25,6 +25,12 @@ public class Stop {
     public static final String STOP_TO_COPY_NULL = "Stop to copy must not be null";
 
     /**
+     * Unique identifier for the stop.
+     * It is a computed attribute.
+     */
+    private final UUID id;
+
+    /**
      * Route sequence position of this stop within the daily plan route.
      * It is a required attribute.
      */
@@ -77,6 +83,35 @@ public class Stop {
                 Distance distanceFromPreviousMeters,
                 Distance cumulativeDistanceMeters) {
         validate(sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
+        this.id = UUID.randomUUID();
+        this.sequence = sequence;
+        this.container = container;
+        this.collectedKilograms = collectedKilograms;
+        this.collectedLiters = collectedLiters;
+        this.distanceFromPreviousMeters = distanceFromPreviousMeters;
+        this.cumulativeDistanceMeters = cumulativeDistanceMeters;
+    }
+
+    /**
+     * Restore constructor.
+     *
+     * @param id                         The unique identifier.
+     * @param sequence                   The sequence number in the route.
+     * @param container                  The container visited.
+     * @param collectedKilograms         The weight of waste collected.
+     * @param collectedLiters            The volume of waste collected.
+     * @param distanceFromPreviousMeters The distance traveled from the previous stop.
+     * @param cumulativeDistanceMeters   The total distance traveled so far.
+     */
+    public Stop(UUID id,
+                RouteSequence sequence,
+                Container container,
+                CollectedWeightKilograms collectedKilograms,
+                CollectedVolumeLiters collectedLiters,
+                Distance distanceFromPreviousMeters,
+                Distance cumulativeDistanceMeters) {
+        validate(sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
+        this.id = id;
         this.sequence = sequence;
         this.container = container;
         this.collectedKilograms = collectedKilograms;
@@ -94,12 +129,22 @@ public class Stop {
         if (otherObject == null) {
             throw new IllegalArgumentException(STOP_TO_COPY_NULL);
         }
+        this.id = otherObject.id;
         this.sequence = otherObject.sequence;
         this.container = otherObject.container;
         this.collectedKilograms = otherObject.collectedKilograms;
         this.collectedLiters = otherObject.collectedLiters;
         this.distanceFromPreviousMeters = otherObject.distanceFromPreviousMeters;
         this.cumulativeDistanceMeters = otherObject.cumulativeDistanceMeters;
+    }
+
+    /**
+     * Returns the unique identifier of this stop.
+     *
+     * @return the stop UUID
+     */
+    public UUID getId() {
+        return id;
     }
 
     /**

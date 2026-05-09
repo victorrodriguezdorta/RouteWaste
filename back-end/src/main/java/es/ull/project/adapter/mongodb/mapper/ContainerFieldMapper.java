@@ -99,6 +99,8 @@ public class ContainerFieldMapper {
      */
     private static final String MONGO_DAILY_DEMAND_LITERS_PER_DAY = "dailyDemandLitersPerDay";
 
+    private static final String ERR_UNSUPPORTED_INSTANTIATION = "This is a utility class and cannot be instantiated.";
+
     private static final Map<String, String> FIELD_MAPPING = new HashMap<>();
 
     static {
@@ -112,7 +114,7 @@ public class ContainerFieldMapper {
      * Private constructor to prevent instantiation of this utility class.
      */
     private ContainerFieldMapper() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated.");
+        throw new UnsupportedOperationException(ERR_UNSUPPORTED_INSTANTIATION);
     }
 
     /**

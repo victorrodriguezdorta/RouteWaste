@@ -12,12 +12,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.DailyPlanRepository;
@@ -44,6 +41,9 @@ import es.ull.project.domain.valueobject.route.RouteSequence;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanDay;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service that transforms the raw algorithm response into the infrastructure
@@ -72,30 +72,18 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	private static final String FIELD_DISTANCE_FROM_PREVIOUS_METERS = "distanceFromPreviousMeters";
 	private static final String FIELD_CUMULATIVE_DISTANCE_METERS = "cumulativeDistanceMeters";
 	private static final String FIELD_VEHICLE = "vehicle";
-	private static final String FIELD_VEHICLE_TYPE = "vehicleType";
-	private static final String FIELD_CAPACITY_KILOGRAMS = "capacityKilograms";
-	private static final String FIELD_CAPACITY_LITERS = "capacityLiters";
-	private static final String FIELD_COST_PER_KILOMETER = "costPerKilometer";
-	private static final String DEFAULT_BUDGET = "1.7976931348623157E308";
 	private static final String FIELD_MAX_BUDGET = "maxBudget";
 	private static final String FIELD_AMOUNT = "amount";
 	private static final String FIELD_CURRENCY = "currency";
 	private static final String FIELD_ID = "id";
-	private static final String FIELD_LOCATION = "location";
-	private static final String FIELD_FACILITY_TYPE = "facilityType";
-	private static final String FIELD_STATUS = "status";
-	private static final String FIELD_WASTE_TYPE = "wasteType";
-	private static final String FIELD_CAPACITY_LITERS_JSON = "capacityLiters";
-	private static final String FIELD_DAILY_DEMAND_LITERS = "dailyDemandLitersPerDay";
-	private static final String FIELD_SERVICE_ZONE = "serviceZone";
-	private static final String FIELD_LATITUDE = "latitude";
-	private static final String FIELD_LONGITUDE = "longitude";
-	private static final String FIELD_POSTAL_ADDRESS = "postalAddress";
-	private static final String FIELD_GIS_REFERENCE = "gisReference";
+	private static final String DEFAULT_BUDGET = "1.7976931348623157E308";
 	private static final String ERR_ALGORITHM_RESPONSE = "Algorithm response is required";
 	private static final String ERR_FACILITY_NOT_FOUND = "Facility not found in MongoDB: ";
-	private static final String ERR_CONTAINER_NOT_FOUND = "Container not found in MongoDB: ";
 	private static final String ERR_VEHICLE_NOT_FOUND = "Vehicle not found in MongoDB: ";
+	private static final String ERR_FACILITY_NODE_REQUIRED = "Facility node is required";
+	private static final String ERR_FACILITY_INVALID_FORMAT = "Facility must be either a UUID string or an object with 'id' field";
+	private static final String ERR_VEHICLE_NODE_REQUIRED = "Vehicle node is required";
+	private static final String ERR_VEHICLE_INVALID_FORMAT = "Vehicle must be either a UUID string or an object with 'id' field";
 
 	private final InfrastructurePlanRepository infrastructurePlanRepository;
 	private final ServiceAssignmentRepository serviceAssignmentRepository;
@@ -103,7 +91,6 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	private final FacilityRepository facilityRepository;
 	private final ContainerRepository containerRepository;
 	private final VehicleRepository vehicleRepository;
-	private final ObjectMapper objectMapper;
 
 	/**
 	 * Constructs a new PersistAlgorithmExecutionResultService.
@@ -111,6 +98,9 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @param infrastructurePlanRepository repository for persisting infrastructure plans
 	 * @param serviceAssignmentRepository  repository for persisting service assignments
 	 * @param dailyPlanRepository          repository for persisting daily plans
+	 * @param facilityRepository           repository for accessing facilities
+	 * @param containerRepository          repository for accessing containers
+	 * @param vehicleRepository            repository for accessing vehicles
 	 */
 	public PersistAlgorithmExecutionResultService(
 			InfrastructurePlanRepository infrastructurePlanRepository,
@@ -125,7 +115,6 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 		this.facilityRepository = facilityRepository;
 		this.containerRepository = containerRepository;
 		this.vehicleRepository = vehicleRepository;
-		this.objectMapper = new ObjectMapper();
 	}
 
 	/**
@@ -146,11 +135,10 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 		String jsonStr = algorithmResponse.getJson();
 		logger.info("Algorithm response JSON size: {} bytes", jsonStr.length());
 		logger.debug("Algorithm response JSON:\n{}", jsonStr);
-
-		JsonNode root;
+		JSONObject root;
 		try {
-			root = this.objectMapper.readTree(algorithmResponse.getJson());
-		} catch (JsonProcessingException e) {
+			root = new JSONObject(jsonStr);
+		} catch (JSONException e) {
 			logger.error("Failed to parse algorithm JSON response", e);
 			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE, e);
 		}
@@ -159,7 +147,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	}
 
 	/**
-	 * Core persistence logic operating on a pre-parsed JsonNode.
+	 * Core persistence logic operating on a pre-parsed JSONObject.
 	 *
 	 * @param algorithmResponse          the pre-parsed JSON response from the algorithm
 	 * @param numberOfDays               the number of days in the planning period
@@ -167,18 +155,17 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @param providedMaxBudget          optional maximum budget override
 	 * @return the persisted InfrastructurePlan
 	 */
-	private InfrastructurePlan persistFromNode(JsonNode algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget) {
-		if (algorithmResponse == null || algorithmResponse.isNull()) {
+	private InfrastructurePlan persistFromNode(JSONObject algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget) {
+		if (algorithmResponse == null) {
 			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE);
 		}
 		logger.info("Parsing algorithm clusters and daily plans...");
-
-		String executedAt = algorithmResponse.path(FIELD_EXECUTED_AT).asText(null);
+		String executedAt = algorithmResponse.has(FIELD_EXECUTED_AT) && !algorithmResponse.isNull(FIELD_EXECUTED_AT) ? algorithmResponse.getString(FIELD_EXECUTED_AT) : null;
 		MaximumBudget effectiveMaxBudget = null;
-		JsonNode maxBudgetNode = algorithmResponse.path(FIELD_MAX_BUDGET);
-		if (maxBudgetNode != null && maxBudgetNode.isObject() && maxBudgetNode.hasNonNull(FIELD_AMOUNT)) {
-			double amount = maxBudgetNode.path(FIELD_AMOUNT).asDouble(Double.parseDouble(DEFAULT_BUDGET));
-			String currency = maxBudgetNode.path(FIELD_CURRENCY).asText(null);
+		JSONObject maxBudgetNode = algorithmResponse.optJSONObject(FIELD_MAX_BUDGET);
+		if (maxBudgetNode != null && maxBudgetNode.has(FIELD_AMOUNT) && !maxBudgetNode.isNull(FIELD_AMOUNT)) {
+			double amount = maxBudgetNode.optDouble(FIELD_AMOUNT, Double.parseDouble(DEFAULT_BUDGET));
+			String currency = maxBudgetNode.has(FIELD_CURRENCY) && !maxBudgetNode.isNull(FIELD_CURRENCY) ? maxBudgetNode.getString(FIELD_CURRENCY) : null;
 			if (currency != null && !currency.isBlank()) {
 				effectiveMaxBudget = new MaximumBudget(amount, currency);
 			} else {
@@ -200,19 +187,18 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 		Map<UUID, Container> containersById = new LinkedHashMap<>();
 		List<ServiceAssignment> serviceAssignments = new ArrayList<>();
 		List<DailyPlan> dailyPlans = new ArrayList<>();
-		JsonNode clustersNode = algorithmResponse.get(FIELD_CLUSTERS);
-		if (clustersNode != null && clustersNode.isArray()) {
-			logger.info("Processing {} clusters...", clustersNode.size());
-			for (JsonNode clusterNode : clustersNode) {
-				Facility facility = resolveFacility(clusterNode.get(FIELD_FACILITY));
+		JSONArray clustersNode = algorithmResponse.optJSONArray(FIELD_CLUSTERS);
+		if (clustersNode != null) {
+			logger.info("Processing {} clusters...", clustersNode.length());
+			for (int i = 0; i < clustersNode.length(); i++) {
+				JSONObject clusterNode = clustersNode.getJSONObject(i);
+				Facility facility = resolveFacility(clusterNode.opt(FIELD_FACILITY));
 				logger.debug("Processing cluster for facility: {}", facility.getId());
 				plan.addFacility(facility);
 				facilitiesById.put(facility.getId(), facility);
-				List<Container> assignedContainers = resolveContainers(clusterNode.get(FIELD_ASSIGNED_CONTAINERS), containersById);
+				List<Container> assignedContainers = resolveContainers(clusterNode.optJSONArray(FIELD_ASSIGNED_CONTAINERS), containersById);
 				if (assignedContainers == null || assignedContainers.isEmpty()) {
 					logger.info("Cluster for facility {} has no assigned containers. Skipping ServiceAssignment.", facility.getId());
-					// Do not create a ServiceAssignment for empty clusters; they represent facilities
-					// that were returned by the algorithm but have no containers assigned.
 					continue;
 				}
 				ServiceAssignment serviceAssignment = new ServiceAssignment(plan, facility, assignedContainers);
@@ -223,26 +209,28 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 		} else {
 			logger.warn("No clusters found in algorithm response");
 		}
-		JsonNode dailyPlansNode = algorithmResponse.get(FIELD_DAILY_PLANS);
-		if (dailyPlansNode != null && dailyPlansNode.isArray()) {
-			logger.info("Processing {} daily plans...", dailyPlansNode.size());
-			for (JsonNode dailyPlanNode : dailyPlansNode) {
-				UUID facilityId = parseUuid(dailyPlanNode.path(FIELD_FACILITY_ID).asText(), FIELD_FACILITY_ID);
+		JSONArray dailyPlansNode = algorithmResponse.optJSONArray(FIELD_DAILY_PLANS);
+		if (dailyPlansNode != null) {
+			logger.info("Processing {} daily plans...", dailyPlansNode.length());
+			for (int i = 0; i < dailyPlansNode.length(); i++) {
+				JSONObject dailyPlanNode = dailyPlansNode.getJSONObject(i);
+				String facilityIdRaw = dailyPlanNode.has(FIELD_FACILITY_ID) && !dailyPlanNode.isNull(FIELD_FACILITY_ID) ? dailyPlanNode.getString(FIELD_FACILITY_ID) : null;
+				UUID facilityId = parseUuid(facilityIdRaw, FIELD_FACILITY_ID);
 				Facility facility = facilitiesById.get(facilityId);
 				if (facility == null) {
 					logger.error("Facility not found in algorithm clusters for daily plan: {}", facilityId);
 					throw new NoSuchElementException("Facility not found in algorithm clusters: " + facilityId);
 				}
-				Vehicle vehicle = resolveVehicle(dailyPlanNode.get(FIELD_VEHICLE));
-				LocalDate serviceDate = LocalDate.parse(dailyPlanNode.path(FIELD_SERVICE_DATE).asText());
-				PlanDay planDay = dailyPlanNode.hasNonNull(FIELD_PLAN_DAY) ? new PlanDay(dailyPlanNode.get(FIELD_PLAN_DAY).asInt()) : null;
+				Vehicle vehicle = resolveVehicle(dailyPlanNode.opt(FIELD_VEHICLE));
+				LocalDate serviceDate = LocalDate.parse(dailyPlanNode.getString(FIELD_SERVICE_DATE));
+				PlanDay planDay = dailyPlanNode.has(FIELD_PLAN_DAY) && !dailyPlanNode.isNull(FIELD_PLAN_DAY) ? new PlanDay(dailyPlanNode.getInt(FIELD_PLAN_DAY)) : null;
 				CollectedWeightKilograms totalCollectedKilograms = CollectedWeightKilograms.fromKilograms(
-						dailyPlanNode.path(FIELD_TOTAL_COLLECTED_KILOGRAMS).asDouble(0.0));
+						dailyPlanNode.optDouble(FIELD_TOTAL_COLLECTED_KILOGRAMS, 0.0));
 				CollectedVolumeLiters totalCollectedLiters = CollectedVolumeLiters.fromLiters(
-						dailyPlanNode.path(FIELD_TOTAL_COLLECTED_LITERS).asDouble(0.0));
+						dailyPlanNode.optDouble(FIELD_TOTAL_COLLECTED_LITERS, 0.0));
 				Distance totalDistanceMeters = Distance.fromMeters(
-						dailyPlanNode.path(FIELD_TOTAL_DISTANCE_METERS).asDouble(0.0));
-				List<Stop> stops = readStops(dailyPlanNode.get(FIELD_STOPS), containersById);
+						dailyPlanNode.optDouble(FIELD_TOTAL_DISTANCE_METERS, 0.0));
+				List<Stop> stops = readStops(dailyPlanNode.optJSONArray(FIELD_STOPS), containersById);
 				DailyPlan dailyPlan = new DailyPlan(
 						plan,
 						facility,
@@ -261,21 +249,19 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			logger.warn("No daily plans found in algorithm response");
 		}
 		plan.updateAlgorithmMetrics(
-				CollectedWeightKilograms.fromKilograms(algorithmResponse.path(FIELD_TOTAL_COLLECTED_KILOGRAMS).asDouble(0.0)),
-				CollectedVolumeLiters.fromLiters(algorithmResponse.path(FIELD_TOTAL_COLLECTED_LITERS).asDouble(0.0)),
-				Distance.fromMeters(algorithmResponse.path(FIELD_TOTAL_DISTANCE_METERS).asDouble(0.0)));
+				CollectedWeightKilograms.fromKilograms(algorithmResponse.optDouble(FIELD_TOTAL_COLLECTED_KILOGRAMS, 0.0)),
+				CollectedVolumeLiters.fromLiters(algorithmResponse.optDouble(FIELD_TOTAL_COLLECTED_LITERS, 0.0)),
+				Distance.fromMeters(algorithmResponse.optDouble(FIELD_TOTAL_DISTANCE_METERS, 0.0)));
 		for (ServiceAssignment serviceAssignment : serviceAssignments) {
 			logger.debug("Saving ServiceAssignment for facility: {}", serviceAssignment.getFacility().getId());
 			this.serviceAssignmentRepository.save(serviceAssignment);
 		}
 		logger.info("Saved {} service assignments to MongoDB", serviceAssignments.size());
-
 		for (DailyPlan dailyPlan : dailyPlans) {
 			logger.debug("Saving DailyPlan for facility: {} on date: {}", dailyPlan.getFacility().getId(), dailyPlan.getServiceDate());
 			this.dailyPlanRepository.save(dailyPlan);
 		}
 		logger.info("Saved {} daily plans to MongoDB", dailyPlans.size());
-
 		logger.info("Saving InfrastructurePlan...");
 		InfrastructurePlan savedPlan = this.infrastructurePlanRepository.save(plan);
 		logger.info("=== PERSIST END === InfrastructurePlan saved with ID: {}", savedPlan.getId());
@@ -288,8 +274,8 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @param algorithmResponse the raw JSON response from the algorithm
 	 * @return the resolved PlanningPeriod
 	 */
-	private PlanningPeriod resolvePlanningPeriod(JsonNode algorithmResponse) {
-		String executedAt = algorithmResponse.path(FIELD_EXECUTED_AT).asText(null);
+	private PlanningPeriod resolvePlanningPeriod(JSONObject algorithmResponse) {
+		String executedAt = algorithmResponse.has(FIELD_EXECUTED_AT) && !algorithmResponse.isNull(FIELD_EXECUTED_AT) ? algorithmResponse.getString(FIELD_EXECUTED_AT) : null;
 		if (executedAt != null) {
 			try {
 				int year = Instant.parse(executedAt).atZone(ZoneOffset.UTC).getYear();
@@ -308,41 +294,35 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @param containersById map to register each parsed container by its UUID
 	 * @return list of parsed Container entities
 	 */
-	private List<Container> resolveContainers(JsonNode containersNode, Map<UUID, Container> containersById) {
+	private List<Container> resolveContainers(JSONArray containersNode, Map<UUID, Container> containersById) {
 		List<Container> containers = new ArrayList<>();
-		if (containersNode == null || !containersNode.isArray()) {
+		if (containersNode == null) {
 			return containers;
 		}
-		for (JsonNode containerNode : containersNode) {
-			UUID containerId;
-			// Handle both textual (UUID string) and object (with "id" field) formats
-			if (containerNode.isTextual()) {
-				// If the element is a direct UUID string, use it
-				String idStr = containerNode.asText();
+		for (int i = 0; i < containersNode.length(); i++) {
+			Object containerNode = containersNode.get(i);
+			UUID containerId = null;
+			if (containerNode instanceof String) {
+				String idStr = (String) containerNode;
 				try {
 					containerId = UUID.fromString(idStr);
 				} catch (IllegalArgumentException ex) {
-					// malformed UUID: skip this container
 					continue;
 				}
-			} else if (containerNode.isObject()) {
-				// If it's an object, extract the "id" field
-				String idStr = containerNode.path(FIELD_ID).asText(null);
+			} else if (containerNode instanceof JSONObject) {
+				JSONObject obj = (JSONObject) containerNode;
+				String idStr = obj.has(FIELD_ID) && !obj.isNull(FIELD_ID) ? obj.getString(FIELD_ID) : null;
 				if (idStr == null || idStr.isBlank()) {
-					// skip containers without an id
 					continue;
 				}
 				try {
 					containerId = UUID.fromString(idStr);
 				} catch (IllegalArgumentException ex) {
-					// malformed UUID: skip this container
 					continue;
 				}
 			} else {
-				// skip unrecognized container node type
 				continue;
 			}
-			// If the container does not exist in the DB, skip it instead of failing the whole persistence flow.
 			this.containerRepository.findById(containerId).ifPresent(container -> {
 				containers.add(container);
 				containersById.put(container.getId(), container);
@@ -358,81 +338,90 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @param containersById map of already-parsed containers keyed by UUID
 	 * @return list of parsed Stop entities
 	 */
-	private List<Stop> readStops(JsonNode stopsNode, Map<UUID, Container> containersById) {
+	private List<Stop> readStops(JSONArray stopsNode, Map<UUID, Container> containersById) {
 		List<Stop> stops = new ArrayList<>();
-		if (stopsNode == null || !stopsNode.isArray()) {
+		if (stopsNode == null) {
 			return stops;
 		}
-		for (JsonNode stopNode : stopsNode) {
-			int sequence = stopNode.path(FIELD_SEQUENCE).asInt();
-			String containerIdRaw = stopNode.path(FIELD_CONTAINER_ID).asText(null);
+		for (int i = 0; i < stopsNode.length(); i++) {
+			JSONObject stopNode = stopsNode.getJSONObject(i);
+			int sequence = stopNode.getInt(FIELD_SEQUENCE);
+			String containerIdRaw = stopNode.has(FIELD_CONTAINER_ID) && !stopNode.isNull(FIELD_CONTAINER_ID) ? stopNode.getString(FIELD_CONTAINER_ID) : null;
 			if (containerIdRaw == null || containerIdRaw.isBlank()) {
-				// skip stops without a container identifier
 				continue;
 			}
 			UUID containerId;
 			try {
 				containerId = UUID.fromString(containerIdRaw);
 			} catch (IllegalArgumentException ex) {
-				// malformed UUID: skip this stop
 				continue;
 			}
 			Container container = containersById.get(containerId);
 			if (container == null) {
-				Optional<Container> opt = this.containerRepository.findById(containerId);
-				if (opt.isPresent()) {
-					container = opt.get();
+				container = this.containerRepository.findById(containerId).orElse(null);
+				if (container != null) {
 					containersById.put(container.getId(), container);
 				} else {
-					// container not found in DB: skip this stop rather than failing
 					continue;
 				}
 			}
 			Stop stop = new Stop(
 					RouteSequence.of(sequence),
 					container,
-					CollectedWeightKilograms.fromKilograms(stopNode.path(FIELD_COLLECTED_KILOGRAMS).asDouble(0.0)),
-					CollectedVolumeLiters.fromLiters(stopNode.path(FIELD_COLLECTED_LITERS).asDouble(0.0)),
-					Distance.fromMeters(stopNode.path(FIELD_DISTANCE_FROM_PREVIOUS_METERS).asDouble(0.0)),
-					Distance.fromMeters(stopNode.path(FIELD_CUMULATIVE_DISTANCE_METERS).asDouble(0.0)));
+					CollectedWeightKilograms.fromKilograms(stopNode.optDouble(FIELD_COLLECTED_KILOGRAMS, 0.0)),
+					CollectedVolumeLiters.fromLiters(stopNode.optDouble(FIELD_COLLECTED_LITERS, 0.0)),
+					Distance.fromMeters(stopNode.optDouble(FIELD_DISTANCE_FROM_PREVIOUS_METERS, 0.0)),
+					Distance.fromMeters(stopNode.optDouble(FIELD_CUMULATIVE_DISTANCE_METERS, 0.0)));
 			stops.add(stop);
 		}
 		return stops;
 	}
 
-	private Facility resolveFacility(JsonNode facilityNode) {
-		// Handle both textual (UUID string) and object (with "id" field) formats
+	/**
+	 * Resolves a Facility from a JSON node.
+	 *
+	 * @param facilityNode the JSON node representing the facility
+	 * @return the resolved Facility
+	 * @throws IllegalArgumentException if the node is missing or malformed
+	 * @throws NoSuchElementException if the facility is not found
+	 */
+	private Facility resolveFacility(Object facilityNode) {
 		UUID id;
-		if (facilityNode == null) {
-			throw new IllegalArgumentException("Facility node is required");
+		if (facilityNode == null || facilityNode == JSONObject.NULL) {
+			throw new IllegalArgumentException(ERR_FACILITY_NODE_REQUIRED);
 		}
-		if (facilityNode.isTextual()) {
-			// If the node is a direct UUID string, use it
-			id = parseUuid(facilityNode.asText(), FIELD_FACILITY);
-		} else if (facilityNode.isObject()) {
-			// If it's an object, extract the "id" field
-			id = parseUuid(facilityNode.path(FIELD_ID).asText(), FIELD_ID);
+		if (facilityNode instanceof String) {
+			id = parseUuid((String) facilityNode, FIELD_FACILITY);
+		} else if (facilityNode instanceof JSONObject) {
+			JSONObject obj = (JSONObject) facilityNode;
+			id = parseUuid(obj.has(FIELD_ID) && !obj.isNull(FIELD_ID) ? obj.getString(FIELD_ID) : null, FIELD_ID);
 		} else {
-			throw new IllegalArgumentException("Facility must be either a UUID string or an object with 'id' field");
+			throw new IllegalArgumentException(ERR_FACILITY_INVALID_FORMAT);
 		}
 		return this.facilityRepository.findById(id)
 				.orElseThrow(() -> new NoSuchElementException(ERR_FACILITY_NOT_FOUND + id));
 	}
 
-	private Vehicle resolveVehicle(JsonNode vehicleNode) {
-		// Handle both textual (UUID string) and object (with "id" field) formats
+	/**
+	 * Resolves a Vehicle from a JSON node.
+	 *
+	 * @param vehicleNode the JSON node representing the vehicle
+	 * @return the resolved Vehicle
+	 * @throws IllegalArgumentException if the node is missing or malformed
+	 * @throws NoSuchElementException if the vehicle is not found
+	 */
+	private Vehicle resolveVehicle(Object vehicleNode) {
 		UUID id;
-		if (vehicleNode == null) {
-			throw new IllegalArgumentException("Vehicle node is required");
+		if (vehicleNode == null || vehicleNode == JSONObject.NULL) {
+			throw new IllegalArgumentException(ERR_VEHICLE_NODE_REQUIRED);
 		}
-		if (vehicleNode.isTextual()) {
-			// If the node is a direct UUID string, use it
-			id = parseUuid(vehicleNode.asText(), FIELD_VEHICLE);
-		} else if (vehicleNode.isObject()) {
-			// If it's an object, extract the "id" field
-			id = parseUuid(vehicleNode.path(FIELD_ID).asText(), FIELD_ID);
+		if (vehicleNode instanceof String) {
+			id = parseUuid((String) vehicleNode, FIELD_VEHICLE);
+		} else if (vehicleNode instanceof JSONObject) {
+			JSONObject obj = (JSONObject) vehicleNode;
+			id = parseUuid(obj.has(FIELD_ID) && !obj.isNull(FIELD_ID) ? obj.getString(FIELD_ID) : null, FIELD_ID);
 		} else {
-			throw new IllegalArgumentException("Vehicle must be either a UUID string or an object with 'id' field");
+			throw new IllegalArgumentException(ERR_VEHICLE_INVALID_FORMAT);
 		}
 		return this.vehicleRepository.findById(id)
 				.orElseThrow(() -> new NoSuchElementException(ERR_VEHICLE_NOT_FOUND + id));

@@ -129,6 +129,8 @@ public class VehicleFieldMapper {
      */
     private static final String MONGO_UPDATED_AT = "updatedAt";
 
+    private static final String ERR_UNSUPPORTED_INSTANTIATION = "This is a utility class and cannot be instantiated.";
+
     private static final Map<String, String> FIELD_MAPPING = new HashMap<>();
 
     static {
@@ -143,7 +145,7 @@ public class VehicleFieldMapper {
      * Private constructor to prevent instantiation of this utility class.
      */
     private VehicleFieldMapper() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated.");
+        throw new UnsupportedOperationException(ERR_UNSUPPORTED_INSTANTIATION);
     }
 
     /**
