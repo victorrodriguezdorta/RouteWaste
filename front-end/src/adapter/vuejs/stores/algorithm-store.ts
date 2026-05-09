@@ -1,6 +1,6 @@
 import { AlgorithmHttpRepository } from '@/adapter/http/algorithm-http-repository';
 import { CreateAlgorithmService } from '@/application/service/algorithm';
-import type { CreateAlgorithmCommand } from '@/application/usecase/algorithm-management/create-algorithm/create-algorithm-use-case';
+import type { CreateAlgorithmCommand, CreateAlgorithmResult } from '@/application/usecase/algorithm-management/create-algorithm/create-algorithm-use-case';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 
@@ -64,7 +64,7 @@ export const useAlgorithmStore = defineStore('Algorithm', {
     /**
      * Algorithm execution result from the backend
      */
-    executionResult: undefined as any,
+    executionResult: undefined as CreateAlgorithmResult | undefined,
 
     /**
      * Repository instance for HTTP communication
@@ -232,7 +232,7 @@ export const useAlgorithmStore = defineStore('Algorithm', {
      * Validates that all required data is present before execution.
      * Uses the CreateAlgorithmService to handle the business logic.
      */
-    async executeAlgorithm() {
+    async executeAlgorithm(): Promise<CreateAlgorithmResult | undefined> {
       this.removeFacilitiesWithoutVehicles();
 
       // Validate that all required data is present
@@ -243,7 +243,7 @@ export const useAlgorithmStore = defineStore('Algorithm', {
           'mdi-alert',
           'warning'
         );
-        return;
+        return undefined;
       }
 
       this.loading = true;
@@ -270,25 +270,38 @@ export const useAlgorithmStore = defineStore('Algorithm', {
       const result = await createService.execute(command);
 
       // Handle the result using Either pattern
-      result.fold(
+      return result.fold(
         error => {
           // Error case: handle and notify user
           this.handleError(error);
           this.loading = false;
+          return undefined;
         },
         data => {
-          // Success case: store result and notify user
+          // Success case: store result and notify user based on backend status
           this.executionResult = data;
           this.loading = false;
-          this.setNotification(
-            'Success',
-            `Algorithm executed successfully. ${data.facilitiesWithVehicles.length} facilities and ${data.selectedContainers.length} containers were processed.`,
-            'mdi-check',
-            'success'
-          );
-          
-          // Optionally reset the form after successful execution
-          // this.resetForm();
+          if (data.status === 'success') {
+            this.setNotification(
+              'Success',
+              data.message,
+              'mdi-check-circle',
+              'success'
+            );
+          } else {
+            const message = data.details
+              ? `${data.message}. ${data.details}`
+              : data.message;
+
+            this.setNotification(
+              'Error',
+              message,
+              'mdi-alert-circle',
+              'error'
+            );
+          }
+
+          return data;
         }
       );
     },

@@ -1,11 +1,17 @@
 <template>
   <v-card flat class="mt-4" :title="t('algorithm.execute.step3.title')">
     <v-card-actions>
-      <v-btn variant="outlined" @click="emit('back')">
+      <v-btn variant="outlined" :disabled="loading" @click="emit('back')">
         {{ t('common.buttons.back') }}
       </v-btn>
       <v-spacer />
-      <v-btn variant="elevated" color="success" @click="emit('execute')" :disabled="!isStep3Valid">
+      <v-btn
+        variant="elevated"
+        color="success"
+        :loading="loading"
+        @click="emit('execute')"
+        :disabled="!isStep3Valid || loading"
+      >
         {{ t('algorithm.list.runButton') }}
       </v-btn>
     </v-card-actions>
@@ -155,6 +161,10 @@ const { t } = useI18n();
 const emit = defineEmits<{
   back: [];
   execute: [];
+}>();
+
+defineProps<{
+  loading?: boolean;
 }>();
 
 const {

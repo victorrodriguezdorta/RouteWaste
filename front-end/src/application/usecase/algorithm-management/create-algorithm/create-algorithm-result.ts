@@ -1,37 +1,34 @@
 /**
  * CreateAlgorithmResult
  *
- * Result object for the algorithm execution use case.
- * Contains the processed data returned by the backend after resolving all
- * selected identifiers.
+ * Result object returned by the backend after attempting to execute
+ * and persist the infrastructure plan.
  */
 export interface CreateAlgorithmResult {
   /**
-   * Facilities and vehicles resolved from the backend.
+   * Backend execution status.
    */
-  facilitiesWithVehicles: AlgorithmFacilityVehiclesResult[];
+  status: 'success' | 'error';
 
   /**
-   * Containers resolved from the backend.
+   * Human-readable backend message.
    */
-  selectedContainers: AlgorithmEntityResult[];
+  message: string;
 
   /**
-   * Number of planning days used in the request.
+   * Optional backend error details.
    */
-  numberOfDays: number;
+  details?: string;
 
   /**
-   * Average pickup time in minutes used in the request.
+   * Persisted infrastructure plan identifier when the operation succeeds.
    */
-  averagePickupTimeMinutes: number;
+  infrastructurePlanId?: string;
 }
 
 /**
- * AlgorithmFacilityVehiclesResult
- *
- * Represents one resolved facility together with the resolved vehicles
- * selected for it.
+ * Legacy response shapes kept temporarily for backward compatibility with
+ * any older consumers that still import these helper interfaces.
  */
 export interface AlgorithmFacilityVehiclesResult {
   facility: AlgorithmEntityResult;
@@ -39,9 +36,7 @@ export interface AlgorithmFacilityVehiclesResult {
 }
 
 /**
- * AlgorithmEntityResult
- *
- * Generic shape used to store the processed entities returned by the backend.
+ * Generic shape used to store resolved entities.
  */
 export interface AlgorithmEntityResult {
   id: string;

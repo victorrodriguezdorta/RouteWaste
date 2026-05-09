@@ -20,7 +20,6 @@
               prepend-icon="mdi-identifier"
               variant="outlined"
               readonly
-              disabled
             />
           </v-col>
 
@@ -31,7 +30,6 @@
               prepend-icon="mdi-calendar-clock"
               variant="outlined"
               readonly
-              disabled
             />
           </v-col>
 
@@ -42,7 +40,6 @@
               prepend-icon="mdi-state-machine"
               variant="outlined"
               readonly
-              disabled
             />
           </v-col>
 
@@ -53,7 +50,6 @@
               prepend-icon="mdi-weight-kilogram"
               variant="outlined"
               readonly
-              disabled
             />
           </v-col>
 
@@ -64,7 +60,6 @@
               prepend-icon="mdi-water"
               variant="outlined"
               readonly
-              disabled
             />
           </v-col>
 
@@ -75,7 +70,6 @@
               prepend-icon="mdi-map-marker-distance"
               variant="outlined"
               readonly
-              disabled
             />
           </v-col>
 
@@ -86,7 +80,6 @@
               prepend-icon="mdi-cash-multiple"
               variant="outlined"
               readonly
-              disabled
             />
           </v-col>
 
@@ -97,7 +90,6 @@
               prepend-icon="mdi-factory"
               variant="outlined"
               readonly
-              disabled
             />
           </v-col>
 
@@ -108,7 +100,6 @@
               prepend-icon="mdi-calendar-multiselect"
               variant="outlined"
               readonly
-              disabled
             />
           </v-col>
 
@@ -119,7 +110,6 @@
               prepend-icon="mdi-calendar-range"
               variant="outlined"
               readonly
-              disabled
             />
           </v-col>
         </v-row>

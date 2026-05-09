@@ -520,7 +520,7 @@ export function useAlgorithmExecution() {
    * Execute the algorithm by sending all collected data to the backend
    */
   const executeAlgorithm = async () => {
-    await algorithmStore.executeAlgorithm();
+    return await algorithmStore.executeAlgorithm();
   };
 
   /**
