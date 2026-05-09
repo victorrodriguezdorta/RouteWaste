@@ -285,7 +285,7 @@ public class Vehicle {
     @Override
     public String toString() {
         return String.format(
-                "Vehicle={id=%s, type=%s, capacityKilograms=%s, capacityLiters=%s, costPerKm=%s}",
+                "Vehicle={id=%s, type=%s, capacityKilograms=%s, CapacityLiters=%s, costPerKm=%s}",
                 this.id,
                 this.vehicleType,
                 this.capacityKilograms,
