@@ -1,6 +1,11 @@
 package es.ull.project.adapter.rest.response.algorithm;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
+import es.ull.project.adapter.rest.serialization.algorithm.AlgorithmExecutionResponseBodySerializer;
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import java.util.List;
 
 /**
@@ -9,6 +14,7 @@ import java.util.List;
  * Represents the processed response returned by the algorithm execution
  * endpoint after resolving all requested identifiers.
  */
+@JsonSerialize(using = AlgorithmExecutionResponseBodySerializer.class)
 public class AlgorithmExecutionResponseBody {
 
     /**
@@ -24,16 +30,16 @@ public class AlgorithmExecutionResponseBody {
     /**
      * Number of planning days received in the request.
      */
-    public int numberOfDays;
+    public NumberOfDays numberOfDays;
 
     /**
      * Average pickup time received in the request.
      */
-    public int averagePickupTimeMinutes;
+    public AveragePickupTimeMinutes averagePickupTimeMinutes;
 
     /**
      * Optional maximum budget included in the processed payload.
      * This field is populated only when the client provides a budget constraint.
      */
-    public MaximumBudgetResponseBody maxBudget;
+    public MaximumBudget maxBudget;
 }

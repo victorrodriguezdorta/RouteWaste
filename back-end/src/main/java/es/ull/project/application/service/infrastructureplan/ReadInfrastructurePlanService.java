@@ -1,16 +1,14 @@
 package es.ull.project.application.service.infrastructureplan;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import es.ull.project.application.repository.DailyPlanRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
 import es.ull.project.domain.entity.InfrastructurePlan;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Service responsible for reading infrastructure plan data from the system.
@@ -27,6 +25,7 @@ public class ReadInfrastructurePlanService implements ReadInfrastructurePlanUseC
      * Constructs a new ReadInfrastructurePlanService with the specified repository.
      *
      * @param repository the infrastructure plan repository used for persistence operations
+     * @param dailyPlanRepository the daily plan repository used to load persisted daily plans
      */
     public ReadInfrastructurePlanService(InfrastructurePlanRepository repository, DailyPlanRepository dailyPlanRepository) {
         this.repository = repository;
@@ -43,7 +42,6 @@ public class ReadInfrastructurePlanService implements ReadInfrastructurePlanUseC
     @Override
     public InfrastructurePlan fetch(UUID id) {
         InfrastructurePlan plan = this.repository.findById(id).orElseThrow(() -> new NoSuchElementException("InfrastructurePlan not found"));
-        // Populate daily plans stored in separate collection
         try {
             var dailyPlans = this.dailyPlanRepository.findByInfrastructurePlanId(plan.getId());
             if (dailyPlans != null) {
@@ -52,8 +50,7 @@ public class ReadInfrastructurePlanService implements ReadInfrastructurePlanUseC
                 }
             }
         } catch (Exception e) {
-            // don't fail the read if daily plans cannot be loaded; log and continue
-            // logging is not available here, so we silently continue to avoid breaking the API
+            return plan;
         }
         return plan;
     }

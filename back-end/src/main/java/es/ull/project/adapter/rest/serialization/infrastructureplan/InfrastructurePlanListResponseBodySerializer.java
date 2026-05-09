@@ -38,7 +38,9 @@ public class InfrastructurePlanListResponseBodySerializer extends StdSerializer<
     public void serialize(InfrastructurePlanListResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
         gen.writeStringField(JsonFields.ID, value.id.toString());
-        gen.writeStringField(FIELD_EXECUTED_AT, value.executedAt);
+        if (value.executedAt != null) {
+            gen.writeStringField(FIELD_EXECUTED_AT, value.executedAt.getTimestamp());
+        }
         gen.writeObjectFieldStart(FIELD_ESTIMATED_TOTAL_COST);
         gen.writeNumberField(JsonFields.AMOUNT, value.estimatedTotalCost.getAmount());
         if (value.estimatedTotalCost.getCurrency().isPresent()) {
@@ -46,10 +48,10 @@ public class InfrastructurePlanListResponseBodySerializer extends StdSerializer<
         }
         gen.writeEndObject();
         if (value.numberOfDays != null) {
-            gen.writeNumberField(FIELD_NUMBER_OF_DAYS, value.numberOfDays);
+            gen.writeNumberField(FIELD_NUMBER_OF_DAYS, value.numberOfDays.getValue());
         }
         if (value.averagePickupTimeMinutes != null) {
-            gen.writeNumberField(FIELD_AVERAGE_PICKUP_TIME_MINUTES, value.averagePickupTimeMinutes);
+            gen.writeNumberField(FIELD_AVERAGE_PICKUP_TIME_MINUTES, value.averagePickupTimeMinutes.getValue());
         }
         gen.writeEndObject();
     }

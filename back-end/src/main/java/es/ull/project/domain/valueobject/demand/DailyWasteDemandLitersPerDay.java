@@ -19,9 +19,8 @@ public final class DailyWasteDemandLitersPerDay {
     private static final int ZERO = 0;
 
     /**
-     * Required.
      * Demand value in liters per day.
-     * It is a required attribute and always measured in liters per day.
+     * It is a required attribute.
      */
     private final double litersPerDay;
 

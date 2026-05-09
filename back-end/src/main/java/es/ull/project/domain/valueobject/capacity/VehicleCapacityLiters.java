@@ -19,9 +19,8 @@ public final class VehicleCapacityLiters {
     private static final int ZERO = 0;
 
     /**
-     * Required.
      * Capacity value in liters.
-     * It is a required attribute and always measured in liters.
+     * It is a required attribute.
      */
     private final double liters;
 

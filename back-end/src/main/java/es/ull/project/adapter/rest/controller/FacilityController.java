@@ -15,6 +15,12 @@ import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.valueobject.page.NumberOfElements;
+import es.ull.project.domain.valueobject.page.PageFlag;
+import es.ull.project.domain.valueobject.page.PageNumber;
+import es.ull.project.domain.valueobject.page.PageSize;
+import es.ull.project.domain.valueobject.page.TotalElements;
+import es.ull.project.domain.valueobject.page.TotalPages;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -185,13 +191,13 @@ public class FacilityController {
                 .toList();
         FacilityPageResponseBody response = new FacilityPageResponseBody();
         response.content = responseBodies;
-        response.totalElements = facilityPage.getTotalElements();
-        response.totalPages = facilityPage.getTotalPages();
-        response.page = facilityPage.getNumber();
-        response.size = facilityPage.getSize();
-        response.numberOfElements = facilityPage.getNumberOfElements();
-        response.first = facilityPage.isFirst();
-        response.last = facilityPage.isLast();
+        response.totalElements = new TotalElements(facilityPage.getTotalElements());
+        response.totalPages = new TotalPages(facilityPage.getTotalPages());
+        response.page = new PageNumber(facilityPage.getNumber());
+        response.size = new PageSize(facilityPage.getSize());
+        response.numberOfElements = new NumberOfElements(facilityPage.getNumberOfElements());
+        response.first = new PageFlag(facilityPage.isFirst());
+        response.last = new PageFlag(facilityPage.isLast());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -26,10 +26,10 @@ public class InfrastructurePlanListResponseMapper {
     public static InfrastructurePlanListResponseBody toResponseBody(InfrastructurePlan plan) {
         InfrastructurePlanListResponseBody responseBody = new InfrastructurePlanListResponseBody();
         responseBody.id = plan.getId();
-        responseBody.executedAt = plan.getExecutedAt().isPresent() ? plan.getExecutedAt().get().getTimestamp() : null;
+        responseBody.executedAt = plan.getExecutedAt().orElse(null);
         responseBody.estimatedTotalCost = plan.getEstimatedTotalCost();
-        responseBody.numberOfDays = plan.getNumberOfDays().isPresent() ? plan.getNumberOfDays().get().getValue() : null;
-        responseBody.averagePickupTimeMinutes = plan.getAveragePickupTimeMinutes().isPresent() ? plan.getAveragePickupTimeMinutes().get().getValue() : null;
+        responseBody.numberOfDays = plan.getNumberOfDays().orElse(null);
+        responseBody.averagePickupTimeMinutes = plan.getAveragePickupTimeMinutes().orElse(null);
         return responseBody;
     }
 }

@@ -1,5 +1,8 @@
 package es.ull.project.adapter.rest.request.algorithm;
 
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,15 +27,15 @@ public class AlgorithmExecutionRequestBody {
     /**
      * Number of planning days.
      */
-    public Integer numberOfDays;
+    public NumberOfDays numberOfDays;
 
     /**
      * Average pickup time in minutes.
      */
-    public Integer averagePickupTimeMinutes;
+    public AveragePickupTimeMinutes averagePickupTimeMinutes;
 
     /**
      * Optional maximum budget to be provided to the algorithm.
      */
-    public MaximumBudgetRequestBody maxBudget;
+    public MaximumBudget maxBudget;
 }

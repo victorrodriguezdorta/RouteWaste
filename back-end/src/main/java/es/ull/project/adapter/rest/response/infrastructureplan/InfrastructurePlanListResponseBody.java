@@ -1,6 +1,9 @@
 package es.ull.project.adapter.rest.response.infrastructureplan;
 
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.TotalCost;
+import es.ull.project.domain.valueobject.time.ExecutedAt;
 import java.util.UUID;
 
 /**
@@ -17,7 +20,7 @@ public class InfrastructurePlanListResponseBody {
     /**
      * Timestamp when the plan was executed.
      */
-    public String executedAt;
+    public ExecutedAt executedAt;
 
     /**
      * Estimated total cost of the plan.
@@ -27,10 +30,10 @@ public class InfrastructurePlanListResponseBody {
     /**
      * Number of days covered by the plan.
      */
-    public Integer numberOfDays;
+    public NumberOfDays numberOfDays;
 
     /**
      * Average pickup time in minutes.
      */
-    public Integer averagePickupTimeMinutes;
+    public AveragePickupTimeMinutes averagePickupTimeMinutes;
 }

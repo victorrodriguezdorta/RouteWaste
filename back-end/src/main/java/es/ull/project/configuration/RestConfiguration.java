@@ -3,12 +3,14 @@ package es.ull.project.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import es.ull.project.adapter.rest.deserialization.algorithm.AlgorithmExecutionRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.container.ContainerPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.container.ContainerPutRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.facility.FacilityPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.facility.FacilityPutRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.vehicle.VehiclePostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.vehicle.VehiclePutRequestBodyDeserializer;
+import es.ull.project.adapter.rest.request.algorithm.AlgorithmExecutionRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
@@ -62,6 +64,9 @@ public class RestConfiguration {
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
         ObjectMapper objectMapper = builder.build();
         SimpleModule module = new SimpleModule();
+        module.addDeserializer(
+                AlgorithmExecutionRequestBody.class,
+                new AlgorithmExecutionRequestBodyDeserializer());
         module.addDeserializer(
                 VehiclePostRequestBody.class,
                 new VehiclePostRequestBodyDeserializer());

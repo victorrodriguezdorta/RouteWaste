@@ -1,6 +1,8 @@
 package es.ull.project.application.usecase.algorithm;
 
 import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import java.util.List;
 
 /**
@@ -25,12 +27,12 @@ public class AlgorithmExecutionResult {
     /**
      * Number of days received in the request.
      */
-    private final int numberOfDays;
+    private final NumberOfDays numberOfDays;
 
     /**
      * Average pickup time received in the request.
      */
-    private final int averagePickupTimeMinutes;
+    private final AveragePickupTimeMinutes averagePickupTimeMinutes;
 
     /**
      * Creates a processed algorithm execution result.
@@ -43,8 +45,8 @@ public class AlgorithmExecutionResult {
     public AlgorithmExecutionResult(
             List<ResolvedFacilityVehiclesSelection> facilitiesWithVehicles,
             List<Container> selectedContainers,
-            int numberOfDays,
-            int averagePickupTimeMinutes) {
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes) {
         this.facilitiesWithVehicles = List.copyOf(facilitiesWithVehicles);
         this.selectedContainers = List.copyOf(selectedContainers);
         this.numberOfDays = numberOfDays;
@@ -74,7 +76,7 @@ public class AlgorithmExecutionResult {
      *
      * @return number of days
      */
-    public int getNumberOfDays() {
+    public NumberOfDays getNumberOfDays() {
         return this.numberOfDays;
     }
 
@@ -83,7 +85,7 @@ public class AlgorithmExecutionResult {
      *
      * @return pickup time in minutes
      */
-    public int getAveragePickupTimeMinutes() {
+    public AveragePickupTimeMinutes getAveragePickupTimeMinutes() {
         return this.averagePickupTimeMinutes;
     }
 }

@@ -9,7 +9,6 @@ import es.ull.project.adapter.rest.mapper.AlgorithmExecutionResponseMapper;
 import es.ull.project.adapter.rest.request.algorithm.AlgorithmExecutionRequestBody;
 import es.ull.project.adapter.rest.request.algorithm.FacilityVehiclesSelectionRequestBody;
 import es.ull.project.adapter.rest.response.algorithm.AlgorithmExecutionResponseBody;
-import es.ull.project.adapter.rest.response.algorithm.MaximumBudgetResponseBody;
 import es.ull.project.application.exception.AlgorithmExecutionException;
 import es.ull.project.application.usecase.algorithm.AlgorithmExecutionResult;
 import es.ull.project.application.usecase.algorithm.AlgorithmExecutionSelection;
@@ -69,7 +68,6 @@ public class AlgorithmController {
     private static final String FIELD_AVERAGE_PICKUP = "averagePickupTimeMinutes";
     private static final String FIELD_FACILITY_ID = "facilityId";
     private static final String FIELD_IDENTIFIER = "identifier";
-    private static final String DEFAULT_CURRENCY = "EUR";
     private static final String EMPTY_STRING = "";
 
     /**
@@ -125,11 +123,12 @@ public class AlgorithmController {
         List<UUID> selectedContainerIds = requestBody.selectedContainerIds != null
                 ? requestBody.selectedContainerIds
                 : this.emptyOrThrow();
-        NumberOfDays numberOfDaysVo = new NumberOfDays(this.requirePositiveInteger(requestBody.numberOfDays, FIELD_NUMBER_OF_DAYS));
-        AveragePickupTimeMinutes averagePickupTimeMinutesVo = new AveragePickupTimeMinutes(this.requirePositiveInteger(requestBody.averagePickupTimeMinutes, FIELD_AVERAGE_PICKUP));
+        NumberOfDays numberOfDaysVo = this.requireNonNull(requestBody.numberOfDays, FIELD_NUMBER_OF_DAYS);
+        AveragePickupTimeMinutes averagePickupTimeMinutesVo =
+                this.requireNonNull(requestBody.averagePickupTimeMinutes, FIELD_AVERAGE_PICKUP);
         MaximumBudget providedMaxBudget = null;
-        if (requestBody.maxBudget != null && requestBody.maxBudget.amount != null) {
-            providedMaxBudget = requestBody.maxBudget.amount;
+        if (requestBody.maxBudget != null) {
+            providedMaxBudget = requestBody.maxBudget;
         }
         AlgorithmExecutionResult result = this.executeAlgorithmUseCase.execute(
                 facilitiesWithVehicles,
@@ -138,10 +137,7 @@ public class AlgorithmController {
                 averagePickupTimeMinutesVo);
         AlgorithmExecutionResponseBody processedResponseBody = AlgorithmExecutionResponseMapper.toResponseBody(result);
         if (providedMaxBudget != null) {
-            MaximumBudgetResponseBody maxBudgetResponse = new MaximumBudgetResponseBody();
-            maxBudgetResponse.amount = providedMaxBudget.getAmount();
-            maxBudgetResponse.currency = providedMaxBudget.getCurrency().map(c -> c.getCode()).orElse(DEFAULT_CURRENCY);
-            processedResponseBody.maxBudget = maxBudgetResponse;
+            processedResponseBody.maxBudget = providedMaxBudget;
         }
         String processedJson = this.serializeProcessedResponse(processedResponseBody);
         AlgorithmJsonPayload algorithmJsonPayload;
@@ -300,12 +296,9 @@ public class AlgorithmController {
      * @param fieldName logical field name used for validation messages
      * @return validated primitive integer
      */
-    private int requirePositiveInteger(Integer value, String fieldName) {
+    private <T> T requireNonNull(T value, String fieldName) {
         if (value == null) {
             throw new IllegalArgumentException(fieldName + " is required");
-        }
-        if (value <= ZERO) {
-            throw new IllegalArgumentException(fieldName + " must be greater than zero");
         }
         return value;
     }

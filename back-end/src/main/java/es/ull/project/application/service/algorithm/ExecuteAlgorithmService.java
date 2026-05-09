@@ -75,8 +75,8 @@ public class ExecuteAlgorithmService implements ExecuteAlgorithmUseCase {
         return new AlgorithmExecutionResult(
                 resolvedFacilitiesWithVehicles,
                 resolvedContainers,
-                numberOfDays.getValue(),
-                averagePickupTimeMinutes.getValue());
+                numberOfDays,
+                averagePickupTimeMinutes);
     }
 
     /**

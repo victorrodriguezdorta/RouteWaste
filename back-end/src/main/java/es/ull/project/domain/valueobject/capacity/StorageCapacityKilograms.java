@@ -19,9 +19,8 @@ public final class StorageCapacityKilograms {
     private static final int ZERO = 0;
 
     /**
-     * Required.
      * Storage capacity value in kilograms.
-     * It is a required attribute and always measured in kilograms.
+     * It is a required attribute.
      */
     private final double kilograms;
 

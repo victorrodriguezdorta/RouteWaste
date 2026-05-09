@@ -19,7 +19,6 @@ public final class UnloadingTime {
     private static final int ZERO = 0;
 
     /**
-     * Required.
      * Unloading time value in minutes.
      * It is a required attribute.
      */
