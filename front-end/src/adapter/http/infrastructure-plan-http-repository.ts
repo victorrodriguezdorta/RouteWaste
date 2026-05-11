@@ -8,6 +8,7 @@ import {
   Either,
   http,
 } from '@ull-tfg/ull-tfg-typescript';
+import { InfrastructurePlanDetailMapper } from './dto/infrastructure-plan/infrastructure-plan-detail-mapper';
 import type { InfrastructurePlanJsonResponse } from './dto/infrastructure-plan/infrastructure-plan-json-response';
 import type { InfrastructurePlansResponse } from './dto/infrastructure-plan/infrastructure-plans-response';
 
@@ -100,7 +101,7 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
         .then(response => {
           if (response.ok) {
             response.json().then((data: InfrastructurePlanJsonResponse) => {
-              resolve(Either.right(data));
+              resolve(Either.right(InfrastructurePlanDetailMapper.toReadModel(data)));
             });
           } else {
             response.json().then((data: ApiError) => {

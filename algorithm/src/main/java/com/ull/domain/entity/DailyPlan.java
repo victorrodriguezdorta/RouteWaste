@@ -16,6 +16,7 @@ public class DailyPlan {
   public static final String FACILITY_NOT_DEFINED = "Facility is not defined";
   public static final String VEHICLE_NOT_DEFINED = "Vehicle is not defined";
   public static final String CONTAINER_NOT_DEFINED = "Container is not defined";
+  public static final String DISTANCE_NOT_VALID = "Distance from previous stop is not valid";
   public static final String COLLECTED_KILOGRAMS_NOT_VALID = "Collected kilograms is not valid";
   public static final String COLLECTED_LITERS_NOT_VALID = "Collected liters is not valid";
 
@@ -155,6 +156,39 @@ public class DailyPlan {
         ? this.originFacility.calculateDistanceTo(container)
         : getLastContainer().calculateDistanceTo(container);
 
+    addStop(
+        container,
+        collectedKilograms,
+        collectedLiters,
+        containerActualLiters,
+        distanceFromPreviousMeters,
+        alerts);
+  }
+
+  /**
+   * Adds a new stop using an explicitly supplied distance from the previous operational point.
+   *
+   * @param container the visited container
+   * @param collectedKilograms kilograms collected at the stop
+   * @param collectedLiters liters collected at the stop
+   * @param containerActualLiters the actual liters in the container before collection
+   * @param distanceFromPreviousMeters distance travelled to reach the stop
+   * @param alerts list of alerts generated at this stop
+   */
+  public void addStop(
+      Container container,
+      double collectedKilograms,
+      double collectedLiters,
+      double containerActualLiters,
+      double distanceFromPreviousMeters,
+      List<Alert> alerts) {
+    validateContainer(container);
+    validateCollectedKilograms(collectedKilograms);
+    validateCollectedLiters(collectedLiters);
+    if (distanceFromPreviousMeters < 0.0) {
+      throw new IllegalArgumentException(DISTANCE_NOT_VALID);
+    }
+
     double cumulativeDistanceMeters = this.totalDistanceMeters + distanceFromPreviousMeters;
     int sequence = this.stops.size() + 1;
 
@@ -184,6 +218,20 @@ public class DailyPlan {
    */
   public void addStop(Container container, double collectedKilograms, double collectedLiters) {
     addStop(container, collectedKilograms, collectedLiters, 0.0, new ArrayList<>());
+  }
+
+  /**
+   * Adds distance travelled without creating a stop entry.
+   *
+   * <p>This is used for deadhead movements such as returning to the facility to unload.
+   *
+   * @param distanceMeters distance to add to the route total
+   */
+  public void addTransitDistance(double distanceMeters) {
+    if (distanceMeters < 0.0) {
+      throw new IllegalArgumentException(DISTANCE_NOT_VALID);
+    }
+    this.totalDistanceMeters += distanceMeters;
   }
 
   /**

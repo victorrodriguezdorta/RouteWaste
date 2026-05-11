@@ -6,6 +6,7 @@
         :service-date="selectedServiceDate"
         :daily-plans="dailyPlansForCurrentDay"
         :facilities="facilitiesForCurrentDay"
+        :container-state-monitoring="plan?.containerStateMonitoring ?? []"
         :current-day="currentDay"
         :total-days="totalDays"
         :can-go-previous="canGoPrevious"
@@ -18,64 +19,32 @@
 </template>
 
 <script lang="ts" setup>
+import type {
+  InfrastructurePlanDailyPlanDetail,
+  InfrastructurePlanDetail,
+  InfrastructurePlanFacilityDetail,
+} from '@/domain/read-model/infrastructure-plan-detail';
 import { computed, ref, watch } from 'vue';
 import DailyPlanContentJson from './DailyPlanContentJson.vue';
 
-interface DailyPlanLike {
-  id?: string;
-  infrastructurePlanId?: string;
-  facilityId?: string;
-  serviceDate?: unknown;
-  planDay?: number;
-  vehicleId?: string;
-  totalCollectedKilograms?: unknown;
-  totalCollectedLiters?: unknown;
-  totalDistanceMeters?: unknown;
-  stops?: unknown[];
-}
-
-interface FacilityLike {
-  id?: string;
-  facilityType?: string;
-  status?: string;
-  location?: unknown;
-  capacities?: unknown;
-  assignedContainers?: unknown[];
-  dailyPlans?: DailyPlanLike[];
-}
-
-interface InfrastructurePlanLike {
-  numberOfDays?: number;
-  facilities?: FacilityLike[];
-}
-
 const props = defineProps<{
-  plan?: unknown;
+  plan?: InfrastructurePlanDetail;
 }>();
 
 const currentDay = ref(1);
 
 const totalDays = computed(() => {
-  const plan = (props.plan ?? {}) as InfrastructurePlanLike;
-  const declaredDays = typeof plan.numberOfDays === 'number' ? plan.numberOfDays : 0;
+  const declaredDays = typeof props.plan?.numberOfDays === 'number' ? props.plan.numberOfDays : 0;
   if (declaredDays > 0) return declaredDays;
 
-  const allPlanDays = (plan.facilities ?? [])
-    .flatMap((facility) => facility.dailyPlans ?? [])
-    .map((dailyPlan) => (typeof dailyPlan.planDay === 'number' ? dailyPlan.planDay : undefined))
+  const allPlanDays = (props.plan?.getDailyPlans() ?? [])
+    .map((dailyPlan) => dailyPlan.planDay)
     .filter((value): value is number => typeof value === 'number' && value > 0);
 
   return allPlanDays.length > 0 ? Math.max(...allPlanDays) : 1;
 });
 
-const allDailyPlans = computed(() =>
-  (((props.plan ?? {}) as InfrastructurePlanLike).facilities ?? []).flatMap((facility) =>
-    (facility.dailyPlans ?? []).map((dailyPlan) => ({
-      ...dailyPlan,
-      facilityId: dailyPlan.facilityId ?? facility.id,
-    })),
-  ),
-);
+const allDailyPlans = computed<InfrastructurePlanDailyPlanDetail[]>(() => props.plan?.getDailyPlans() ?? []);
 
 const dailyPlansForCurrentDay = computed(() =>
   allDailyPlans.value.filter((dailyPlan) => dailyPlan.planDay === currentDay.value),
@@ -86,18 +55,17 @@ const selectedServiceDate = computed(() => {
   return getServiceDate(fromCurrentDay);
 });
 
-const planFacilities = computed(() => (((props.plan ?? {}) as InfrastructurePlanLike).facilities ?? []));
+const planFacilities = computed<InfrastructurePlanFacilityDetail[]>(() => props.plan?.facilities ?? []);
 
 const facilitiesForCurrentDay = computed(() => {
   const ids = new Set(
     dailyPlansForCurrentDay.value
-      .map((dailyPlan) => dailyPlan.facilityId)
+      .map((dailyPlan) => dailyPlan.facilityId.getValue())
       .filter((value): value is string => typeof value === 'string' && value.length > 0),
   );
 
   return planFacilities.value
-    .filter((facility) => typeof facility.id === 'string' && ids.has(facility.id))
-    .map(({ dailyPlans, ...facility }) => facility);
+    .filter((facility) => ids.has(facility.id.getValue()));
 });
 
 const canGoPrevious = computed(() => currentDay.value > 1);

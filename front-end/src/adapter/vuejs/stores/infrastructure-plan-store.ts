@@ -1,4 +1,3 @@
-import type { InfrastructurePlanJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-json-response';
 import type { InfrastructurePlanSummaryJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-summary-json-response';
 import { InfrastructurePlanHttpRepository } from '@/adapter/http/infrastructure-plan-http-repository';
 import {
@@ -6,6 +5,7 @@ import {
   GetInfrastructurePlanService,
   ListInfrastructurePlansService,
 } from '@/application/service/infrastructure-plan';
+import type { InfrastructurePlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 
@@ -43,7 +43,7 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
     rowsPerPage: 10,
     
     /** Currently selected infrastructure plan detail (if any) */
-    infrastructurePlan: undefined as InfrastructurePlanJsonResponse | undefined,
+    infrastructurePlan: undefined as InfrastructurePlanDetail | undefined,
     
     /** Repository instance for HTTP communication */
     infrastructurePlanRepository: new InfrastructurePlanHttpRepository(),

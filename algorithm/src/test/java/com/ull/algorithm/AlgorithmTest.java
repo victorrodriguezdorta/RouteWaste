@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import com.ull.domain.DeliveryPlanningProblem;
 import com.ull.domain.DeliveryPlanningSolution;
 import com.ull.domain.entity.Container;
+import com.ull.domain.entity.ContainerDailyState;
 import com.ull.domain.entity.DailyPlan;
 import com.ull.domain.entity.Facility;
 import com.ull.domain.entity.FacilityCluster;
@@ -23,9 +24,7 @@ import com.ull.domain.valueobject.location.Location;
 
 class AlgorithmTest {
 
-  // -------------------------------------------------------------------------
-  // Factories
-  // -------------------------------------------------------------------------
+  private static final double DELTA = 0.000001;
 
   private Location location(double lat, double lon) {
     return new Location(lat, lon, "Test Address", "GIS-TEST");
@@ -45,37 +44,49 @@ class AlgorithmTest {
   }
 
   private Vehicle vehicle(String id, String type) {
-    return new Vehicle(id, type, 1000.0, 1000.0, 0.5);
+    return vehicle(id, type, 1000.0, 1000.0);
+  }
+
+  private Vehicle vehicle(String id, String type, double capacityKilograms, double capacityLiters) {
+    return new Vehicle(id, type, capacityKilograms, capacityLiters, 0.5);
   }
 
   private Container container(String id, double lat, double lon) {
+    return container(id, lat, lon, 500.0, 50.0);
+  }
+
+  private Container container(
+      String id,
+      double lat,
+      double lon,
+      double capacityLiters,
+      double dailyDemandLitersPerDay) {
     return new Container(
         id,
         location(lat, lon),
         WasteType.ORGANIC,
-        500.0,
-        50.0,
+        capacityLiters,
+        dailyDemandLitersPerDay,
         "DISTRICT");
   }
 
-  // -------------------------------------------------------------------------
-  // Tests
-  // -------------------------------------------------------------------------
-
   @Test
   void shouldReturnSuboptimalSolutionForSimpleProblem() {
-    Facility f = facility("facility-1");
-    Vehicle v = vehicle("vehicle-1", "COLLECTION_TRUCK");
-    Container c1 = container("container-1", 28.465, -16.263);
-    Container c2 = container("container-2", 28.462, -16.264);
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Container firstContainer = container("container-1", 28.465, -16.263);
+    Container secondContainer = container("container-2", 28.462, -16.264);
 
-    FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-      15, 7, List.of(fwv), List.of(c1, c2), new MaximumBudget(5000.0, "EUR"));
+        15,
+        7,
+        List.of(facilityWithVehicles),
+        List.of(firstContainer, secondContainer),
+        new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
-    // Status should be SUBOPTIMAL (stub algorithm)
     assertEquals(DeliveryPlanningSolution.Status.SUBOPTIMAL, solution.getStatus());
     assertNotNull(solution.getExecutedAt());
     assertEquals(new MaximumBudget(5000.0, "EUR"), solution.getMaxBudget());
@@ -83,53 +94,144 @@ class AlgorithmTest {
 
   @Test
   void shouldCreateOneClusterPerAlgorithmCall() {
-    Facility f = facility("facility-1");
-    Vehicle v = vehicle("vehicle-1", "COLLECTION_TRUCK");
-    Container c1 = container("container-1", 28.465, -16.263);
-    Container c2 = container("container-2", 28.462, -16.264);
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Container firstContainer = container("container-1", 28.465, -16.263);
+    Container secondContainer = container("container-2", 28.462, -16.264);
 
-    FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-      15, 7, List.of(fwv), List.of(c1, c2), new MaximumBudget(5000.0, "EUR"));
+        15,
+        7,
+        List.of(facilityWithVehicles),
+        List.of(firstContainer, secondContainer),
+        new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
     List<FacilityCluster> clusters = solution.getClusters();
     assertEquals(1, clusters.size());
-
-    FacilityCluster cluster = clusters.get(0);
-    assertEquals("facility-1", cluster.getFacility().getId());
-    assertEquals(2, cluster.getAssignedContainers().size());
+    assertEquals("facility-1", clusters.get(0).getFacility().getId());
+    assertEquals(2, clusters.get(0).getAssignedContainers().size());
   }
 
   @Test
-  void shouldCreateOneDailyPlanPerVehicle() {
-    Facility f = facility("facility-1");
-    Vehicle v1 = vehicle("vehicle-1", "COLLECTION_TRUCK");
-    Vehicle v2 = vehicle("vehicle-2", "SUPPORT_VEHICLE");
-    Container c = container("container-1", 28.465, -16.263);
+  void shouldCreateOneDailyPlanPerVehicleAndDay() {
+    Facility facility = facility("facility-1");
+    Vehicle firstVehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Vehicle secondVehicle = vehicle("vehicle-2", "SUPPORT_VEHICLE");
+    Container container = container("container-1", 28.465, -16.263);
 
-    FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v1, v2));
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(
+        facility,
+        List.of(firstVehicle, secondVehicle));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-      15, 7, List.of(fwv), List.of(c), new MaximumBudget(5000.0, "EUR"));
+        15,
+        3,
+        List.of(facilityWithVehicles),
+        List.of(container),
+        new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
     List<DailyPlan> dailyPlans = solution.getDailyPlans();
-    assertEquals(2, dailyPlans.size());
+    assertEquals(6, dailyPlans.size());
+    assertEquals(2, dailyPlans.stream().filter(plan -> plan.getPlanDay() == 1).count());
+    assertEquals(2, dailyPlans.stream().filter(plan -> plan.getPlanDay() == 2).count());
+    assertEquals(2, dailyPlans.stream().filter(plan -> plan.getPlanDay() == 3).count());
+    assertEquals(150.0, solution.getTotalCollectedLiters(), DELTA);
+  }
 
-    // Each plan should have 1 stop (one container)
-    for (DailyPlan plan : dailyPlans) {
-      assertEquals(1, plan.getStops().size());
-      assertEquals(1, plan.getPlanDay());
-    }
+  @Test
+  void shouldCreatePlansForAllRequestedDays() {
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "SUPPORT_VEHICLE", 88.0, 88.0);
+    Container firstContainer = container("container-1", 28.465837, -16.263835, 76.0, 67.0);
+    Container secondContainer = container("container-2", 28.464925, -16.268236, 100.0, 50.0);
+
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+        15,
+        2,
+        List.of(facilityWithVehicles),
+        List.of(firstContainer, secondContainer),
+        new MaximumBudget(1.0E11, "EUR"));
+
+    DeliveryPlanningSolution solution = new Algorithm(problem).run();
+
+    assertEquals(2, solution.getDailyPlans().size());
+    assertEquals(1, solution.getDailyPlans().get(0).getPlanDay());
+    assertEquals(2, solution.getDailyPlans().get(1).getPlanDay());
+    assertEquals(117.0, solution.getDailyPlans().get(0).getTotalCollectedLiters(), DELTA);
+    assertEquals(117.0, solution.getDailyPlans().get(1).getTotalCollectedLiters(), DELTA);
+    assertEquals(234.0, solution.getTotalCollectedLiters(), DELTA);
+
+    List<ContainerDailyState> monitoring = solution.getContainerStateMonitoring();
+    assertEquals(4, monitoring.size());
+    assertTrue(monitoring.stream().allMatch(state -> Math.abs(state.getDailyFillingLiters()) <= DELTA));
+  }
+
+  @Test
+  void shouldRevisitContainerAfterUnloadUntilItIsEmpty() {
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK", 60.0, 60.0);
+    Container container = container("container-1", 28.465, -16.263, 500.0, 100.0);
+
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+        15,
+        1,
+        List.of(facilityWithVehicles),
+        List.of(container),
+        new MaximumBudget(5000.0, "EUR"));
+
+    DeliveryPlanningSolution solution = new Algorithm(problem).run();
+
+    DailyPlan dailyPlan = solution.getDailyPlans().get(0);
+    assertEquals(2, dailyPlan.getStops().size());
+    assertEquals(60.0, dailyPlan.getStops().get(0).getCollectedLiters(), DELTA);
+    assertEquals(40.0, dailyPlan.getStops().get(1).getCollectedLiters(), DELTA);
+    assertEquals(100.0, dailyPlan.getTotalCollectedLiters(), DELTA);
+    assertEquals(0.0, solution.getContainerStateMonitoring().get(0).getDailyFillingLiters(), DELTA);
+  }
+
+  @Test
+  void shouldNotDuplicateCollectionAcrossVehicles() {
+    Facility facility = facility("facility-1");
+    Vehicle firstVehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Vehicle secondVehicle = vehicle("vehicle-2", "SUPPORT_VEHICLE");
+    Container container = container("container-1", 28.465, -16.263, 500.0, 50.0);
+
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(
+        facility,
+        List.of(firstVehicle, secondVehicle));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+        15,
+        1,
+        List.of(facilityWithVehicles),
+        List.of(container),
+        new MaximumBudget(5000.0, "EUR"));
+
+    DeliveryPlanningSolution solution = new Algorithm(problem).run();
+
+    long stopCount = solution.getDailyPlans().stream()
+        .flatMap(plan -> plan.getStops().stream())
+        .count();
+
+    assertEquals(2, solution.getDailyPlans().size());
+    assertEquals(1, stopCount);
+    assertEquals(50.0, solution.getTotalCollectedLiters(), DELTA);
   }
 
   @Test
   void shouldReturnInfeasibleWhenNoFacilities() {
-    Container c = container("container-1", 28.465, -16.263);
+    Container container = container("container-1", 28.465, -16.263);
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-      15, 7, List.of(), List.of(c), new MaximumBudget(5000.0, "EUR"));
+        15,
+        7,
+        List.of(),
+        List.of(container),
+        new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
@@ -140,11 +242,15 @@ class AlgorithmTest {
 
   @Test
   void shouldReturnInfeasibleWhenNoContainers() {
-    Facility f = facility("facility-1");
-    Vehicle v = vehicle("vehicle-1", "COLLECTION_TRUCK");
-    FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-      15, 7, List.of(fwv), List.of(), new MaximumBudget(5000.0, "EUR"));
+        15,
+        7,
+        List.of(facilityWithVehicles),
+        List.of(),
+        new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
@@ -155,15 +261,19 @@ class AlgorithmTest {
 
   @Test
   void shouldAssignAllContainersToTheCluster() {
-    Facility f = facility("facility-1");
-    Vehicle v = vehicle("vehicle-1", "COLLECTION_TRUCK");
-    Container c1 = container("container-1", 28.465, -16.263);
-    Container c2 = container("container-2", 28.462, -16.264);
-    Container c3 = container("container-3", 28.460, -16.260);
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Container firstContainer = container("container-1", 28.465, -16.263);
+    Container secondContainer = container("container-2", 28.462, -16.264);
+    Container thirdContainer = container("container-3", 28.460, -16.260);
 
-    FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-      15, 7, List.of(fwv), List.of(c1, c2, c3), new MaximumBudget(5000.0, "EUR"));
+        15,
+        7,
+        List.of(facilityWithVehicles),
+        List.of(firstContainer, secondContainer, thirdContainer),
+        new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
@@ -181,14 +291,18 @@ class AlgorithmTest {
 
   @Test
   void dailyPlanStopsShouldMatchContainerCount() {
-    Facility f = facility("facility-1");
-    Vehicle v = vehicle("vehicle-1", "COLLECTION_TRUCK");
-    Container c1 = container("container-1", 28.465, -16.263);
-    Container c2 = container("container-2", 28.462, -16.264);
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Container firstContainer = container("container-1", 28.465, -16.263);
+    Container secondContainer = container("container-2", 28.462, -16.264);
 
-    FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-      15, 7, List.of(fwv), List.of(c1, c2), new MaximumBudget(5000.0, "EUR"));
+        15,
+        7,
+        List.of(facilityWithVehicles),
+        List.of(firstContainer, secondContainer),
+        new MaximumBudget(5000.0, "EUR"));
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
@@ -200,18 +314,22 @@ class AlgorithmTest {
 
   @Test
   void vehicleShouldBeEmptyAfterFinishingTheRoute() {
-    Facility f = facility("facility-1");
-    Vehicle v = vehicle("vehicle-1", "COLLECTION_TRUCK");
-    Container c1 = container("container-1", 28.465, -16.263);
-    Container c2 = container("container-2", 28.462, -16.264);
-    Container c3 = container("container-3", 28.460, -16.260);
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Container firstContainer = container("container-1", 28.465, -16.263);
+    Container secondContainer = container("container-2", 28.462, -16.264);
+    Container thirdContainer = container("container-3", 28.460, -16.260);
 
-    FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
     DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
-      15, 7, List.of(fwv), List.of(c1, c2, c3), new MaximumBudget(5000.0, "EUR"));
+        15,
+        7,
+        List.of(facilityWithVehicles),
+        List.of(firstContainer, secondContainer, thirdContainer),
+        new MaximumBudget(5000.0, "EUR"));
 
     new Algorithm(problem).run();
 
-    assertEquals(0.0, v.getCurrentLoadLiters());
+    assertEquals(0.0, vehicle.getCurrentLoadLiters(), DELTA);
   }
 }

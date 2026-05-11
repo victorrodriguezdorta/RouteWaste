@@ -19,16 +19,16 @@
 
             <div
               v-for="facility in selectableFacilities"
-              :key="facility.id"
+              :key="facility.id.getValue()"
               class="entity-action-row mb-2"
             >
               <v-checkbox
-                :model-value="isFacilitySelected(facility.id)"
+                :model-value="isFacilitySelected(facility.id.getValue())"
                 color="primary"
                 density="compact"
                 hide-details
                 class="entity-checkbox"
-                @update:model-value="toggleFacilitySelection(facility.id)"
+                @update:model-value="toggleFacilitySelection(facility.id.getValue())"
               />
               <ButtonTooltip
                 :text="facilityButtonLabel(facility)"
@@ -38,8 +38,8 @@
                 variant="flat"
                 color="white"
                 class="entity-button flex-grow-1"
-                :class="{ 'entity-button-selected': isFacilitySelected(facility.id) }"
-                :eventclick="() => toggleFacilitySelection(facility.id)"
+                :class="{ 'entity-button-selected': isFacilitySelected(facility.id.getValue()) }"
+                :eventclick="() => toggleFacilitySelection(facility.id.getValue())"
               />
               <ButtonTooltip
                 text=""
@@ -49,7 +49,7 @@
                 variant="flat"
                 color="white"
                 class="entity-view-button"
-                :eventclick="() => openFacility(facility.id)"
+                :eventclick="() => openFacility(facility.id.getValue())"
               />
             </div>
           </v-card-text>
@@ -156,6 +156,87 @@
       </v-col>
     </v-row>
 
+    <v-card variant="flat" class="mt-4 monitoring-card">
+      <v-card-title class="d-flex align-center ga-2">
+        <v-icon icon="mdi-trash-can-outline" color="primary" />
+        <span>Container monitoring for day {{ planDay }}</span>
+      </v-card-title>
+
+      <v-divider />
+
+      <v-card-text>
+        <div v-if="selectedFacilityMonitoring.length === 0" class="text-body-2 text-medium-emphasis">
+          Select a facility to inspect its containers for the selected day.
+        </div>
+
+        <div
+          v-for="facilityMonitoring in selectedFacilityMonitoring"
+          :key="facilityMonitoring.facility.id.getValue()"
+          class="monitoring-facility mb-4"
+        >
+          <div class="monitoring-facility__header">
+            <div>
+              <div class="text-subtitle-1 font-weight-bold">
+                {{ formatFacilityType(facilityMonitoring.facility.facilityType) }}
+              </div>
+              <div class="text-body-2 text-medium-emphasis">
+                {{ facilityMonitoring.facility.id.getValue() }}
+              </div>
+            </div>
+            <div class="text-body-2 text-medium-emphasis">
+              {{ facilityMonitoring.containers.length }} containers
+            </div>
+          </div>
+
+          <div v-if="facilityMonitoring.containers.length === 0" class="text-body-2 text-medium-emphasis mt-2">
+            No containers assigned to this facility.
+          </div>
+
+          <div v-else class="monitoring-grid">
+            <div
+              v-for="containerMonitoring in facilityMonitoring.containers"
+              :key="containerMonitoring.container.id.getValue()"
+              class="monitoring-item"
+              :class="{ 'monitoring-item-overflowed': containerMonitoring.state?.status === 'OVERFLOWED' }"
+            >
+              <div class="monitoring-item__header">
+                <div>
+                  <div class="text-body-1 font-weight-medium">
+                    Container {{ truncateIdentifier(containerMonitoring.container.id.getValue(), 12) }}
+                  </div>
+                  <div class="text-body-2 text-medium-emphasis">
+                    {{ formatContainerLocation(containerMonitoring.container) }}
+                  </div>
+                </div>
+                <v-chip
+                  size="small"
+                  :color="!containerMonitoring.state ? 'secondary' : containerMonitoring.state.status === 'OVERFLOWED' ? 'error' : 'success'"
+                  variant="flat"
+                >
+                  {{ monitoringStatusLabel(containerMonitoring.state?.status) }}
+                </v-chip>
+              </div>
+
+              <div class="monitoring-item__metrics">
+                <div>
+                  <strong>Filling:</strong>
+                  {{ formatLiters(containerMonitoring.state?.dailyFillingLiters) }}
+                </div>
+                <div>
+                  <strong>Capacity:</strong>
+                  {{ formatLiters(containerMonitoring.state?.containerCapacityLiters?.getLiters?.() ?? containerMonitoring.container.capacityLiters.getLiters()) }}
+                </div>
+                <div>
+                  <strong>Demand/day:</strong>
+                  {{ formatLiters(containerMonitoring.state?.dailyDemandLitersPerDay?.getLitersPerDay?.() ?? containerMonitoring.container.dailyDemandLitersPerDay.getLitersPerDay()) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </v-card-text>
+    </v-card>
+
     <v-card variant="flat" class="mt-4">
       <v-card-title class="d-flex align-center ga-2">
         <v-icon icon="mdi-code-json" color="primary" />
@@ -172,39 +253,24 @@
 </template>
 
 <script lang="ts" setup>
+import type {
+  InfrastructurePlanContainerDailyStateDetail,
+  InfrastructurePlanContainerDetail,
+  InfrastructurePlanDailyPlanDetail,
+  InfrastructurePlanFacilityDetail,
+} from '@/domain/read-model/infrastructure-plan-detail';
+import { FacilityType } from '@/domain/enumerate/facility-type';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DailyPlanRouteTimeline from './DailyPlanRouteTimeline.vue';
 import router from '../../router/router';
 
-interface DailyPlanLike {
-  id?: string;
-  infrastructurePlanId?: string;
-  facilityId?: string;
-  serviceDate?: unknown;
-  planDay?: number;
-  vehicleId?: string;
-  totalCollectedKilograms?: unknown;
-  totalCollectedLiters?: unknown;
-  totalDistanceMeters?: unknown;
-  stops?: unknown[];
-}
-
 interface VehicleRouteOption {
   key: string;
   vehicleId: string;
   facilityId: string;
-  dailyPlan: DailyPlanLike;
-}
-
-interface FacilityLike {
-  id?: string;
-  facilityType?: string;
-  status?: string;
-  location?: unknown;
-  capacities?: unknown;
-  assignedContainers?: unknown[];
+  dailyPlan: InfrastructurePlanDailyPlanDetail;
 }
 
 interface LeafletMap {
@@ -237,8 +303,9 @@ interface LeafletNamespace {
 const props = defineProps<{
   planDay: number;
   serviceDate?: string;
-  dailyPlans: DailyPlanLike[];
-  facilities: FacilityLike[];
+  dailyPlans: InfrastructurePlanDailyPlanDetail[];
+  facilities: InfrastructurePlanFacilityDetail[];
+  containerStateMonitoring: InfrastructurePlanContainerDailyStateDetail[];
   currentDay: number;
   totalDays: number;
   canGoPrevious: boolean;
@@ -269,14 +336,12 @@ const DEFAULT_CENTER: [number, number] = [28.4636, -16.2518];
 const DEFAULT_ZOOM = 12;
 
 const selectableFacilities = computed(() =>
-  props.facilities.filter((facility): facility is FacilityLike & { id: string } =>
-    typeof facility.id === 'string' && facility.id.length > 0,
-  ),
+  props.facilities.filter((facility) => facility.id.getValue().length > 0),
 );
 
 const selectedFacilities = computed(() => {
   const ids = new Set(selectedFacilityIds.value);
-  return selectableFacilities.value.filter((facility) => ids.has(facility.id!));
+  return selectableFacilities.value.filter((facility) => ids.has(facility.id.getValue()));
 });
 
 const selectableVehicleRoutes = computed<VehicleRouteOption[]>(() => {
@@ -284,10 +349,10 @@ const selectableVehicleRoutes = computed<VehicleRouteOption[]>(() => {
   const deduped = new Map<string, VehicleRouteOption>();
 
   props.dailyPlans.forEach((dailyPlan) => {
-    const vehicleId = dailyPlan.vehicleId;
-    const facilityId = dailyPlan.facilityId;
-    if (typeof vehicleId !== 'string' || vehicleId.length === 0) return;
-    if (typeof facilityId !== 'string' || facilityId.length === 0) return;
+    const vehicleId = dailyPlan.vehicleId.getValue();
+    const facilityId = dailyPlan.facilityId.getValue();
+    if (vehicleId.length === 0) return;
+    if (facilityId.length === 0) return;
     if (!selectedIds.has(facilityId)) return;
 
     const key = `${facilityId}::${vehicleId}`;
@@ -302,6 +367,23 @@ const selectableVehicleRoutes = computed<VehicleRouteOption[]>(() => {
 const selectedVehicleRoutes = computed<VehicleRouteOption[]>(() => {
   const selectedKeys = new Set(selectedVehicleRouteKeys.value);
   return selectableVehicleRoutes.value.filter((route) => selectedKeys.has(route.key));
+});
+
+const selectedFacilityMonitoring = computed(() => {
+  const selectedDay = normalizePlanDay(props.planDay);
+  const monitoringByContainerId = new Map(
+    props.containerStateMonitoring
+      .filter((state) => normalizePlanDay(state.planDay) === selectedDay)
+      .map((state) => [normalizeIdentifier(state.containerId.getValue()), state]),
+  );
+
+  return selectedFacilities.value.map((facility) => ({
+    facility,
+    containers: (facility.assignedContainers ?? []).map((container) => ({
+      container,
+      state: monitoringByContainerId.get(normalizeIdentifier(container.id.getValue())),
+    })),
+  }));
 });
 
 const jsonContent = computed(() => {
@@ -321,7 +403,7 @@ const jsonContent = computed(() => {
 });
 
 watch(
-  () => selectableFacilities.value.map((facility) => facility.id),
+  () => selectableFacilities.value.map((facility) => facility.id.getValue()),
   (ids) => {
     selectedFacilityIds.value = ids;
   },
@@ -368,18 +450,70 @@ onUnmounted(() => {
   markersLayer.value = null;
 });
 
-function facilityButtonLabel(facility: FacilityLike): string {
+function facilityButtonLabel(facility: InfrastructurePlanFacilityDetail): string {
   return formatFacilityType(facility.facilityType);
 }
 
-function facilityTooltip(facility: FacilityLike): string {
+function facilityTooltip(facility: InfrastructurePlanFacilityDetail): string {
   const facilityType = formatFacilityType(facility.facilityType);
-  const facilityId = facility.id ?? '-';
+  const facilityId = facility.id.getValue();
   return `${facilityType} (${facilityId})`;
 }
 
 function vehicleButtonLabel(vehicleId: string): string {
   return truncateIdentifier(vehicleId, 8);
+}
+
+function normalizeIdentifier(value: string | null | undefined): string {
+  return String(value ?? '').trim().toLowerCase();
+}
+
+function normalizePlanDay(value: number | string | null | undefined): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const parsedValue = Number(value);
+    if (Number.isFinite(parsedValue)) {
+      return parsedValue;
+    }
+  }
+
+  return -1;
+}
+
+function formatContainerLocation(container: InfrastructurePlanContainerDetail): string {
+  const { postalAddress, gisReference, latitude, longitude } = container.location;
+
+  if (postalAddress) {
+    return postalAddress;
+  }
+
+  if (gisReference) {
+    return gisReference;
+  }
+
+  return `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+}
+
+function formatLiters(value: number | null | undefined): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return '-';
+  }
+
+  return `${value.toFixed(1)} L`;
+}
+
+function monitoringStatusLabel(status: string | null | undefined): string {
+  if (!status) {
+    return 'No data';
+  }
+
+  return String(status)
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 function truncateIdentifier(value: string, visibleCharacters: number): string {
@@ -389,12 +523,12 @@ function truncateIdentifier(value: string, visibleCharacters: number): string {
   return `${value.slice(0, visibleCharacters)}...`;
 }
 
-function formatFacilityType(value?: string): string {
+function formatFacilityType(value?: FacilityType | string): string {
   if (!value) {
     return '-';
   }
 
-  return value
+  return String(value)
     .replace(/_/g, ' ')
     .toLowerCase()
     .replace(/\b\w/g, (character) => character.toUpperCase());
@@ -450,45 +584,20 @@ function hasCoordinates(location: unknown): location is { latitude: number; long
   );
 }
 
-function extractContainerId(container: unknown): string | undefined {
-  if (!container || typeof container !== 'object') {
-    return undefined;
-  }
-  const id = (container as Record<string, unknown>).id;
-  return typeof id === 'string' ? id : undefined;
+function extractContainerId(container: InfrastructurePlanContainerDetail): string | undefined {
+  return container.id.getValue();
 }
 
-function extractContainerLocation(container: unknown): unknown {
-  if (!container || typeof container !== 'object') {
-    return undefined;
-  }
-  return (container as Record<string, unknown>).location;
+function extractContainerLocation(container: InfrastructurePlanContainerDetail): InfrastructurePlanContainerDetail['location'] {
+  return container.location;
 }
 
-function extractStopContainerId(stop: unknown): string | undefined {
-  if (!stop || typeof stop !== 'object') {
-    return undefined;
-  }
-  const containerId = (stop as Record<string, unknown>).containerId;
-  return typeof containerId === 'string' ? containerId : undefined;
+function extractStopContainerId(stop: InfrastructurePlanDailyPlanDetail['stops'][number]): string | undefined {
+  return stop.containerId.getValue();
 }
 
-function extractStopSequence(stop: unknown): number {
-  if (!stop || typeof stop !== 'object') {
-    return Number.MAX_SAFE_INTEGER;
-  }
-
-  const sequence = (stop as Record<string, unknown>).sequence;
-  if (typeof sequence === 'number') {
-    return sequence;
-  }
-  if (sequence && typeof sequence === 'object') {
-    const sequenceValue = (sequence as Record<string, unknown>).value;
-    if (typeof sequenceValue === 'number') {
-      return sequenceValue;
-    }
-  }
-  return Number.MAX_SAFE_INTEGER;
+function extractStopSequence(stop: InfrastructurePlanDailyPlanDetail['stops'][number]): number {
+  return stop.sequence.getValue();
 }
 
 async function ensureLeafletAssets(): Promise<LeafletNamespace> {
@@ -579,7 +688,7 @@ function renderMarkers(): void {
   layer.clearLayers();
 
   const boundsPoints: Array<[number, number]> = [];
-  const selectedFacilityMap = new Map(selectedFacilities.value.map((facility) => [facility.id ?? '', facility]));
+  const selectedFacilityMap = new Map(selectedFacilities.value.map((facility) => [facility.id.getValue(), facility]));
   const routeContainerLocationMap = new Map<string, [number, number]>();
 
   selectedFacilities.value.forEach((facility) => {
@@ -588,7 +697,7 @@ function renderMarkers(): void {
       boundsPoints.push(point);
       L.marker(point, { icon: facilityIcon })
         .addTo(layer)
-        .bindPopup(`<strong>Facility</strong><br>${facility.id ?? '-'}`);
+        .bindPopup(`<strong>Facility</strong><br>${facility.id.getValue()}`);
     }
 
     (facility.assignedContainers ?? []).forEach((container) => {
@@ -764,6 +873,55 @@ function renderMarkers(): void {
   background: #d32f2f;
   border: 3px solid #ffffff;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.monitoring-card {
+  border-radius: 12px;
+}
+
+.monitoring-facility {
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.monitoring-facility__header {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.monitoring-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.monitoring-item {
+  background: rgba(var(--v-theme-surface-variant), 0.55);
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.monitoring-item-overflowed {
+  background: rgba(var(--v-theme-error), 0.08);
+  border-color: rgba(var(--v-theme-error), 0.55);
+}
+
+.monitoring-item__header {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.monitoring-item__metrics {
+  display: grid;
+  gap: 6px;
 }
 
 @media (max-width: 960px) {

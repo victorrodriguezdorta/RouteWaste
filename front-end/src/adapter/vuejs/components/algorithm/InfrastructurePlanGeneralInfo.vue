@@ -15,7 +15,7 @@
         <v-row>
           <v-col cols="12" md="6">
             <v-text-field
-              :model-value="plan?.id ?? '-'"
+              :model-value="plan?.id?.getValue() ?? '-'"
               :label="t('infrastructurePlan.show.generalInfo.fields.id')"
               prepend-icon="mdi-identifier"
               variant="outlined"
@@ -28,16 +28,6 @@
               :model-value="formatDateTime(plan?.executedAt)"
               :label="t('infrastructurePlan.show.generalInfo.fields.executedAt')"
               prepend-icon="mdi-calendar-clock"
-              variant="outlined"
-              readonly
-            />
-          </v-col>
-
-          <v-col cols="12" md="4">
-            <v-text-field
-              :model-value="generalInfo.status"
-              :label="t('infrastructurePlan.show.generalInfo.fields.status')"
-              prepend-icon="mdi-state-machine"
               variant="outlined"
               readonly
             />
@@ -139,101 +129,46 @@
 </template>
 
 <script lang="ts" setup>
+import type { InfrastructurePlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-interface InfrastructurePlanLike {
-  id?: string;
-  executedAt?: string;
-  status?: string;
-  totalCollectedKilograms?: number;
-  totalCollectedLiters?: number;
-  totalDistanceMeters?: number;
-  averagePickupTimeMinutes?: number;
-  estimatedTotalCost?: { amount?: number; currency?: string };
-  maxBudget?: { amount?: number; currency?: string };
-  metrics?: {
-    totalCollectedKilograms?: number;
-    totalCollectedLiters?: number;
-    totalDistanceMeters?: number;
-    averagePickupTimeMinutes?: number;
-    estimatedTotalCost?: { amount?: number; currency?: string };
-    maxBudget?: { amount?: number; currency?: string };
-  };
-  dailyPlans?: unknown[];
-  facilities?: Array<{ status?: string; dailyPlans?: unknown[] }>;
-  clusters?: unknown[];
-}
-
 const props = defineProps<{
-  plan?: InfrastructurePlanLike;
+  plan?: InfrastructurePlanDetail;
 }>();
 
 const { t } = useI18n();
 const isExpanded = ref(false);
 
 const generalInfo = computed(() => {
-  const plan = (props.plan ?? {}) as Record<string, any>;
-  const metrics = (plan.metrics ?? {}) as Record<string, any>;
-
-  const facilities = Array.isArray(plan.facilities)
-    ? plan.facilities
-    : Array.isArray(plan.clusters)
-      ? plan.clusters
-      : [];
-
-  const status =
-    (typeof plan.status === 'string' && plan.status.length > 0
-      ? plan.status
-      : typeof facilities[0]?.status === 'string'
-        ? facilities[0].status
-        : '-');
-
-  const maxBudgetSource = (plan.maxBudget ?? metrics.maxBudget ?? {}) as Record<string, any>;
-  const estimatedTotalCostSource = (plan.estimatedTotalCost ?? metrics.estimatedTotalCost ?? {}) as Record<string, any>;
+  const plan = props.plan;
 
   return {
-    status,
-    totalCollectedKilograms: asNumber(plan.totalCollectedKilograms) ?? asNumber(metrics.totalCollectedKilograms),
-    totalCollectedLiters: asNumber(plan.totalCollectedLiters) ?? asNumber(metrics.totalCollectedLiters),
-    totalDistanceMeters: asNumber(plan.totalDistanceMeters) ?? asNumber(metrics.totalDistanceMeters),
-    averagePickupTimeMinutes: asNumber(plan.averagePickupTimeMinutes) ?? asNumber(metrics.averagePickupTimeMinutes),
-    estimatedTotalCostAmount: asNumber(estimatedTotalCostSource.amount),
-    estimatedTotalCostCurrency:
-      typeof estimatedTotalCostSource.currency === 'string' ? estimatedTotalCostSource.currency : undefined,
-    maxBudgetAmount: asNumber(maxBudgetSource.amount),
-    maxBudgetCurrency: typeof maxBudgetSource.currency === 'string' ? maxBudgetSource.currency : undefined,
+    totalCollectedKilograms: plan?.metrics.totalCollectedKilograms.getValue(),
+    totalCollectedLiters: plan?.metrics.totalCollectedLiters.getValue(),
+    totalDistanceMeters: plan?.metrics.totalDistanceMeters.getValue(),
+    averagePickupTimeMinutes: plan?.metrics.averagePickupTimeMinutes ?? undefined,
+    estimatedTotalCostAmount: plan?.metrics.estimatedTotalCost.getAmount(),
+    estimatedTotalCostCurrency: plan?.metrics.estimatedTotalCost.getCurrency().getCode(),
+    maxBudgetAmount: plan?.metrics.maxBudget.getAmount(),
+    maxBudgetCurrency: plan?.metrics.maxBudget.getCurrency().getCode(),
   };
 });
 
-const clusterCount = computed(() => {
-  const plan = (props.plan ?? {}) as Record<string, any>;
-  if (Array.isArray(plan.facilities)) {
-    return plan.facilities.length;
-  }
-  if (Array.isArray(plan.clusters)) {
-    return plan.clusters.length;
-  }
-  return 0;
-});
+const clusterCount = computed(() => props.plan?.facilities.length ?? 0);
 
-const allDailyPlans = computed(() => {
-  const plan = (props.plan ?? {}) as Record<string, any>;
-  if (Array.isArray(plan.dailyPlans)) {
-    return plan.dailyPlans;
-  }
-  if (Array.isArray(plan.facilities)) {
-    return plan.facilities.flatMap((facility: any) => (Array.isArray(facility.dailyPlans) ? facility.dailyPlans : []));
-  }
-  return [] as any[];
-});
+const allDailyPlans = computed(() => props.plan?.getDailyPlans() ?? []);
 
 const dailyPlanCount = computed(() => allDailyPlans.value.length);
 
 const dayCount = computed(() => {
+  if (typeof props.plan?.numberOfDays === 'number' && props.plan.numberOfDays > 0) {
+    return props.plan.numberOfDays;
+  }
+
   const uniqueDates = new Set(
     allDailyPlans.value
-      .map((plan: any) => getServiceDate(plan?.serviceDate))
+      .map((plan) => getServiceDate(plan.serviceDate))
       .filter((value: string | undefined): value is string => typeof value === 'string' && value.length > 0),
   );
 
@@ -264,10 +199,6 @@ function formatMoney(amount: number | undefined, currency: string | undefined): 
   } catch {
     return `${amount.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${code}`;
   }
-}
-
-function asNumber(value: unknown): number | undefined {
-  return typeof value === 'number' ? value : undefined;
 }
 
 function getServiceDate(value: unknown): string | undefined {

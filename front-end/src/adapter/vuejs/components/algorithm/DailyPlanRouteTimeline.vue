@@ -23,10 +23,30 @@
             <div class="route-section__header">
               <div>
                 <div class="route-section__title">
-                  {{ t('infrastructurePlan.show.daily.route.vehicleLabel') }}: {{ route.vehicleId }}
+                  <span>{{ t('infrastructurePlan.show.daily.route.vehicleLabel') }}: {{ route.vehicleId }}</span>
+                  <ButtonTooltip
+                    text=""
+                    :tooltip="viewTooltip"
+                    icon="mdi-eye"
+                    size="small"
+                    variant="flat"
+                    color="white"
+                    class="route-section__view-button"
+                    :eventclick="() => openVehicle(route.vehicleId)"
+                  />
                 </div>
                 <div class="route-section__meta">
-                  {{ t('infrastructurePlan.show.daily.route.facilityLabel') }}: {{ route.facilityId }}
+                  <span>{{ t('infrastructurePlan.show.daily.route.facilityLabel') }}: {{ route.facilityId }}</span>
+                  <ButtonTooltip
+                    text=""
+                    :tooltip="viewTooltip"
+                    icon="mdi-eye"
+                    size="small"
+                    variant="flat"
+                    color="white"
+                    class="route-section__view-button"
+                    :eventclick="() => openFacility(route.facilityId)"
+                  />
                 </div>
               </div>
               <div class="route-section__summary">
@@ -71,8 +91,8 @@
                   </div>
 
                   <div class="route-stop__metrics">
-                    <span>{{ t('infrastructurePlan.show.daily.route.collectedKilogramsLabel') }}: {{ formatNumber(stop.collectedKilograms) }}</span>
-                    <span>{{ t('infrastructurePlan.show.daily.route.collectedLitersLabel') }}: {{ formatNumber(stop.collectedLiters) }}</span>
+                    <span>{{ t('infrastructurePlan.show.daily.route.collectedKilogramsLabel') }}: {{ formatWithCumulative(stop.collectedKilograms, stop.cumulativeKilograms, 'kg') }}</span>
+                    <span>{{ t('infrastructurePlan.show.daily.route.collectedLitersLabel') }}: {{ formatWithCumulative(stop.collectedLiters, stop.cumulativeLiters, 'L') }}</span>
                     <span>{{ t('infrastructurePlan.show.daily.route.distanceFromPreviousLabel') }}: {{ formatMeters(stop.distanceFromPreviousMeters) }}</span>
                     <span>{{ t('infrastructurePlan.show.daily.route.cumulativeDistanceLabel') }}: {{ formatMeters(stop.cumulativeDistanceMeters) }}</span>
                   </div>
@@ -87,30 +107,17 @@
 </template>
 
 <script lang="ts" setup>
+import type { InfrastructurePlanDailyPlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import router from '../../router/router';
 
-interface StopLike {
-  sequence?: unknown;
-  containerId?: string;
-  collectedKilograms?: unknown;
-  collectedLiters?: unknown;
-  distanceFromPreviousMeters?: unknown;
-  cumulativeDistanceMeters?: unknown;
-}
-
-interface DailyPlanLike {
-  totalDistanceMeters?: unknown;
-  stops?: unknown[];
-}
-
 interface VehicleRouteLike {
   key: string;
   vehicleId: string;
   facilityId: string;
-  dailyPlan: DailyPlanLike;
+  dailyPlan: InfrastructurePlanDailyPlanDetail;
 }
 
 interface NormalizedStop {
@@ -120,6 +127,8 @@ interface NormalizedStop {
   collectedLiters?: number;
   distanceFromPreviousMeters?: number;
   cumulativeDistanceMeters?: number;
+  cumulativeKilograms?: number;
+  cumulativeLiters?: number;
 }
 
 interface NormalizedRoute {
@@ -145,59 +154,40 @@ const normalizedRoutes = computed<NormalizedRoute[]>(() =>
     key: route.key,
     vehicleId: route.vehicleId,
     facilityId: route.facilityId,
-    totalDistanceMeters: extractNumericValue(route.dailyPlan.totalDistanceMeters),
+    totalDistanceMeters: route.dailyPlan.totalDistanceMeters.getValue(),
     stops: normalizeStops(route.dailyPlan.stops),
   })),
 );
 
-function normalizeStops(stops: unknown[] | undefined): NormalizedStop[] {
-  if (!Array.isArray(stops)) {
-    return [];
-  }
-
-  return [...stops]
-    .map((stop) => {
-      const parsedStop = stop as StopLike;
-      return {
-        sequence: extractSequence(parsedStop.sequence),
-        containerId: typeof parsedStop.containerId === 'string' && parsedStop.containerId.length > 0 ? parsedStop.containerId : '-',
-        collectedKilograms: extractNumericValue(parsedStop.collectedKilograms),
-        collectedLiters: extractNumericValue(parsedStop.collectedLiters),
-        distanceFromPreviousMeters: extractNumericValue(parsedStop.distanceFromPreviousMeters),
-        cumulativeDistanceMeters: extractNumericValue(parsedStop.cumulativeDistanceMeters),
-      };
-    })
+function normalizeStops(stops: InfrastructurePlanDailyPlanDetail['stops']): NormalizedStop[] {
+  const sorted = [...stops]
+    .map((stop) => ({
+      sequence: stop.sequence.getValue(),
+      containerId: stop.containerId.getValue().length > 0 ? stop.containerId.getValue() : '-',
+      collectedKilograms: stop.collectedKilograms.getKilograms(),
+      collectedLiters: stop.collectedLiters.getLiters(),
+      distanceFromPreviousMeters: stop.distanceFromPreviousMeters.getValue(),
+      cumulativeDistanceMeters: stop.cumulativeDistanceMeters.getValue(),
+    }))
     .sort((left, right) => left.sequence - right.sequence);
-}
 
-function extractSequence(value: unknown): number {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value;
-  }
+  // Calculate cumulative kilograms and liters
+  let cumulativeKg = 0;
+  let cumulativeLiters = 0;
 
-  if (value && typeof value === 'object') {
-    const nestedValue = (value as Record<string, unknown>).value;
-    if (typeof nestedValue === 'number' && Number.isFinite(nestedValue)) {
-      return nestedValue;
+  return sorted.map((stop) => {
+    if (typeof stop.collectedKilograms === 'number') {
+      cumulativeKg += stop.collectedKilograms;
     }
-  }
-
-  return 0;
-}
-
-function extractNumericValue(value: unknown): number | undefined {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value;
-  }
-
-  if (value && typeof value === 'object') {
-    const nestedValue = (value as Record<string, unknown>).value;
-    if (typeof nestedValue === 'number' && Number.isFinite(nestedValue)) {
-      return nestedValue;
+    if (typeof stop.collectedLiters === 'number') {
+      cumulativeLiters += stop.collectedLiters;
     }
-  }
-
-  return undefined;
+    return {
+      ...stop,
+      cumulativeKilograms: cumulativeKg,
+      cumulativeLiters: cumulativeLiters,
+    };
+  });
 }
 
 function formatNumber(value: number | undefined): string {
@@ -216,12 +206,42 @@ function formatMeters(value: number | undefined): string {
   return `${value.toLocaleString(undefined, { maximumFractionDigits: 2 })} m`;
 }
 
+function formatWithCumulative(value: number | undefined, cumulative: number | undefined, unit: string): string {
+  if (typeof value !== 'number') {
+    return '-';
+  }
+
+  const formatted = value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  if (typeof cumulative !== 'number') {
+    return `${formatted} ${unit}`;
+  }
+
+  const cumulativeFormatted = cumulative.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  return `${formatted} ${unit} (ac. ${cumulativeFormatted} ${unit})`;
+}
+
 function openContainer(containerId: string): void {
   if (!containerId || containerId === '-') {
     return;
   }
 
   void router.push({ name: 'ShowContainer', params: { id: containerId } });
+}
+
+function openVehicle(vehicleId: string): void {
+  if (!vehicleId) {
+    return;
+  }
+
+  void router.push({ name: 'ShowVehicle', params: { id: vehicleId } });
+}
+
+function openFacility(facilityId: string): void {
+  if (!facilityId) {
+    return;
+  }
+
+  void router.push({ name: 'ShowFacility', params: { id: facilityId } });
 }
 </script>
 
@@ -254,12 +274,23 @@ function openContainer(containerId: string): void {
   color: rgb(var(--v-theme-primary));
   font-size: 1rem;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .route-section__meta,
 .route-section__summary {
   color: rgba(0, 0, 0, 0.7);
   font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.route-section__view-button {
+  background: #ffffff !important;
+  color: rgb(var(--v-theme-primary)) !important;
 }
 
 .route-stops {

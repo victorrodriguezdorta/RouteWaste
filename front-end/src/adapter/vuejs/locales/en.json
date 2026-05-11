@@ -15,7 +15,9 @@
       "back": "Back",
       "edit": "Edit",
       "next": "Next",
-      "confirm": "Confirm"
+      "confirm": "Confirm",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all"
     },
     "timeUnits": {
       "DAY": "Day",

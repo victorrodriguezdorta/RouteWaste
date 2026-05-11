@@ -15,7 +15,9 @@
       "back": "Volver",
       "edit": "Editar",
       "next": "Siguiente",
-      "confirm": "Confirmar"
+      "confirm": "Confirmar",
+      "selectAll": "Seleccionar todos",
+      "deselectAll": "Deseleccionar todos"
     },
     "timeUnits": {
       "DAY": "Día",

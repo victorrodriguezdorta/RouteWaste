@@ -23,12 +23,13 @@ export interface StopAlertJsonResponse {
  * Stop included in a daily plan.
  */
 export interface InfrastructurePlanStopJsonResponse {
-  sequence: number;
-  container: ContainerJsonResponse;
-  collectedKilograms: number;
-  collectedLiters: number;
-  distanceFromPreviousMeters: number;
-  cumulativeDistanceMeters: number;
+  sequence: number | { value: number };
+  container?: ContainerJsonResponse;
+  containerId?: string;
+  collectedKilograms: number | { value: number };
+  collectedLiters: number | { value: number };
+  distanceFromPreviousMeters: number | { value: number };
+  cumulativeDistanceMeters: number | { value: number };
   containerActualLiters?: number;
   alerts?: StopAlertJsonResponse[];
 }
@@ -39,12 +40,15 @@ export interface InfrastructurePlanStopJsonResponse {
 export interface InfrastructurePlanDailyPlanJsonResponse {
   id?: string;
   infrastructurePlanId?: string;
-  facility: FacilityJsonResponse;
-  serviceDate: string;
-  vehicle: VehicleJsonResponse;
-  totalCollectedKilograms: number;
-  totalCollectedLiters: number;
-  totalDistanceMeters: number;
+  facility?: FacilityJsonResponse;
+  facilityId?: string;
+  serviceDate: string | { date?: string; value?: string };
+  planDay?: number;
+  vehicle?: VehicleJsonResponse;
+  vehicleId?: string;
+  totalCollectedKilograms: number | { value: number };
+  totalCollectedLiters: number | { value: number };
+  totalDistanceMeters: number | { value: number };
   stops: InfrastructurePlanStopJsonResponse[];
 }
 
@@ -59,13 +63,48 @@ export interface InfrastructurePlanClusterJsonResponse {
 }
 
 /**
+ * Facility returned by the newer infrastructure plan detail endpoint.
+ */
+export interface InfrastructurePlanFacilityJsonResponse {
+  id: string;
+  facilityType: string;
+  status: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    postalAddress: string;
+    gisReference?: string;
+  };
+  capacities?: {
+    storageCapacityKg?: number;
+    processingCapacityKgPerDay?: number;
+  };
+  assignedContainers?: ContainerJsonResponse[];
+  dailyPlans?: InfrastructurePlanDailyPlanJsonResponse[];
+}
+
+/**
+ * Metrics block returned by the newer infrastructure plan detail endpoint.
+ */
+export interface InfrastructurePlanMetricsJsonResponse {
+  totalCollectedKilograms?: number;
+  totalCollectedLiters?: number;
+  totalDistanceMeters?: number;
+  averagePickupTimeMinutes?: number;
+  estimatedTotalCost?: InfrastructurePlanMoneyJsonResponse;
+  maxBudget?: InfrastructurePlanMoneyJsonResponse;
+}
+
+/**
  * Container daily state for monitoring purposes.
  */
 export interface ContainerDailyStateJsonResponse {
+  id?: string;
   containerId: string;
   planDay: number;
   dailyFillingLiters: number;
   containerCapacityLiters: number;
+  dailyDemandLitersPerDay?: number;
   status: 'CORRECT' | 'OVERFLOWED';
 }
 
@@ -75,13 +114,19 @@ export interface ContainerDailyStateJsonResponse {
 export interface InfrastructurePlanDetailJsonResponse {
   id?: string;
   executedAt: string;
-  totalCollectedKilograms: number;
-  totalCollectedLiters: number;
-  maxBudget: InfrastructurePlanMoneyJsonResponse;
-  totalDistanceMeters: number;
-  clusters: InfrastructurePlanClusterJsonResponse[];
-  status: string;
-  dailyPlans: InfrastructurePlanDailyPlanJsonResponse[];
+  period?: number;
+  numberOfDays?: number;
+  totalCollectedKilograms?: number;
+  totalCollectedLiters?: number;
+  maxBudget?: InfrastructurePlanMoneyJsonResponse;
+  totalDistanceMeters?: number;
+  averagePickupTimeMinutes?: number;
+  estimatedTotalCost?: InfrastructurePlanMoneyJsonResponse;
+  metrics?: InfrastructurePlanMetricsJsonResponse;
+  facilities?: InfrastructurePlanFacilityJsonResponse[];
+  clusters?: InfrastructurePlanClusterJsonResponse[];
+  status?: string;
+  dailyPlans?: InfrastructurePlanDailyPlanJsonResponse[];
   containerStateMonitoring?: ContainerDailyStateJsonResponse[];
 }
 

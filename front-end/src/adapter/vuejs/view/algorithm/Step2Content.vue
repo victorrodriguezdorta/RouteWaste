@@ -4,6 +4,14 @@
       <v-btn variant="outlined" @click="emit('back')">
         {{ t('common.buttons.back') }}
       </v-btn>
+      <v-btn
+        variant="outlined"
+        color="primary"
+        @click="toggleVisibleContainersSelection"
+        :disabled="step2ContainerItems.length === 0"
+      >
+        {{ areAllVisibleContainersSelected ? t('common.buttons.deselectAll') : t('common.buttons.selectAll') }}
+      </v-btn>
       <v-spacer />
       <v-btn variant="elevated" color="primary" @click="emit('next')" :disabled="!isStep2Valid">
         {{ t('common.buttons.next') }}
@@ -182,6 +190,7 @@ const emit = defineEmits<{
   step2ContainerItems,
   formattedCommandJson,
   isStep2Valid,
+  areAllVisibleContainersSelected,
 
   // Store reference
   algorithmStore,
@@ -193,6 +202,7 @@ const emit = defineEmits<{
   onStep2TableOptionsUpdate,
   isContainerSelected,
   toggleContainer,
+  toggleVisibleContainersSelection,
 } = useAlgorithmExecution();
 
 // Handler wrapper for location filter (Step 2 version)

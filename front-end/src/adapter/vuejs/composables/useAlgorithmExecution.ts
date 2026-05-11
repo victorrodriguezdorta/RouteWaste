@@ -739,6 +739,14 @@ export function useAlgorithmExecution() {
   };
 
   /**
+   * Check whether all containers currently visible in the step 2 table are selected.
+   */
+  const areAllVisibleContainersSelected = computed(() => {
+    const visibleContainerIds = step2ContainerItems.value.map((container) => container.id);
+    return visibleContainerIds.length > 0 && visibleContainerIds.every((containerId) => isContainerSelected(containerId));
+  });
+
+  /**
    * Toggle container selection
    */
   const toggleContainer = (containerId: string) => {
@@ -747,6 +755,27 @@ export function useAlgorithmExecution() {
     } else {
       algorithmStore.addSelectedContainer(containerId);
     }
+  };
+
+  /**
+   * Toggle the bulk selection of all containers currently visible in the step 2 table.
+   */
+  const toggleVisibleContainersSelection = () => {
+    const visibleContainerIds = step2ContainerItems.value.map((container) => container.id);
+
+    if (areAllVisibleContainersSelected.value) {
+      const visibleContainerIdSet = new Set(visibleContainerIds);
+      algorithmStore.setSelectedContainers(
+        algorithmStore.selectedContainerIds.filter((containerId) => !visibleContainerIdSet.has(containerId))
+      );
+      return;
+    }
+
+    const nextSelectedContainerIds = Array.from(
+      new Set([...algorithmStore.selectedContainerIds, ...visibleContainerIds])
+    );
+
+    algorithmStore.setSelectedContainers(nextSelectedContainerIds);
   };
 
   return {
@@ -846,7 +875,9 @@ export function useAlgorithmExecution() {
     onContainerLocationFilterChange,
     onStep2TableOptionsUpdate,
     isContainerSelected,
+    areAllVisibleContainersSelected,
     toggleContainer,
+    toggleVisibleContainersSelection,
     
     // Methods - Step 3
     setExtraData,
