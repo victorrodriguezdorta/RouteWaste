@@ -135,8 +135,6 @@ public class Algorithm {
 
         // For each day, track which containers have been collected
         for (int day = 1; day <= numberOfDays; day++) {
-          // Reset daily collected containers set
-          collectedContainersPerDay.clear();
           
           LocalDate serviceDate = startDate.plusDays(day - 1);
           
@@ -153,6 +151,8 @@ public class Algorithm {
           // to update container fill levels so that uncollected containers may overflow.
           if (day == 1) {
             for (Vehicle vehicle : vehicles) {
+              // Reset collected set before each vehicle so each vehicle gets its own plan
+              collectedContainersPerDay.clear();
               if (vehicle == null) {
                 continue;
               }
@@ -349,24 +349,14 @@ public class Algorithm {
                 stopAlerts
             );
 
-            // Update vehicle load
+            // Update vehicle load (route planning only)
             vehicleCurrentLoad += toCollect;
             vehicle.updateCurrentLoadLiters(vehicleCurrentLoad);
 
-            // Update container current liters (subtract collected amount)
-            double remainingInContainer = containerCurrentLiters - toCollect;
-            nearest.updateCurrentLiters(remainingInContainer);
-
-            // Mark container as collected for the day only if now empty
-            if (remainingInContainer <= 0) {
-              collectedContainersPerDay.add(nearest.getId());
-            }
-
-            // Update current location and remove from unvisited if fully collected
+            // Do NOT modify the real container state here; keep planning read-only
+            // Remove the container from the local unvisited list (one visit per vehicle)
             currentLocation = nearest;
-            if (remainingInContainer <= 0) {
-              unvisited.remove(nearestIndex);
-            }
+            unvisited.remove(nearestIndex);
 
             if (vehicleCurrentLoad >= vehicleCapacity) {
               returnToFacilityAndUnload(vehicle, facility);
