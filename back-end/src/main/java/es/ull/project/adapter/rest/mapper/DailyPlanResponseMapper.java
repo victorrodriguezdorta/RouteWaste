@@ -1,12 +1,12 @@
 package es.ull.project.adapter.rest.mapper;
 
+import java.util.stream.Collectors;
+
 import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.dailyplan.StopResponseBody;
 import es.ull.project.domain.entity.DailyPlan;
 import es.ull.project.domain.entity.Stop;
 import es.ull.project.domain.valueobject.time.ServiceDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Mapper for DailyPlan related response DTOs.
@@ -64,6 +64,8 @@ public class DailyPlanResponseMapper {
         response.collectedLiters = stop.getCollectedLiters();
         response.distanceFromPreviousMeters = stop.getDistanceFromPreviousMeters();
         response.cumulativeDistanceMeters = stop.getCumulativeDistanceMeters();
+        response.containerActualLiters = stop.getContainerActualLiters();
+        response.alerts = stop.getAlerts();
         return response;
     }
 }

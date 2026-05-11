@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 
 import es.ull.project.application.query.ContainerSearchCriteria;
 import es.ull.project.application.query.FacilitySearchCriteria;
+import es.ull.project.application.repository.ContainerDailyStateRepository;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.DailyPlanRepository;
 import es.ull.project.application.repository.FacilityRepository;
@@ -24,6 +25,7 @@ import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.entity.ContainerDailyState;
 import es.ull.project.domain.entity.DailyPlan;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
@@ -57,6 +59,7 @@ class PersistAlgorithmExecutionResultTests {
         InMemoryInfrastructurePlanRepository infrastructurePlanRepository = new InMemoryInfrastructurePlanRepository();
         InMemoryServiceAssignmentRepository serviceAssignmentRepository = new InMemoryServiceAssignmentRepository();
         InMemoryDailyPlanRepository dailyPlanRepository = new InMemoryDailyPlanRepository();
+        InMemoryContainerDailyStateRepository containerDailyStateRepository = new InMemoryContainerDailyStateRepository();
         InMemoryFacilityRepository facilityRepository = new InMemoryFacilityRepository();
         InMemoryContainerRepository containerRepository = new InMemoryContainerRepository();
         InMemoryVehicleRepository vehicleRepository = new InMemoryVehicleRepository();
@@ -67,6 +70,7 @@ class PersistAlgorithmExecutionResultTests {
                 infrastructurePlanRepository,
                 serviceAssignmentRepository,
           dailyPlanRepository,
+        containerDailyStateRepository,
           facilityRepository,
           containerRepository,
           vehicleRepository);
@@ -82,9 +86,11 @@ class PersistAlgorithmExecutionResultTests {
         assertEquals(new NumberOfDays(7), plan.getNumberOfDays().get());
         assertEquals(new AveragePickupTimeMinutes(15), plan.getAveragePickupTimeMinutes().get());
         assertEquals(new ExecutedAt("2026-04-29T10:30:32.420542549Z"), plan.getExecutedAt().get());
+        assertEquals(2, plan.getContainerDailyStates().size());
         assertEquals(1, infrastructurePlanRepository.saved.size());
         assertEquals(1, serviceAssignmentRepository.saved.size());
         assertEquals(2, dailyPlanRepository.saved.size());
+        assertEquals(2, containerDailyStateRepository.saved.size());
 
         ServiceAssignment assignment = serviceAssignmentRepository.saved.values().iterator().next();
         assertEquals(2, assignment.getAssignedContainers().size());
@@ -275,6 +281,24 @@ class PersistAlgorithmExecutionResultTests {
                         "vehicleType": "COLLECTION_TRUCK"
                       }
                     }
+                  ],
+                  "containerStateMonitoring": [
+                    {
+                      "containerId": "2dd7627e-f357-42e1-b257-2cf1160440d3",
+                      "planDay": 1,
+                      "dailyFillingLiters": 100.0,
+                      "containerCapacityLiters": 1000.0,
+                      "dailyDemandLitersPerDay": 100.0,
+                      "status": "CORRECT"
+                    },
+                    {
+                      "containerId": "374ae62c-1e31-4210-88d3-dbefa4320a72",
+                      "planDay": 2,
+                      "dailyFillingLiters": 1100.0,
+                      "containerCapacityLiters": 1000.0,
+                      "dailyDemandLitersPerDay": 100.0,
+                      "status": "OVERFLOWED"
+                    }
                   ]
                 }
                 """;
@@ -384,6 +408,33 @@ class PersistAlgorithmExecutionResultTests {
             }
             return plans;
         }
+    }
+
+    private static final class InMemoryContainerDailyStateRepository implements ContainerDailyStateRepository {
+      private final Map<UUID, ContainerDailyState> saved = new LinkedHashMap<>();
+
+      @Override
+      public ContainerDailyState save(ContainerDailyState entity) {
+        saved.put(entity.getId(), entity);
+        return entity;
+      }
+
+      @Override
+      public Optional<ContainerDailyState> findById(UUID id) {
+        return Optional.ofNullable(saved.get(id));
+      }
+
+      @Override
+      public List<ContainerDailyState> findAll() {
+        return new ArrayList<>(saved.values());
+      }
+
+      @Override
+      public void delete(ContainerDailyState entity) {
+        if (entity != null) {
+          saved.remove(entity.getId());
+        }
+      }
     }
 
       private static final class InMemoryFacilityRepository implements FacilityRepository {

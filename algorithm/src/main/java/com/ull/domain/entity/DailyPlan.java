@@ -138,8 +138,15 @@ public class DailyPlan {
    * @param container the visited container
    * @param collectedKilograms kilograms collected at the stop
    * @param collectedLiters liters collected at the stop
+   * @param containerActualLiters the actual liters in the container before collection
+   * @param alerts list of alerts generated at this stop
    */
-  public void addStop(Container container, double collectedKilograms, double collectedLiters) {
+  public void addStop(
+      Container container,
+      double collectedKilograms,
+      double collectedLiters,
+      double containerActualLiters,
+      List<Alert> alerts) {
     validateContainer(container);
     validateCollectedKilograms(collectedKilograms);
     validateCollectedLiters(collectedLiters);
@@ -157,12 +164,26 @@ public class DailyPlan {
         distanceFromPreviousMeters,
         cumulativeDistanceMeters,
         collectedKilograms,
-        collectedLiters);
+        collectedLiters,
+        containerActualLiters,
+        alerts);
 
     this.stops.add(stop);
     this.totalDistanceMeters = cumulativeDistanceMeters;
     this.totalCollectedKilograms += collectedKilograms;
     this.totalCollectedLiters += collectedLiters;
+  }
+
+  /**
+   * Adds a new stop to the daily plan and updates the route totals.
+   * Legacy method for backward compatibility (no alerts, no container actual liters).
+   *
+   * @param container the visited container
+   * @param collectedKilograms kilograms collected at the stop
+   * @param collectedLiters liters collected at the stop
+   */
+  public void addStop(Container container, double collectedKilograms, double collectedLiters) {
+    addStop(container, collectedKilograms, collectedLiters, 0.0, new ArrayList<>());
   }
 
   /**

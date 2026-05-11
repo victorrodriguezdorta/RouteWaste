@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.ull.domain.entity.ContainerDailyState;
 import com.ull.domain.entity.DailyPlan;
 import com.ull.domain.entity.FacilityCluster;
 import com.ull.domain.valueobject.cost.MaximumBudget;
@@ -43,6 +44,7 @@ public class DeliveryPlanningSolution {
   private MaximumBudget maxBudget;
   private final List<FacilityCluster> clusters;
   private final List<DailyPlan> dailyPlans;
+  private final List<ContainerDailyState> containerStateMonitoring;
 
   /**
    * Creates an empty solution stamped with the current instant.
@@ -53,6 +55,7 @@ public class DeliveryPlanningSolution {
     this.executedAt = Instant.now();
     this.clusters = new ArrayList<>();
     this.dailyPlans = new ArrayList<>();
+    this.containerStateMonitoring = new ArrayList<>();
   }
 
   // -------------------------------------------------------------------------
@@ -134,6 +137,31 @@ public class DeliveryPlanningSolution {
       throw new IllegalArgumentException(DAILY_PLANS_NOT_DEFINED);
     }
     this.dailyPlans.add(dailyPlan);
+  }
+
+  // -------------------------------------------------------------------------
+  // Container state monitoring
+  // -------------------------------------------------------------------------
+
+  /**
+   * Returns an unmodifiable view of the container daily states.
+   *
+   * @return the container state monitoring list
+   */
+  public List<ContainerDailyState> getContainerStateMonitoring() {
+    return Collections.unmodifiableList(this.containerStateMonitoring);
+  }
+
+  /**
+   * Adds a container daily state to the monitoring list.
+   *
+   * @param containerDailyState the container daily state to add
+   */
+  public void addContainerDailyState(ContainerDailyState containerDailyState) {
+    if (containerDailyState == null) {
+      throw new IllegalArgumentException("Container daily state is not defined");
+    }
+    this.containerStateMonitoring.add(containerDailyState);
   }
 
   // -------------------------------------------------------------------------

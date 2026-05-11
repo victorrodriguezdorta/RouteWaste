@@ -1,5 +1,17 @@
 package es.ull.project.adapter.mongodb.reader;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
+
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Facility;
@@ -13,16 +25,6 @@ import es.ull.project.domain.valueobject.cost.TotalCost;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.ReadingConverter;
-import org.springframework.lang.NonNull;
 
 /**
  * InfrastructurePlanReadingConverter
@@ -103,6 +105,18 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
                 }
             }
         }
+        List<es.ull.project.domain.entity.ContainerDailyState> containerDailyStates = new ArrayList<>();
+        List<?> containerDailyStateIdsList = document.get(MongoFields.CONTAINER_DAILY_STATE_IDS, List.class);
+        if (containerDailyStateIdsList != null) {
+            for (Object idObj : containerDailyStateIdsList) {
+                UUID cdsId = (UUID) idObj;
+                Optional<es.ull.project.domain.entity.ContainerDailyState> optionalCds =
+                    mongoConfiguration.containerDailyStateRepository().findById(cdsId);
+                if (optionalCds.isPresent()) {
+                    containerDailyStates.add(optionalCds.get());
+                }
+            }
+        }
         ServicePolicies servicePolicies = null;
         Document policiesDocument = document.get(MongoFields.SERVICE_POLICIES, Document.class);
         if (policiesDocument != null) {
@@ -155,6 +169,7 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
             selectedFacilities,
             serviceAssignments,
             dailyPlans,
+            containerDailyStates,
             servicePolicies,
             maxBudget,
             estimatedTotalCost,

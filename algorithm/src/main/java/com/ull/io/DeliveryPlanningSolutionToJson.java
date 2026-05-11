@@ -6,7 +6,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.ull.domain.DeliveryPlanningSolution;
+import com.ull.domain.entity.Alert;
 import com.ull.domain.entity.Container;
+import com.ull.domain.entity.ContainerDailyState;
 import com.ull.domain.entity.DailyPlan;
 import com.ull.domain.entity.DailyPlanStop;
 import com.ull.domain.entity.Facility;
@@ -48,9 +50,21 @@ import com.ull.domain.valueobject.cost.MaximumBudget;
  *           "distanceFromPreviousMeters": 850.0,
  *           "cumulativeDistanceMeters": 850.0,
  *           "collectedKilograms": 40.0,
- *           "collectedLiters": 48.0
+ *           "collectedLiters": 48.0,
+ *           "containerActualLiters": 60.0,
+ *           "alerts": []
  *         }
  *       ]
+ *     }
+ *   ]
+ *   "containerStateMonitoring": [
+ *     {
+ *       "containerId": "...",
+ *       "planDay": 1,
+ *       "dailyFillingLiters": 12.0,
+ *       "containerCapacityLiters": 100.0,
+ *       "dailyDemandLitersPerDay": 12.0,
+ *       "status": "CORRECT"
  *     }
  *   ]
  * }
@@ -73,6 +87,7 @@ public class DeliveryPlanningSolutionToJson
     }
     json.put("clusters", serializeClusters(solution));
     json.put("dailyPlans", serializeDailyPlans(solution));
+    json.put("containerStateMonitoring", serializeContainerStateMonitoring(solution));
 
     return json;
   }
@@ -137,7 +152,38 @@ public class DeliveryPlanningSolutionToJson
     json.put("cumulativeDistanceMeters", stop.getCumulativeDistanceMeters());
     json.put("collectedKilograms", stop.getCollectedKilograms());
     json.put("collectedLiters", stop.getCollectedLiters());
+    json.put("containerActualLiters", stop.getContainerActualLiters());
+    json.put("alerts", serializeAlerts(stop.getAlerts()));
     return json;
+  }
+
+  private JSONArray serializeAlerts(java.util.List<Alert> alerts) {
+    JSONArray array = new JSONArray();
+    for (Alert alert : alerts) {
+      JSONObject json = new JSONObject();
+      json.put("type", alert.getType());
+      json.put("message", alert.getMessage());
+      if (alert.getValue() != null) {
+        json.put("value", alert.getValue());
+      }
+      array.put(json);
+    }
+    return array;
+  }
+
+  private JSONArray serializeContainerStateMonitoring(DeliveryPlanningSolution solution) {
+    JSONArray array = new JSONArray();
+    for (ContainerDailyState state : solution.getContainerStateMonitoring()) {
+      JSONObject json = new JSONObject();
+      json.put("containerId", state.getContainerId());
+      json.put("planDay", state.getPlanDay());
+      json.put("dailyFillingLiters", state.getDailyFillingLiters());
+      json.put("containerCapacityLiters", state.getContainerCapacityLiters());
+      json.put("dailyDemandLitersPerDay", state.getDailyDemandLitersPerDay());
+      json.put("status", state.getStatus().name());
+      array.put(json);
+    }
+    return array;
   }
 
   // -------------------------------------------------------------------------

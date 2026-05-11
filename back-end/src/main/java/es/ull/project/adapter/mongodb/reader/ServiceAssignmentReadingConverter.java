@@ -1,36 +1,26 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.configuration.MongoConfiguration;
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.entity.InfrastructurePlan;
-import es.ull.project.domain.entity.ServiceAssignment;
-import es.ull.project.domain.enumerate.FacilityStatus;
-import es.ull.project.domain.enumerate.FacilityType;
-import es.ull.project.domain.enumerate.ServiceZone;
-import es.ull.project.domain.enumerate.WasteType;
-import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
-import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
-import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
-import es.ull.project.domain.valueobject.capacity.UnloadingTime;
-import es.ull.project.domain.valueobject.cost.Currency;
-import es.ull.project.domain.valueobject.cost.MaximumBudget;
-import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
-import es.ull.project.domain.valueobject.cost.TotalCost;
-import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
-import es.ull.project.domain.valueobject.location.Location;
-import es.ull.project.domain.valueobject.time.PlanningPeriod;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.lang.NonNull;
+
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.entity.ServiceAssignment;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
+import es.ull.project.domain.valueobject.cost.TotalCost;
+import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
 /**
  * ServiceAssignmentReadingConverter
@@ -75,7 +65,7 @@ public class ServiceAssignmentReadingConverter implements Converter<Document, Se
         InfrastructurePlan infrastructurePlan = new InfrastructurePlan(
             planId,
             new PlanningPeriod(String.valueOf(LocalDate.now().getYear())),
-            null, null, null, null,
+            null, null, null, null, null,
             new MaximumBudget(1.0),
             new TotalCost(0.0),
             null, null, null,

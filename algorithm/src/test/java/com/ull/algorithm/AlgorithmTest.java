@@ -197,4 +197,21 @@ class AlgorithmTest {
     assertEquals(2, plan.getStops().size());
     assertTrue(plan.getTotalDistanceMeters() > 0);
   }
+
+  @Test
+  void vehicleShouldBeEmptyAfterFinishingTheRoute() {
+    Facility f = facility("facility-1");
+    Vehicle v = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Container c1 = container("container-1", 28.465, -16.263);
+    Container c2 = container("container-2", 28.462, -16.264);
+    Container c3 = container("container-3", 28.460, -16.260);
+
+    FacilityWithVehicles fwv = new FacilityWithVehicles(f, List.of(v));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+      15, 7, List.of(fwv), List.of(c1, c2, c3), new MaximumBudget(5000.0, "EUR"));
+
+    new Algorithm(problem).run();
+
+    assertEquals(0.0, v.getCurrentLoadLiters());
+  }
 }

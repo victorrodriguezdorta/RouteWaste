@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import es.ull.project.application.port.algorithm.AlgorithmRunner;
+import es.ull.project.application.repository.ContainerDailyStateRepository;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.DailyPlanRepository;
 import es.ull.project.application.repository.FacilityRepository;
@@ -77,6 +78,7 @@ public class ServiceConfiguration {
             InfrastructurePlanRepository infrastructurePlanRepository,
             ServiceAssignmentRepository serviceAssignmentRepository,
             DailyPlanRepository dailyPlanRepository,
+            ContainerDailyStateRepository containerDailyStateRepository,
             FacilityRepository facilityRepository,
             ContainerRepository containerRepository,
             VehicleRepository vehicleRepository) {
@@ -84,6 +86,7 @@ public class ServiceConfiguration {
                 infrastructurePlanRepository,
                 serviceAssignmentRepository,
                 dailyPlanRepository,
+                containerDailyStateRepository,
                 facilityRepository,
                 containerRepository,
                 vehicleRepository);

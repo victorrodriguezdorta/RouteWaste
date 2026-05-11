@@ -5,6 +5,15 @@ import { Distance } from '@/domain/valueobject/location/distance';
 import { RouteSequence } from '@/domain/valueobject/location/route-sequence';
 
 /**
+ * Stop alert containing information about events during collection.
+ */
+export interface StopAlert {
+  type: string;
+  message: string;
+  value?: number;
+}
+
+/**
  * Stop
  *
  * Represents a single point visited in a route (DailyPlan).
@@ -45,6 +54,16 @@ export class Stop {
   private readonly cumulativeDistanceMeters: Distance;
 
   /**
+   * The actual liters in the container before collection at this stop.
+   */
+  private readonly containerActualLiters: number;
+
+  /**
+   * List of alerts generated at this stop.
+   */
+  private readonly alerts: StopAlert[];
+
+  /**
    * Create a new Stop.
    * @param sequence The sequence number in the route
    * @param container The container visited
@@ -52,6 +71,8 @@ export class Stop {
    * @param collectedLiters The volume of waste collected
    * @param distanceFromPreviousMeters The distance traveled from the previous stop
    * @param cumulativeDistanceMeters The total distance traveled so far
+   * @param containerActualLiters The actual liters before collection (optional)
+   * @param alerts Array of alerts (optional)
    * @throws Error when required parameters are missing
    */
   constructor(
@@ -60,7 +81,9 @@ export class Stop {
     collectedKilograms: CollectedWeightKilograms,
     collectedLiters: CollectedVolumeLiters,
     distanceFromPreviousMeters: Distance,
-    cumulativeDistanceMeters: Distance
+    cumulativeDistanceMeters: Distance,
+    containerActualLiters?: number,
+    alerts?: StopAlert[]
   ) {
     this.validate(sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
     this.sequence = sequence;
@@ -69,6 +92,8 @@ export class Stop {
     this.collectedLiters = collectedLiters;
     this.distanceFromPreviousMeters = distanceFromPreviousMeters;
     this.cumulativeDistanceMeters = cumulativeDistanceMeters;
+    this.containerActualLiters = containerActualLiters ?? 0;
+    this.alerts = alerts ?? [];
   }
 
   /**
@@ -140,6 +165,22 @@ export class Stop {
   }
 
   /**
+   * Get the actual liters in the container before collection.
+   * @returns The container actual liters
+   */
+  getContainerActualLiters(): number {
+    return this.containerActualLiters;
+  }
+
+  /**
+   * Get the alerts generated at this stop.
+   * @returns The alerts as an array
+   */
+  getAlerts(): StopAlert[] {
+    return this.alerts;
+  }
+
+  /**
    * Compare equality with another object.
    * Two stops are equal if they have the same sequence and container.
    * @param otherObject The object to compare with
@@ -160,6 +201,6 @@ export class Stop {
    * @returns A formatted string representation
    */
   toString(): string {
-    return `Stop={sequence=${this.sequence}, containerId=${this.container.getId()}, collectedKg=${this.collectedKilograms}, collectedL=${this.collectedLiters}, distPrev=${this.distanceFromPreviousMeters}, distCum=${this.cumulativeDistanceMeters}}`;
+    return `Stop={sequence=${this.sequence}, containerId=${this.container.getId()}, collectedKg=${this.collectedKilograms}, collectedL=${this.collectedLiters}, distPrev=${this.distanceFromPreviousMeters}, distCum=${this.cumulativeDistanceMeters}, containerActualLiters=${this.containerActualLiters}, alerts=${this.alerts}}`;
   }
 }

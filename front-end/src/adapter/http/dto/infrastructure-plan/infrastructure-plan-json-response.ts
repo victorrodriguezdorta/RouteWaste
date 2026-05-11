@@ -11,6 +11,15 @@ export interface InfrastructurePlanMoneyJsonResponse {
 }
 
 /**
+ * Stop alert containing information about events during collection.
+ */
+export interface StopAlertJsonResponse {
+  type: string;
+  message: string;
+  value?: number;
+}
+
+/**
  * Stop included in a daily plan.
  */
 export interface InfrastructurePlanStopJsonResponse {
@@ -20,6 +29,8 @@ export interface InfrastructurePlanStopJsonResponse {
   collectedLiters: number;
   distanceFromPreviousMeters: number;
   cumulativeDistanceMeters: number;
+  containerActualLiters?: number;
+  alerts?: StopAlertJsonResponse[];
 }
 
 /**
@@ -48,6 +59,17 @@ export interface InfrastructurePlanClusterJsonResponse {
 }
 
 /**
+ * Container daily state for monitoring purposes.
+ */
+export interface ContainerDailyStateJsonResponse {
+  containerId: string;
+  planDay: number;
+  dailyFillingLiters: number;
+  containerCapacityLiters: number;
+  status: 'CORRECT' | 'OVERFLOWED';
+}
+
+/**
  * Infrastructure plan detail payload returned by the backend.
  */
 export interface InfrastructurePlanDetailJsonResponse {
@@ -60,6 +82,7 @@ export interface InfrastructurePlanDetailJsonResponse {
   clusters: InfrastructurePlanClusterJsonResponse[];
   status: string;
   dailyPlans: InfrastructurePlanDailyPlanJsonResponse[];
+  containerStateMonitoring?: ContainerDailyStateJsonResponse[];
 }
 
 /**

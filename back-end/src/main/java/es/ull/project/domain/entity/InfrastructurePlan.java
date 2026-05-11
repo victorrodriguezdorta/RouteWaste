@@ -1,5 +1,12 @@
 package es.ull.project.domain.entity;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
@@ -11,12 +18,6 @@ import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * InfrastructurePlan
@@ -117,6 +118,11 @@ public class InfrastructurePlan {
     private ExecutedAt executedAt;
 
     /**
+     * Container daily state snapshots associated with this plan (domain view).
+     */
+    private List<ContainerDailyState> containerDailyStates;
+
+    /**
      * Creates a new InfrastructurePlan.
      *
      * @param period                   Planning period
@@ -149,6 +155,7 @@ public class InfrastructurePlan {
         this.totalCollectedKilograms = CollectedWeightKilograms.fromKilograms(0.0);
         this.totalCollectedLiters = CollectedVolumeLiters.fromLiters(0.0);
         this.totalDistanceMeters = Distance.fromMeters(0.0);
+        this.containerDailyStates = new ArrayList<>();
     }
 
     /**
@@ -172,6 +179,7 @@ public class InfrastructurePlan {
         this.totalCollectedKilograms = otherObject.totalCollectedKilograms;
         this.totalCollectedLiters = otherObject.totalCollectedLiters;
         this.totalDistanceMeters = otherObject.totalDistanceMeters;
+        this.containerDailyStates = new ArrayList<>(otherObject.containerDailyStates);
     }
 
     /**
@@ -193,12 +201,13 @@ public class InfrastructurePlan {
      * @param averagePickupTimeMinutes the average pickup time in minutes
      * @param executedAt         the timestamp of algorithm execution
      */
-    public InfrastructurePlan(UUID id,
+        public InfrastructurePlan(UUID id,
             PlanningPeriod period,
             List<Facility> selectedFacilities,
             List<ServiceAssignment> serviceAssignments,
             List<DailyPlan> dailyPlans,
-            ServicePolicies servicePolicies,
+                List<ContainerDailyState> containerDailyStates,
+                ServicePolicies servicePolicies,
             MaximumBudget maxBudget,
             TotalCost estimatedTotalCost,
             CollectedWeightKilograms totalCollectedKilograms,
@@ -214,6 +223,7 @@ public class InfrastructurePlan {
         this.selectedFacilities = selectedFacilities != null ? new ArrayList<>(selectedFacilities) : new ArrayList<>();
         this.serviceAssignments = serviceAssignments != null ? new ArrayList<>(serviceAssignments) : new ArrayList<>();
         this.dailyPlans = dailyPlans != null ? new ArrayList<>(dailyPlans) : new ArrayList<>();
+        this.containerDailyStates = containerDailyStates != null ? new ArrayList<>(containerDailyStates) : new ArrayList<>();
         this.servicePolicies = servicePolicies;
         this.maxBudget = maxBudget;
         this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
@@ -223,6 +233,27 @@ public class InfrastructurePlan {
         this.numberOfDays = numberOfDays;
         this.averagePickupTimeMinutes = averagePickupTimeMinutes;
         this.executedAt = executedAt;
+    }
+
+    /**
+     * Backwards-compatible restore constructor without containerDailyStates parameter.
+     * Delegates to the main restore constructor passing null for containerDailyStates.
+     */
+    public InfrastructurePlan(UUID id,
+            PlanningPeriod period,
+            List<Facility> selectedFacilities,
+            List<ServiceAssignment> serviceAssignments,
+            List<DailyPlan> dailyPlans,
+            ServicePolicies servicePolicies,
+            MaximumBudget maxBudget,
+            TotalCost estimatedTotalCost,
+            CollectedWeightKilograms totalCollectedKilograms,
+            CollectedVolumeLiters totalCollectedLiters,
+            Distance totalDistanceMeters,
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes,
+            ExecutedAt executedAt) {
+        this(id, period, selectedFacilities, serviceAssignments, dailyPlans, null, servicePolicies, maxBudget, estimatedTotalCost, totalCollectedKilograms, totalCollectedLiters, totalDistanceMeters, numberOfDays, averagePickupTimeMinutes, executedAt);
     }
 
     /**
@@ -316,6 +347,26 @@ public class InfrastructurePlan {
     }
 
     /**
+     * Adds a container daily state snapshot to this plan if not already present.
+     *
+     * @param containerDailyState the snapshot to add
+     */
+    public void addContainerDailyState(ContainerDailyState containerDailyState) {
+        if (containerDailyState != null) {
+            boolean exists = false;
+            for (ContainerDailyState cds : containerDailyStates) {
+                if (cds.getId().equals(containerDailyState.getId())) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                containerDailyStates.add(containerDailyState);
+            }
+        }
+    }
+
+    /**
      * Recalculates the total estimated cost of the plan.
      */
     public void recalculateTotalCost() {
@@ -398,6 +449,31 @@ public class InfrastructurePlan {
         List<UUID> ids = new ArrayList<>();
         for (DailyPlan dp : dailyPlans) {
             ids.add(dp.getId());
+        }
+        return Collections.unmodifiableList(ids);
+    }
+
+    /**
+     * Returns the container daily states associated with this plan (domain objects).
+     *
+     * @return unmodifiable list of ContainerDailyState
+     */
+    public List<ContainerDailyState> getContainerDailyStates() {
+        return Collections.unmodifiableList(containerDailyStates);
+    }
+
+    /**
+     * Returns the identifiers of the ContainerDailyState snapshots associated with this plan.
+     * Useful for persistence where only ids are stored in the InfrastructurePlan document.
+     *
+     * @return list of UUIDs
+     */
+    public List<UUID> getContainerDailyStateIds() {
+        List<UUID> ids = new ArrayList<>();
+        if (this.containerDailyStates != null) {
+            for (ContainerDailyState cds : this.containerDailyStates) {
+                ids.add(cds.getId());
+            }
         }
         return Collections.unmodifiableList(ids);
     }

@@ -1,11 +1,12 @@
 package es.ull.project.adapter.rest.serialization.infrastructureplan;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import es.ull.project.adapter.rest.deserialization.JsonFields;
+
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
-import java.io.IOException;
 
 /**
  * Custom JSON serializer for InfrastructurePlanResponseBody
@@ -140,6 +141,36 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
                 }
                 gen.writeEndArray();
 
+                gen.writeEndObject();
+            }
+        }
+        gen.writeEndArray();
+
+        gen.writeArrayFieldStart("containerStateMonitoring");
+        if (value.containerStateMonitoring != null) {
+            for (var state : value.containerStateMonitoring) {
+                gen.writeStartObject();
+                if (state.id != null) {
+                    gen.writeStringField("id", state.id.toString());
+                }
+                if (state.containerId != null) {
+                    gen.writeStringField("containerId", state.containerId);
+                }
+                if (state.planDay != null) {
+                    gen.writeNumberField("planDay", state.planDay);
+                }
+                if (state.dailyFillingLiters != null) {
+                    gen.writeNumberField("dailyFillingLiters", state.dailyFillingLiters);
+                }
+                if (state.containerCapacityLiters != null) {
+                    gen.writeNumberField("containerCapacityLiters", state.containerCapacityLiters);
+                }
+                if (state.dailyDemandLitersPerDay != null) {
+                    gen.writeNumberField("dailyDemandLitersPerDay", state.dailyDemandLitersPerDay);
+                }
+                if (state.status != null) {
+                    gen.writeStringField("status", state.status);
+                }
                 gen.writeEndObject();
             }
         }

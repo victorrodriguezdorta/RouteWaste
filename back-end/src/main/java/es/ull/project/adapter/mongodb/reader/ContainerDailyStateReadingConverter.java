@@ -1,0 +1,42 @@
+package es.ull.project.adapter.mongodb.reader;
+
+import java.util.UUID;
+
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
+
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.domain.entity.ContainerDailyState;
+import es.ull.project.domain.enumerate.ContainerStatus;
+
+@ReadingConverter
+public class ContainerDailyStateReadingConverter implements Converter<Document, ContainerDailyState> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ContainerDailyStateReadingConverter.class);
+
+    @Override
+    public ContainerDailyState convert(@NonNull Document document) {
+        logger.info("Reading ContainerDailyState from document");
+        UUID id = (UUID) document.get(MongoFields.ID);
+        String containerId = document.getString(MongoFields.CONTAINER_ID);
+        Integer planDay = document.getInteger(MongoFields.PLAN_DAY);
+        Double dailyFilling = document.getDouble(MongoFields.DAILY_FILLING_LITERS);
+        Double capacity = document.getDouble(MongoFields.CAPACITY_LITERS);
+        Double dailyDemand = document.getDouble(MongoFields.DAILY_DEMAND_LITERS_PER_DAY);
+        String statusRaw = document.getString(MongoFields.STATUS);
+        ContainerStatus status = ContainerStatus.fromString(statusRaw);
+        return new ContainerDailyState(
+            id,
+            containerId,
+            planDay != null ? planDay : 1,
+            dailyFilling != null ? dailyFilling : 0.0,
+            capacity != null ? capacity : 0.0,
+            dailyDemand != null ? dailyDemand : 0.0,
+            status
+        );
+    }
+}

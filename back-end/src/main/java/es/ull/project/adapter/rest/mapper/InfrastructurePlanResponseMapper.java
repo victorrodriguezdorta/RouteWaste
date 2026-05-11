@@ -1,12 +1,15 @@
 package es.ull.project.adapter.rest.mapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
+import es.ull.project.adapter.rest.response.infrastructureplan.ContainerDailyStateResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
+import es.ull.project.domain.entity.ContainerDailyState;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Mapper class to convert InfrastructurePlan domain entities to InfrastructurePlanResponseBody DTOs
@@ -48,6 +51,18 @@ public class InfrastructurePlanResponseMapper {
             responseBody.serviceAssignments.add(ServiceAssignmentResponseMapper.toResponseBody(assignment));
         }
         responseBody.dailyPlans = dailyPlans;
+        responseBody.containerStateMonitoring = new ArrayList<>();
+        for (ContainerDailyState state : plan.getContainerDailyStates()) {
+            ContainerDailyStateResponseBody stateResponse = new ContainerDailyStateResponseBody();
+            stateResponse.id = state.getId();
+            stateResponse.containerId = state.getContainerId();
+            stateResponse.planDay = state.getPlanDay();
+            stateResponse.dailyFillingLiters = state.getDailyFillingLiters();
+            stateResponse.containerCapacityLiters = state.getContainerCapacityLiters();
+            stateResponse.dailyDemandLitersPerDay = state.getDailyDemandLitersPerDay();
+            stateResponse.status = state.getStatus().name();
+            responseBody.containerStateMonitoring.add(stateResponse);
+        }
         responseBody.numberOfDays = plan.getNumberOfDays().isPresent() ? plan.getNumberOfDays().get().getValue() : null;
         responseBody.averagePickupTimeMinutes = plan.getAveragePickupTimeMinutes().isPresent() ? plan.getAveragePickupTimeMinutes().get().getValue() : null;
         responseBody.executedAt = plan.getExecutedAt().isPresent() ? plan.getExecutedAt().get().getTimestamp() : null;

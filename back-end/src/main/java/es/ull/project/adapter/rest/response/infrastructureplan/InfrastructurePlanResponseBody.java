@@ -1,5 +1,8 @@
 package es.ull.project.adapter.rest.response.infrastructureplan;
 
+import java.util.List;
+import java.util.UUID;
+
 import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
 import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
@@ -7,8 +10,6 @@ import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.TotalCost;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Data Transfer Object representing an InfrastructurePlan response
@@ -56,6 +57,11 @@ public class InfrastructurePlanResponseBody {
      * Daily plans (routes) associated with this infrastructure plan
      */
     public List<DailyPlanResponseBody> dailyPlans;
+
+    /**
+     * Container daily monitoring snapshots associated with this infrastructure plan.
+     */
+    public List<ContainerDailyStateResponseBody> containerStateMonitoring;
 
     /**
      * Total collected kilograms across all routes

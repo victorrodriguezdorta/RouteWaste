@@ -29,7 +29,13 @@ public class MongoFields {
     public static final String CAPACITY_LITERS = "capacityLiters";
     public static final String DAILY_DEMAND_LITERS_PER_DAY = "dailyDemandLitersPerDay";
     public static final String SERVICE_ZONE = "serviceZone";
+    public static final String CONTAINER_ID = "containerId";
+    public static final String DAILY_FILLING_LITERS = "dailyFillingLiters";
 
+    /**
+     * ContainerDailyState ids stored in InfrastructurePlan documents.
+     */
+    public static final String CONTAINER_DAILY_STATE_IDS = "containerDailyStateIds";
     /**
      * WasteDemand fields (used by Facility and ServiceAssignment).
      */

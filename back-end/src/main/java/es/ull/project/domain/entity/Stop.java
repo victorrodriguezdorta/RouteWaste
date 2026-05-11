@@ -1,12 +1,15 @@
 package es.ull.project.domain.entity;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.route.RouteSequence;
-
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Stop
@@ -67,7 +70,51 @@ public class Stop {
     private final Distance cumulativeDistanceMeters;
 
     /**
+     * The actual liters in the container before collection at this stop.
+     * Useful for displaying the container's state to the user.
+     */
+    private final Double containerActualLiters;
+
+    /**
+     * List of alerts generated at this stop.
+     * Can include alerts like vehicle full, container overflowed, etc.
+     */
+    private final List<StopAlert> alerts;
+
+    /**
      * Creates a new Stop.
+     *
+     * @param sequence                   The sequence number in the route.
+     * @param container                  The container visited.
+     * @param collectedKilograms         The weight of waste collected.
+     * @param collectedLiters            The volume of waste collected.
+     * @param distanceFromPreviousMeters The distance traveled from the previous stop.
+     * @param cumulativeDistanceMeters   The total distance traveled so far.
+     * @param containerActualLiters      The actual liters before collection.
+     * @param alerts                     List of alerts.
+     */
+    public Stop(RouteSequence sequence,
+                Container container,
+                CollectedWeightKilograms collectedKilograms,
+                CollectedVolumeLiters collectedLiters,
+                Distance distanceFromPreviousMeters,
+                Distance cumulativeDistanceMeters,
+                Double containerActualLiters,
+                List<StopAlert> alerts) {
+        validate(sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
+        this.id = UUID.randomUUID();
+        this.sequence = sequence;
+        this.container = container;
+        this.collectedKilograms = collectedKilograms;
+        this.collectedLiters = collectedLiters;
+        this.distanceFromPreviousMeters = distanceFromPreviousMeters;
+        this.cumulativeDistanceMeters = cumulativeDistanceMeters;
+        this.containerActualLiters = containerActualLiters != null ? containerActualLiters : 0.0;
+        this.alerts = alerts != null ? new ArrayList<>(alerts) : new ArrayList<>();
+    }
+
+    /**
+     * Legacy constructor without containerActualLiters and alerts.
      *
      * @param sequence                   The sequence number in the route.
      * @param container                  The container visited.
@@ -82,18 +129,45 @@ public class Stop {
                 CollectedVolumeLiters collectedLiters,
                 Distance distanceFromPreviousMeters,
                 Distance cumulativeDistanceMeters) {
+        this(sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, 0.0, new ArrayList<>());
+    }
+
+    /**
+     * Restore constructor.
+     *
+     * @param id                         The unique identifier.
+     * @param sequence                   The sequence number in the route.
+     * @param container                  The container visited.
+     * @param collectedKilograms         The weight of waste collected.
+     * @param collectedLiters            The volume of waste collected.
+     * @param distanceFromPreviousMeters The distance traveled from the previous stop.
+     * @param cumulativeDistanceMeters   The total distance traveled so far.
+     * @param containerActualLiters      The actual liters before collection.
+     * @param alerts                     List of alerts.
+     */
+    public Stop(UUID id,
+                RouteSequence sequence,
+                Container container,
+                CollectedWeightKilograms collectedKilograms,
+                CollectedVolumeLiters collectedLiters,
+                Distance distanceFromPreviousMeters,
+                Distance cumulativeDistanceMeters,
+                Double containerActualLiters,
+                List<StopAlert> alerts) {
         validate(sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
-        this.id = UUID.randomUUID();
+        this.id = id;
         this.sequence = sequence;
         this.container = container;
         this.collectedKilograms = collectedKilograms;
         this.collectedLiters = collectedLiters;
         this.distanceFromPreviousMeters = distanceFromPreviousMeters;
         this.cumulativeDistanceMeters = cumulativeDistanceMeters;
+        this.containerActualLiters = containerActualLiters != null ? containerActualLiters : 0.0;
+        this.alerts = alerts != null ? new ArrayList<>(alerts) : new ArrayList<>();
     }
 
     /**
-     * Restore constructor.
+     * Legacy restore constructor without containerActualLiters and alerts.
      *
      * @param id                         The unique identifier.
      * @param sequence                   The sequence number in the route.
@@ -110,14 +184,7 @@ public class Stop {
                 CollectedVolumeLiters collectedLiters,
                 Distance distanceFromPreviousMeters,
                 Distance cumulativeDistanceMeters) {
-        validate(sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
-        this.id = id;
-        this.sequence = sequence;
-        this.container = container;
-        this.collectedKilograms = collectedKilograms;
-        this.collectedLiters = collectedLiters;
-        this.distanceFromPreviousMeters = distanceFromPreviousMeters;
-        this.cumulativeDistanceMeters = cumulativeDistanceMeters;
+        this(id, sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, 0.0, new ArrayList<>());
     }
 
     /**
@@ -136,6 +203,8 @@ public class Stop {
         this.collectedLiters = otherObject.collectedLiters;
         this.distanceFromPreviousMeters = otherObject.distanceFromPreviousMeters;
         this.cumulativeDistanceMeters = otherObject.cumulativeDistanceMeters;
+        this.containerActualLiters = otherObject.containerActualLiters;
+        this.alerts = new ArrayList<>(otherObject.alerts);
     }
 
     /**
@@ -235,6 +304,24 @@ public class Stop {
     }
 
     /**
+     * Returns the actual liters in the container before collection at this stop.
+     *
+     * @return container actual liters
+     */
+    public Double getContainerActualLiters() {
+        return containerActualLiters;
+    }
+
+    /**
+     * Returns the alerts generated at this stop.
+     *
+     * @return unmodifiable list of alerts
+     */
+    public List<StopAlert> getAlerts() {
+        return Collections.unmodifiableList(alerts);
+    }
+
+    /**
      * Checks equality based on sequence and container.
      *
      * @param otherObject the object to compare with
@@ -270,7 +357,7 @@ public class Stop {
      */
     @Override
     public String toString() {
-        return String.format("Stop={sequence=%s, containerId=%s, collectedKg=%s, collectedL=%s, distPrev=%s, distCum=%s}",
-                sequence, container.getId(), collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
+        return String.format("Stop={sequence=%s, containerId=%s, collectedKg=%s, collectedL=%s, distPrev=%s, distCum=%s, containerActualLiters=%s, alerts=%s}",
+                sequence, container.getId(), collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, containerActualLiters, alerts);
     }
 }

@@ -9,13 +9,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import es.ull.project.application.repository.ContainerDailyStateRepository;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.DailyPlanRepository;
 import es.ull.project.application.repository.FacilityRepository;
@@ -24,12 +26,14 @@ import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.application.usecase.algorithm.PersistAlgorithmExecutionResultUseCase;
 import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.entity.ContainerDailyState;
 import es.ull.project.domain.entity.DailyPlan;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
 import es.ull.project.domain.entity.Stop;
 import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.ContainerStatus;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
@@ -41,9 +45,6 @@ import es.ull.project.domain.valueobject.route.RouteSequence;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanDay;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Service that transforms the raw algorithm response into the infrastructure
@@ -72,6 +73,11 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	private static final String FIELD_DISTANCE_FROM_PREVIOUS_METERS = "distanceFromPreviousMeters";
 	private static final String FIELD_CUMULATIVE_DISTANCE_METERS = "cumulativeDistanceMeters";
 	private static final String FIELD_VEHICLE = "vehicle";
+	private static final String FIELD_CONTAINER_STATE_MONITORING = "containerStateMonitoring";
+	private static final String FIELD_DAILY_FILLING_LITERS = "dailyFillingLiters";
+	private static final String FIELD_CONTAINER_CAPACITY_LITERS = "containerCapacityLiters";
+	private static final String FIELD_DAILY_DEMAND_LITERS_PER_DAY = "dailyDemandLitersPerDay";
+	private static final String FIELD_STATUS = "status";
 	private static final String FIELD_MAX_BUDGET = "maxBudget";
 	private static final String FIELD_AMOUNT = "amount";
 	private static final String FIELD_CURRENCY = "currency";
@@ -88,6 +94,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	private final InfrastructurePlanRepository infrastructurePlanRepository;
 	private final ServiceAssignmentRepository serviceAssignmentRepository;
 	private final DailyPlanRepository dailyPlanRepository;
+	private final ContainerDailyStateRepository containerDailyStateRepository;
 	private final FacilityRepository facilityRepository;
 	private final ContainerRepository containerRepository;
 	private final VehicleRepository vehicleRepository;
@@ -106,12 +113,14 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			InfrastructurePlanRepository infrastructurePlanRepository,
 			ServiceAssignmentRepository serviceAssignmentRepository,
 			DailyPlanRepository dailyPlanRepository,
+			ContainerDailyStateRepository containerDailyStateRepository,
 			FacilityRepository facilityRepository,
 			ContainerRepository containerRepository,
 			VehicleRepository vehicleRepository) {
 		this.infrastructurePlanRepository = infrastructurePlanRepository;
 		this.serviceAssignmentRepository = serviceAssignmentRepository;
 		this.dailyPlanRepository = dailyPlanRepository;
+		this.containerDailyStateRepository = containerDailyStateRepository;
 		this.facilityRepository = facilityRepository;
 		this.containerRepository = containerRepository;
 		this.vehicleRepository = vehicleRepository;
@@ -248,6 +257,14 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 		} else {
 			logger.warn("No daily plans found in algorithm response");
 		}
+		JSONArray containerStateMonitoringNode = algorithmResponse.optJSONArray(FIELD_CONTAINER_STATE_MONITORING);
+		List<ContainerDailyState> containerDailyStates = readContainerDailyStates(containerStateMonitoringNode);
+		for (ContainerDailyState containerDailyState : containerDailyStates) {
+			plan.addContainerDailyState(containerDailyState);
+			if (this.containerDailyStateRepository != null) {
+				this.containerDailyStateRepository.save(containerDailyState);
+			}
+		}
 		plan.updateAlgorithmMetrics(
 				CollectedWeightKilograms.fromKilograms(algorithmResponse.optDouble(FIELD_TOTAL_COLLECTED_KILOGRAMS, 0.0)),
 				CollectedVolumeLiters.fromLiters(algorithmResponse.optDouble(FIELD_TOTAL_COLLECTED_LITERS, 0.0)),
@@ -262,6 +279,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			this.dailyPlanRepository.save(dailyPlan);
 		}
 		logger.info("Saved {} daily plans to MongoDB", dailyPlans.size());
+		logger.info("Saved {} container daily states to MongoDB", containerDailyStates.size());
 		logger.info("Saving InfrastructurePlan...");
 		InfrastructurePlan savedPlan = this.infrastructurePlanRepository.save(plan);
 		logger.info("=== PERSIST END === InfrastructurePlan saved with ID: {}", savedPlan.getId());
@@ -375,6 +393,56 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			stops.add(stop);
 		}
 		return stops;
+	}
+
+	/**
+	 * Reads container daily state monitoring entries from the algorithm response.
+	 *
+	 * @param containerStateMonitoringNode JSON array with container daily states
+	 * @return list of parsed ContainerDailyState entities
+	 */
+	private List<ContainerDailyState> readContainerDailyStates(JSONArray containerStateMonitoringNode) {
+		List<ContainerDailyState> containerDailyStates = new ArrayList<>();
+		if (containerStateMonitoringNode == null) {
+			return containerDailyStates;
+		}
+		for (int i = 0; i < containerStateMonitoringNode.length(); i++) {
+			Object node = containerStateMonitoringNode.get(i);
+			if (!(node instanceof JSONObject)) {
+				continue;
+			}
+			JSONObject stateNode = (JSONObject) node;
+			String containerId = stateNode.has(FIELD_CONTAINER_ID) && !stateNode.isNull(FIELD_CONTAINER_ID)
+					? stateNode.getString(FIELD_CONTAINER_ID)
+					: null;
+			if (containerId == null || containerId.isBlank()) {
+				continue;
+			}
+			int planDay = stateNode.has(FIELD_PLAN_DAY) && !stateNode.isNull(FIELD_PLAN_DAY)
+					? stateNode.getInt(FIELD_PLAN_DAY)
+					: 1;
+			double dailyFillingLiters = stateNode.optDouble(FIELD_DAILY_FILLING_LITERS, 0.0);
+			double containerCapacityLiters = stateNode.optDouble(FIELD_CONTAINER_CAPACITY_LITERS, 0.0);
+			double dailyDemandLitersPerDay = stateNode.optDouble(FIELD_DAILY_DEMAND_LITERS_PER_DAY, 0.0);
+			String statusRaw = stateNode.has(FIELD_STATUS) && !stateNode.isNull(FIELD_STATUS)
+					? stateNode.getString(FIELD_STATUS)
+					: null;
+			ContainerStatus status = ContainerStatus.fromString(statusRaw);
+			try {
+				ContainerDailyState containerDailyState = new ContainerDailyState(
+						UUID.randomUUID(),
+						containerId,
+						planDay,
+						dailyFillingLiters,
+						containerCapacityLiters,
+						dailyDemandLitersPerDay,
+						status);
+				containerDailyStates.add(containerDailyState);
+			} catch (IllegalArgumentException ex) {
+				logger.debug("Skipping invalid container daily state node: {}", ex.getMessage());
+			}
+		}
+		return containerDailyStates;
 	}
 
 	/**
