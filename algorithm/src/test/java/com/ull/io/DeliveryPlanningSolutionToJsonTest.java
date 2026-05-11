@@ -18,8 +18,8 @@ import com.ull.domain.entity.DailyPlan;
 import com.ull.domain.entity.Facility;
 import com.ull.domain.entity.FacilityCluster;
 import com.ull.domain.entity.Vehicle;
+import com.ull.domain.enumerate.ContainerStatus;
 import com.ull.domain.enumerate.WasteType;
-import com.ull.domain.enums.ContainerStatus;
 import com.ull.domain.valueobject.cost.MaximumBudget;
 import com.ull.domain.valueobject.location.Location;
 

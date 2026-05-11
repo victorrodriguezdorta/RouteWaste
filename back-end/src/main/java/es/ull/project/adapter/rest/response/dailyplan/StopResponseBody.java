@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import es.ull.project.domain.entity.StopAlert;
+import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.location.Distance;
@@ -25,6 +26,11 @@ public class StopResponseBody {
      * Unique identifier of the container visited at this stop.
      */
     public UUID containerId;
+
+    /**
+     * Kind of stop (container visit or facility unload).
+     */
+    public StopType type;
 
     /**
      * Weight of waste collected at this stop (value object).

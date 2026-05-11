@@ -114,6 +114,7 @@ public class MongoFields {
     public static final String VEHICLE = "vehicle";
     public static final String STOPS = "stops";
     public static final String SEQUENCE = "sequence";
+    public static final String STOP_TYPE = "type";
     public static final String COLLECTED_KILOGRAMS = "collectedKilograms";
     public static final String COLLECTED_LITERS = "collectedLiters";
     public static final String DISTANCE_FROM_PREVIOUS_METERS = "distanceFromPreviousMeters";

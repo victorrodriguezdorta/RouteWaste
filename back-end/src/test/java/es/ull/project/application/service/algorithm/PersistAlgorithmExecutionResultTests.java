@@ -2,6 +2,7 @@ package es.ull.project.application.service.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -34,6 +35,7 @@ import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.enumerate.ServiceZone;
+import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
@@ -97,10 +99,12 @@ class PersistAlgorithmExecutionResultTests {
         assertEquals(UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"), assignment.getFacility().getId());
 
         DailyPlan firstDailyPlan = dailyPlanRepository.saved.values().iterator().next();
-        assertEquals(2, firstDailyPlan.getStops().size());
+        assertEquals(3, firstDailyPlan.getStops().size());
         assertEquals(new PlanDay(1), firstDailyPlan.getPlanDay());
         assertEquals(UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"), firstDailyPlan.getFacility().getId());
         assertEquals(UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"), firstDailyPlan.getStops().get(0).getContainer().getId());
+        assertEquals(StopType.FACILITY, firstDailyPlan.getStops().get(2).getType());
+        assertNull(firstDailyPlan.getStops().get(2).getContainer());
     }
 
         private void seedInfrastructureEntities(
@@ -237,6 +241,16 @@ class PersistAlgorithmExecutionResultTests {
                           "collectedLiters": 0,
                           "distanceFromPreviousMeters": 343.08,
                           "cumulativeDistanceMeters": 1772.48
+                        },
+                        {
+                          "sequence": 3,
+                          "collectedKilograms": 0,
+                          "type": "FACILITY",
+                          "collectedLiters": 0,
+                          "containerId": null,
+                          "distanceFromPreviousMeters": 0.0,
+                          "cumulativeDistanceMeters": 1772.48,
+                          "containerActualLiters": 0
                         }
                       ],
                       "planDay": 1,
@@ -270,6 +284,16 @@ class PersistAlgorithmExecutionResultTests {
                           "collectedLiters": 0,
                           "distanceFromPreviousMeters": 343.08,
                           "cumulativeDistanceMeters": 1772.48
+                        },
+                        {
+                          "sequence": 3,
+                          "collectedKilograms": 0,
+                          "type": "FACILITY",
+                          "collectedLiters": 0,
+                          "containerId": null,
+                          "distanceFromPreviousMeters": 0.0,
+                          "cumulativeDistanceMeters": 1772.48,
+                          "containerActualLiters": 0
                         }
                       ],
                       "planDay": 1,

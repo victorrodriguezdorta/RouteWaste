@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import com.ull.domain.enumerate.StopType;
 
 /**
  * Represents the daily route assigned to a vehicle starting from a facility.
@@ -134,6 +135,31 @@ public class DailyPlan {
   }
 
   /**
+   * Adds a facility stop (no container) to the daily plan and updates totals.
+   * This represents returning to the origin facility to unload.
+   *
+   * @param distanceFromPreviousMeters distance travelled to reach the facility
+   * @param alerts optional alerts for the stop
+   */
+  public void addFacilityStop(double distanceFromPreviousMeters, List<Alert> alerts) {
+    if (distanceFromPreviousMeters < 0.0) {
+      throw new IllegalArgumentException(DISTANCE_NOT_VALID);
+    }
+
+    double cumulativeDistanceMeters = this.totalDistanceMeters + distanceFromPreviousMeters;
+    int sequence = this.stops.size() + 1;
+
+    DailyPlanStop stop = DailyPlanStop.forFacility(
+        sequence,
+        distanceFromPreviousMeters,
+        cumulativeDistanceMeters,
+        alerts != null ? alerts : new ArrayList<>());
+
+    this.stops.add(stop);
+    this.totalDistanceMeters = cumulativeDistanceMeters;
+  }
+
+  /**
    * Adds a new stop to the daily plan and updates the route totals.
    *
    * @param container the visited container
@@ -152,9 +178,15 @@ public class DailyPlan {
     validateCollectedKilograms(collectedKilograms);
     validateCollectedLiters(collectedLiters);
 
-    double distanceFromPreviousMeters = this.stops.isEmpty()
-        ? this.originFacility.calculateDistanceTo(container)
-        : getLastContainer().calculateDistanceTo(container);
+    double distanceFromPreviousMeters;
+    if (this.stops.isEmpty()) {
+      distanceFromPreviousMeters = this.originFacility.calculateDistanceTo(container);
+    } else {
+      Container lastContainer = this.stops.get(this.stops.size() - 1).getContainer();
+      distanceFromPreviousMeters = lastContainer != null
+          ? lastContainer.calculateDistanceTo(container)
+          : this.originFacility.calculateDistanceTo(container);
+    }
 
     addStop(
         container,
@@ -193,14 +225,15 @@ public class DailyPlan {
     int sequence = this.stops.size() + 1;
 
     DailyPlanStop stop = new DailyPlanStop(
-        sequence,
-        container,
-        distanceFromPreviousMeters,
-        cumulativeDistanceMeters,
-        collectedKilograms,
-        collectedLiters,
-        containerActualLiters,
-        alerts);
+      sequence,
+      StopType.CONTAINER,
+      container,
+      distanceFromPreviousMeters,
+      cumulativeDistanceMeters,
+      collectedKilograms,
+      collectedLiters,
+      containerActualLiters,
+      alerts);
 
     this.stops.add(stop);
     this.totalDistanceMeters = cumulativeDistanceMeters;

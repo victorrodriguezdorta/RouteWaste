@@ -11,6 +11,7 @@ import com.ull.domain.entity.Container;
 import com.ull.domain.entity.ContainerDailyState;
 import com.ull.domain.entity.DailyPlan;
 import com.ull.domain.entity.DailyPlanStop;
+import com.ull.domain.enumerate.StopType;
 import com.ull.domain.entity.Facility;
 import com.ull.domain.entity.FacilityCluster;
 import com.ull.domain.entity.Vehicle;
@@ -147,12 +148,17 @@ public class DeliveryPlanningSolutionToJson
   private JSONObject serializeStop(DailyPlanStop stop) {
     JSONObject json = new JSONObject();
     json.put("sequence", stop.getSequence());
-    json.put("containerId", stop.getContainer().getId());
+    json.put("type", stop.getType() != null ? stop.getType().name() : JSONObject.NULL);
     json.put("distanceFromPreviousMeters", stop.getDistanceFromPreviousMeters());
     json.put("cumulativeDistanceMeters", stop.getCumulativeDistanceMeters());
     json.put("collectedKilograms", stop.getCollectedKilograms());
     json.put("collectedLiters", stop.getCollectedLiters());
     json.put("containerActualLiters", stop.getContainerActualLiters());
+    if (stop.getType() == StopType.CONTAINER && stop.getContainer() != null) {
+      json.put("containerId", stop.getContainer().getId());
+    } else {
+      json.put("containerId", JSONObject.NULL);
+    }
     json.put("alerts", serializeAlerts(stop.getAlerts()));
     return json;
   }

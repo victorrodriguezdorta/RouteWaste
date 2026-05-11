@@ -400,6 +400,7 @@
           "totalDistanceLabel": "Total distance",
           "stopLabel": "Stop {sequence}",
           "containerLabel": "Container",
+          "facilityStopMessage": "The vehicle has been unloaded at the facility.",
           "collectedKilogramsLabel": "Collected kg",
           "collectedLitersLabel": "Collected liters",
           "distanceFromPreviousLabel": "Distance from previous",

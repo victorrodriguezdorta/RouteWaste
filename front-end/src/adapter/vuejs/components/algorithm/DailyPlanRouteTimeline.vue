@@ -61,8 +61,9 @@
             <div v-else class="route-stops">
               <article
                 v-for="stop in route.stops"
-                :key="`${route.key}-${stop.sequence}-${stop.containerId}`"
+                :key="`${route.key}-${stop.sequence}-${stop.containerId}-${stop.type}`"
                 class="route-stop"
+                :class="{ 'route-stop--facility': stop.type === StopType.FACILITY }"
               >
                 <div class="route-stop__marker">
                   <span class="route-stop__dot" />
@@ -73,11 +74,16 @@
                     <span class="route-stop__title">
                       {{ t('infrastructurePlan.show.daily.route.stopLabel', { sequence: stop.sequence }) }}
                     </span>
-                    <div class="route-stop__container-row">
+                    <div v-if="stop.type === StopType.FACILITY" class="route-stop__facility-indicator">
+                      <v-icon icon="mdi-office-building" color="danger-dark" size="small" />
+                      <span>{{ t('infrastructurePlan.show.daily.route.facilityStopMessage') }}</span>
+                    </div>
+                    <div v-else class="route-stop__container-row">
                       <span class="route-stop__container">
-                        {{ t('infrastructurePlan.show.daily.route.containerLabel') }}: {{ stop.containerId }}
+                        {{ t('infrastructurePlan.show.daily.route.containerLabel') }}: {{ stop.containerId ?? '-' }}
                       </span>
                       <ButtonTooltip
+                        v-if="stop.containerId"
                         text=""
                         :tooltip="viewTooltip"
                         icon="mdi-eye"
@@ -107,6 +113,7 @@
 </template>
 
 <script lang="ts" setup>
+import { StopType } from '@/domain/enumerate/stop-type';
 import type { InfrastructurePlanDailyPlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed } from 'vue';
@@ -122,7 +129,8 @@ interface VehicleRouteLike {
 
 interface NormalizedStop {
   sequence: number;
-  containerId: string;
+  type: StopType;
+  containerId: string | null;
   collectedKilograms?: number;
   collectedLiters?: number;
   distanceFromPreviousMeters?: number;
@@ -163,7 +171,8 @@ function normalizeStops(stops: InfrastructurePlanDailyPlanDetail['stops']): Norm
   const sorted = [...stops]
     .map((stop) => ({
       sequence: stop.sequence.getValue(),
-      containerId: stop.containerId.getValue().length > 0 ? stop.containerId.getValue() : '-',
+      type: stop.type,
+      containerId: stop.containerId ? stop.containerId.getValue() : null,
       collectedKilograms: stop.collectedKilograms.getKilograms(),
       collectedLiters: stop.collectedLiters.getLiters(),
       distanceFromPreviousMeters: stop.distanceFromPreviousMeters.getValue(),
@@ -173,29 +182,25 @@ function normalizeStops(stops: InfrastructurePlanDailyPlanDetail['stops']): Norm
 
   // Calculate cumulative kilograms and liters
   let cumulativeKg = 0;
-  let cumulativeLiters = 0;
+  let runningCumulativeLiters = 0;
 
   return sorted.map((stop) => {
     if (typeof stop.collectedKilograms === 'number') {
       cumulativeKg += stop.collectedKilograms;
     }
     if (typeof stop.collectedLiters === 'number') {
-      cumulativeLiters += stop.collectedLiters;
+      runningCumulativeLiters += stop.collectedLiters;
     }
+
+    const cumulativeKilograms = stop.type === StopType.FACILITY ? 0 : cumulativeKg;
+    const cumulativeLiters = stop.type === StopType.FACILITY ? 0 : runningCumulativeLiters;
+
     return {
       ...stop,
-      cumulativeKilograms: cumulativeKg,
-      cumulativeLiters: cumulativeLiters,
+      cumulativeKilograms,
+      cumulativeLiters,
     };
   });
-}
-
-function formatNumber(value: number | undefined): string {
-  if (typeof value !== 'number') {
-    return '-';
-  }
-
-  return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 
 function formatMeters(value: number | undefined): string {
@@ -220,8 +225,8 @@ function formatWithCumulative(value: number | undefined, cumulative: number | un
   return `${formatted} ${unit} (ac. ${cumulativeFormatted} ${unit})`;
 }
 
-function openContainer(containerId: string): void {
-  if (!containerId || containerId === '-') {
+function openContainer(containerId: string | null): void {
+  if (!containerId) {
     return;
   }
 
@@ -305,6 +310,19 @@ function openFacility(facilityId: string): void {
   gap: 14px;
 }
 
+.route-stop--facility .route-stop__dot {
+  background: rgb(var(--v-theme-danger-dark));
+}
+
+.route-stop--facility .route-stop__content {
+  background: rgba(var(--v-theme-danger-dark), 0.08);
+  border: 1px solid rgba(var(--v-theme-danger-dark), 0.18);
+}
+
+.route-stop--facility .route-stop__title {
+  color: rgb(var(--v-theme-danger-dark));
+}
+
 .route-stop__marker {
   align-items: stretch;
   display: flex;
@@ -349,6 +367,14 @@ function openFacility(facilityId: string): void {
 .route-stop__title {
   color: rgb(var(--v-theme-primary));
   font-weight: 700;
+}
+
+.route-stop__facility-indicator {
+  align-items: center;
+  color: rgb(var(--v-theme-danger-dark));
+  display: inline-flex;
+  gap: 6px;
+  font-weight: 600;
 }
 
 .route-stop__container {

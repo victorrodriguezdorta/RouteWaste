@@ -14,10 +14,12 @@ import com.ull.domain.DeliveryPlanningSolution;
 import com.ull.domain.entity.Container;
 import com.ull.domain.entity.ContainerDailyState;
 import com.ull.domain.entity.DailyPlan;
+import com.ull.domain.entity.DailyPlanStop;
 import com.ull.domain.entity.Facility;
 import com.ull.domain.entity.FacilityCluster;
 import com.ull.domain.entity.FacilityWithVehicles;
 import com.ull.domain.entity.Vehicle;
+import com.ull.domain.enumerate.StopType;
 import com.ull.domain.enumerate.WasteType;
 import com.ull.domain.valueobject.cost.MaximumBudget;
 import com.ull.domain.valueobject.location.Location;
@@ -187,10 +189,13 @@ class AlgorithmTest {
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
-    DailyPlan dailyPlan = solution.getDailyPlans().get(0);
-    assertEquals(2, dailyPlan.getStops().size());
-    assertEquals(60.0, dailyPlan.getStops().get(0).getCollectedLiters(), DELTA);
-    assertEquals(40.0, dailyPlan.getStops().get(1).getCollectedLiters(), DELTA);
+      DailyPlan dailyPlan = solution.getDailyPlans().get(0);
+      List<DailyPlanStop> containerStops = dailyPlan.getStops().stream()
+        .filter(s -> s.getType() == StopType.CONTAINER)
+        .toList();
+      assertEquals(2, containerStops.size());
+      assertEquals(60.0, containerStops.get(0).getCollectedLiters(), DELTA);
+      assertEquals(40.0, containerStops.get(1).getCollectedLiters(), DELTA);
     assertEquals(100.0, dailyPlan.getTotalCollectedLiters(), DELTA);
     assertEquals(0.0, solution.getContainerStateMonitoring().get(0).getDailyFillingLiters(), DELTA);
   }
@@ -214,13 +219,41 @@ class AlgorithmTest {
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
-    long stopCount = solution.getDailyPlans().stream()
+      long stopCount = solution.getDailyPlans().stream()
         .flatMap(plan -> plan.getStops().stream())
+        .filter(s -> s.getType() == StopType.CONTAINER)
         .count();
 
     assertEquals(2, solution.getDailyPlans().size());
     assertEquals(1, stopCount);
     assertEquals(50.0, solution.getTotalCollectedLiters(), DELTA);
+  }
+
+  @Test
+  void shouldLimitFacilityVisitsToTwoPerVehicle() {
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK", 1000.0, 50.0);
+    Container firstContainer = container("container-1", 28.465, -16.263, 500.0, 40.0);
+    Container secondContainer = container("container-2", 28.462, -16.264, 500.0, 40.0);
+    Container thirdContainer = container("container-3", 28.460, -16.260, 500.0, 40.0);
+
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+        15,
+        1,
+        List.of(facilityWithVehicles),
+        List.of(firstContainer, secondContainer, thirdContainer),
+        new MaximumBudget(5000.0, "EUR"));
+
+    DeliveryPlanningSolution solution = new Algorithm(problem).run();
+
+    assertEquals(1, solution.getDailyPlans().size());
+    long facilityStopCount = solution.getDailyPlans().get(0).getStops().stream()
+        .filter(s -> s.getType() == StopType.FACILITY)
+        .count();
+
+    assertEquals(1, facilityStopCount);
+    assertTrue(solution.getTotalCollectedLiters() <= 100.0 + DELTA);
   }
 
   @Test
@@ -308,7 +341,10 @@ class AlgorithmTest {
 
     assertFalse(solution.getDailyPlans().isEmpty());
     DailyPlan plan = solution.getDailyPlans().get(0);
-    assertEquals(2, plan.getStops().size());
+    long containerStopCount = plan.getStops().stream()
+      .filter(s -> s.getType() == StopType.CONTAINER)
+      .count();
+    assertEquals(2, containerStopCount);
     assertTrue(plan.getTotalDistanceMeters() > 0);
   }
 

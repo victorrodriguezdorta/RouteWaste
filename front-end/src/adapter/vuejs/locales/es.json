@@ -400,6 +400,7 @@
           "totalDistanceLabel": "Distancia total",
           "stopLabel": "Parada {sequence}",
           "containerLabel": "Contenedor",
+          "facilityStopMessage": "El vehículo se ha descargado en la instalación.",
           "collectedKilogramsLabel": "Kg recogidos",
           "collectedLitersLabel": "Litros recogidos",
           "distanceFromPreviousLabel": "Distancia desde la anterior",

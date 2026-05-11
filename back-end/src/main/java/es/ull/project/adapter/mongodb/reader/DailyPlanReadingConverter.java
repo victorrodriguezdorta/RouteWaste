@@ -20,6 +20,7 @@ import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.Stop;
 import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
@@ -41,6 +42,7 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
 
     private static final Logger logger = LoggerFactory.getLogger(DailyPlanReadingConverter.class);
     private static final String CONTAINER_FIELD = "containerId";
+    private static final String TYPE_FIELD = "type";
     private static final String ERR_FACILITY_SNAPSHOT = "Facility with id '%s' not found when loading DailyPlan";
     private static final String ERR_VEHICLE_SNAPSHOT = "Vehicle with id '%s' not found when loading DailyPlan";
     private static final String ERR_CONTAINER_SNAPSHOT = "Container with id '%s' not found when loading DailyPlan";
@@ -116,15 +118,25 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
      */
     private Stop readStopSnapshot(Document document) {
         int sequence = document.getInteger(MongoFields.SEQUENCE);
+        StopType stopType = document.containsKey(TYPE_FIELD) && document.get(TYPE_FIELD) != null
+            ? StopType.fromString(document.getString(TYPE_FIELD))
+            : StopType.CONTAINER;
         double collectedKilograms = document.getDouble(MongoFields.COLLECTED_KILOGRAMS);
         double collectedLiters = document.getDouble(MongoFields.COLLECTED_LITERS);
         double distanceFromPreviousMeters = document.getDouble(MongoFields.DISTANCE_FROM_PREVIOUS_METERS);
         double cumulativeDistanceMeters = document.getDouble(MongoFields.CUMULATIVE_DISTANCE_METERS);
+        Container container = null;
         UUID containerId = (UUID) document.get(CONTAINER_FIELD);
-        Container container = mongoConfiguration.containerRepository().findById(containerId)
+        if (stopType == StopType.CONTAINER) {
+            if (containerId == null) {
+            throw new IllegalStateException("Container id is required for container stops");
+            }
+            container = mongoConfiguration.containerRepository().findById(containerId)
                 .orElseThrow(() -> new IllegalStateException(String.format(ERR_CONTAINER_SNAPSHOT, containerId)));
+        }
         return new Stop(
                 RouteSequence.of(sequence),
+            stopType,
                 container,
                 CollectedWeightKilograms.fromKilograms(collectedKilograms),
                 CollectedVolumeLiters.fromLiters(collectedLiters),

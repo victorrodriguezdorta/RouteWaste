@@ -253,18 +253,19 @@
 </template>
 
 <script lang="ts" setup>
+import { FacilityType } from '@/domain/enumerate/facility-type';
+import { StopType } from '@/domain/enumerate/stop-type';
 import type {
   InfrastructurePlanContainerDailyStateDetail,
   InfrastructurePlanContainerDetail,
   InfrastructurePlanDailyPlanDetail,
   InfrastructurePlanFacilityDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
-import { FacilityType } from '@/domain/enumerate/facility-type';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import DailyPlanRouteTimeline from './DailyPlanRouteTimeline.vue';
 import router from '../../router/router';
+import DailyPlanRouteTimeline from './DailyPlanRouteTimeline.vue';
 
 interface VehicleRouteOption {
   key: string;
@@ -593,7 +594,7 @@ function extractContainerLocation(container: InfrastructurePlanContainerDetail):
 }
 
 function extractStopContainerId(stop: InfrastructurePlanDailyPlanDetail['stops'][number]): string | undefined {
-  return stop.containerId.getValue();
+  return stop.containerId ? stop.containerId.getValue() : undefined;
 }
 
 function extractStopSequence(stop: InfrastructurePlanDailyPlanDetail['stops'][number]): number {
@@ -733,23 +734,62 @@ function renderMarkers(): void {
         ? [...route.dailyPlan.stops].sort((a, b) => extractStopSequence(a) - extractStopSequence(b))
         : [];
 
+      // Facility return lines: draw red polylines from last visited container to the facility
+      const facilityPoint: [number, number] | null = facility && hasCoordinates(facility.location)
+        ? [facility.location.latitude, facility.location.longitude]
+        : null;
+
+      let lastContainerPoint: [number, number] | null = null;
+      // Track facility as departure point: initialize so first container after facility draws blue line
+      let lastFacilityPoint: [number, number] | null = facilityPoint;
+      const containerRoutePoints: Array<[number, number]> = [];
+
       orderedStops.forEach((stop) => {
+        if (stop.type === StopType.FACILITY) {
+          // Draw red line from last container to facility (if both exist)
+          if (lastContainerPoint && facilityPoint) {
+            L.polyline([lastContainerPoint, facilityPoint], {
+              color: '#b00020',
+              weight: 4,
+              opacity: 0.95,
+            }).addTo(layer);
+            boundsPoints.push(facilityPoint);
+          }
+          // After returning to facility, reset lastContainerPoint so subsequent containers start a new segment
+          lastContainerPoint = null;
+          // Mark facility as origin for the next departure (draw blue to next container)
+          lastFacilityPoint = facilityPoint;
+          return;
+        }
+
+        // Default: container stop
         const containerId = extractStopContainerId(stop);
         if (!containerId) return;
         const containerPoint = routeContainerLocationMap.get(containerId);
         if (!containerPoint) return;
-        routePoints.push(containerPoint);
+        // If we have a facility departure pending, draw a blue line to this container
+        if (lastFacilityPoint && containerPoint) {
+          L.polyline([lastFacilityPoint, containerPoint], {
+            color: '#1e88e5',
+            weight: 4,
+            opacity: 0.95,
+          }).addTo(layer);
+          // facility already in bounds; ensure container included
+        }
+        containerRoutePoints.push(containerPoint);
+        boundsPoints.push(containerPoint);
+        // clear pending facility departure after drawing
+        lastFacilityPoint = null;
+        lastContainerPoint = containerPoint;
       });
 
-      if (routePoints.length >= 2) {
-        L.polyline(routePoints, {
+      if (containerRoutePoints.length >= 2) {
+        L.polyline(containerRoutePoints, {
           color: '#00a83a',
           weight: 5,
           opacity: 0.95,
         }).addTo(layer);
       }
-
-      boundsPoints.push(...routePoints);
     });
 
   if (boundsPoints.length > 0) {

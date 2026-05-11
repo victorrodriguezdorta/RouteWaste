@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.location.Distance;
@@ -20,6 +21,7 @@ import es.ull.project.domain.valueobject.route.RouteSequence;
 public class Stop {
 
     public static final String SEQUENCE_NOT_DEFINED = "Route sequence is not defined";
+    public static final String STOP_TYPE_NOT_DEFINED = "Stop type is not defined";
     public static final String CONTAINER_NOT_DEFINED = "Container is not defined";
     public static final String COLLECTED_KILOGRAMS_NOT_DEFINED = "Collected kilograms is not defined";
     public static final String COLLECTED_LITERS_NOT_DEFINED = "Collected liters is not defined";
@@ -38,6 +40,11 @@ public class Stop {
      * It is a required attribute.
      */
     private final RouteSequence sequence;
+
+    /**
+     * Kind of stop represented by this entity.
+     */
+    private final StopType type;
 
     /**
      * Container visited at this stop.
@@ -94,6 +101,31 @@ public class Stop {
      * @param alerts                     List of alerts.
      */
     public Stop(RouteSequence sequence,
+            Container container,
+            CollectedWeightKilograms collectedKilograms,
+            CollectedVolumeLiters collectedLiters,
+            Distance distanceFromPreviousMeters,
+            Distance cumulativeDistanceMeters,
+            Double containerActualLiters,
+            List<StopAlert> alerts) {
+        this(sequence, StopType.CONTAINER, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, containerActualLiters, alerts);
+        }
+
+        /**
+         * Creates a new Stop.
+         *
+         * @param sequence                   The sequence number in the route.
+         * @param type                       The kind of stop.
+         * @param container                  The container visited.
+         * @param collectedKilograms         The weight of waste collected.
+         * @param collectedLiters            The volume of waste collected.
+         * @param distanceFromPreviousMeters The distance traveled from the previous stop.
+         * @param cumulativeDistanceMeters   The total distance traveled so far.
+         * @param containerActualLiters      The actual liters before collection.
+         * @param alerts                     List of alerts.
+         */
+        public Stop(RouteSequence sequence,
+            StopType type,
                 Container container,
                 CollectedWeightKilograms collectedKilograms,
                 CollectedVolumeLiters collectedLiters,
@@ -101,9 +133,10 @@ public class Stop {
                 Distance cumulativeDistanceMeters,
                 Double containerActualLiters,
                 List<StopAlert> alerts) {
-        validate(sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
+        validate(sequence, type, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
         this.id = UUID.randomUUID();
         this.sequence = sequence;
+        this.type = type;
         this.container = container;
         this.collectedKilograms = collectedKilograms;
         this.collectedLiters = collectedLiters;
@@ -111,6 +144,27 @@ public class Stop {
         this.cumulativeDistanceMeters = cumulativeDistanceMeters;
         this.containerActualLiters = containerActualLiters != null ? containerActualLiters : 0.0;
         this.alerts = alerts != null ? new ArrayList<>(alerts) : new ArrayList<>();
+    }
+
+    /**
+     * Creates a new Stop with an explicit type and default collection metadata.
+     *
+     * @param sequence                   The sequence number in the route.
+     * @param type                       The kind of stop.
+     * @param container                  The container visited.
+     * @param collectedKilograms         The weight of waste collected.
+     * @param collectedLiters            The volume of waste collected.
+     * @param distanceFromPreviousMeters The distance traveled from the previous stop.
+     * @param cumulativeDistanceMeters   The total distance traveled so far.
+     */
+    public Stop(RouteSequence sequence,
+                StopType type,
+                Container container,
+                CollectedWeightKilograms collectedKilograms,
+                CollectedVolumeLiters collectedLiters,
+                Distance distanceFromPreviousMeters,
+                Distance cumulativeDistanceMeters) {
+        this(sequence, type, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, 0.0, new ArrayList<>());
     }
 
     /**
@@ -129,7 +183,67 @@ public class Stop {
                 CollectedVolumeLiters collectedLiters,
                 Distance distanceFromPreviousMeters,
                 Distance cumulativeDistanceMeters) {
-        this(sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, 0.0, new ArrayList<>());
+        this(sequence, StopType.CONTAINER, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, 0.0, new ArrayList<>());
+    }
+
+    /**
+     * Restore constructor.
+     *
+     * @param id                         The unique identifier.
+     * @param sequence                   The sequence number in the route.
+     * @param type                       The kind of stop.
+     * @param container                  The container visited.
+     * @param collectedKilograms         The weight of waste collected.
+     * @param collectedLiters            The volume of waste collected.
+     * @param distanceFromPreviousMeters The distance traveled from the previous stop.
+     * @param cumulativeDistanceMeters   The total distance traveled so far.
+     * @param containerActualLiters      The actual liters before collection.
+     * @param alerts                     List of alerts.
+     */
+    public Stop(UUID id,
+                RouteSequence sequence,
+                StopType type,
+                Container container,
+                CollectedWeightKilograms collectedKilograms,
+                CollectedVolumeLiters collectedLiters,
+                Distance distanceFromPreviousMeters,
+                Distance cumulativeDistanceMeters,
+                Double containerActualLiters,
+                List<StopAlert> alerts) {
+        validate(sequence, type, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
+        this.id = id;
+        this.sequence = sequence;
+        this.type = type;
+        this.container = container;
+        this.collectedKilograms = collectedKilograms;
+        this.collectedLiters = collectedLiters;
+        this.distanceFromPreviousMeters = distanceFromPreviousMeters;
+        this.cumulativeDistanceMeters = cumulativeDistanceMeters;
+        this.containerActualLiters = containerActualLiters != null ? containerActualLiters : 0.0;
+        this.alerts = alerts != null ? new ArrayList<>(alerts) : new ArrayList<>();
+    }
+
+    /**
+     * Restore constructor with explicit type and default collection metadata.
+     *
+     * @param id                         The unique identifier.
+     * @param sequence                   The sequence number in the route.
+     * @param type                       The kind of stop.
+     * @param container                  The container visited.
+     * @param collectedKilograms         The weight of waste collected.
+     * @param collectedLiters            The volume of waste collected.
+     * @param distanceFromPreviousMeters The distance traveled from the previous stop.
+     * @param cumulativeDistanceMeters   The total distance traveled so far.
+     */
+    public Stop(UUID id,
+                RouteSequence sequence,
+                StopType type,
+                Container container,
+                CollectedWeightKilograms collectedKilograms,
+                CollectedVolumeLiters collectedLiters,
+                Distance distanceFromPreviousMeters,
+                Distance cumulativeDistanceMeters) {
+        this(id, sequence, type, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, 0.0, new ArrayList<>());
     }
 
     /**
@@ -154,16 +268,7 @@ public class Stop {
                 Distance cumulativeDistanceMeters,
                 Double containerActualLiters,
                 List<StopAlert> alerts) {
-        validate(sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
-        this.id = id;
-        this.sequence = sequence;
-        this.container = container;
-        this.collectedKilograms = collectedKilograms;
-        this.collectedLiters = collectedLiters;
-        this.distanceFromPreviousMeters = distanceFromPreviousMeters;
-        this.cumulativeDistanceMeters = cumulativeDistanceMeters;
-        this.containerActualLiters = containerActualLiters != null ? containerActualLiters : 0.0;
-        this.alerts = alerts != null ? new ArrayList<>(alerts) : new ArrayList<>();
+        this(id, sequence, StopType.CONTAINER, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, containerActualLiters, alerts);
     }
 
     /**
@@ -184,7 +289,7 @@ public class Stop {
                 CollectedVolumeLiters collectedLiters,
                 Distance distanceFromPreviousMeters,
                 Distance cumulativeDistanceMeters) {
-        this(id, sequence, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, 0.0, new ArrayList<>());
+        this(id, sequence, StopType.CONTAINER, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, 0.0, new ArrayList<>());
     }
 
     /**
@@ -198,6 +303,7 @@ public class Stop {
         }
         this.id = otherObject.id;
         this.sequence = otherObject.sequence;
+        this.type = otherObject.type;
         this.container = otherObject.container;
         this.collectedKilograms = otherObject.collectedKilograms;
         this.collectedLiters = otherObject.collectedLiters;
@@ -226,13 +332,16 @@ public class Stop {
      * @param distanceFromPreviousMeters distance from previous stop; must not be null
      * @param cumulativeDistanceMeters   cumulative route distance; must not be null
      */
-    private void validate(RouteSequence sequence, Container container, CollectedWeightKilograms collectedKilograms,
+    private void validate(RouteSequence sequence, StopType type, Container container, CollectedWeightKilograms collectedKilograms,
                           CollectedVolumeLiters collectedLiters, Distance distanceFromPreviousMeters,
                           Distance cumulativeDistanceMeters) {
         if (sequence == null) {
             throw new IllegalArgumentException(SEQUENCE_NOT_DEFINED);
         }
-        if (container == null) {
+        if (type == null) {
+            throw new IllegalArgumentException(STOP_TYPE_NOT_DEFINED);
+        }
+        if (type == StopType.CONTAINER && container == null) {
             throw new IllegalArgumentException(CONTAINER_NOT_DEFINED);
         }
         if (collectedKilograms == null) {
@@ -256,6 +365,15 @@ public class Stop {
      */
     public RouteSequence getSequence() {
         return sequence;
+    }
+
+    /**
+     * Returns the type of stop.
+     *
+     * @return the stop type
+     */
+    public StopType getType() {
+        return type;
     }
 
     /**
@@ -337,6 +455,7 @@ public class Stop {
         }
         Stop other = (Stop) otherObject;
         return Objects.equals(sequence, other.sequence) &&
+             Objects.equals(type, other.type) &&
                Objects.equals(container, other.container);
     }
 
@@ -347,7 +466,7 @@ public class Stop {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(sequence, container);
+        return Objects.hash(sequence, type, container);
     }
 
     /**
@@ -357,7 +476,8 @@ public class Stop {
      */
     @Override
     public String toString() {
-        return String.format("Stop={sequence=%s, containerId=%s, collectedKg=%s, collectedL=%s, distPrev=%s, distCum=%s, containerActualLiters=%s, alerts=%s}",
-                sequence, container.getId(), collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, containerActualLiters, alerts);
+        String containerId = container != null ? container.getId().toString() : null;
+        return String.format("Stop={sequence=%s, type=%s, containerId=%s, collectedKg=%s, collectedL=%s, distPrev=%s, distCum=%s, containerActualLiters=%s, alerts=%s}",
+            sequence, type, containerId, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, containerActualLiters, alerts);
     }
 }

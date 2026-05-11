@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import com.ull.domain.enums.ContainerStatus;
+import com.ull.domain.enumerate.ContainerStatus;
 
 class ContainerDailyStateTest {
 

@@ -112,6 +112,7 @@ const vuetify = createVuetify({
           secondary: '#4f772d',    // Slate oscuro medio
           accent: '#90a955',       // Azul moderno para resaltar
           error: '#880d1e',        // Rojo claro
+          'danger-dark': '#5c0f1b', // Rojo oscuro para estados críticos
           info: '#4f772d',         // Azul claro
           success: '#90a955',      // Verde esmeralda
           warning: '#ffca3a',      // Ámbar 

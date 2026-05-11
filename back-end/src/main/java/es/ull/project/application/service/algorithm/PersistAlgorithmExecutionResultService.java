@@ -34,6 +34,7 @@ import es.ull.project.domain.entity.ServiceAssignment;
 import es.ull.project.domain.entity.Stop;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.ContainerStatus;
+import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
@@ -67,6 +68,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	private static final String FIELD_TOTAL_COLLECTED_LITERS = "totalCollectedLiters";
 	private static final String FIELD_TOTAL_DISTANCE_METERS = "totalDistanceMeters";
 	private static final String FIELD_SEQUENCE = "sequence";
+	private static final String FIELD_TYPE = "type";
 	private static final String FIELD_CONTAINER_ID = "containerId";
 	private static final String FIELD_COLLECTED_KILOGRAMS = "collectedKilograms";
 	private static final String FIELD_COLLECTED_LITERS = "collectedLiters";
@@ -364,27 +366,34 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 		for (int i = 0; i < stopsNode.length(); i++) {
 			JSONObject stopNode = stopsNode.getJSONObject(i);
 			int sequence = stopNode.getInt(FIELD_SEQUENCE);
+			StopType stopType = stopNode.has(FIELD_TYPE) && !stopNode.isNull(FIELD_TYPE)
+					? StopType.fromString(stopNode.getString(FIELD_TYPE))
+					: StopType.CONTAINER;
 			String containerIdRaw = stopNode.has(FIELD_CONTAINER_ID) && !stopNode.isNull(FIELD_CONTAINER_ID) ? stopNode.getString(FIELD_CONTAINER_ID) : null;
-			if (containerIdRaw == null || containerIdRaw.isBlank()) {
-				continue;
-			}
-			UUID containerId;
-			try {
-				containerId = UUID.fromString(containerIdRaw);
-			} catch (IllegalArgumentException ex) {
-				continue;
-			}
-			Container container = containersById.get(containerId);
-			if (container == null) {
-				container = this.containerRepository.findById(containerId).orElse(null);
-				if (container != null) {
-					containersById.put(container.getId(), container);
-				} else {
+			Container container = null;
+			if (stopType == StopType.CONTAINER) {
+				if (containerIdRaw == null || containerIdRaw.isBlank()) {
 					continue;
+				}
+				UUID containerId;
+				try {
+					containerId = UUID.fromString(containerIdRaw);
+				} catch (IllegalArgumentException ex) {
+					continue;
+				}
+				container = containersById.get(containerId);
+				if (container == null) {
+					container = this.containerRepository.findById(containerId).orElse(null);
+					if (container != null) {
+						containersById.put(container.getId(), container);
+					} else {
+						continue;
+					}
 				}
 			}
 			Stop stop = new Stop(
 					RouteSequence.of(sequence),
+					stopType,
 					container,
 					CollectedWeightKilograms.fromKilograms(stopNode.optDouble(FIELD_COLLECTED_KILOGRAMS, 0.0)),
 					CollectedVolumeLiters.fromLiters(stopNode.optDouble(FIELD_COLLECTED_LITERS, 0.0)),

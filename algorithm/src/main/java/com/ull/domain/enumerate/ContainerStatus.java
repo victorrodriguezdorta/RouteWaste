@@ -1,4 +1,4 @@
-package com.ull.domain.enums;
+package com.ull.domain.enumerate;
 
 /**
  * Status of a container for a given day.

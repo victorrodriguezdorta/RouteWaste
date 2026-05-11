@@ -4,6 +4,7 @@ import { Distance } from '@/domain/valueobject/location/distance';
 import { RouteSequence } from '@/domain/valueobject/location/route-sequence';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import type { InfrastructurePlanStopAlertDetail } from './infrastructure-plan-stop-alert-detail';
+import { StopType } from '@/domain/enumerate/stop-type';
 
 /**
  * Read-only stop embedded in a daily plan.
@@ -11,7 +12,8 @@ import type { InfrastructurePlanStopAlertDetail } from './infrastructure-plan-st
 export class InfrastructurePlanStopDetail {
   constructor(
     public readonly sequence: RouteSequence,
-    public readonly containerId: UllUUID,
+    public readonly containerId: UllUUID | null,
+    public readonly type: StopType,
     public readonly collectedKilograms: CollectedWeightKilograms,
     public readonly collectedLiters: CollectedVolumeLiters,
     public readonly distanceFromPreviousMeters: Distance,

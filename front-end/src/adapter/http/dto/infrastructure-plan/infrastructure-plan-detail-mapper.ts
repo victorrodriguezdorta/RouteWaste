@@ -14,6 +14,7 @@ import { facilityTypeFromString } from '@/domain/enumerate/facility-type';
 import { serviceZoneFromString } from '@/domain/enumerate/service-zone';
 import { vehicleTypeFromString } from '@/domain/enumerate/vehicle-type';
 import { wasteTypeFromString } from '@/domain/enumerate/waste-type';
+import { stopTypeFromString, StopType } from '@/domain/enumerate/stop-type';
 import { CollectedVolumeLiters } from '@/domain/valueobject/capacity/collected-volume-liters';
 import { CollectedWeightKilograms } from '@/domain/valueobject/capacity/collected-weight-kilograms';
 import { ProcessingCapacityKilogramsPerDay } from '@/domain/valueobject/capacity/processing-capacity-kilograms-per-day';
@@ -170,9 +171,16 @@ export class InfrastructurePlanDetailMapper {
   }
 
   private static mapStop(stop: InfrastructurePlanStopJsonResponse): InfrastructurePlanStopDetail {
+    const type = stop.type ? stopTypeFromString(stop.type) : StopType.CONTAINER;
+    const isContainer = type === StopType.CONTAINER;
+    const containerUuid = isContainer
+      ? new UllUUID(stop.containerId ?? stop.container?.id ?? UllUUID.random().getValue())
+      : null;
+
     return new InfrastructurePlanStopDetail(
       RouteSequence.of(this.extractPositiveSequence(stop.sequence)),
-      new UllUUID(stop.containerId ?? stop.container?.id ?? UllUUID.random().getValue()),
+      containerUuid,
+      type,
       CollectedWeightKilograms.fromKilograms(this.extractNumber(stop.collectedKilograms)),
       CollectedVolumeLiters.fromLiters(this.extractNumber(stop.collectedLiters)),
       Distance.fromMeters(this.extractNumber(stop.distanceFromPreviousMeters)),

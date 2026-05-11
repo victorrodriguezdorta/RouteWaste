@@ -1,5 +1,6 @@
 package com.ull.domain.entity;
 
+import com.ull.domain.enumerate.StopType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Objects;
  * Represents a stop inside a daily collection plan.
  */
 public class DailyPlanStop {
+
 
   public static final String CONTAINER_NOT_DEFINED = "Container is not defined";
   public static final String SEQUENCE_NOT_VALID = "Stop sequence is not valid";
@@ -20,6 +22,7 @@ public class DailyPlanStop {
 
   private final int sequence;
   private final Container container;
+  private final StopType type;
   private final double distanceFromPreviousMeters;
   private final double cumulativeDistanceMeters;
   private final double collectedKilograms;
@@ -41,6 +44,7 @@ public class DailyPlanStop {
    */
   public DailyPlanStop(
       int sequence,
+      StopType type,
       Container container,
       double distanceFromPreviousMeters,
       double cumulativeDistanceMeters,
@@ -49,13 +53,16 @@ public class DailyPlanStop {
       double containerActualLiters,
       List<Alert> alerts) {
     validateSequence(sequence);
-    validateContainer(container);
+    if (type == StopType.CONTAINER) {
+      validateContainer(container);
+    }
     validateDistance(distanceFromPreviousMeters);
     validateCumulativeDistance(cumulativeDistanceMeters);
     validateCollectedKilograms(collectedKilograms);
     validateCollectedLiters(collectedLiters);
     validateContainerActualLiters(containerActualLiters);
     this.sequence = sequence;
+    this.type = type;
     this.container = container;
     this.distanceFromPreviousMeters = distanceFromPreviousMeters;
     this.cumulativeDistanceMeters = cumulativeDistanceMeters;
@@ -84,6 +91,7 @@ public class DailyPlanStop {
       double collectedLiters) {
     this(
         sequence,
+        StopType.CONTAINER,
         container,
         distanceFromPreviousMeters,
         cumulativeDistanceMeters,
@@ -91,6 +99,26 @@ public class DailyPlanStop {
         collectedLiters,
         0.0,
         new ArrayList<>());
+  }
+
+  /**
+   * Factory to create a facility stop (no container).
+   */
+  public static DailyPlanStop forFacility(
+      int sequence,
+      double distanceFromPreviousMeters,
+      double cumulativeDistanceMeters,
+      List<Alert> alerts) {
+    return new DailyPlanStop(
+        sequence,
+        StopType.FACILITY,
+        null,
+        distanceFromPreviousMeters,
+        cumulativeDistanceMeters,
+        0.0,
+        0.0,
+        0.0,
+        alerts != null ? alerts : new ArrayList<>());
   }
 
   private void validateSequence(int sequence) {
@@ -143,6 +171,10 @@ public class DailyPlanStop {
     return this.container;
   }
 
+  public StopType getType() {
+    return this.type;
+  }
+
   public double getDistanceFromPreviousMeters() {
     return this.distanceFromPreviousMeters;
   }
@@ -177,19 +209,21 @@ public class DailyPlanStop {
     }
     DailyPlanStop otherStop = (DailyPlanStop) otherObject;
     return this.sequence == otherStop.sequence
-        && Objects.equals(this.container, otherStop.container);
+      && this.type == otherStop.type
+      && Objects.equals(this.container, otherStop.container);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.sequence, this.container);
+    return Objects.hash(this.sequence, this.type, this.container);
   }
 
   @Override
   public String toString() {
     return String.format(
-        "DailyPlanStop{sequence=%s, container=%s, distanceFromPreviousMeters=%s, cumulativeDistanceMeters=%s, collectedKilograms=%s, collectedLiters=%s, containerActualLiters=%s, alerts=%s}",
+        "DailyPlanStop{sequence=%s, type=%s, container=%s, distanceFromPreviousMeters=%s, cumulativeDistanceMeters=%s, collectedKilograms=%s, collectedLiters=%s, containerActualLiters=%s, alerts=%s}",
         this.sequence,
+        this.type,
         this.container,
         this.distanceFromPreviousMeters,
         this.cumulativeDistanceMeters,

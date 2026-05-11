@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import es.ull.project.domain.enumerate.ServiceZone;
+import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
@@ -76,6 +77,17 @@ class StopTests {
                 randomDistance());
     }
 
+    private static Stop facilityStop() {
+        return new Stop(
+                randomSequence(),
+                StopType.FACILITY,
+                null,
+                randomKilograms(),
+                randomLiters(),
+                randomDistance(),
+                randomDistance());
+    }
+
     // ========== Restore Constructor ==========
 
     @Test
@@ -95,6 +107,15 @@ class StopTests {
         assertEquals(liters, stop.getCollectedLiters());
         assertEquals(distPrev, stop.getDistanceFromPreviousMeters());
         assertEquals(distCum, stop.getCumulativeDistanceMeters());
+        assertEquals(StopType.CONTAINER, stop.getType());
+    }
+
+    @Test
+    void restoreConstructor_facilityStop_right() {
+        Stop stop = facilityStop();
+
+        assertEquals(StopType.FACILITY, stop.getType());
+        assertEquals(null, stop.getContainer());
     }
 
     @Test
@@ -159,6 +180,7 @@ class StopTests {
         Stop copy = new Stop(original);
 
         assertEquals(original.getSequence(), copy.getSequence());
+        assertEquals(original.getType(), copy.getType());
         assertEquals(original.getContainer(), copy.getContainer());
         assertEquals(original.getCollectedKilograms(), copy.getCollectedKilograms());
         assertEquals(original.getCollectedLiters(), copy.getCollectedLiters());
@@ -201,5 +223,6 @@ class StopTests {
 
         assertNotNull(result);
         assertTrue(result.contains("Stop="));
+        assertTrue(result.contains("type="));
     }
 }

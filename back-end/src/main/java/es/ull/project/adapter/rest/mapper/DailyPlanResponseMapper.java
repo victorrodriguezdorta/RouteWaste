@@ -6,6 +6,7 @@ import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.dailyplan.StopResponseBody;
 import es.ull.project.domain.entity.DailyPlan;
 import es.ull.project.domain.entity.Stop;
+import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.valueobject.time.ServiceDate;
 
 /**
@@ -59,7 +60,8 @@ public class DailyPlanResponseMapper {
         }
         StopResponseBody response = new StopResponseBody();
         response.sequence = stop.getSequence();
-        response.containerId = stop.getContainer().getId();
+        response.type = stop.getType();
+        response.containerId = stop.getContainer() != null ? stop.getContainer().getId() : null;
         response.collectedKilograms = stop.getCollectedKilograms();
         response.collectedLiters = stop.getCollectedLiters();
         response.distanceFromPreviousMeters = stop.getDistanceFromPreviousMeters();

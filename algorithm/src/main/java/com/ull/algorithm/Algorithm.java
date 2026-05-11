@@ -16,7 +16,7 @@ import com.ull.domain.entity.Facility;
 import com.ull.domain.entity.FacilityCluster;
 import com.ull.domain.entity.FacilityWithVehicles;
 import com.ull.domain.entity.Vehicle;
-import com.ull.domain.enums.ContainerStatus;
+import com.ull.domain.enumerate.ContainerStatus;
 
 /**
  * Entry point for the planning algorithm.
@@ -33,6 +33,7 @@ import com.ull.domain.enums.ContainerStatus;
 public class Algorithm {
 
   private static final double EPSILON = 0.000001;
+  private static final int MAX_FACILITY_VISITS = 1;
 
   private final DeliveryPlanningProblem problem;
   /**
@@ -226,14 +227,24 @@ public class Algorithm {
 
     double vehicleCurrentLoad = 0.0;
     Object currentLocation = facility;
+    int facilityVisits = 1;
 
     while (hasPendingLiters(availableContainers)) {
       double remainingCapacity = vehicleCapacity - vehicleCurrentLoad;
       if (remainingCapacity <= EPSILON) {
+        if (facilityVisits >= MAX_FACILITY_VISITS) {
+          break;
+        }
+
         returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
         vehicleCurrentLoad = 0.0;
         currentLocation = facility;
+        facilityVisits++;
         continue;
+      }
+
+      if (facilityVisits >= MAX_FACILITY_VISITS && vehicleCurrentLoad > EPSILON) {
+        break;
       }
 
       Container nearest = findNearestCollectableContainer(currentLocation, availableContainers);
@@ -264,14 +275,20 @@ public class Algorithm {
       currentLocation = nearest;
 
       if (vehicleCurrentLoad >= vehicleCapacity - EPSILON) {
+        if (facilityVisits >= MAX_FACILITY_VISITS) {
+          break;
+        }
+
         returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
         vehicleCurrentLoad = 0.0;
         currentLocation = facility;
+        facilityVisits++;
       }
     }
 
-    if (vehicleCurrentLoad > EPSILON) {
+    if (vehicleCurrentLoad > EPSILON && facilityVisits < MAX_FACILITY_VISITS) {
       returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
+      facilityVisits++;
     }
   }
 
@@ -436,7 +453,9 @@ public class Algorithm {
       return;
     }
 
-    dailyPlan.addTransitDistance(calculateDistanceToFacility(currentLocation, facility));
+    double distanceToFacility = calculateDistanceToFacility(currentLocation, facility);
+    // Add a facility stop to record the return-to-facility event.
+    dailyPlan.addFacilityStop(distanceToFacility, new ArrayList<>());
     vehicle.emptyLoad();
   }
 

@@ -2,7 +2,7 @@ package com.ull.domain.entity;
 
 import java.util.Objects;
 
-import com.ull.domain.enums.ContainerStatus;
+import com.ull.domain.enumerate.ContainerStatus;
 
 /**
  * Represents the monitoring state of a container for a specific day.

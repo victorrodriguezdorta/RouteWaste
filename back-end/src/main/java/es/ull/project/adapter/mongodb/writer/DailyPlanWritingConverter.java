@@ -8,6 +8,7 @@ import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.Stop;
 import es.ull.project.domain.entity.Vehicle;
+import es.ull.project.domain.enumerate.StopType;
 import java.util.ArrayList;
 import java.util.List;
 import org.bson.Document;
@@ -80,11 +81,12 @@ public class DailyPlanWritingConverter implements Converter<DailyPlan, Document>
     private Document toStopDocument(Stop stop) {
         Document document = new Document();
         document.put(MongoFields.SEQUENCE, stop.getSequence().getValue());
+        document.put(MongoFields.STOP_TYPE, stop.getType() != null ? stop.getType().name() : StopType.CONTAINER.name());
         document.put(MongoFields.COLLECTED_KILOGRAMS, stop.getCollectedKilograms().getValue());
         document.put(MongoFields.COLLECTED_LITERS, stop.getCollectedLiters().getValue());
         document.put(MongoFields.DISTANCE_FROM_PREVIOUS_METERS, stop.getDistanceFromPreviousMeters().getValue());
         document.put(MongoFields.CUMULATIVE_DISTANCE_METERS, stop.getCumulativeDistanceMeters().getValue());
-        document.put(CONTAINER_FIELD, stop.getContainer().getId());
+        document.put(CONTAINER_FIELD, stop.getContainer() != null ? stop.getContainer().getId() : null);
         return document;
     }
 

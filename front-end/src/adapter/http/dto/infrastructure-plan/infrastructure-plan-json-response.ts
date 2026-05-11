@@ -26,6 +26,7 @@ export interface InfrastructurePlanStopJsonResponse {
   sequence: number | { value: number };
   container?: ContainerJsonResponse;
   containerId?: string;
+  type?: string;
   collectedKilograms: number | { value: number };
   collectedLiters: number | { value: number };
   distanceFromPreviousMeters: number | { value: number };
