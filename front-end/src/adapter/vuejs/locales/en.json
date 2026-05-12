@@ -405,6 +405,22 @@
           "collectedLitersLabel": "Collected liters",
           "distanceFromPreviousLabel": "Distance from previous",
           "cumulativeDistanceLabel": "Cumulative distance"
+        },
+        "monitoring": {
+          "title": "Container monitoring for day {day}",
+          "noFacilities": "Select a facility to inspect its containers for the selected day.",
+          "containersUnit": "containers",
+          "noContainersAssigned": "No containers assigned to this facility.",
+          "containerLabel": "Container",
+          "fillingLabel": "Filling",
+          "capacityLabel": "Capacity",
+          "demandPerDayLabel": "Demand/day",
+          "noData": "No data",
+          "statuses": {
+            "OVERFLOWED": "Overflowed",
+            "OK": "OK",
+            "NO_DATA": "No data"
+          }
         }
       }
     }

@@ -97,7 +97,26 @@
           </v-card-text>
         </v-card>
 
-        <DailyPlanRouteTimeline :routes="selectedVehicleRoutes" />
+        <v-card variant="flat" class="mt-4 daily-details-card">
+          <v-tabs v-model="dailyDetailsTab" bg-color="transparent" color="primary" grow class="daily-details-tabs">
+            <v-tab value="routes">{{ t('infrastructurePlan.show.daily.route.title') }}</v-tab>
+            <v-tab value="monitoring">{{ t('infrastructurePlan.show.daily.monitoring.title', { day: planDay }) }}</v-tab>
+          </v-tabs>
+
+          <v-window v-model="dailyDetailsTab" class="daily-details-window">
+            <v-window-item value="routes">
+              <DailyPlanRouteTimeline :routes="selectedVehicleRoutes" />
+            </v-window-item>
+
+            <v-window-item value="monitoring">
+              <DailyPlanContainerMonitoring
+                :plan-day="planDay"
+                :selected-facilities="selectedFacilities"
+                :container-state-monitoring="containerStateMonitoring"
+              />
+            </v-window-item>
+          </v-window>
+        </v-card>
       </v-col>
 
       <v-col cols="12" md="2">
@@ -156,87 +175,6 @@
       </v-col>
     </v-row>
 
-    <v-card variant="flat" class="mt-4 monitoring-card">
-      <v-card-title class="d-flex align-center ga-2">
-        <v-icon icon="mdi-trash-can-outline" color="primary" />
-        <span>Container monitoring for day {{ planDay }}</span>
-      </v-card-title>
-
-      <v-divider />
-
-      <v-card-text>
-        <div v-if="selectedFacilityMonitoring.length === 0" class="text-body-2 text-medium-emphasis">
-          Select a facility to inspect its containers for the selected day.
-        </div>
-
-        <div
-          v-for="facilityMonitoring in selectedFacilityMonitoring"
-          :key="facilityMonitoring.facility.id.getValue()"
-          class="monitoring-facility mb-4"
-        >
-          <div class="monitoring-facility__header">
-            <div>
-              <div class="text-subtitle-1 font-weight-bold">
-                {{ formatFacilityType(facilityMonitoring.facility.facilityType) }}
-              </div>
-              <div class="text-body-2 text-medium-emphasis">
-                {{ facilityMonitoring.facility.id.getValue() }}
-              </div>
-            </div>
-            <div class="text-body-2 text-medium-emphasis">
-              {{ facilityMonitoring.containers.length }} containers
-            </div>
-          </div>
-
-          <div v-if="facilityMonitoring.containers.length === 0" class="text-body-2 text-medium-emphasis mt-2">
-            No containers assigned to this facility.
-          </div>
-
-          <div v-else class="monitoring-grid">
-            <div
-              v-for="containerMonitoring in facilityMonitoring.containers"
-              :key="containerMonitoring.container.id.getValue()"
-              class="monitoring-item"
-              :class="{ 'monitoring-item-overflowed': containerMonitoring.state?.status === 'OVERFLOWED' }"
-            >
-              <div class="monitoring-item__header">
-                <div>
-                  <div class="text-body-1 font-weight-medium">
-                    Container {{ truncateIdentifier(containerMonitoring.container.id.getValue(), 12) }}
-                  </div>
-                  <div class="text-body-2 text-medium-emphasis">
-                    {{ formatContainerLocation(containerMonitoring.container) }}
-                  </div>
-                </div>
-                <v-chip
-                  size="small"
-                  :color="!containerMonitoring.state ? 'secondary' : containerMonitoring.state.status === 'OVERFLOWED' ? 'error' : 'success'"
-                  variant="flat"
-                >
-                  {{ monitoringStatusLabel(containerMonitoring.state?.status) }}
-                </v-chip>
-              </div>
-
-              <div class="monitoring-item__metrics">
-                <div>
-                  <strong>Filling:</strong>
-                  {{ formatLiters(containerMonitoring.state?.dailyFillingLiters) }}
-                </div>
-                <div>
-                  <strong>Capacity:</strong>
-                  {{ formatLiters(containerMonitoring.state?.containerCapacityLiters?.getLiters?.() ?? containerMonitoring.container.capacityLiters.getLiters()) }}
-                </div>
-                <div>
-                  <strong>Demand/day:</strong>
-                  {{ formatLiters(containerMonitoring.state?.dailyDemandLitersPerDay?.getLitersPerDay?.() ?? containerMonitoring.container.dailyDemandLitersPerDay.getLitersPerDay()) }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </v-card-text>
-    </v-card>
-
     <v-card variant="flat" class="mt-4">
       <v-card-title class="d-flex align-center ga-2">
         <v-icon icon="mdi-code-json" color="primary" />
@@ -265,6 +203,7 @@ import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import router from '../../router/router';
+import DailyPlanContainerMonitoring from './DailyPlanContainerMonitoring.vue';
 import DailyPlanRouteTimeline from './DailyPlanRouteTimeline.vue';
 
 interface VehicleRouteOption {
@@ -319,6 +258,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const dailyDetailsTab = ref<'routes' | 'monitoring'>('routes');
 const viewTooltip = computed(() => {
   const translated = t('algorithm.list.table.tooltips.view');
   return translated === 'algorithm.list.table.tooltips.view' ? 'View details' : translated;
@@ -368,23 +308,6 @@ const selectableVehicleRoutes = computed<VehicleRouteOption[]>(() => {
 const selectedVehicleRoutes = computed<VehicleRouteOption[]>(() => {
   const selectedKeys = new Set(selectedVehicleRouteKeys.value);
   return selectableVehicleRoutes.value.filter((route) => selectedKeys.has(route.key));
-});
-
-const selectedFacilityMonitoring = computed(() => {
-  const selectedDay = normalizePlanDay(props.planDay);
-  const monitoringByContainerId = new Map(
-    props.containerStateMonitoring
-      .filter((state) => normalizePlanDay(state.planDay) === selectedDay)
-      .map((state) => [normalizeIdentifier(state.containerId.getValue()), state]),
-  );
-
-  return selectedFacilities.value.map((facility) => ({
-    facility,
-    containers: (facility.assignedContainers ?? []).map((container) => ({
-      container,
-      state: monitoringByContainerId.get(normalizeIdentifier(container.id.getValue())),
-    })),
-  }));
 });
 
 const jsonContent = computed(() => {
@@ -465,62 +388,11 @@ function vehicleButtonLabel(vehicleId: string): string {
   return truncateIdentifier(vehicleId, 8);
 }
 
-function normalizeIdentifier(value: string | null | undefined): string {
-  return String(value ?? '').trim().toLowerCase();
-}
-
-function normalizePlanDay(value: number | string | null | undefined): number {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value;
-  }
-
-  if (typeof value === 'string') {
-    const parsedValue = Number(value);
-    if (Number.isFinite(parsedValue)) {
-      return parsedValue;
-    }
-  }
-
-  return -1;
-}
-
-function formatContainerLocation(container: InfrastructurePlanContainerDetail): string {
-  const { postalAddress, gisReference, latitude, longitude } = container.location;
-
-  if (postalAddress) {
-    return postalAddress;
-  }
-
-  if (gisReference) {
-    return gisReference;
-  }
-
-  return `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-}
-
-function formatLiters(value: number | null | undefined): string {
-  if (typeof value !== 'number' || !Number.isFinite(value)) {
-    return '-';
-  }
-
-  return `${value.toFixed(1)} L`;
-}
-
-function monitoringStatusLabel(status: string | null | undefined): string {
-  if (!status) {
-    return 'No data';
-  }
-
-  return String(status)
-    .replace(/_/g, ' ')
-    .toLowerCase()
-    .replace(/\b\w/g, (character) => character.toUpperCase());
-}
-
 function truncateIdentifier(value: string, visibleCharacters: number): string {
   if (value.length <= visibleCharacters) {
     return value;
   }
+
   return `${value.slice(0, visibleCharacters)}...`;
 }
 
@@ -882,6 +754,18 @@ function renderMarkers(): void {
   margin-left: -0.35rem;
 }
 
+.daily-details-card {
+  border-radius: 12px;
+}
+
+.daily-details-tabs {
+  padding-inline: 4px;
+}
+
+.daily-details-window {
+  padding-top: 12px;
+}
+
 .json-block {
   background: rgb(var(--v-theme-surface-variant));
   border-radius: 8px;
@@ -913,55 +797,6 @@ function renderMarkers(): void {
   background: #d32f2f;
   border: 3px solid #ffffff;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
-}
-
-.monitoring-card {
-  border-radius: 12px;
-}
-
-.monitoring-facility {
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-  border-radius: 12px;
-  padding: 16px;
-}
-
-.monitoring-facility__header {
-  align-items: center;
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.monitoring-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.monitoring-item {
-  background: rgba(var(--v-theme-surface-variant), 0.55);
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-  border-radius: 10px;
-  padding: 12px;
-}
-
-.monitoring-item-overflowed {
-  background: rgba(var(--v-theme-error), 0.08);
-  border-color: rgba(var(--v-theme-error), 0.55);
-}
-
-.monitoring-item__header {
-  align-items: flex-start;
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.monitoring-item__metrics {
-  display: grid;
-  gap: 6px;
 }
 
 @media (max-width: 960px) {

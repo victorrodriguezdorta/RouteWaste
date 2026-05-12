@@ -405,6 +405,22 @@
           "collectedLitersLabel": "Litros recogidos",
           "distanceFromPreviousLabel": "Distancia desde la anterior",
           "cumulativeDistanceLabel": "Distancia acumulada"
+        },
+        "monitoring": {
+          "title": "Monitoreo de contenedores para el día {day}",
+          "noFacilities": "Selecciona una instalación para inspeccionar sus contenedores en el día seleccionado.",
+          "containersUnit": "contenedores",
+          "noContainersAssigned": "No hay contenedores asignados a esta instalación.",
+          "containerLabel": "Contenedor",
+          "fillingLabel": "Llenado",
+          "capacityLabel": "Capacidad",
+          "demandPerDayLabel": "Demanda/día",
+          "noData": "Sin datos",
+          "statuses": {
+            "OVERFLOWED": "Desbordado",
+            "OK": "Correcto",
+            "NO_DATA": "Sin datos"
+          }
         }
       }
     }

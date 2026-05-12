@@ -1,10 +1,5 @@
 <template>
   <v-card variant="flat" class="route-timeline-card mt-4">
-    <v-card-title class="d-flex align-center ga-2">
-      <v-icon icon="mdi-route" color="primary" />
-      <span>{{ t('infrastructurePlan.show.daily.route.title') }}</span>
-    </v-card-title>
-
     <v-divider />
 
     <v-card-text>

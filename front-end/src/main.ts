@@ -37,10 +37,14 @@ import {
   VStepperItem,
   VStepperWindow,
   VStepperWindowItem,
+  VTab,
+  VTabs,
   VTextField,
   VToolbar,
   VToolbarTitle,
   VTooltip,
+  VWindow,
+  VWindowItem,
 } from 'vuetify/components';
 import { Ripple } from 'vuetify/directives';
 import { en as vuetifyEn, es as vuetifyEs } from 'vuetify/locale';
@@ -90,6 +94,10 @@ const vuetify = createVuetify({
     VToolbar,
     VToolbarTitle,
     VTooltip,
+    VTabs,
+    VTab,
+    VWindow,
+    VWindowItem,
   },
   directives: {
     Ripple,
