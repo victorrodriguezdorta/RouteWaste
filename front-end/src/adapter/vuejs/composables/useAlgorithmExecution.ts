@@ -108,12 +108,6 @@ export function useAlgorithmExecution() {
       sortable: true,
       key: 'openingCost',
     },
-    {
-      title: t('facility.list.table.headers.status'),
-      align: 'center' as const,
-      sortable: true,
-      key: 'status',
-    },
   ]);
 
   // Filter options
@@ -186,6 +180,22 @@ export function useAlgorithmExecution() {
       };
     });
   });
+
+  /** Pins for Step 1 map: current facility page, gray vs primary by algorithm selection. */
+  const step1FacilityMapPins = computed(() =>
+    facilities.value.map((facility) => {
+      const location = facility.getLocation();
+      const id = facility.getId().toString();
+      const selected = algorithmStore.facilitiesWithVehicles.some((f) => f.facilityId === id);
+      return {
+        id,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        label: facility.getName().getValue(),
+        markerTone: selected ? ('primary' as const) : ('muted' as const),
+      };
+    }),
+  );
 
   // Format vehicles for table display in dialog
   const vehicleItems = computed(() => {
@@ -831,6 +841,7 @@ export function useAlgorithmExecution() {
     vehicleTypeFilterOptions,
     vehicleHeaders,
     facilityItems,
+    step1FacilityMapPins,
     vehicleItems,
     isStep1Valid,
     totalSelectedVehicles,

@@ -62,6 +62,15 @@
         class="text-white"
         @click="navigateTo('Algorithm')"
       ></v-list-item>
+
+      <v-list-item
+        prepend-icon="mdi-play-circle-outline"
+        :title="t('algorithm.list.runButton')"
+        value="execute-algorithm"
+        active-color="white"
+        class="text-white"
+        @click="navigateTo('ExecuteAlgorithm')"
+      ></v-list-item>
     </v-list>
 
     <template v-slot:append>

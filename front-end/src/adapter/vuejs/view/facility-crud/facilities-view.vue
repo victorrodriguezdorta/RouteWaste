@@ -28,24 +28,26 @@
         />
       </template>
 
-      <v-data-table-server
-        :headers="headers"
-        :items="facilityItems"
-        :loading="loading"
-        :items-length="totalFacilities"
-        v-model:page="tablePage"
-        :items-per-page="itemsPerPage"
-        :items-per-page-options="[
-          { value: 5, title: '5' },
-          { value: 10, title: '10' },
-          { value: 25, title: '25' },
-          { value: 50, title: '50' }
-        ]"
-        @update:options="onTableOptionsUpdate"
-        item-value="id"
-        hover
-        class="elevation-2"
-      >
+      <div class="list-with-map-layout">
+        <div class="list-with-map-layout__main">
+          <v-data-table-server
+            :headers="headers"
+            :items="facilityItems"
+            :loading="loading"
+            :items-length="totalFacilities"
+            v-model:page="tablePage"
+            :items-per-page="itemsPerPage"
+            :items-per-page-options="[
+              { value: 5, title: '5' },
+              { value: 10, title: '10' },
+              { value: 25, title: '25' },
+              { value: 50, title: '50' }
+            ]"
+            @update:options="onTableOptionsUpdate"
+            item-value="id"
+            hover
+            class="elevation-2"
+          >
         <template v-slot:item.type="{ item }">
           <v-chip :color="facilityTypeColor(item.rawFacilityType)" size="small">
             {{ item.type }}
@@ -126,7 +128,16 @@
             />
           </v-alert>
         </template>
-      </v-data-table-server>
+          </v-data-table-server>
+        </div>
+
+        <div class="list-with-map-layout__map">
+          <LocationsListMap
+            :locations="facilityMapPins"
+            detail-route-name="EditFacility"
+          />
+        </div>
+      </div>
 
       <template #toolbar-append>
         <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px;">
@@ -200,6 +211,7 @@ import { useI18n } from 'vue-i18n';
 import { facilityStatusColor, facilityStatusToOptions } from '../../../../domain/enumerate/facility-status';
 import { facilityTypeColor, facilityTypeToOptions } from '../../../../domain/enumerate/facility-type';
 import CrudLayout from '../../components/common/CrudLayout.vue';
+import LocationsListMap from '../../components/common/LocationsListMap.vue';
 import router from '../../router/router';
 import { useFacilityStore } from '../../stores/facility-store';
 
@@ -278,6 +290,18 @@ const headers = computed(() => [
 const facilityTypeFilterOptions = computed(() => facilityTypeToOptions(t));
 
 const facilityStatusFilterOptions = computed(() => facilityStatusToOptions(t));
+
+const facilityMapPins = computed(() =>
+  facilities.value.map((facility) => {
+    const location = facility.getLocation();
+    return {
+      id: facility.getId().toString(),
+      latitude: location.latitude,
+      longitude: location.longitude,
+      label: facility.getName().getValue(),
+    };
+  }),
+);
 
 const facilityItems = computed(() => {
   return facilities.value.map((facility) => {
@@ -392,5 +416,54 @@ const confirmDelete = async () => {
 
 .v-data-table {
   border-radius: 8px;
+}
+
+.list-with-map-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.list-with-map-layout__main {
+  flex: 2 1 0;
+  min-width: 0;
+}
+
+.list-with-map-layout__map {
+  flex: 1 1 0;
+  min-width: 0;
+  position: sticky;
+  top: 12px;
+}
+
+.list-with-map-layout__map :deep(.locations-list-map),
+.list-with-map-layout__map :deep(.locations-list-map--empty) {
+  margin-top: 0;
+}
+
+.list-with-map-layout__map :deep(.locations-list-map__map) {
+  height: min(480px, 55vh);
+}
+
+@media (max-width: 960px) {
+  .list-with-map-layout {
+    flex-direction: column;
+  }
+
+  .list-with-map-layout__main {
+    width: 100%;
+  }
+
+  .list-with-map-layout__map {
+    flex: 1 1 auto;
+    width: 100%;
+    position: static;
+    max-width: none;
+  }
+
+  .list-with-map-layout__map :deep(.locations-list-map__map) {
+    height: 280px;
+  }
 }
 </style>

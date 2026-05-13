@@ -28,24 +28,26 @@
         />
       </template>
 
-      <v-data-table-server
-        :headers="headers"
-        :items="containerItems"
-        :loading="loading"
-        :items-length="totalContainers"
-        v-model:page="tablePage"
-        :items-per-page="itemsPerPage"
-        :items-per-page-options="[
-          { value: 5, title: '5' },
-          { value: 10, title: '10' },
-          { value: 25, title: '25' },
-          { value: 50, title: '50' }
-        ]"
-        @update:options="onTableOptionsUpdate"
-        item-value="id"
-        hover
-        class="elevation-2"
-      >
+      <div class="list-with-map-layout">
+        <div class="list-with-map-layout__main">
+          <v-data-table-server
+            :headers="headers"
+            :items="containerItems"
+            :loading="loading"
+            :items-length="totalContainers"
+            v-model:page="tablePage"
+            :items-per-page="itemsPerPage"
+            :items-per-page-options="[
+              { value: 5, title: '5' },
+              { value: 10, title: '10' },
+              { value: 25, title: '25' },
+              { value: 50, title: '50' }
+            ]"
+            @update:options="onTableOptionsUpdate"
+            item-value="id"
+            hover
+            class="elevation-2"
+          >
         <template v-slot:item.wasteType="{ item }">
           <v-chip :color="wasteTypeColor(item.rawWasteType)" size="small">
             {{ item.wasteType }}
@@ -120,7 +122,16 @@
             />
           </v-alert>
         </template>
-      </v-data-table-server>
+          </v-data-table-server>
+        </div>
+
+        <div class="list-with-map-layout__map">
+          <LocationsListMap
+            :locations="containerMapPins"
+            detail-route-name="ShowContainer"
+          />
+        </div>
+      </div>
 
       <template #toolbar-append>
         <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px;">
@@ -194,6 +205,7 @@ import { useI18n } from 'vue-i18n';
 import { serviceZoneColor, serviceZoneToOptions } from '../../../../domain/enumerate/service-zone';
 import { wasteTypeColor, wasteTypeToOptions } from '../../../../domain/enumerate/waste-type';
 import CrudLayout from '../../components/common/CrudLayout.vue';
+import LocationsListMap from '../../components/common/LocationsListMap.vue';
 import router from '../../router/router';
 import { useContainerStore } from '../../stores/container-store';
 
@@ -259,6 +271,18 @@ const headers = computed(() => [
 
 const wasteTypeFilterOptions = computed(() => wasteTypeToOptions(t));
 const serviceZoneFilterOptions = computed(() => serviceZoneToOptions(t));
+
+const containerMapPins = computed(() =>
+  containers.value.map((container) => {
+    const location = container.getLocation();
+    return {
+      id: container.getId().toString(),
+      latitude: location.latitude,
+      longitude: location.longitude,
+      label: container.getName().getValue(),
+    };
+  }),
+);
 
 const containerItems = computed(() => {
   return containers.value.map((container) => {
@@ -372,5 +396,54 @@ const confirmDelete = async () => {
 
 .v-data-table {
   border-radius: 8px;
+}
+
+.list-with-map-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.list-with-map-layout__main {
+  flex: 2 1 0;
+  min-width: 0;
+}
+
+.list-with-map-layout__map {
+  flex: 1 1 0;
+  min-width: 0;
+  position: sticky;
+  top: 12px;
+}
+
+.list-with-map-layout__map :deep(.locations-list-map),
+.list-with-map-layout__map :deep(.locations-list-map--empty) {
+  margin-top: 0;
+}
+
+.list-with-map-layout__map :deep(.locations-list-map__map) {
+  height: min(480px, 55vh);
+}
+
+@media (max-width: 960px) {
+  .list-with-map-layout {
+    flex-direction: column;
+  }
+
+  .list-with-map-layout__main {
+    width: 100%;
+  }
+
+  .list-with-map-layout__map {
+    flex: 1 1 auto;
+    width: 100%;
+    position: static;
+    max-width: none;
+  }
+
+  .list-with-map-layout__map :deep(.locations-list-map__map) {
+    height: 280px;
+  }
 }
 </style>

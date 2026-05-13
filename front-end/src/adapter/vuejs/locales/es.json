@@ -38,6 +38,11 @@
       "openMap": "Abrir mapa",
       "latitude": "Latitud",
       "longitude": "Longitud",
+      "listOverview": {
+        "eyebrow": "Ubicaciones en esta página",
+        "title": "Vista geográfica",
+        "empty": "No hay coordenadas disponibles para los elementos de esta página."
+      },
       "selector": {
         "badge": "Selector de ubicacion",
         "title": "Elegir punto en el mapa",
@@ -399,19 +404,19 @@
         "content": {
           "title": "JSON del día",
           "mapTitle": "Mapa del día",
-          "selectorTitle": "Facilities",
-          "selectorHint": "Selecciona uno o varios facilities para mostrar en el mapa sus puntos y contenedores asociados.",
-          "noFacilities": "No hay facilities disponibles para este día.",
+          "selectorTitle": "Instalaciones",
+          "selectorHint": "Selecciona una o varias instalaciones para mostrar en el mapa sus puntos y contenedores asociados.",
+          "noFacilities": "No hay instalaciones disponibles para este día.",
           "vehiclesTitle": "Vehículos",
           "vehiclesHint": "Selecciona los vehículos para mostrar su ruta sobre el mapa.",
-          "noVehicles": "No hay vehículos para los facilities seleccionados."
+          "noVehicles": "No hay vehículos para las instalaciones seleccionadas."
         },
         "route": {
           "title": "Ruta del vehículo",
           "noRoutes": "Selecciona un vehículo para ver el detalle de su ruta.",
           "noStops": "No hay paradas definidas para esta ruta.",
           "vehicleLabel": "Vehículo",
-          "facilityLabel": "Facility",
+          "facilityLabel": "Instalación",
           "totalDistanceLabel": "Distancia total",
           "stopLabel": "Parada {sequence}",
           "containerLabel": "Contenedor",
@@ -465,7 +470,7 @@
     "execute": {
       "title": "Ejecutar Algoritmo",
       "description": "Ejecuta el algoritmo de optimización de rutas de recolección.",
-      "opening": "Abriendo el asistente del algoritmo...",
+      "opening": "Abriendo el algoritmo...",
       "loadingData": "Cargando instalaciones, vehiculos y contenedores...",
       "executing": "Ejecutando algoritmo...",
       "step1": {

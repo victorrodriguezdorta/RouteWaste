@@ -38,6 +38,11 @@
       "openMap": "Open map",
       "latitude": "Latitude",
       "longitude": "Longitude",
+      "listOverview": {
+        "eyebrow": "Locations on this page",
+        "title": "Geographic overview",
+        "empty": "No coordinates are available for the items on this page."
+      },
       "selector": {
         "badge": "Location picker",
         "title": "Choose point on map",
@@ -465,7 +470,7 @@
     "execute": {
       "title": "Execute Algorithm",
       "description": "Run the collection route optimization algorithm.",
-      "opening": "Opening the algorithm wizard...",
+      "opening": "Opening the algorithm...",
       "loadingData": "Loading facilities, vehicles and containers...",
       "executing": "Executing algorithm...",
       "step1": {
