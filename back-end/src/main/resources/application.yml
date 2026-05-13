@@ -28,3 +28,9 @@ server:
     include-message: always
     include-stacktrace: never
     include-binding-errors: never
+
+algorithm:
+  docker:
+    project-directory: ..
+    compose-file: docker-compose.yml
+    service-name: algorithm

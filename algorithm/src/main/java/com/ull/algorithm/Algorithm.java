@@ -33,7 +33,7 @@ import com.ull.domain.enumerate.ContainerStatus;
 public class Algorithm {
 
   private static final double EPSILON = 0.000001;
-  private static final int MAX_FACILITY_VISITS = 1;
+  private static final int MAX_FACILITY_VISITS = 3;
 
   private final DeliveryPlanningProblem problem;
   /**
