@@ -1,8 +1,8 @@
 <template>
   <div class="mt-4">
     <v-row class="ma-0" dense>
-      <v-col cols="12" md="2">
-        <v-card variant="flat" class="selector-card h-100">
+      <v-col cols="12" md="3">
+        <v-card variant="flat" class="selector-card">
           <v-card-title class="d-flex align-center ga-2">
             <v-icon icon="mdi-factory" color="primary" />
             <span>{{ t('infrastructurePlan.show.daily.content.selectorTitle') }}</span>
@@ -17,46 +17,103 @@
               {{ t('infrastructurePlan.show.daily.content.noFacilities') }}
             </div>
 
-            <div
-              v-for="facility in selectableFacilities"
-              :key="facility.id.getValue()"
-              class="entity-action-row mb-2"
-            >
-              <v-checkbox
-                :model-value="isFacilitySelected(facility.id.getValue())"
-                color="primary"
-                density="compact"
-                hide-details
-                class="entity-checkbox"
-                @update:model-value="toggleFacilitySelection(facility.id.getValue())"
-              />
-              <ButtonTooltip
-                :text="facilityButtonLabel(facility)"
-                :tooltip="facilityTooltip(facility)"
-                icon=""
-                size="small"
-                variant="flat"
-                color="white"
-                class="entity-button flex-grow-1"
-                :class="{ 'entity-button-selected': isFacilitySelected(facility.id.getValue()) }"
-                :eventclick="() => toggleFacilitySelection(facility.id.getValue())"
-              />
-              <ButtonTooltip
-                text=""
-                :tooltip="viewTooltip"
-                icon="mdi-eye"
-                size="small"
-                variant="flat"
-                color="white"
-                class="entity-view-button"
-                :eventclick="() => openFacility(facility.id.getValue())"
-              />
+            <div v-else class="entity-list">
+              <div
+                v-for="facility in selectableFacilities"
+                :key="facility.id.getValue()"
+                class="entity-action-row mb-2"
+              >
+                <v-checkbox
+                  :model-value="isFacilitySelected(facility.id.getValue())"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  class="entity-checkbox"
+                  @update:model-value="toggleFacilitySelection(facility.id.getValue())"
+                />
+                <ButtonTooltip
+                  :text="facilityButtonLabel(facility)"
+                  :tooltip="facilityTooltip(facility)"
+                  icon=""
+                  size="small"
+                  variant="flat"
+                  color="white"
+                  class="entity-button flex-grow-1"
+                  :class="{ 'entity-button-selected': isFacilitySelected(facility.id.getValue()) }"
+                  :eventclick="() => toggleFacilitySelection(facility.id.getValue())"
+                />
+                <ButtonTooltip
+                  text=""
+                  :tooltip="viewTooltip"
+                  icon="mdi-eye"
+                  size="small"
+                  variant="flat"
+                  color="white"
+                  class="entity-view-button"
+                  :eventclick="() => openFacility(facility.id.getValue())"
+                />
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+
+        <v-card variant="flat" class="selector-card mt-4">
+          <v-card-title class="d-flex align-center ga-2">
+            <v-icon icon="mdi-truck" color="primary" />
+            <span>{{ t('infrastructurePlan.show.daily.content.vehiclesTitle') }}</span>
+          </v-card-title>
+          <v-divider />
+          <v-card-text>
+            <p class="text-body-2 text-medium-emphasis mb-3">
+              {{ t('infrastructurePlan.show.daily.content.vehiclesHint') }}
+            </p>
+
+            <div v-if="selectableVehicleRoutes.length === 0" class="text-body-2 text-medium-emphasis">
+              {{ t('infrastructurePlan.show.daily.content.noVehicles') }}
+            </div>
+
+            <div v-else class="entity-list">
+              <div
+                v-for="route in selectableVehicleRoutes"
+                :key="route.key"
+                class="entity-action-row mb-2"
+              >
+                <v-checkbox
+                  :model-value="isVehicleRouteSelected(route.key)"
+                  color="primary"
+                  density="compact"
+                  hide-details
+                  class="entity-checkbox"
+                  @update:model-value="toggleVehicleRouteSelection(route.key)"
+                />
+                <ButtonTooltip
+                  :text="vehicleButtonLabel(route.vehicleId)"
+                  :tooltip="route.vehicleId"
+                  icon=""
+                  size="small"
+                  variant="flat"
+                  color="white"
+                  class="entity-button flex-grow-1"
+                  :class="{ 'entity-button-selected': isVehicleRouteSelected(route.key) }"
+                  :eventclick="() => toggleVehicleRouteSelection(route.key)"
+                />
+                <ButtonTooltip
+                  text=""
+                  :tooltip="viewTooltip"
+                  icon="mdi-eye"
+                  size="small"
+                  variant="flat"
+                  color="white"
+                  class="entity-view-button"
+                  :eventclick="() => openVehicle(route.vehicleId)"
+                />
+              </div>
             </div>
           </v-card-text>
         </v-card>
       </v-col>
 
-      <v-col cols="12" md="8">
+      <v-col cols="12" md="9">
         <v-card variant="flat" class="map-card">
           <v-card-title class="map-card__header">
             <div class="d-flex align-center ga-2">
@@ -116,61 +173,6 @@
               />
             </v-window-item>
           </v-window>
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" md="2">
-        <v-card variant="flat" class="selector-card h-100">
-          <v-card-title class="d-flex align-center ga-2">
-            <v-icon icon="mdi-truck" color="primary" />
-            <span>{{ t('infrastructurePlan.show.daily.content.vehiclesTitle') }}</span>
-          </v-card-title>
-          <v-divider />
-          <v-card-text>
-            <p class="text-body-2 text-medium-emphasis mb-3">
-              {{ t('infrastructurePlan.show.daily.content.vehiclesHint') }}
-            </p>
-
-            <div v-if="selectableVehicleRoutes.length === 0" class="text-body-2 text-medium-emphasis">
-              {{ t('infrastructurePlan.show.daily.content.noVehicles') }}
-            </div>
-
-            <div
-              v-for="route in selectableVehicleRoutes"
-              :key="route.key"
-              class="entity-action-row mb-2"
-            >
-              <v-checkbox
-                :model-value="isVehicleRouteSelected(route.key)"
-                color="primary"
-                density="compact"
-                hide-details
-                class="entity-checkbox"
-                @update:model-value="toggleVehicleRouteSelection(route.key)"
-              />
-              <ButtonTooltip
-                :text="vehicleButtonLabel(route.vehicleId)"
-                :tooltip="route.vehicleId"
-                icon=""
-                size="small"
-                variant="flat"
-                color="white"
-                class="entity-button flex-grow-1"
-                :class="{ 'entity-button-selected': isVehicleRouteSelected(route.key) }"
-                :eventclick="() => toggleVehicleRouteSelection(route.key)"
-              />
-              <ButtonTooltip
-                text=""
-                :tooltip="viewTooltip"
-                icon="mdi-eye"
-                size="small"
-                variant="flat"
-                color="white"
-                class="entity-view-button"
-                :eventclick="() => openVehicle(route.vehicleId)"
-              />
-            </div>
-          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -727,6 +729,12 @@ function renderMarkers(): void {
   display: flex;
   align-items: center;
   gap: 2px;
+}
+
+.entity-list {
+  max-height: 225px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .entity-checkbox {
