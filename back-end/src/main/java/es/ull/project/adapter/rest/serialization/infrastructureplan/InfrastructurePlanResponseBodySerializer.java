@@ -97,6 +97,9 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
             for (var facility : value.selectedFacilities) {
                 gen.writeStartObject();
                 gen.writeStringField("id", facility.id.toString());
+                if (facility.name != null) {
+                    gen.writeStringField("name", facility.name.getValue());
+                }
                 if (facility.facilityType != null) {
                     gen.writeStringField("facilityType", facility.facilityType.name());
                 }
@@ -155,6 +158,9 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
                 }
                 if (state.containerId != null) {
                     gen.writeStringField("containerId", state.containerId);
+                }
+                if (state.containerName != null) {
+                    gen.writeStringField("containerName", state.containerName);
                 }
                 if (state.planDay != null) {
                     gen.writeNumberField("planDay", state.planDay);

@@ -81,6 +81,7 @@ const { vehicleNotification } = storeToRefs(vehicleStore);
 // Form data - new vehicle to be created
 const newVehicle = ref<VehicleAdd>(
   new VehicleAdd(
+    'Vehicle',
     VehicleType.COLLECTION_TRUCK,
     0,
     0,

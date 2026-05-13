@@ -8,6 +8,11 @@ import type { CreateFacilityCommand } from '@/application/usecase/facility-manag
  */
 export class FacilityPostJsonRequest {
   /**
+   * Nombre de la instalación.
+   */
+  name: string;
+
+  /**
    * Tipo de la instalación.
    */
   facilityType: string;
@@ -46,6 +51,7 @@ export class FacilityPostJsonRequest {
   status: string;
 
   constructor(
+    name: string,
     facilityType: string,
     location: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
     storageCapacity: { value: number },
@@ -54,6 +60,7 @@ export class FacilityPostJsonRequest {
     openingFixedCost: { amount: number; currency?: string },
     status: string
   ) {
+    this.name = name;
     this.facilityType = facilityType;
     this.location = location;
     this.storageCapacity = storageCapacity;
@@ -73,6 +80,7 @@ export class FacilityPostJsonRequest {
     console.log('[FacilityPostJsonRequest.toRequest] Converting command to request:', data);
     
     const request = new FacilityPostJsonRequest(
+      data.name.getValue(),
       data.facilityType,
       {
         latitude: data.location.latitude,

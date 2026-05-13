@@ -255,6 +255,7 @@ public class FacilityController {
             @Parameter(description = "Facility data") @RequestBody FacilityPostRequestBody requestBody) {
         try {
             Facility createdFacility = this.createFacilityUseCase.create(
+                    requestBody.name,
                     requestBody.facilityType,
                     requestBody.location,
                     requestBody.storageCapacity,
@@ -299,6 +300,7 @@ public class FacilityController {
             UUID facilityId = UUID.fromString(id);
             Facility updatedFacility = this.updateFacilityUseCase.update(
                     facilityId,
+                    requestBody.name,
                     requestBody.facilityType,
                     requestBody.location,
                     requestBody.storageCapacity,

@@ -4,6 +4,8 @@ import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
+
 
 /**
  * VehiclePutRequestBody
@@ -19,6 +21,8 @@ import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
  * This class contains no business logic, only data representation.
  */
 public class VehiclePutRequestBody {
+
+    public Name name;
 
     /**
      * Type of the vehicle (e.g., COLLECTION_TRUCK, TRANSFER_TRUCK).
@@ -52,7 +56,8 @@ public class VehiclePutRequestBody {
     @Override
     public String toString() {
         return String.format(
-                "VehiclePutRequestBody={vehicleType=%s, capacityKilograms=%s, capacityLiters=%s, costPerKilometer=%s}",
+                "VehiclePutRequestBody={name=%s, vehicleType=%s, capacityKilograms=%s, capacityLiters=%s, costPerKilometer=%s}",
+                this.name,
                 this.vehicleType,
                 this.capacityKilograms,
                 this.capacityLiters,

@@ -18,6 +18,7 @@ import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import es.ull.project.domain.valueobject.route.RouteSequence;
 
 class StopTests {
@@ -47,12 +48,17 @@ class StopTests {
 
     private static Container randomContainer() {
         return new Container(
+            randomName(),
             randomLocation(),
             WasteType.random(),
             randomCapacityLiters(),
             randomDailyDemandLitersPerDay(),
             ServiceZone.random()
         );
+    }
+
+    private static Name randomName() {
+        return new Name("container-" + ((int) (Math.random() * 10000)));
     }
 
     private static CollectedWeightKilograms randomKilograms() {

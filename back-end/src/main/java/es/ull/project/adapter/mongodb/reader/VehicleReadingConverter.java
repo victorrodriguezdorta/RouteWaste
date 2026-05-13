@@ -8,6 +8,7 @@ import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.UUID;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ public class VehicleReadingConverter implements Converter<Document, Vehicle> {
     public Vehicle convert(@NonNull Document document) {
         logger.info("Vehicle to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
+        Name name = new Name(document.getString(MongoFields.NAME));
         VehicleType vehicleType = VehicleType.fromString(document.getString(MongoFields.VEHICLE_TYPE));
         VehicleCapacityKilograms capacityKilograms;
         Document capacityKgDocument = (Document) document.get(MongoFields.CAPACITY_Kilograms);
@@ -84,7 +86,7 @@ public class VehicleReadingConverter implements Converter<Document, Vehicle> {
             logger.warn("Missing or null costPerKilometer in vehicle document: {}", id);
             costPerKilometer = new TransportationVariableCost(0.0);
         }
-        Vehicle vehicle = new Vehicle(id, vehicleType, capacityKilograms, capacityLiters, costPerKilometer);
+        Vehicle vehicle = new Vehicle(id, name, vehicleType, capacityKilograms, capacityLiters, costPerKilometer);
         return vehicle;
     }
 }

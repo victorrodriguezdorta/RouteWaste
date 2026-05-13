@@ -46,6 +46,7 @@ public class VehicleWritingConverter implements Converter<Vehicle, Document> {
         logger.info("Vehicle with id '{}' to be written", vehicle.getId());
         Document document = new Document();
         document.put(MongoFields.ID, vehicle.getId());
+        document.put(MongoFields.NAME, vehicle.getName().getValue());
         document.put(MongoFields.VEHICLE_TYPE, vehicle.getVehicleType().toString());
         VehicleCapacityKilograms capacityKg = vehicle.getCapacityKilograms();
         Document capacityKgDocument = new Document();

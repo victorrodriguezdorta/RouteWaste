@@ -193,6 +193,12 @@ const currentSortOrder = ref<'asc' | 'desc'>('asc');
 // Table column headers configuration
 const headers = computed(() => [
   {
+    title: t('vehicle.list.table.headers.name'),
+    align: 'start' as const,
+    sortable: false,
+    key: 'name',
+  },
+  {
     title: t('vehicle.list.table.headers.type'),
     align: 'start' as const,
     sortable: true,
@@ -237,6 +243,7 @@ const vehicleTypeFilterOptions = computed(() => vehicleTypeToOptions(t));
 const vehicleItems = computed(() => {
   return vehicles.value.map((vehicle) => ({
     id: vehicle.getId().toString(),
+    name: vehicle.getName().getValue(),
     rawType: vehicle.getVehicleType(),
     type: formatVehicleType(vehicle.getVehicleType()),
     capacityKilograms: vehicle.getCapacityKilograms().getKilograms(),

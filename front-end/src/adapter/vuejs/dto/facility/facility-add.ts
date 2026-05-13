@@ -7,6 +7,7 @@ import { UnloadingTime } from '@/domain/valueobject/capacity/unloading-time';
 import { Currency } from '@/domain/valueobject/cost/currency';
 import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
 import { Location } from '@/domain/valueobject/location/location';
+import { Name } from '@/domain/valueobject/name/name';
 
 /**
  * FacilityAdd
@@ -46,6 +47,11 @@ export class FacilityAdd {
   public gisReference: string;
 
   /**
+   * Human-readable facility name.
+   */
+  public name: string;
+
+  /**
    * Storage capacity in kilograms (must be >= 0).
    */
   public storageCapacity: number;
@@ -83,6 +89,7 @@ export class FacilityAdd {
    * @param longitude Longitude coordinate
    * @param postalAddress Postal address
    * @param gisReference GIS reference
+   * @param name Human-readable facility name
    * @param storageCapacity Storage capacity in kilograms
    * @param processingCapacity Processing capacity in kilograms per day
    * @param unloadingTime Unloading time in minutes
@@ -97,6 +104,7 @@ export class FacilityAdd {
     longitude: number,
     postalAddress: string,
     gisReference: string,
+    name: string,
     storageCapacity: number,
     processingCapacity: number,
     unloadingTime: number,
@@ -109,6 +117,7 @@ export class FacilityAdd {
     this.validate<number>(longitude, 'Longitude is not defined');
     this.validate<string>(postalAddress, 'Postal address is not defined');
     this.validate<string>(gisReference, 'GIS reference is not defined');
+    this.validate<string>(name, 'Name is not defined');
     this.validate<number>(storageCapacity, 'Storage capacity is not defined');
     this.validate<number>(processingCapacity, 'Processing capacity is not defined');
     this.validate<number>(unloadingTime, 'Unloading time is not defined');
@@ -121,6 +130,7 @@ export class FacilityAdd {
     this.longitude = longitude;
     this.postalAddress = postalAddress;
     this.gisReference = gisReference;
+    this.name = name;
     this.storageCapacity = storageCapacity;
     this.processingCapacity = processingCapacity;
     this.unloadingTime = unloadingTime;
@@ -234,6 +244,15 @@ export class FacilityAdd {
       if (value.length > GIS_MAX) {
         throw new Error(`GIS reference must be at most ${GIS_MAX} characters`);
       }
+      return true;
+    } catch (error: any) {
+      return error.message;
+    }
+  }
+
+  static externalValidateName(value: string): boolean | string {
+    try {
+      new Name(value);
       return true;
     } catch (error: any) {
       return error.message;
@@ -356,6 +375,7 @@ export class FacilityAdd {
       randomLongitude,
       randomPostalAddress,
       randomGisReference,
+      `Facility ${Math.floor(Math.random() * 10000)}`,
       randomStorageCapacity,
       randomProcessingCapacity,
       randomUnloadingTime,
@@ -373,6 +393,7 @@ export class FacilityAdd {
    * @throws Error if any value object validation fails
    */
   static toFacility(facilityAdd: FacilityAdd): Facility {
+    const name = new Name(facilityAdd.name);
     const facilityType = facilityTypeFromString(facilityAdd.facilityType);
     const location = new Location(
       facilityAdd.latitude,
@@ -387,6 +408,7 @@ export class FacilityAdd {
     const status = facilityStatusFromString(facilityAdd.status);
 
     return new Facility(
+      name,
       facilityType,
       location,
       storageCapacity,

@@ -1,5 +1,24 @@
 <template>
   <div>
+    <v-row>
+      <v-col cols="12">
+        <InputTooltip
+          :data="container.name"
+          input-type="text"
+          :text="t('container.add.fields.name')"
+          :tooltip="t('container.add.fields.name')"
+          counter="120"
+          :rules="[
+            (value: string) => ContainerAdd.externalValidateName(value),
+          ]"
+          :required="!readonly"
+          :readonly="readonly"
+          :disabled="readonly"
+          @updateData="updateName"
+        />
+      </v-col>
+    </v-row>
+
     <v-row v-if="!readonly">
       <v-col cols="12">
         <v-btn
@@ -244,6 +263,10 @@ const updatePostalAddress = (value: string) => {
 
 const updateGisReference = (value: string) => {
   emit('update:container', { ...props.container, gisReference: value });
+};
+
+const updateName = (value: string) => {
+  emit('update:container', { ...props.container, name: value });
 };
 
 const updateWasteType = (value: string) => {

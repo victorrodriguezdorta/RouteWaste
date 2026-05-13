@@ -24,6 +24,11 @@ export class ContainerInfo {
   public id: string;
 
   /**
+   * Human-readable name of the container.
+   */
+  public name: string;
+
+  /**
    * Latitude coordinate of the container location.
    */
   public latitude: number;
@@ -67,6 +72,7 @@ export class ContainerInfo {
    * Create a new ContainerInfo DTO.
    * 
    * @param id Unique identifier of the container
+   * @param name Human-readable name
    * @param latitude Latitude coordinate
    * @param longitude Longitude coordinate
    * @param postalAddress Postal address
@@ -79,6 +85,7 @@ export class ContainerInfo {
    */
   constructor(
     id: string,
+    name: string,
     latitude: number,
     longitude: number,
     postalAddress: string,
@@ -89,6 +96,7 @@ export class ContainerInfo {
     serviceZone?: string
   ) {
     this.validate<string>(id, 'Container id is not defined');
+    this.validate<string>(name, 'Name is not defined');
     this.validate<number>(latitude, 'Latitude is not defined');
     this.validate<number>(longitude, 'Longitude is not defined');
     this.validate<string>(postalAddress, 'Postal address is not defined');
@@ -98,6 +106,7 @@ export class ContainerInfo {
     this.validate<number>(dailyDemandLitersPerDay, 'Daily demand in liters per day is not defined');
 
     this.id = id;
+    this.name = name;
     this.latitude = latitude;
     this.longitude = longitude;
     this.postalAddress = postalAddress;
@@ -144,6 +153,7 @@ export class ContainerInfo {
 
     return new ContainerInfo(
       randomId,
+      `Container ${Math.floor(Math.random() * 10000)}`,
       randomLatitude,
       randomLongitude,
       randomPostalAddress,
@@ -169,6 +179,7 @@ export class ContainerInfo {
 
     return new ContainerInfo(
       container.getId().getValue(),
+      container.getName().getValue(),
       location.latitude,
       location.longitude,
       location.postalAddress,

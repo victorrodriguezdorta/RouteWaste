@@ -10,6 +10,7 @@ import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -47,6 +48,7 @@ public class UpdateFacilityService implements UpdateFacilityUseCase {
     @Override
     public Facility update(
         UUID id,
+        Name newName,
         FacilityType newFacilityType,
         Location newLocation,
         StorageCapacityKilograms newStorageCapacity,
@@ -57,6 +59,9 @@ public class UpdateFacilityService implements UpdateFacilityUseCase {
     ) {
         Facility existing = this.repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Facility not found"));
+        if (newName != null) {
+            existing.updateName(newName);
+        }
         if (newFacilityType != null) {
             existing.updateFacilityType(newFacilityType);
         }

@@ -29,6 +29,7 @@ public final class JsonFields {
      * Common fields
      */
     public static final String ID = "id";
+    public static final String NAME = "name";
 
     /**
      * Vehicle fields

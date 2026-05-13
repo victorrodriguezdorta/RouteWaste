@@ -6,7 +6,6 @@ import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.dailyplan.StopResponseBody;
 import es.ull.project.domain.entity.DailyPlan;
 import es.ull.project.domain.entity.Stop;
-import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.valueobject.time.ServiceDate;
 
 /**
@@ -34,9 +33,10 @@ public class DailyPlanResponseMapper {
         response.id = entity.getId();
         response.infrastructurePlanId = entity.getInfrastructurePlan().getId();
         response.facilityId = entity.getFacility().getId();
+        response.facilityName = entity.getFacility().getName().getValue();
         response.serviceDate = new ServiceDate(entity.getServiceDate());
         response.planDay = entity.getPlanDay() != null ? entity.getPlanDay().getDay() : null;
-        response.vehicleId = entity.getVehicle().getId();
+        response.vehicle = VehicleResponseMapper.toResponseBody(entity.getVehicle());
         response.totalCollectedKilograms = entity.getTotalCollectedKilograms();
         response.totalCollectedLiters = entity.getTotalCollectedLiters();
         response.totalDistanceMeters = entity.getTotalDistanceMeters();
@@ -62,6 +62,7 @@ public class DailyPlanResponseMapper {
         response.sequence = stop.getSequence();
         response.type = stop.getType();
         response.containerId = stop.getContainer() != null ? stop.getContainer().getId() : null;
+        response.containerName = stop.getContainer() != null ? stop.getContainer().getName().getValue() : null;
         response.collectedKilograms = stop.getCollectedKilograms();
         response.collectedLiters = stop.getCollectedLiters();
         response.distanceFromPreviousMeters = stop.getDistanceFromPreviousMeters();

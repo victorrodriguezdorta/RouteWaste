@@ -16,6 +16,7 @@ import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,7 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
             throws IOException {
         JsonNode rootNode = parser.getCodec().readTree(parser);
         List<FieldError> errors = new ArrayList<>();
+        Name name = parseName(rootNode, errors);
         FacilityType facilityType = parseFacilityType(rootNode, errors);
         Location location = parseLocation(rootNode, errors);
         StorageCapacityKilograms storageCapacity = parseStorageCapacity(rootNode, errors);
@@ -58,6 +60,7 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
             throw new ValidationException(errors);
         }
         FacilityPostRequestBody requestBody = new FacilityPostRequestBody();
+        requestBody.name = name;
         requestBody.facilityType = facilityType;
         requestBody.location = location;
         requestBody.storageCapacity = storageCapacity;
@@ -66,6 +69,24 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
         requestBody.openingFixedCost = openingFixedCost;
         requestBody.status = status;
         return requestBody;
+    }
+
+    private Name parseName(JsonNode rootNode, List<FieldError> errors) {
+        if (!rootNode.has(JsonFields.NAME)) {
+            errors.add(new FieldError(JsonFields.NAME, "Field is required"));
+            return null;
+        }
+        JsonNode node = rootNode.get(JsonFields.NAME);
+        if (node.isNull() || !node.isTextual()) {
+            errors.add(new FieldError(JsonFields.NAME, "Must be a non-null string"));
+            return null;
+        }
+        try {
+            return new Name(node.asText());
+        } catch (Exception e) {
+            errors.add(new FieldError(JsonFields.NAME, e.getMessage()));
+            return null;
+        }
     }
 
     /**

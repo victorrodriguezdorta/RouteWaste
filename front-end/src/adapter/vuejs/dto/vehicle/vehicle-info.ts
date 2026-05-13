@@ -23,6 +23,11 @@ export class VehicleInfo {
   public id: string;
 
   /**
+   * Human-readable vehicle name.
+   */
+  public name: string;
+
+  /**
    * Type of the vehicle (e.g., COLLECTION_TRUCK, TRANSFER_TRUCK, SUPPORT_VEHICLE).
    */
   public vehicleType: string;
@@ -51,6 +56,7 @@ export class VehicleInfo {
    * Create a new VehicleInfo DTO.
    * 
    * @param id Unique identifier of the vehicle
+   * @param name Human-readable name
    * @param vehicleType Type of the vehicle
    * @param capacityKilograms Capacity in kilograms
    * @param capacityLiters Capacity in liters
@@ -60,6 +66,7 @@ export class VehicleInfo {
    */
   constructor(
     id: string,
+    name: string,
     vehicleType: string,
     capacityKilograms: number,
     capacityLiters: number,
@@ -67,6 +74,7 @@ export class VehicleInfo {
     currencyCode: string
   ) {
     this.validate<string>(id, 'Vehicle id is not defined');
+    this.validate<string>(name, 'Name is not defined');
     this.validate<string>(vehicleType, 'Vehicle type is not defined');
     this.validate<number>(capacityKilograms, 'Capacity in kilograms is not defined');
     this.validate<number>(capacityLiters, 'Capacity in liters is not defined');
@@ -74,6 +82,7 @@ export class VehicleInfo {
     this.validate<string>(currencyCode, 'Currency code is not defined');
 
     this.id = id;
+    this.name = name;
     this.vehicleType = vehicleType;
     this.capacityKilograms = capacityKilograms;
     this.capacityLiters = capacityLiters;
@@ -113,6 +122,7 @@ export class VehicleInfo {
 
     return new VehicleInfo(
       randomId,
+      `Vehicle ${Math.floor(Math.random() * 10000)}`,
       randomVehicleType as string,
       randomCapacityKg,
       randomCapacityL,
@@ -130,6 +140,7 @@ export class VehicleInfo {
   static fromVehicle(vehicle: Vehicle): VehicleInfo {
     return new VehicleInfo(
       vehicle.getId().getValue(),
+      vehicle.getName().getValue(),
       vehicle.getVehicleType(),
       vehicle.getCapacityKilograms().getKilograms(),
       vehicle.getCapacityLiters().getLiters(),

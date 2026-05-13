@@ -46,6 +46,7 @@ public class ContainerWritingConverter implements Converter<Container, Document>
         logger.info("Container with id '{}' to be written", container.getId());
         Document document = new Document();
         document.put(MongoFields.ID, container.getId());
+        document.put(MongoFields.NAME, container.getName().getValue());
         Document locationDocument = new Document();
         locationDocument.put(MongoFields.LATITUDE, container.getLocation().getLatitude());
         locationDocument.put(MongoFields.LONGITUDE, container.getLocation().getLongitude());

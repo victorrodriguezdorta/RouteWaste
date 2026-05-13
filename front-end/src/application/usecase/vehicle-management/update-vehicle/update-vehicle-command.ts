@@ -2,6 +2,7 @@ import { VehicleType } from '@/domain/enumerate/vehicle-type';
 import { VehicleCapacityKilograms } from '@/domain/valueobject/capacity/vehicle-capacity-kilograms';
 import { VehicleCapacityLiters } from '@/domain/valueobject/capacity/vehicle-capacity-liters';
 import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
+import type { Name } from '@/domain/valueobject/name/name';
 import type { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -14,6 +15,7 @@ import type { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 export interface UpdateVehicleCommand {
     vehicleId: UllUUID;
     updatedFields: Partial<{
+        name: Name;
         vehicleType: VehicleType;
         capacityKilograms: VehicleCapacityKilograms;
         capacityLiters: VehicleCapacityLiters;

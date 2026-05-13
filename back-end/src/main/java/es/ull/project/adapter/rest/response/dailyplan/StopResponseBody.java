@@ -28,6 +28,11 @@ public class StopResponseBody {
     public UUID containerId;
 
     /**
+     * Container display name when {@link #type} is a container stop.
+     */
+    public String containerName;
+
+    /**
      * Kind of stop (container visit or facility unload).
      */
     public StopType type;

@@ -87,8 +87,8 @@
                   @update:model-value="toggleVehicleRouteSelection(route.key)"
                 />
                 <ButtonTooltip
-                  :text="vehicleButtonLabel(route.vehicleId)"
-                  :tooltip="route.vehicleId"
+                  :text="vehicleButtonLabel(route)"
+                  :tooltip="vehicleRouteTooltip(route)"
                   icon=""
                   size="small"
                   variant="flat"
@@ -201,6 +201,7 @@ import type {
   InfrastructurePlanDailyPlanDetail,
   InfrastructurePlanFacilityDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
+import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -312,21 +313,7 @@ const selectedVehicleRoutes = computed<VehicleRouteOption[]>(() => {
   return selectableVehicleRoutes.value.filter((route) => selectedKeys.has(route.key));
 });
 
-const jsonContent = computed(() => {
-  const dayInfo = {
-    planDay: props.planDay,
-    serviceDate: props.serviceDate ?? null,
-    totals: {
-      dailyPlans: props.dailyPlans.length,
-      facilities: props.facilities.length,
-      stops: props.dailyPlans.reduce((acc, plan) => acc + (Array.isArray(plan.stops) ? plan.stops.length : 0), 0),
-    },
-    facilities: props.facilities,
-    dailyPlans: props.dailyPlans,
-  };
-
-  return JSON.stringify(dayInfo, null, 2);
-});
+const jsonContent = computed(() => JSON.stringify(buildPublicDaySummary(), null, 2));
 
 watch(
   () => selectableFacilities.value.map((facility) => facility.id.getValue()),
@@ -376,26 +363,69 @@ onUnmounted(() => {
   markersLayer.value = null;
 });
 
+function unnamedEntityLabel(): string {
+  const key = 'infrastructurePlan.show.daily.display.unnamedEntity';
+  const translated = t(key);
+  return translated === key ? '—' : translated;
+}
+
+function displayEntityNameOrUnnamed(raw: string): string {
+  const trimmed = raw.trim();
+  if (
+    trimmed.length === 0
+    || trimmed === infrastructurePlanDetailFallbackDisplayNames.facility
+    || trimmed === infrastructurePlanDetailFallbackDisplayNames.container
+  ) {
+    return unnamedEntityLabel();
+  }
+  return trimmed;
+}
+
+function facilityDisplayName(facility: InfrastructurePlanFacilityDetail): string {
+  return displayEntityNameOrUnnamed(facility.name.getValue());
+}
+
 function facilityButtonLabel(facility: InfrastructurePlanFacilityDetail): string {
-  return formatFacilityType(facility.facilityType);
+  return facilityDisplayName(facility);
 }
 
 function facilityTooltip(facility: InfrastructurePlanFacilityDetail): string {
+  const name = facilityDisplayName(facility);
   const facilityType = formatFacilityType(facility.facilityType);
-  const facilityId = facility.id.getValue();
-  return `${facilityType} (${facilityId})`;
+  return facilityType && facilityType !== '-' ? `${name} · ${facilityType}` : name;
 }
 
-function vehicleButtonLabel(vehicleId: string): string {
-  return truncateIdentifier(vehicleId, 8);
-}
-
-function truncateIdentifier(value: string, visibleCharacters: number): string {
-  if (value.length <= visibleCharacters) {
-    return value;
+function formatVehicleTypeLabel(value: unknown): string {
+  if (value == null || value === '') {
+    return '';
   }
 
-  return `${value.slice(0, visibleCharacters)}...`;
+  return String(value)
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function vehicleButtonLabel(route: VehicleRouteOption): string {
+  const name = route.dailyPlan.vehicle?.name?.getValue()?.trim();
+  if (name) {
+    return name;
+  }
+  const typeStr = formatVehicleTypeLabel(route.dailyPlan.vehicle?.vehicleType);
+  return typeStr.length > 0 ? typeStr : unnamedEntityLabel();
+}
+
+function vehicleRouteTooltip(route: VehicleRouteOption): string {
+  const snapshot = route.dailyPlan.vehicle;
+  const name = snapshot?.name?.getValue()?.trim() ?? '';
+  const typeStr = formatVehicleTypeLabel(snapshot?.vehicleType);
+  if (name && typeStr) {
+    return `${name} · ${typeStr}`;
+  }
+  if (name) {
+    return name;
+  }
+  return typeStr.length > 0 ? typeStr : unnamedEntityLabel();
 }
 
 function formatFacilityType(value?: FacilityType | string): string {
@@ -407,6 +437,120 @@ function formatFacilityType(value?: FacilityType | string): string {
     .replace(/_/g, ' ')
     .toLowerCase()
     .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function publicLocationSnapshot(location: InfrastructurePlanContainerDetail['location']): Record<string, unknown> {
+  return {
+    latitude: location.latitude,
+    longitude: location.longitude,
+    postalAddress: location.postalAddress,
+    gisReference: location.gisReference,
+  };
+}
+
+function serializeVehicleSnapshot(vehicle: InfrastructurePlanDailyPlanDetail['vehicle']): Record<string, unknown> | null {
+  if (!vehicle) {
+    return null;
+  }
+
+  const cost = vehicle.costPerKilometer;
+  return {
+    name: vehicle.name?.getValue() ?? null,
+    vehicleType: vehicle.vehicleType,
+    capacityKilograms: vehicle.capacityKilograms?.getKilograms() ?? null,
+    capacityLiters: vehicle.capacityLiters?.getLiters() ?? null,
+    costPerKilometer:
+      cost != null
+        ? {
+            amount: cost.getAmount(),
+            currency: cost.getCurrency().getCode(),
+          }
+        : null,
+  };
+}
+
+function serializeStopPublic(stop: InfrastructurePlanDailyPlanDetail['stops'][number]): Record<string, unknown> {
+  return {
+    sequence: stop.sequence.getValue(),
+    type: stop.type,
+    containerName: stop.containerName?.getValue() ?? null,
+    collectedKilograms: stop.collectedKilograms.getKilograms(),
+    collectedLiters: stop.collectedLiters.getLiters(),
+    distanceFromPreviousMeters: stop.distanceFromPreviousMeters.getValue(),
+    cumulativeDistanceMeters: stop.cumulativeDistanceMeters.getValue(),
+    containerActualLiters: stop.containerActualLiters,
+    alerts: stop.alerts.map((alert) => ({
+      type: alert.type,
+      message: alert.message,
+      value: alert.value,
+    })),
+  };
+}
+
+function serializeDailyPlanPublic(plan: InfrastructurePlanDailyPlanDetail): Record<string, unknown> {
+  return {
+    facilityName: plan.facilityName,
+    serviceDate: plan.serviceDate,
+    planDay: plan.planDay,
+    vehicle: serializeVehicleSnapshot(plan.vehicle),
+    totalCollectedKilograms: plan.totalCollectedKilograms.getKilograms(),
+    totalCollectedLiters: plan.totalCollectedLiters.getLiters(),
+    totalDistanceMeters: plan.totalDistanceMeters.getValue(),
+    stops: plan.stops.map(serializeStopPublic),
+  };
+}
+
+function serializeFacilityPublic(facility: InfrastructurePlanFacilityDetail): Record<string, unknown> {
+  return {
+    name: facility.name.getValue(),
+    facilityType: facility.facilityType,
+    status: facility.status,
+    location: publicLocationSnapshot(facility.location),
+    storageCapacityKilograms: facility.storageCapacity.getKilograms(),
+    processingCapacityKilogramsPerDay: facility.processingCapacity.getKilogramsPerDay(),
+    assignedContainers: (facility.assignedContainers ?? []).map((container) => ({
+      name: container.name.getValue(),
+      wasteType: container.wasteType,
+      serviceZone: container.serviceZone,
+      capacityLiters: container.capacityLiters.getLiters(),
+      dailyDemandLitersPerDay: container.dailyDemandLitersPerDay.getLitersPerDay(),
+      location: publicLocationSnapshot(container.location),
+    })),
+    dailyPlans: facility.dailyPlans.map(serializeDailyPlanPublic),
+  };
+}
+
+function buildPublicDaySummary(): Record<string, unknown> {
+  return {
+    planDay: props.planDay,
+    serviceDate: props.serviceDate ?? null,
+    totals: {
+      dailyPlans: props.dailyPlans.length,
+      facilities: props.facilities.length,
+      stops: props.dailyPlans.reduce((acc, plan) => acc + (Array.isArray(plan.stops) ? plan.stops.length : 0), 0),
+    },
+    facilities: props.facilities.map(serializeFacilityPublic),
+    dailyPlans: props.dailyPlans.map(serializeDailyPlanPublic),
+    containerStateMonitoring: props.containerStateMonitoring
+      .filter((state) => state.planDay === props.planDay)
+      .map((state) => ({
+        planDay: state.planDay,
+        containerName: state.containerName?.getValue() ?? null,
+        dailyFillingLiters: state.dailyFillingLiters,
+        containerCapacityLiters: state.containerCapacityLiters.getLiters(),
+        dailyDemandLitersPerDay: state.dailyDemandLitersPerDay?.getLitersPerDay() ?? null,
+        status: state.status,
+      })),
+  };
 }
 
 function isFacilitySelected(facilityId: string): boolean {
@@ -570,9 +714,14 @@ function renderMarkers(): void {
     if (hasCoordinates(facility.location)) {
       const point: [number, number] = [facility.location.latitude, facility.location.longitude];
       boundsPoints.push(point);
+      const facilityTitle = t('infrastructurePlan.show.daily.route.facilityLabel');
+      const facilityNameHtml = escapeHtml(facilityDisplayName(facility));
+      const facilityTitleHtml = escapeHtml(
+        facilityTitle === 'infrastructurePlan.show.daily.route.facilityLabel' ? 'Facility' : facilityTitle,
+      );
       L.marker(point, { icon: facilityIcon })
         .addTo(layer)
-        .bindPopup(`<strong>Facility</strong><br>${facility.id.getValue()}`);
+        .bindPopup(`<strong>${facilityTitleHtml}</strong><br>${facilityNameHtml}`);
     }
 
     (facility.assignedContainers ?? []).forEach((container) => {
@@ -586,10 +735,15 @@ function renderMarkers(): void {
       if (containerId) {
         routeContainerLocationMap.set(containerId, point);
       }
+      const containerTitle = t('infrastructurePlan.show.daily.route.containerLabel');
+      const containerTitleHtml = escapeHtml(
+        containerTitle === 'infrastructurePlan.show.daily.route.containerLabel' ? 'Container' : containerTitle,
+      );
+      const containerNameHtml = escapeHtml(displayEntityNameOrUnnamed(container.name.getValue()));
       boundsPoints.push(point);
       L.marker(point)
         .addTo(layer)
-        .bindPopup(`<strong>Container</strong><br>${containerId ?? '-'}`);
+        .bindPopup(`<strong>${containerTitleHtml}</strong><br>${containerNameHtml}`);
     });
   });
 

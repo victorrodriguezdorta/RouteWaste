@@ -15,10 +15,10 @@
         <div class="monitoring-facility__header">
           <div>
             <div class="text-subtitle-1 font-weight-bold">
-              {{ formatFacilityType(facilityMonitoring.facility.facilityType) }}
+              {{ displayEntityNameOrUnnamed(facilityMonitoring.facility.name.getValue()) }}
             </div>
             <div class="text-body-2 text-medium-emphasis">
-              {{ facilityMonitoring.facility.id.getValue() }}
+              {{ formatFacilityType(facilityMonitoring.facility.facilityType) }}
             </div>
           </div>
           <div class="text-body-2 text-medium-emphasis">
@@ -40,7 +40,7 @@
             <div class="monitoring-item__header">
               <div>
                 <div class="text-body-1 font-weight-medium">
-                  {{ t('infrastructurePlan.show.daily.monitoring.containerLabel') }} {{ truncateIdentifier(containerMonitoring.container.id.getValue(), 12) }}
+                  {{ displayEntityNameOrUnnamed(containerMonitoring.container.name.getValue()) }}
                   <ButtonTooltip
                     text=""
                     :tooltip="viewTooltip"
@@ -96,6 +96,7 @@ import type {
     InfrastructurePlanContainerDetail,
     InfrastructurePlanFacilityDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
+import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -120,6 +121,24 @@ const viewTooltip = computed(() => {
   const translated = t('algorithm.list.table.tooltips.view');
   return translated === 'algorithm.list.table.tooltips.view' ? 'View details' : translated;
 });
+
+function unnamedEntityLabel(): string {
+  const key = 'infrastructurePlan.show.daily.display.unnamedEntity';
+  const translated = t(key);
+  return translated === key ? '—' : translated;
+}
+
+function displayEntityNameOrUnnamed(raw: string): string {
+  const trimmed = raw.trim();
+  if (
+    trimmed.length === 0
+    || trimmed === infrastructurePlanDetailFallbackDisplayNames.facility
+    || trimmed === infrastructurePlanDetailFallbackDisplayNames.container
+  ) {
+    return unnamedEntityLabel();
+  }
+  return trimmed;
+}
 
 function normalizeIdentifier(value: string | null | undefined): string {
   return String(value ?? '').trim().toLowerCase();
@@ -212,14 +231,6 @@ function computeFillPercent(entry: { container: InfrastructurePlanContainerDetai
 function openContainer(containerId: string | null): void {
   if (!containerId) return;
   void router.push({ name: 'ShowContainer', params: { id: containerId } });
-}
-
-function truncateIdentifier(value: string, visibleCharacters: number): string {
-  if (value.length <= visibleCharacters) {
-    return value;
-  }
-
-  return `${value.slice(0, visibleCharacters)}...`;
 }
 
 function formatFacilityType(value?: FacilityType | string): string {

@@ -4,6 +4,7 @@ import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.UUID;
 
 /**
@@ -17,6 +18,7 @@ public class VehicleResponseBody {
      * Unique identifier of the vehicle
      */
     public UUID id;
+    public Name name;
 
     /**
      * Type of the vehicle (COLLECTION_TRUCK, TRANSFER_TRUCK, SUPPORT_VEHICLE)

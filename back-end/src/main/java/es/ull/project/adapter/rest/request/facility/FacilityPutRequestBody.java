@@ -7,6 +7,8 @@ import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
+
 
 /**
  * FacilityPutRequestBody
@@ -22,6 +24,8 @@ import es.ull.project.domain.valueobject.location.Location;
  * This class contains no business logic, only data representation.
  */
 public class FacilityPutRequestBody {
+
+    public Name name;
 
     /**
      * Type of the facility (e.g., TRANSFER_STATION, TREATMENT_PLANT).
@@ -73,7 +77,8 @@ public class FacilityPutRequestBody {
     @Override
     public String toString() {
         return String.format(
-                "FacilityPutRequestBody={facilityType=%s, location=%s, storageCapacity=%s, processingCapacity=%s, unloadingTime=%s, openingFixedCost=%s, status=%s}",
+                "FacilityPutRequestBody={name=%s, facilityType=%s, location=%s, storageCapacity=%s, processingCapacity=%s, unloadingTime=%s, openingFixedCost=%s, status=%s}",
+                this.name,
                 this.facilityType,
                 this.location,
                 this.storageCapacity,

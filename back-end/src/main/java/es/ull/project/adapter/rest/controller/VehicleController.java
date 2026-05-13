@@ -231,6 +231,7 @@ public class VehicleController {
     public ResponseEntity<VehicleResponseBody> createVehicle(
             @Parameter(description = "Vehicle data") @RequestBody VehiclePostRequestBody requestBody) {
         Vehicle createdVehicle = this.createVehicleUseCase.create(
+                requestBody.name,
                 requestBody.vehicleType,
                 requestBody.capacityKilograms,
                 requestBody.capacityLiters,
@@ -269,6 +270,7 @@ public class VehicleController {
             UUID vehicleId = UUID.fromString(id);
             Vehicle updatedVehicle = this.updateVehicleUseCase.update(
                     vehicleId,
+                    requestBody.name,
                     requestBody.vehicleType,
                     requestBody.capacityKilograms,
                     requestBody.capacityLiters,

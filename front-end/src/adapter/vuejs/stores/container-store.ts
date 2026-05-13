@@ -188,6 +188,7 @@ export const useContainerStore = defineStore('Container', {
       
       // Execute the create operation with container properties
       const result = await createService.execute({
+        name: container.getName(),
         location: container.getLocation(),
         wasteType: container.getWasteType(),
         capacityLiters: container.getCapacityLiters(),
@@ -231,6 +232,7 @@ export const useContainerStore = defineStore('Container', {
       const result = await updateService.execute({ 
         containerId, 
         updatedFields: {
+          name: container.getName(),
           location: container.getLocation(),
           wasteType: container.getWasteType(),
           capacityLiters: container.getCapacityLiters(),

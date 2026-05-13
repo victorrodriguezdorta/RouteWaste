@@ -7,6 +7,7 @@ import { VehicleCapacityKilograms } from "@/domain/valueobject/capacity/vehicle-
 import { VehicleCapacityLiters } from "@/domain/valueobject/capacity/vehicle-capacity-liters";
 import { Currency } from "@/domain/valueobject/cost/currency";
 import { TransportationVariableCost } from "@/domain/valueobject/cost/transportation-variable-cost";
+import { Name } from "@/domain/valueobject/name/name";
 import { UllUUID } from "@ull-tfg/ull-tfg-typescript";
 
 /**
@@ -27,6 +28,11 @@ export class VehicleEdit {
    * Unique identifier of the vehicle being edited.
    */
   public id: string;
+
+  /**
+   * Human-readable vehicle name.
+   */
+  public name: string;
 
   /**
    * Type of the vehicle (e.g., COLLECTION_TRUCK, TRANSFER_TRUCK, SUPPORT_VEHICLE).
@@ -57,6 +63,7 @@ export class VehicleEdit {
    * Create a new VehicleEdit DTO.
    *
    * @param id Unique identifier of the vehicle
+   * @param name Human-readable name
    * @param vehicleType Type of the vehicle
    * @param capacityKilograms Capacity in kilograms
    * @param capacityLiters Capacity in liters
@@ -66,6 +73,7 @@ export class VehicleEdit {
    */
   constructor(
     id: string,
+    name: string,
     vehicleType: string,
     capacityKilograms: number,
     capacityLiters: number,
@@ -73,6 +81,7 @@ export class VehicleEdit {
     currencyCode: string,
   ) {
     this.validate<string>(id, "Vehicle id is not defined");
+    this.validate<string>(name, "Name is not defined");
     this.validate<string>(vehicleType, "Vehicle type is not defined");
     this.validate<number>(capacityKilograms, "Capacity in kilograms is not defined");
     this.validate<number>(capacityLiters, "Capacity in liters is not defined");
@@ -83,6 +92,7 @@ export class VehicleEdit {
     this.validate<string>(currencyCode, "Currency code is not defined");
 
     this.id = id;
+    this.name = name;
     this.vehicleType = vehicleType;
     this.capacityKilograms = capacityKilograms;
     this.capacityLiters = capacityLiters;
@@ -222,6 +232,7 @@ export class VehicleEdit {
 
     return new VehicleEdit(
       randomId,
+      `Vehicle ${Math.floor(Math.random() * 10000)}`,
       randomVehicleType as string,
       randomCapacityKg,
       randomCapacityL,
@@ -238,6 +249,7 @@ export class VehicleEdit {
    * @throws Error if any value object validation fails
    */
   static toVehicle(vehicleEdit: VehicleEdit): Vehicle {
+    const name = new Name(vehicleEdit.name);
     const vehicleType = vehicleTypeFromString(vehicleEdit.vehicleType);
     const capacityKg = new VehicleCapacityKilograms(vehicleEdit.capacityKilograms);
     const capacityL = new VehicleCapacityLiters(vehicleEdit.capacityLiters);
@@ -247,7 +259,7 @@ export class VehicleEdit {
     );
     const id = new UllUUID(vehicleEdit.id);
 
-    return new Vehicle(vehicleType, capacityKg, capacityL, cost, id);
+    return new Vehicle(name, vehicleType, capacityKg, capacityL, cost, id);
   }
 
   /**
@@ -259,6 +271,7 @@ export class VehicleEdit {
   static fromVehicle(vehicle: Vehicle): VehicleEdit {
     return new VehicleEdit(
       vehicle.getId().getValue(),
+      vehicle.getName().getValue(),
       vehicle.getVehicleType(),
       vehicle.getCapacityKilograms().getKilograms(),
       vehicle.getCapacityLiters().getLiters(),
@@ -276,6 +289,7 @@ export class VehicleEdit {
     return {
       vehicleId: new UllUUID(this.id),
       updatedFields: {
+        name: new Name(this.name),
         vehicleType: vehicleTypeFromString(this.vehicleType),
         capacityKilograms: new VehicleCapacityKilograms(this.capacityKilograms),
         capacityLiters: new VehicleCapacityLiters(this.capacityLiters),

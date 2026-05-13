@@ -6,6 +6,7 @@ import { VehicleCapacityKilograms } from "@/domain/valueobject/capacity/vehicle-
 import { VehicleCapacityLiters } from "@/domain/valueobject/capacity/vehicle-capacity-liters";
 import { Currency } from "@/domain/valueobject/cost/currency";
 import { TransportationVariableCost } from "@/domain/valueobject/cost/transportation-variable-cost";
+import { Name } from "@/domain/valueobject/name/name";
 
 /**
  * VehicleAdd
@@ -19,6 +20,11 @@ import { TransportationVariableCost } from "@/domain/valueobject/cost/transporta
  * All attributes are public to allow direct binding with Vue.js form components.
  */
 export class VehicleAdd {
+  /**
+   * Human-readable vehicle name.
+   */
+  public name: string;
+
   /**
    * Type of the vehicle (e.g., COLLECTION_TRUCK, TRANSFER_TRUCK, SUPPORT_VEHICLE).
    */
@@ -47,6 +53,7 @@ export class VehicleAdd {
   /**
    * Create a new VehicleAdd DTO.
    *
+   * @param name Human-readable name
    * @param vehicleType Type of the vehicle
    * @param capacityKilograms Capacity in kilograms
    * @param capacityLiters Capacity in liters
@@ -55,12 +62,14 @@ export class VehicleAdd {
    * @throws Error if any required attribute is undefined or null
    */
   constructor(
+    name: string,
     vehicleType: string,
     capacityKilograms: number,
     capacityLiters: number,
     costPerKilometer: number,
     currencyCode: string,
   ) {
+    this.validate<string>(name, "Name is not defined");
     this.validate<string>(vehicleType, "Vehicle type is not defined");
     this.validate<number>(capacityKilograms, "Capacity in kilograms is not defined");
     this.validate<number>(capacityLiters, "Capacity in liters is not defined");
@@ -70,6 +79,7 @@ export class VehicleAdd {
     );
     this.validate<string>(currencyCode, "Currency code is not defined");
 
+    this.name = name;
     this.vehicleType = vehicleType;
     this.capacityKilograms = capacityKilograms;
     this.capacityLiters = capacityLiters;
@@ -90,6 +100,15 @@ export class VehicleAdd {
   ): asserts attribute is T {
     if (attribute === undefined || attribute === null) {
       throw new Error(errorMessage);
+    }
+  }
+
+  static externalValidateName(value: string): boolean | string {
+    try {
+      new Name(value);
+      return true;
+    } catch (error: any) {
+      return error.message;
     }
   }
 
@@ -180,6 +199,7 @@ export class VehicleAdd {
    */
   static fromVehicle(vehicle: Vehicle): VehicleAdd {
     return new VehicleAdd(
+      vehicle.getName().getValue(),
       vehicle.getVehicleType(),
       vehicle.getCapacityKilograms().getKilograms(),
       vehicle.getCapacityLiters().getLiters(),
@@ -196,6 +216,7 @@ export class VehicleAdd {
    * @throws Error if any value object validation fails
    */
   static toVehicle(vehicleAdd: VehicleAdd): Vehicle {
+    const name = new Name(vehicleAdd.name);
     const vehicleType = vehicleTypeFromString(vehicleAdd.vehicleType);
     const capacityKg = new VehicleCapacityKilograms(vehicleAdd.capacityKilograms);
     const capacityL = new VehicleCapacityLiters(vehicleAdd.capacityLiters);
@@ -204,7 +225,7 @@ export class VehicleAdd {
       vehicleAdd.currencyCode,
     );
 
-    return new Vehicle(vehicleType, capacityKg, capacityL, cost);
+    return new Vehicle(name, vehicleType, capacityKg, capacityL, cost);
   }
 
   /**
@@ -214,6 +235,7 @@ export class VehicleAdd {
    */
   toCreateVehicleCommand(): any {
     return {
+      name: new Name(this.name),
       vehicleType: vehicleTypeFromString(this.vehicleType),
       capacityKilograms: new VehicleCapacityKilograms(this.capacityKilograms),
       capacityLiters: new VehicleCapacityLiters(this.capacityLiters),

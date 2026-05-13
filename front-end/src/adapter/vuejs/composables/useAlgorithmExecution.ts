@@ -67,6 +67,12 @@ export function useAlgorithmExecution() {
       width: '50px',
     },
     {
+      title: t('facility.list.table.headers.name'),
+      align: 'start' as const,
+      sortable: false,
+      key: 'name',
+    },
+    {
       title: t('facility.list.table.headers.type'),
       align: 'start' as const,
       sortable: true,
@@ -125,6 +131,12 @@ export function useAlgorithmExecution() {
       width: '50px',
     },
     {
+      title: t('vehicle.list.table.headers.name'),
+      align: 'start' as const,
+      sortable: false,
+      key: 'name',
+    },
+    {
       title: t('vehicle.list.table.headers.type'),
       align: 'start' as const,
       sortable: true,
@@ -161,6 +173,7 @@ export function useAlgorithmExecution() {
 
       return {
         id: facility.getId().toString(),
+        name: facility.getName().getValue(),
         rawFacilityType: facility.getFacilityType(),
         rawStatus: facility.getStatus(),
         type: t(`facility.add.facilityTypes.${facility.getFacilityType()}`),
@@ -178,6 +191,7 @@ export function useAlgorithmExecution() {
   const vehicleItems = computed(() => {
     return allVehicles.value.map((vehicle) => ({
       id: vehicle.getId().toString(),
+      name: vehicle.getName().getValue(),
       rawType: vehicle.getVehicleType(),
       type: t(`vehicle.add.vehicleTypes.${vehicle.getVehicleType()}`),
       capacityKilograms: vehicle.getCapacityKilograms().getKilograms(),
@@ -556,6 +570,12 @@ export function useAlgorithmExecution() {
       width: '50px',
     },
     {
+      title: t('container.list.table.headers.name'),
+      align: 'start' as const,
+      sortable: false,
+      key: 'name',
+    },
+    {
       title: t('container.list.table.headers.wasteType'),
       align: 'start' as const,
       sortable: true,
@@ -599,6 +619,7 @@ export function useAlgorithmExecution() {
 
       return {
         id: container.getId().toString(),
+        name: container.getName().getValue(),
         rawWasteType: container.getWasteType(),
         rawServiceZone: serviceZone,
         wasteType: t(`container.add.wasteTypes.${container.getWasteType()}`),

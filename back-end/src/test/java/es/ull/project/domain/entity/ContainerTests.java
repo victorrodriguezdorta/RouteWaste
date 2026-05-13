@@ -14,6 +14,7 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 
 class ContainerTests {
     
@@ -38,12 +39,17 @@ class ContainerTests {
     
     private static Container randomContainer() {
         return new Container(
+            randomName(),
             randomLocation(),
             WasteType.random(),
             randomCapacityLiters(),
             randomDailyDemandLitersPerDay(),
             ServiceZone.random()
         );
+    }
+
+    private static Name randomName() {
+        return new Name("container-" + ((int) (Math.random() * 10000)));
     }
     
     // ========== PUBLIC CONSTRUCTORS ==========
@@ -56,7 +62,8 @@ class ContainerTests {
         DailyWasteDemandLitersPerDay dailyDemandLitersPerDay = randomDailyDemandLitersPerDay();
         ServiceZone serviceZone = ServiceZone.random();
         
-        Container container = new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone);
+        Name name = randomName();
+        Container container = new Container(name, location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone);
         
         // Required attributes:
         assertEquals(location, container.getLocation());
@@ -79,7 +86,8 @@ class ContainerTests {
         ContainerCapacityLiters capacityLiters = randomCapacityLiters();
         DailyWasteDemandLitersPerDay dailyDemandLitersPerDay = randomDailyDemandLitersPerDay();
         
-        Container container = new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay);
+        Name name = randomName();
+        Container container = new Container(name, location, wasteType, capacityLiters, dailyDemandLitersPerDay);
         
         // Required attributes:
         assertEquals(location, container.getLocation());
@@ -104,7 +112,7 @@ class ContainerTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone)
+            () -> new Container(randomName(), location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone)
         );
         
         assertEquals(Container.LOCATION_NOT_DEFINED, exception.getMessage());
@@ -120,7 +128,7 @@ class ContainerTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone)
+            () -> new Container(randomName(), location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone)
         );
         
         assertEquals(Container.WASTE_TYPE_NOT_DEFINED, exception.getMessage());
@@ -136,7 +144,7 @@ class ContainerTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone)
+            () -> new Container(randomName(), location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone)
         );
         
         assertEquals(Container.CAPACITY_LITERS_NOT_DEFINED, exception.getMessage());
@@ -152,7 +160,7 @@ class ContainerTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone)
+            () -> new Container(randomName(), location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone)
         );
         
         assertEquals(Container.DAILY_DEMAND_LITERS_NOT_DEFINED, exception.getMessage());
@@ -167,7 +175,7 @@ class ContainerTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay)
+            () -> new Container(randomName(), location, wasteType, capacityLiters, dailyDemandLitersPerDay)
         );
         
         assertEquals(Container.LOCATION_NOT_DEFINED, exception.getMessage());
@@ -182,7 +190,7 @@ class ContainerTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay)
+            () -> new Container(randomName(), location, wasteType, capacityLiters, dailyDemandLitersPerDay)
         );
         
         assertEquals(Container.WASTE_TYPE_NOT_DEFINED, exception.getMessage());
@@ -197,7 +205,7 @@ class ContainerTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay)
+            () -> new Container(randomName(), location, wasteType, capacityLiters, dailyDemandLitersPerDay)
         );
         
         assertEquals(Container.CAPACITY_LITERS_NOT_DEFINED, exception.getMessage());
@@ -212,7 +220,7 @@ class ContainerTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay)
+            () -> new Container(randomName(), location, wasteType, capacityLiters, dailyDemandLitersPerDay)
         );
         
         assertEquals(Container.DAILY_DEMAND_LITERS_NOT_DEFINED, exception.getMessage());
@@ -224,6 +232,7 @@ class ContainerTests {
     void equalsMethod() {
         Container container1 = randomContainer();
         Container container2 = new Container(
+            randomName(),
             container1.getLocation(),
             container1.getWasteType(),
             container1.getCapacityLiters(),
@@ -246,6 +255,7 @@ class ContainerTests {
     void hashCodeMethod() {
         Container container1 = randomContainer();
         Container container2 = new Container(
+            randomName(),
             container1.getLocation(),
             container1.getWasteType(),
             container1.getCapacityLiters(),
@@ -385,8 +395,9 @@ class ContainerTests {
         Container container = randomContainer();
         
         String expectedValue = String.format(
-            "Container={id=%s, location=%s, wasteType=%s, capacityLiters=%s, dailyDemandLitersPerDay=%s, serviceZone=%s}",
+            "Container={id=%s, name=%s, location=%s, wasteType=%s, capacityLiters=%s, dailyDemandLitersPerDay=%s, serviceZone=%s}",
             container.getId(),
+            container.getName(),
             container.getLocation(),
             container.getWasteType(),
             container.getCapacityLiters(),
@@ -403,11 +414,12 @@ class ContainerTests {
         WasteType wasteType = WasteType.random();
         ContainerCapacityLiters capacityLiters = randomCapacityLiters();
         DailyWasteDemandLitersPerDay dailyDemandLitersPerDay = randomDailyDemandLitersPerDay();
-        Container container = new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay);
+        Container container = new Container(randomName(), location, wasteType, capacityLiters, dailyDemandLitersPerDay);
         
         String expectedValue = String.format(
-            "Container={id=%s, location=%s, wasteType=%s, capacityLiters=%s, dailyDemandLitersPerDay=%s, serviceZone=%s}",
+            "Container={id=%s, name=%s, location=%s, wasteType=%s, capacityLiters=%s, dailyDemandLitersPerDay=%s, serviceZone=%s}",
             container.getId(),
+            container.getName(),
             container.getLocation(),
             container.getWasteType(),
             container.getCapacityLiters(),

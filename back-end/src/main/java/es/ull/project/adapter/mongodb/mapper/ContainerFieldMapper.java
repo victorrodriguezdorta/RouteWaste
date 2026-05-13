@@ -23,6 +23,7 @@ public class ContainerFieldMapper {
      * API and MongoDB field name for the waste type.
      */
     private static final String FIELD_WASTE_TYPE = "wasteType";
+    private static final String FIELD_NAME = "name";
 
     /**
      * API and MongoDB field name for the service zone.
@@ -122,6 +123,7 @@ public class ContainerFieldMapper {
      */
     private static void registerBasicFields() {
         FIELD_MAPPING.put(FIELD_ID, FIELD_ID);
+        FIELD_MAPPING.put(FIELD_NAME, FIELD_NAME);
         FIELD_MAPPING.put(FIELD_WASTE_TYPE, FIELD_WASTE_TYPE);
         FIELD_MAPPING.put(FIELD_SERVICE_ZONE, FIELD_SERVICE_ZONE);
         FIELD_MAPPING.put(FIELD_CREATED_AT, FIELD_CREATED_AT);

@@ -8,6 +8,8 @@ import type { UpdateVehicleCommand } from '@/application/usecase/vehicle-managem
  * are used so the object can be serialized directly.
  */
 export class VehiclePutJsonRequest {
+  /** Optional human-readable name. */
+  name?: string;
   /** Optional vehicle type string. */
   vehicleType?: string;
   /** Optional capacity in kilograms. */
@@ -28,11 +30,13 @@ export class VehiclePutJsonRequest {
    * @param costPerKilometer optional cost parts
    */
   constructor(
+    name?: string,
     vehicleType?: string,
     capacityKilograms?: number,
     CapacityLiters?: number,
     costPerKilometer?: { amount: number; currency?: string }
   ) {
+    this.name = name;
     this.vehicleType = vehicleType;
     this.capacityKilograms = capacityKilograms;
     this.CapacityLiters = CapacityLiters;
@@ -48,6 +52,7 @@ export class VehiclePutJsonRequest {
   public static toRequest(data: UpdateVehicleCommand): VehiclePutJsonRequest {
     const f = data.updatedFields;
     return new VehiclePutJsonRequest(
+      f.name?.getValue(),
       f.vehicleType,
       f.capacityKilograms
         ? f.capacityKilograms.getKilograms()

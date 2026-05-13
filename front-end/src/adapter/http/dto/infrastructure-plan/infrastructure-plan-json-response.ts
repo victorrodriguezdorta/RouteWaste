@@ -26,6 +26,7 @@ export interface InfrastructurePlanStopJsonResponse {
   sequence: number | { value: number };
   container?: ContainerJsonResponse;
   containerId?: string;
+  containerName?: string;
   type?: string;
   collectedKilograms: number | { value: number };
   collectedLiters: number | { value: number };
@@ -43,9 +44,11 @@ export interface InfrastructurePlanDailyPlanJsonResponse {
   infrastructurePlanId?: string;
   facility?: FacilityJsonResponse;
   facilityId?: string;
+  facilityName?: string;
   serviceDate: string | { date?: string; value?: string };
   planDay?: number;
   vehicle?: VehicleJsonResponse;
+  /** @deprecated Prefer {@link vehicle}; kept for older API responses. */
   vehicleId?: string;
   totalCollectedKilograms: number | { value: number };
   totalCollectedLiters: number | { value: number };
@@ -68,6 +71,7 @@ export interface InfrastructurePlanClusterJsonResponse {
  */
 export interface InfrastructurePlanFacilityJsonResponse {
   id: string;
+  name?: string;
   facilityType: string;
   status: string;
   location: {
@@ -102,6 +106,7 @@ export interface InfrastructurePlanMetricsJsonResponse {
 export interface ContainerDailyStateJsonResponse {
   id?: string;
   containerId: string;
+  containerName?: string;
   planDay: number;
   dailyFillingLiters: number;
   containerCapacityLiters: number;

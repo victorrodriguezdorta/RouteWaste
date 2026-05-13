@@ -28,6 +28,7 @@ public class ContainerResponseMapper {
     public static ContainerResponseBody toResponseBody(Container container) {
         ContainerResponseBody responseBody = new ContainerResponseBody();
         responseBody.id = container.getId();
+        responseBody.name = container.getName();
         responseBody.location = container.getLocation();
         responseBody.wasteType = container.getWasteType();
         responseBody.capacityLiters = container.getCapacityLiters();

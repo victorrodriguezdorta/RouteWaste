@@ -8,6 +8,7 @@ import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -33,6 +34,7 @@ public class Facility {
     public static final String STATUS_NOT_DEFINED = "Facility status is not defined";
     public static final String FACILITY_DISCARDED = "Facility is discarded and cannot receive assignments";
     public static final String STORAGE_CAPACITY_EXCEEDED = "Facility storage capacity exceeded";
+    public static final String NAME_NOT_DEFINED = "Facility name is not defined";
     private static final String ERROR_PROCESSING_AMOUNT_NEGATIVE = "Processing amount cannot be negative";
     private static final String ERROR_WASTE_AMOUNT_NEGATIVE = "Waste amount cannot be negative";
     private static final int ZERO = 0;
@@ -43,6 +45,7 @@ public class Facility {
      * It is a computed attribute.
      */
     private final UUID id;
+    private Name name;
 
     /**
      * Type of the facility.
@@ -104,6 +107,7 @@ public class Facility {
      * @param status              Facility status.
      */
     public Facility(
+            Name name,
             FacilityType facilityType,
             Location location,
             StorageCapacityKilograms storageCapacity,
@@ -111,6 +115,7 @@ public class Facility {
             UnloadingTime unloadingTime,
             OpeningFixedCost openingFixedCost,
             FacilityStatus status) {
+        this.validateName(name);
         this.validateFacilityType(facilityType);
         this.validateLocation(location);
         this.validateStorageCapacity(storageCapacity);
@@ -119,6 +124,7 @@ public class Facility {
         this.validateOpeningFixedCost(openingFixedCost);
         this.validateStatus(status);
         this.id = UUID.randomUUID();
+        this.name = name;
         this.facilityType = facilityType;
         this.location = location;
         this.storageCapacity = storageCapacity;
@@ -137,6 +143,7 @@ public class Facility {
      */
     public Facility(Facility otherObject) {
         this.id = otherObject.id;
+        this.name = otherObject.name;
         this.facilityType = otherObject.facilityType;
         this.location = otherObject.location;
         this.storageCapacity = otherObject.storageCapacity;
@@ -162,6 +169,7 @@ public class Facility {
      * @param currentFillingLevel the current filling level in liters per day
      */
     public Facility(UUID id,
+            Name name,
             FacilityType facilityType,
             Location location,
             StorageCapacityKilograms storageCapacity,
@@ -170,6 +178,7 @@ public class Facility {
             OpeningFixedCost openingFixedCost,
             FacilityStatus status,
             DailyWasteDemandLitersPerDay currentFillingLevel) {
+        this.validateName(name);
         this.validateFacilityType(facilityType);
         this.validateLocation(location);
         this.validateStorageCapacity(storageCapacity);
@@ -178,6 +187,7 @@ public class Facility {
         this.validateOpeningFixedCost(openingFixedCost);
         this.validateStatus(status);
         this.id = id;
+        this.name = name;
         this.facilityType = facilityType;
         this.location = location;
         this.storageCapacity = storageCapacity;
@@ -186,6 +196,26 @@ public class Facility {
         this.openingFixedCost = openingFixedCost;
         this.status = status;
         this.currentFillingLevel = currentFillingLevel != null ? currentFillingLevel : new DailyWasteDemandLitersPerDay(0.0);
+    }
+
+    /**
+     * Returns the unique identifier of the facility.
+     *
+     * @return Facility UUID.
+     */
+    private void validateName(Name name) {
+        if (name == null) {
+            throw new IllegalArgumentException(NAME_NOT_DEFINED);
+        }
+    }
+
+    public Name getName() {
+        return this.name;
+    }
+
+    public void updateName(Name name) {
+        this.validateName(name);
+        this.name = name;
     }
 
     /**
@@ -503,8 +533,9 @@ public class Facility {
     @Override
     public String toString() {
         return String.format(
-                "Facility={id=%s, type=%s, location=%s, storageCapacity=%s, processingCapacity=%s, unloadingTime=%s, currentFillingLevel=%s, openingCost=%s, status=%s}",
+                "Facility={id=%s, name=%s, type=%s, location=%s, storageCapacity=%s, processingCapacity=%s, unloadingTime=%s, currentFillingLevel=%s, openingCost=%s, status=%s}",
                 this.id,
+                this.name,
                 this.facilityType,
                 this.location,
                 this.storageCapacity,

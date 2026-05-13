@@ -12,6 +12,7 @@ import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.UUID;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -56,6 +57,7 @@ public class FacilityReadingConverter implements Converter<Document, Facility> {
     public Facility convert(@NonNull Document document) {
         logger.info("Facility to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
+        Name name = new Name(document.getString(MongoFields.NAME));
         FacilityType facilityType = FacilityType.fromString(document.getString(MongoFields.FACILITY_TYPE));
         Document locationDocument = (Document) document.get(MongoFields.LOCATION);
         double latitude = locationDocument.getDouble(MongoFields.LATITUDE);
@@ -88,6 +90,7 @@ public class FacilityReadingConverter implements Converter<Document, Facility> {
         DailyWasteDemandLitersPerDay currentFillingLevel = new DailyWasteDemandLitersPerDay(currentFillingLevelValue);
         Facility facility = new Facility(
                 id,
+                name,
                 facilityType,
                 location,
                 storageCapacity,

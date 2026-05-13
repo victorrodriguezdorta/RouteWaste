@@ -5,6 +5,7 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.UUID;
 /**
  * Data Transfer Object representing a Container response
@@ -17,6 +18,7 @@ public class ContainerResponseBody {
      * Unique identifier of the container
      */
     public UUID id;
+    public Name name;
 
     /**
      * Physical location of the container (value object)

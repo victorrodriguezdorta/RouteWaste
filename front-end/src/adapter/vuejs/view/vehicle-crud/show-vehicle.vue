@@ -121,16 +121,7 @@ watch(locale, () => {
  */
 const setVehicle = () => {
   if (vehicle.value) {
-    vehicleInfo.value = new VehicleInfo(
-      vehicle.value.getId().toString(),
-      vehicle.value.getVehicleType(),
-      vehicle.value.getCapacityKilograms().getKilograms(),
-      vehicle.value.getCapacityLiters().getLiters(),
-      vehicle.value.getCostPerKilometer().getAmount(),
-      vehicle.value.getCostPerKilometer().getCurrency().getCode()
-    );
-
-    // Update title
+    vehicleInfo.value = VehicleInfo.fromVehicle(vehicle.value);
     title.value = t('vehicle.show.title');
   }
 };

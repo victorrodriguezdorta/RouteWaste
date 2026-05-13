@@ -8,6 +8,7 @@ import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.UUID;
 
 /**
@@ -21,6 +22,7 @@ public class FacilityResponseBody {
      * Unique identifier of the facility
      */
     public UUID id;
+    public Name name;
 
     /**
      * Type of the facility (enum)

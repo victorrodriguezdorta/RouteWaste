@@ -258,6 +258,7 @@ public class ContainerController {
             @Parameter(description = "Container data") @RequestBody ContainerPostRequestBody requestBody) {
         try {
             Container createdContainer = this.createContainerUseCase.create(
+                    requestBody.name,
                     requestBody.location,
                     requestBody.wasteType,
                     requestBody.capacityLiters,
@@ -300,6 +301,7 @@ public class ContainerController {
             UUID containerId = UUID.fromString(id);
             Container updatedContainer = this.updateContainerUseCase.update(
                     containerId,
+                    requestBody.name,
                     requestBody.location,
                     requestBody.wasteType,
                     requestBody.capacityLiters,

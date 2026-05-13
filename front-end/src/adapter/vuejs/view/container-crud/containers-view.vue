@@ -214,6 +214,12 @@ const currentSortOrder = ref<'asc' | 'desc'>('asc');
 
 const headers = computed(() => [
   {
+    title: t('container.list.table.headers.name'),
+    align: 'start' as const,
+    sortable: false,
+    key: 'name',
+  },
+  {
     title: t('container.list.table.headers.wasteType'),
     align: 'start' as const,
     sortable: true,
@@ -263,6 +269,7 @@ const containerItems = computed(() => {
 
     return {
       id: container.getId().toString(),
+      name: container.getName().getValue(),
       rawWasteType: container.getWasteType(),
       rawServiceZone: serviceZone,
       wasteType: t(`container.add.wasteTypes.${container.getWasteType()}`),

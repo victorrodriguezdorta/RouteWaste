@@ -9,6 +9,7 @@ import { Currency } from '@/domain/valueobject/cost/currency';
 import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
 import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
 import { Location } from '@/domain/valueobject/location/location';
+import { Name } from '@/domain/valueobject/name/name';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -29,6 +30,11 @@ export class FacilityEdit {
    * Unique identifier of the facility being edited.
    */
   public id: string;
+
+  /**
+   * Human-readable facility name.
+   */
+  public name: string;
 
   /**
    * Type of the facility (e.g., OPERATIONAL_BASE, TRANSFER_STATION, TREATMENT_PLANT).
@@ -89,6 +95,7 @@ export class FacilityEdit {
    * Create a new FacilityEdit DTO.
    * 
    * @param id Unique identifier of the facility
+   * @param name Human-readable name
    * @param facilityType Type of the facility
    * @param latitude Latitude coordinate
    * @param longitude Longitude coordinate
@@ -104,6 +111,7 @@ export class FacilityEdit {
    */
   constructor(
     id: string,
+    name: string,
     facilityType: string,
     latitude: number,
     longitude: number,
@@ -117,6 +125,7 @@ export class FacilityEdit {
     status: string
   ) {
     this.validate<string>(id, 'Facility id is not defined');
+    this.validate<string>(name, 'Name is not defined');
     this.validate<string>(facilityType, 'Facility type is not defined');
     this.validate<number>(latitude, 'Latitude is not defined');
     this.validate<number>(longitude, 'Longitude is not defined');
@@ -130,6 +139,7 @@ export class FacilityEdit {
     this.validate<string>(status, 'Facility status is not defined');
 
     this.id = id;
+    this.name = name;
     this.facilityType = facilityType;
     this.latitude = latitude;
     this.longitude = longitude;
@@ -384,6 +394,7 @@ export class FacilityEdit {
 
     return new FacilityEdit(
       randomId,
+      `Facility ${Math.floor(Math.random() * 10000)}`,
       randomFacilityType as string,
       randomLatitude,
       randomLongitude,
@@ -406,6 +417,7 @@ export class FacilityEdit {
    * @throws Error if any value object validation fails
    */
   static toFacility(facilityEdit: FacilityEdit): Facility {
+    const name = new Name(facilityEdit.name);
     const facilityType = facilityTypeFromString(facilityEdit.facilityType);
     const location = new Location(
       facilityEdit.latitude,
@@ -420,7 +432,7 @@ export class FacilityEdit {
     const status = facilityStatusFromString(facilityEdit.status);
     const id = new UllUUID(facilityEdit.id);
 
-    return new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status, id);
+    return new Facility(name, facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status, id);
   }
 
   /**
@@ -438,6 +450,7 @@ export class FacilityEdit {
 
     return new FacilityEdit(
       facility.getId().getValue(),
+      facility.getName().getValue(),
       facility.getFacilityType(),
       location.latitude,
       location.longitude,

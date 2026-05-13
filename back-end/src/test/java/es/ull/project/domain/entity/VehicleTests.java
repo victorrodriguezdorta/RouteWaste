@@ -13,6 +13,7 @@ import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
 
 class VehicleTests {
 
@@ -30,7 +31,11 @@ class VehicleTests {
 	}
 
 	private static Vehicle randomVehicle() {
-		return new Vehicle(VehicleType.random(), randomCapacityKilograms(), randomCapacityLiters(), randomCost());
+		return new Vehicle(randomName(), VehicleType.random(), randomCapacityKilograms(), randomCapacityLiters(), randomCost());
+	}
+
+	private static Name randomName() {
+		return new Name("vehicle-" + ((int) (Math.random() * 10000)));
 	}
 
 	// ========== Constructors ==========
@@ -42,7 +47,7 @@ class VehicleTests {
 		VehicleCapacityLiters capacityL = randomCapacityLiters();
 		TransportationVariableCost cost = randomCost();
 
-		Vehicle v = new Vehicle(type, capacityKg, capacityL, cost);
+		Vehicle v = new Vehicle(randomName(), type, capacityKg, capacityL, cost);
 
 		assertEquals(type, v.getVehicleType());
 		assertEquals(capacityKg, v.getCapacityKilograms());
@@ -60,7 +65,7 @@ class VehicleTests {
 
 		IllegalArgumentException exception = assertThrows(
 			IllegalArgumentException.class,
-			() -> new Vehicle(type, capacityKg, capacityL, cost)
+			() -> new Vehicle(randomName(), type, capacityKg, capacityL, cost)
 		);
 		assertEquals(Vehicle.TYPE_NOT_DEFINED, exception.getMessage());
 	}
@@ -74,7 +79,7 @@ class VehicleTests {
 
 		IllegalArgumentException exception = assertThrows(
 			IllegalArgumentException.class,
-			() -> new Vehicle(type, capacityKg, capacityL, cost)
+			() -> new Vehicle(randomName(), type, capacityKg, capacityL, cost)
 		);
 		assertEquals(Vehicle.CAPACITY_Kilograms_NOT_DEFINED, exception.getMessage());
 	}
@@ -88,7 +93,7 @@ class VehicleTests {
 
 		IllegalArgumentException exception = assertThrows(
 			IllegalArgumentException.class,
-			() -> new Vehicle(type, capacityKg, capacityL, cost)
+			() -> new Vehicle(randomName(), type, capacityKg, capacityL, cost)
 		);
 		assertEquals(Vehicle.CAPACITY_liters_NOT_DEFINED, exception.getMessage());
 	}
@@ -102,7 +107,7 @@ class VehicleTests {
 
 		IllegalArgumentException exception = assertThrows(
 			IllegalArgumentException.class,
-			() -> new Vehicle(type, capacityKg, capacityL, cost)
+			() -> new Vehicle(randomName(), type, capacityKg, capacityL, cost)
 		);
 		assertEquals(Vehicle.COST_NOT_DEFINED, exception.getMessage());
 	}
@@ -208,7 +213,7 @@ class VehicleTests {
 	@Test
 	void toStringMethod() {
 		Vehicle v = randomVehicle();
-		String expected = String.format("Vehicle={id=%s, type=%s, capacityKilograms=%s, CapacityLiters=%s, costPerKm=%s}", v.getId(), v.getVehicleType(), v.getCapacityKilograms(), v.getCapacityLiters(), v.getCostPerKilometer());
+		String expected = String.format("Vehicle={id=%s, name=%s, type=%s, capacityKilograms=%s, CapacityLiters=%s, costPerKm=%s}", v.getId(), v.getName(), v.getVehicleType(), v.getCapacityKilograms(), v.getCapacityLiters(), v.getCostPerKilometer());
 		assertEquals(expected, v.toString());
 	}
 }

@@ -8,6 +8,7 @@ import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.UUID;
 
 /**
@@ -32,6 +33,7 @@ public interface UpdateFacilityUseCase {
      */
     Facility update(
         UUID id,
+        Name newName,
         FacilityType newFacilityType,
         Location newLocation,
         StorageCapacityKilograms newStorageCapacity,

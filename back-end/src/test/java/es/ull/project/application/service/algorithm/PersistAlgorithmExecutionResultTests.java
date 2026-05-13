@@ -51,6 +51,7 @@ import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanDay;
 
@@ -112,6 +113,7 @@ class PersistAlgorithmExecutionResultTests {
           InMemoryContainerRepository containerRepository,
           InMemoryVehicleRepository vehicleRepository) {
       Facility facility = new Facility(
+        new Name("facility-seed"),
         FacilityType.TRANSFER_STATION,
         new Location(28.47, -16.25, "Calle Principal 123, Las Palmas", "GIS-REF-001"),
         new StorageCapacityKilograms(1000.0),
@@ -123,6 +125,7 @@ class PersistAlgorithmExecutionResultTests {
       facilityRepository.save(facility);
 
       Container container1 = new Container(
+        new Name("container-seed-1"),
         new Location(28.465837, -16.263835, "Calle random", "123414"),
         WasteType.ORGANIC,
         new ContainerCapacityLiters(1000.0),
@@ -132,6 +135,7 @@ class PersistAlgorithmExecutionResultTests {
       containerRepository.save(container1);
 
       Container container2 = new Container(
+        new Name("container-seed-2"),
         new Location(28.462808, -16.264503, "adf", "afdsa"),
         WasteType.ORGANIC,
         new ContainerCapacityLiters(1000.0),
@@ -141,6 +145,7 @@ class PersistAlgorithmExecutionResultTests {
       containerRepository.save(container2);
 
       Vehicle vehicle1 = new Vehicle(
+        new Name("vehicle-seed-1"),
         VehicleType.SUPPORT_VEHICLE,
         new VehicleCapacityKilograms(88),
         new VehicleCapacityLiters(88),
@@ -149,6 +154,7 @@ class PersistAlgorithmExecutionResultTests {
       vehicleRepository.save(vehicle1);
 
       Vehicle vehicle2 = new Vehicle(
+        new Name("vehicle-seed-2"),
         VehicleType.COLLECTION_TRUCK,
         new VehicleCapacityKilograms(88),
         new VehicleCapacityLiters(88),

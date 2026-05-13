@@ -5,12 +5,14 @@ import { StorageCapacityKilograms } from '@/domain/valueobject/capacity/storage-
 import { UnloadingTime } from '@/domain/valueobject/capacity/unloading-time';
 import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
 import { Location } from '@/domain/valueobject/location/location';
+import type { Name } from '@/domain/valueobject/name/name';
 import type { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 // Command object for input data
 export interface UpdateFacilityCommand {
     facilityId: UllUUID;
     updatedFields: Partial<{
+        name: Name;
         facilityType: FacilityType;
         location: Location;
         storageCapacity: StorageCapacityKilograms;

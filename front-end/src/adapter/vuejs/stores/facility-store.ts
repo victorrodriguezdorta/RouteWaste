@@ -185,6 +185,7 @@ export const useFacilityStore = defineStore('Facility', {
       
       // Execute the create operation with facility properties
       const result = await createService.execute({
+        name: facility.getName(),
         facilityType: facility.getFacilityType(),
         location: facility.getLocation(),
         storageCapacity: facility.getStorageCapacity(),
@@ -230,6 +231,7 @@ export const useFacilityStore = defineStore('Facility', {
       const result = await updateService.execute({ 
         facilityId, 
         updatedFields: {
+          name: facility.getName(),
           facilityType: facility.getFacilityType(),
           location: facility.getLocation(),
           storageCapacity: facility.getStorageCapacity(),

@@ -10,6 +10,7 @@ import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-
 import { QuantityUnit } from '@/domain/valueobject/demand/quantity-unit';
 import { WasteDemand } from '@/domain/valueobject/demand/waste-demand';
 import { Location } from '@/domain/valueobject/location/location';
+import { Name } from '@/domain/valueobject/name/name';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -26,6 +27,11 @@ export class Facility {
    * Identificador único de la instalación.
    */
   readonly id: UllUUID;
+
+  /**
+   * Nombre legible de la instalación.
+   */
+  private name: Name;
 
   /**
    * Tipo de instalación (clasificación).
@@ -79,6 +85,7 @@ export class Facility {
 
   /**
    * Create a new `Facility` aggregate.
+   * @param name nombre de la instalación
    * @param facilityType facility classification
    * @param location facility geographic location
    * @param storageCapacity storage capacity value object in kilograms
@@ -91,6 +98,7 @@ export class Facility {
    * @throws Error when required parameters are missing
    */
   constructor(
+    name: Name,
     facilityType: FacilityType,
     location: Location,
     storageCapacity: StorageCapacityKilograms,
@@ -101,6 +109,7 @@ export class Facility {
     id?: UllUUID,
     currentFillingLevel?: DailyWasteDemandLitersPerDay
   ) {
+    if (!name) throw new Error('Facility name is not defined');
     if (!facilityType) throw new Error('Facility type is not defined');
     if (!location) throw new Error('Facility location is not defined');
     if (!storageCapacity) throw new Error('Facility storage capacity is not defined');
@@ -110,6 +119,7 @@ export class Facility {
     if (!status) throw new Error('Facility status is not defined');
 
     this.id = id ?? UllUUID.random();
+    this.name = name;
     this.facilityType = facilityType;
     this.location = location;
     this.storageCapacity = storageCapacity;
@@ -129,6 +139,19 @@ export class Facility {
    * @returns El identificador único de la instalación.
    */
   getId(): UllUUID { return this.id; }
+
+  /**
+   * Devuelve el nombre de la instalación.
+   */
+  getName(): Name { return this.name; }
+
+  /**
+   * Actualiza el nombre de la instalación.
+   */
+  updateName(name: Name): void {
+    if (!name) throw new Error('Facility name is not defined');
+    this.name = name;
+  }
 
   /**
    * Assign additional daily waste demand to the facility (liters/day).
@@ -316,6 +339,6 @@ export class Facility {
    * @returns Cadena representando la instalación.
    */
   toString(): string {
-    return `Facility={id=${this.id}, type=${this.facilityType}, location=${this.location}, capacity=${this.capacity}, assignedDemand=${this.assignedWasteDemand}, openingCost=${this.openingFixedCost}, status=${this.status}`;
+    return `Facility={id=${this.id}, name=${this.name}, type=${this.facilityType}, location=${this.location}, capacity=${this.capacity}, assignedDemand=${this.assignedWasteDemand}, openingCost=${this.openingFixedCost}, status=${this.status}`;
   }
 }

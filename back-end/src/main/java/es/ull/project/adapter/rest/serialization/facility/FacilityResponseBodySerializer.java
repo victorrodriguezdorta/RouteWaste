@@ -35,6 +35,7 @@ public class FacilityResponseBodySerializer extends StdSerializer<FacilityRespon
     public void serialize(FacilityResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
         gen.writeStringField(JsonFields.ID, value.id.toString());
+        gen.writeStringField(JsonFields.NAME, value.name.getValue());
         gen.writeStringField(JsonFields.FACILITY_TYPE, value.facilityType.name());
         gen.writeObjectFieldStart(JsonFields.LOCATION);
         gen.writeNumberField(JsonFields.LATITUDE, value.location.getLatitude());

@@ -5,6 +5,7 @@ import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.UUID;
 
 /**
@@ -21,5 +22,5 @@ public interface UpdateVehicleUseCase {
      * @param newCostPerKilometer    the new cost per kilometer
      * @return the updated vehicle
      */
-    Vehicle update(UUID id, VehicleType newVehicleType, VehicleCapacityKilograms newCapacityKilograms, VehicleCapacityLiters newCapacityLiters, TransportationVariableCost newCostPerKilometer);
+    Vehicle update(UUID id, Name newName, VehicleType newVehicleType, VehicleCapacityKilograms newCapacityKilograms, VehicleCapacityLiters newCapacityLiters, TransportationVariableCost newCostPerKilometer);
 }

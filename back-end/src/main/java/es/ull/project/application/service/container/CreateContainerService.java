@@ -8,6 +8,7 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 
 /**
  * Service implementation for creating containers.
@@ -35,8 +36,8 @@ public class CreateContainerService implements CreateContainerUseCase {
      * @return the created and persisted container
      */
     @Override
-    public Container create(Location location, WasteType wasteType, ContainerCapacityLiters capacityLiters, DailyWasteDemandLitersPerDay dailyDemandLitersPerDay, ServiceZone serviceZone) {
-        Container newContainer = new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone);
+    public Container create(Name name, Location location, WasteType wasteType, ContainerCapacityLiters capacityLiters, DailyWasteDemandLitersPerDay dailyDemandLitersPerDay, ServiceZone serviceZone) {
+        Container newContainer = new Container(name, location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone);
         Container saved = this.repository.save(newContainer);
         return saved;
     }

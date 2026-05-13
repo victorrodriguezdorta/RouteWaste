@@ -4,6 +4,7 @@ import { WasteType, wasteTypeFromString } from '@/domain/enumerate/waste-type';
 import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-capacity-liters';
 import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { Location } from '@/domain/valueobject/location/location';
+import { Name } from '@/domain/valueobject/name/name';
 
 /**
  * ContainerAdd
@@ -38,6 +39,11 @@ export class ContainerAdd {
   public gisReference: string;
 
   /**
+   * Human-readable name for the container.
+   */
+  public name: string;
+
+  /**
    * Type of waste collected by this container (e.g., ORGANIC, PACKAGING, GLASS).
    */
   public wasteType: string;
@@ -64,6 +70,7 @@ export class ContainerAdd {
    * @param longitude Longitude coordinate
    * @param postalAddress Postal address
    * @param gisReference GIS reference
+   * @param name Human-readable name
    * @param wasteType Type of waste
    * @param capacityLiters Container capacity in liters
    * @param dailyDemandLitersPerDay Daily waste demand in liters per day
@@ -75,6 +82,7 @@ export class ContainerAdd {
     longitude: number,
     postalAddress: string,
     gisReference: string,
+    name: string,
     wasteType: string,
     capacityLiters: number,
     dailyDemandLitersPerDay: number,
@@ -84,6 +92,7 @@ export class ContainerAdd {
     this.validate<number>(longitude, 'Longitude is not defined');
     this.validate<string>(postalAddress, 'Postal address is not defined');
     this.validate<string>(gisReference, 'GIS reference is not defined');
+    this.validate<string>(name, 'Name is not defined');
     this.validate<string>(wasteType, 'Waste type is not defined');
     this.validate<number>(capacityLiters, 'Capacity in liters is not defined');
     this.validate<number>(dailyDemandLitersPerDay, 'Daily demand in liters per day is not defined');
@@ -92,6 +101,7 @@ export class ContainerAdd {
     this.longitude = longitude;
     this.postalAddress = postalAddress;
     this.gisReference = gisReference;
+    this.name = name;
     this.wasteType = wasteType;
     this.capacityLiters = capacityLiters;
     this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
@@ -195,6 +205,18 @@ export class ContainerAdd {
   }
 
   /**
+   * Validate container name for form fields.
+   */
+  static externalValidateName(value: string): boolean | string {
+    try {
+      new Name(value);
+      return true;
+    } catch (error: any) {
+      return error.message;
+    }
+  }
+
+  /**
    * Validate waste type for form fields.
    * 
    * @param value Waste type string to validate
@@ -281,6 +303,7 @@ export class ContainerAdd {
       randomLongitude,
       randomPostalAddress,
       randomGisReference,
+      `Container ${Math.floor(Math.random() * 10000)}`,
       randomWasteType as string,
       randomCapacityLiters,
       randomDailyDemandLitersPerDay,
@@ -296,6 +319,7 @@ export class ContainerAdd {
    * @throws Error if any value object validation fails
    */
   static toContainer(containerAdd: ContainerAdd): Container {
+    const name = new Name(containerAdd.name);
     const location = new Location(
       containerAdd.latitude,
       containerAdd.longitude,
@@ -307,6 +331,6 @@ export class ContainerAdd {
     const dailyDemandLitersPerDay = new DailyWasteDemandLitersPerDay(containerAdd.dailyDemandLitersPerDay);
     const serviceZone = containerAdd.serviceZone ? serviceZoneFromString(containerAdd.serviceZone) : null;
 
-    return new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone);
+    return new Container(name, location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone);
   }
 }

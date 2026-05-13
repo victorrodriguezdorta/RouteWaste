@@ -3,6 +3,7 @@ import { WasteType } from '@/domain/enumerate/waste-type';
 import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-capacity-liters';
 import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { Location } from '@/domain/valueobject/location/location';
+import { Name } from '@/domain/valueobject/name/name';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -17,6 +18,9 @@ import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 export class Container {
   /** Unique identifier for the container */
   readonly id: UllUUID;
+
+  /** Human-readable name for the container */
+  private name: Name;
 
   /** Geographic location of the container */
   private location: Location;
@@ -35,6 +39,7 @@ export class Container {
 
   /**
    * Create a new `Container`.
+   * @param name human-readable name
    * @param location geographic location of the container
    * @param wasteType type/category of waste collected
    * @param capacityLiters maximum capacity of the container in liters
@@ -44,6 +49,7 @@ export class Container {
    * @throws Error when required parameters are missing
    */
   constructor(
+    name: Name,
     location: Location,
     wasteType: WasteType,
     capacityLiters: ContainerCapacityLiters,
@@ -51,11 +57,13 @@ export class Container {
     serviceZone?: ServiceZone | null,
     id?: UllUUID
   ) {
+    if (!name) throw new Error('Container name is not defined');
     if (!location) throw new Error('Container location is not defined');
     if (!wasteType) throw new Error('Waste type is not defined');
     if (!capacityLiters) throw new Error('Container capacity in liters is not defined');
     if (!dailyDemandLitersPerDay) throw new Error('Daily waste demand in liters is not defined');
     this.id = id ?? UllUUID.random();
+    this.name = name;
     this.location = location;
     this.wasteType = wasteType;
     this.capacityLiters = capacityLiters;
@@ -68,6 +76,16 @@ export class Container {
    * @returns The unique identifier of this container
    */
   getId(): UllUUID { return this.id; }
+
+  /**
+   * Return the container display name.
+   */
+  getName(): Name { return this.name; }
+
+  /**
+   * Update the container name.
+   */
+  updateName(name: Name): void { if (!name) throw new Error('Container name is not defined'); this.name = name; }
 
   /**
    * Return the container location value object.
@@ -144,5 +162,5 @@ export class Container {
    * Human-readable representation for debugging.
    * @returns A string representation of this container
    */
-  toString(): string { return `Container={id=${this.id}, location=${this.location}, wasteType=${this.wasteType}, capacityLiters=${this.capacityLiters}, dailyDemandLitersPerDay=${this.dailyDemandLitersPerDay}, serviceZone=${this.serviceZone}}`; }
+  toString(): string { return `Container={id=${this.id}, name=${this.name}, location=${this.location}, wasteType=${this.wasteType}, capacityLiters=${this.capacityLiters}, dailyDemandLitersPerDay=${this.dailyDemandLitersPerDay}, serviceZone=${this.serviceZone}}`; }
 }

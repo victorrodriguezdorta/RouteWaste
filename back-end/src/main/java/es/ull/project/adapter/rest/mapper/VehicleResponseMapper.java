@@ -28,6 +28,7 @@ public class VehicleResponseMapper {
     public static VehicleResponseBody toResponseBody(Vehicle vehicle) {
         VehicleResponseBody responseBody = new VehicleResponseBody();
         responseBody.id = vehicle.getId();
+        responseBody.name = vehicle.getName();
         responseBody.vehicleType = vehicle.getVehicleType();
         responseBody.capacityKilograms = vehicle.getCapacityKilograms();
         responseBody.capacityLiters = vehicle.getCapacityLiters();

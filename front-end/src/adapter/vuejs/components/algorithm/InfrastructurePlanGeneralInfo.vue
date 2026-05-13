@@ -13,17 +13,7 @@
     <v-expand-transition>
       <div v-if="isExpanded" class="pa-4">
         <v-row>
-          <v-col cols="12" md="6">
-            <v-text-field
-              :model-value="plan?.id?.getValue() ?? '-'"
-              :label="t('infrastructurePlan.show.generalInfo.fields.id')"
-              prepend-icon="mdi-identifier"
-              variant="outlined"
-              readonly
-            />
-          </v-col>
-
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="12">
             <v-text-field
               :model-value="formatDateTime(plan?.executedAt)"
               :label="t('infrastructurePlan.show.generalInfo.fields.executedAt')"

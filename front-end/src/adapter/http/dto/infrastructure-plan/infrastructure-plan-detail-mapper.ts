@@ -28,6 +28,7 @@ import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-c
 import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { Distance } from '@/domain/valueobject/location/distance';
 import { Location } from '@/domain/valueobject/location/location';
+import { Name } from '@/domain/valueobject/name/name';
 import { RouteSequence } from '@/domain/valueobject/location/route-sequence';
 import {
   InfrastructurePlanContainerDailyStateDetail,
@@ -41,6 +42,12 @@ import {
   InfrastructurePlanVehicleDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
+
+/** When the API omits `name`, the mapper uses these; the UI maps them to i18n (never IDs). */
+export const infrastructurePlanDetailFallbackDisplayNames = {
+  facility: 'Unnamed facility',
+  container: 'Unnamed container',
+} as const;
 
 /**
  * Maps infrastructure plan HTTP responses into the read-only model consumed by the UI.
@@ -110,6 +117,7 @@ export class InfrastructurePlanDetailMapper {
 
     return new InfrastructurePlanFacilityDetail(
       new UllUUID(facilityId),
+      this.facilityNameFromJson(facility),
       facilityTypeFromString(facility.facilityType),
       facilityStatusFromString(facility.status),
       this.mapLocation(facility.location),
@@ -119,7 +127,13 @@ export class InfrastructurePlanDetailMapper {
       topLevelDailyPlans
         .filter((dailyPlan) => this.extractFacilityId(dailyPlan) === facilityId)
         .map((dailyPlan) =>
-          this.mapDailyPlan(dailyPlan, facilityId, infrastructurePlanId, serviceDateToDayMap),
+          this.mapDailyPlan(
+            dailyPlan,
+            facilityId,
+            infrastructurePlanId,
+            serviceDateToDayMap,
+            this.facilityNameFromJson(facility).getValue(),
+          ),
         ),
     );
   }
@@ -132,6 +146,7 @@ export class InfrastructurePlanDetailMapper {
   ): InfrastructurePlanFacilityDetail {
     return new InfrastructurePlanFacilityDetail(
       new UllUUID(facility.id),
+      this.facilityNameFromJson(facility),
       facilityTypeFromString(facility.facilityType),
       facilityStatusFromString(facility.status),
       this.mapLocation(facility.location),
@@ -139,7 +154,13 @@ export class InfrastructurePlanDetailMapper {
       new ProcessingCapacityKilogramsPerDay(this.extractProcessingCapacityKgPerDay(facility)),
       (facility.assignedContainers ?? []).map((container) => this.mapContainer(container)),
       dailyPlans.map((dailyPlan) =>
-        this.mapDailyPlan(dailyPlan, facility.id, infrastructurePlanId, serviceDateToDayMap),
+        this.mapDailyPlan(
+          dailyPlan,
+          facility.id,
+          infrastructurePlanId,
+          serviceDateToDayMap,
+          this.facilityNameFromJson(facility).getValue(),
+        ),
       ),
     );
   }
@@ -149,24 +170,34 @@ export class InfrastructurePlanDetailMapper {
     fallbackFacilityId: string,
     fallbackInfrastructurePlanId: string | null,
     serviceDateToDayMap: Map<string, number>,
+    fallbackFacilityName: string | null = null,
   ): InfrastructurePlanDailyPlanDetail {
     const serviceDate = this.normalizeServiceDate(dailyPlan.serviceDate);
-    const vehicleId = this.extractVehicleId(dailyPlan);
+    const vehicle = this.mapVehicle(dailyPlan);
+    if (!vehicle) {
+      throw new Error('Daily plan response must include vehicle or vehicleId');
+    }
+    const facilityNameFromPlan =
+      typeof dailyPlan.facilityName === 'string' && dailyPlan.facilityName.trim().length > 0
+        ? dailyPlan.facilityName.trim()
+        : null;
+    const facilityName = facilityNameFromPlan ?? fallbackFacilityName ?? null;
 
     return new InfrastructurePlanDailyPlanDetail(
       this.parseOptionalUuid(dailyPlan.id),
       this.parseOptionalUuid(dailyPlan.infrastructurePlanId ?? fallbackInfrastructurePlanId),
       new UllUUID(this.extractFacilityId(dailyPlan) ?? fallbackFacilityId),
+      facilityName,
       serviceDate,
       typeof dailyPlan.planDay === 'number'
         ? dailyPlan.planDay
         : serviceDateToDayMap.get(serviceDate) ?? 1,
-      new UllUUID(vehicleId),
+      vehicle.id,
       CollectedWeightKilograms.fromKilograms(this.extractNumber(dailyPlan.totalCollectedKilograms)),
       CollectedVolumeLiters.fromLiters(this.extractNumber(dailyPlan.totalCollectedLiters)),
       Distance.fromMeters(this.extractNumber(dailyPlan.totalDistanceMeters)),
       (dailyPlan.stops ?? []).map((stop) => this.mapStop(stop)),
-      this.mapVehicle(dailyPlan),
+      vehicle,
     );
   }
 
@@ -176,6 +207,14 @@ export class InfrastructurePlanDetailMapper {
     const containerUuid = isContainer
       ? new UllUUID(stop.containerId ?? stop.container?.id ?? UllUUID.random().getValue())
       : null;
+
+    const containerNameRaw =
+      typeof stop.containerName === 'string' && stop.containerName.trim().length > 0
+        ? stop.containerName.trim()
+        : typeof stop.container?.name === 'string' && stop.container.name.trim().length > 0
+          ? stop.container.name.trim()
+          : null;
+    const containerName = containerNameRaw ? new Name(containerNameRaw) : null;
 
     return new InfrastructurePlanStopDetail(
       RouteSequence.of(this.extractPositiveSequence(stop.sequence)),
@@ -187,6 +226,7 @@ export class InfrastructurePlanDetailMapper {
       Distance.fromMeters(this.extractNumber(stop.cumulativeDistanceMeters)),
       typeof stop.containerActualLiters === 'number' ? stop.containerActualLiters : null,
       (stop.alerts ?? []).map((alert) => this.mapAlert(alert)),
+      containerName,
     );
   }
 
@@ -218,6 +258,9 @@ export class InfrastructurePlanDetailMapper {
 
       return new InfrastructurePlanVehicleDetail(
         new UllUUID(dailyPlan.vehicle.id),
+        typeof dailyPlan.vehicle.name === 'string' && dailyPlan.vehicle.name.trim().length > 0
+          ? new Name(dailyPlan.vehicle.name.trim())
+          : null,
         dailyPlan.vehicle.vehicleType ? vehicleTypeFromString(dailyPlan.vehicle.vehicleType) : null,
         capacityKilograms != null ? new VehicleCapacityKilograms(capacityKilograms) : null,
         capacityLiters != null ? new VehicleCapacityLiters(capacityLiters) : null,
@@ -234,6 +277,7 @@ export class InfrastructurePlanDetailMapper {
 
   private static mapContainer(container: {
     id: string;
+    name?: string;
     location: { latitude: number; longitude: number; postalAddress: string; gisReference?: string };
     wasteType: string;
     capacityLiters: { liters: number };
@@ -242,6 +286,7 @@ export class InfrastructurePlanDetailMapper {
   }): InfrastructurePlanContainerDetail {
     return new InfrastructurePlanContainerDetail(
       new UllUUID(container.id),
+      this.containerNameFromJson(container),
       this.mapLocation(container.location),
       wasteTypeFromString(container.wasteType),
       new ContainerCapacityLiters(this.extractNamedNumber(container.capacityLiters, 'liters') ?? 0),
@@ -267,6 +312,12 @@ export class InfrastructurePlanDetailMapper {
   private static mapContainerDailyState(
     state: ContainerDailyStateJsonResponse,
   ): InfrastructurePlanContainerDailyStateDetail {
+    const containerNameRaw =
+      typeof state.containerName === 'string' && state.containerName.trim().length > 0
+        ? state.containerName.trim()
+        : null;
+    const containerName = containerNameRaw ? new Name(containerNameRaw) : null;
+
     return new InfrastructurePlanContainerDailyStateDetail(
       this.parseOptionalUuid(state.id),
       new UllUUID(state.containerId),
@@ -277,6 +328,7 @@ export class InfrastructurePlanDetailMapper {
         ? new DailyWasteDemandLitersPerDay(state.dailyDemandLitersPerDay)
         : null,
       containerStatusFromString(state.status),
+      containerName,
     );
   }
 
@@ -348,18 +400,6 @@ export class InfrastructurePlanDetailMapper {
     }
 
     return undefined;
-  }
-
-  private static extractVehicleId(dailyPlan: InfrastructurePlanDailyPlanJsonResponse): string {
-    if (typeof dailyPlan.vehicleId === 'string' && dailyPlan.vehicleId.length > 0) {
-      return dailyPlan.vehicleId;
-    }
-
-    if (dailyPlan.vehicle && typeof dailyPlan.vehicle.id === 'string') {
-      return dailyPlan.vehicle.id;
-    }
-
-    return UllUUID.random().getValue();
   }
 
   private static normalizeServiceDate(value: string | { date?: string; value?: string }): string {
@@ -469,5 +509,21 @@ export class InfrastructurePlanDetailMapper {
     }
 
     return new UllUUID(value);
+  }
+
+  private static facilityNameFromJson(facility: { id: string; name?: string }): Name {
+    const trimmed = facility.name?.trim();
+    if (trimmed) {
+      return new Name(trimmed);
+    }
+    return new Name(infrastructurePlanDetailFallbackDisplayNames.facility);
+  }
+
+  private static containerNameFromJson(container: { id: string; name?: string }): Name {
+    const trimmed = container.name?.trim();
+    if (trimmed) {
+      return new Name(trimmed);
+    }
+    return new Name(infrastructurePlanDetailFallbackDisplayNames.container);
   }
 }

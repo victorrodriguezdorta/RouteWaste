@@ -1,6 +1,7 @@
 import { ContainerStatus } from '@/domain/enumerate/container-status';
 import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-capacity-liters';
 import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
+import { Name } from '@/domain/valueobject/name/name';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -15,5 +16,6 @@ export class InfrastructurePlanContainerDailyStateDetail {
     public readonly containerCapacityLiters: ContainerCapacityLiters,
     public readonly dailyDemandLitersPerDay: DailyWasteDemandLitersPerDay | null,
     public readonly status: ContainerStatus,
+    public readonly containerName: Name | null = null,
   ) {}
 }

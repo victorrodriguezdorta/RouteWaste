@@ -27,6 +27,7 @@ import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
@@ -51,6 +52,7 @@ class InfrastructurePlanTests {
 
     private static Facility randomFacility() {
         return new Facility(
+                randomName("facility"),
                 FacilityType.random(),
                 randomLocation(),
                 new StorageCapacityKilograms(1000.0),
@@ -63,12 +65,17 @@ class InfrastructurePlanTests {
 
     private static Container randomContainer() {
         return new Container(
+            randomName("container"),
             randomLocation(),
             WasteType.random(),
             new ContainerCapacityLiters(100.0),
             new DailyWasteDemandLitersPerDay(10.0),
             ServiceZone.random()
         );
+    }
+
+    private static Name randomName(String prefix) {
+        return new Name(prefix + "-" + ((int) (Math.random() * 10000)));
     }
 
     private static ServiceAssignment randomServiceAssignment(InfrastructurePlan plan, Facility facility) {
@@ -179,6 +186,7 @@ class InfrastructurePlanTests {
         InfrastructurePlan plan = new InfrastructurePlan(randomPeriod(), smallBudget, randomServicePolicies(), null, null, null);
         // Facility with large opening cost
         Facility expensive = new Facility(
+            randomName("facility"),
             FacilityType.random(),
             randomLocation(),
             new StorageCapacityKilograms(1000.0),

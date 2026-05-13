@@ -14,6 +14,7 @@ import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.io.IOException;
 
 /**
@@ -44,6 +45,7 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
         JsonNode rootNode = parser.getCodec().readTree(parser);
         try {
             FacilityType facilityType = parseFacilityType(rootNode);
+            Name name = parseName(rootNode);
             Location location = parseLocation(rootNode);
             StorageCapacityKilograms storageCapacity = parseStorageCapacity(rootNode);
             ProcessingCapacityKilogramsPerDay processingCapacity = parseProcessingCapacity(rootNode);
@@ -51,6 +53,7 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
             OpeningFixedCost openingFixedCost = parseOpeningFixedCost(rootNode);
             FacilityStatus status = parseStatus(rootNode);
             FacilityPutRequestBody requestBody = new FacilityPutRequestBody();
+            requestBody.name = name;
             requestBody.facilityType = facilityType;
             requestBody.location = location;
             requestBody.storageCapacity = storageCapacity;
@@ -62,6 +65,17 @@ public class FacilityPutRequestBodyDeserializer extends JsonDeserializer<Facilit
         } catch (Exception e) {
             throw new IOException("Failed to deserialize FacilityPutRequestBody: " + e.getMessage(), e);
         }
+    }
+
+    private Name parseName(JsonNode rootNode) {
+        if (!rootNode.has(JsonFields.NAME)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.NAME + "' is missing");
+        }
+        JsonNode node = rootNode.get(JsonFields.NAME);
+        if (node.isNull() || !node.isTextual()) {
+            throw new IllegalArgumentException("Field '" + JsonFields.NAME + "' must be a non-null string");
+        }
+        return new Name(node.asText());
     }
 
     /**

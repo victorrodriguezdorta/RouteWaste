@@ -6,6 +6,7 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.UUID;
 
 /**
@@ -23,5 +24,5 @@ public interface UpdateContainerUseCase {
      * @param newServiceZone the new service zone
      * @return the updated container
      */
-    Container update(UUID id, Location newLocation, WasteType newWasteType, ContainerCapacityLiters newCapacityLiters, DailyWasteDemandLitersPerDay newDailyDemandLitersPerDay, ServiceZone newServiceZone);
+    Container update(UUID id, Name newName, Location newLocation, WasteType newWasteType, ContainerCapacityLiters newCapacityLiters, DailyWasteDemandLitersPerDay newDailyDemandLitersPerDay, ServiceZone newServiceZone);
 }

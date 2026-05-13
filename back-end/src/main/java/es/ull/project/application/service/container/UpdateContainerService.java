@@ -8,6 +8,7 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -39,8 +40,11 @@ public class UpdateContainerService implements UpdateContainerUseCase {
      * @throws NoSuchElementException if no container is found with the given id
      */
     @Override
-    public Container update(UUID id, Location newLocation, WasteType newWasteType, ContainerCapacityLiters newCapacityLiters, DailyWasteDemandLitersPerDay newDailyDemandLitersPerDay, ServiceZone newServiceZone) {
+    public Container update(UUID id, Name newName, Location newLocation, WasteType newWasteType, ContainerCapacityLiters newCapacityLiters, DailyWasteDemandLitersPerDay newDailyDemandLitersPerDay, ServiceZone newServiceZone) {
         Container existing = this.repository.findById(id).orElseThrow(() -> new NoSuchElementException("Container not found"));
+        if (newName != null) {
+            existing.updateName(newName);
+        }
         if (newLocation != null) {
             existing.updateLocation(newLocation);
         }

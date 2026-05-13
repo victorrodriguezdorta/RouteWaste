@@ -10,6 +10,7 @@ import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 
 /**
  * Service implementation for creating facilities.
@@ -40,6 +41,7 @@ public class CreateFacilityService implements CreateFacilityUseCase {
      */
     @Override
     public Facility create(
+        Name name,
         FacilityType facilityType,
         Location location,
         StorageCapacityKilograms storageCapacity,
@@ -49,6 +51,7 @@ public class CreateFacilityService implements CreateFacilityUseCase {
         FacilityStatus status
     ) {
         Facility newFacility = new Facility(
+            name,
             facilityType,
             location,
             storageCapacity,

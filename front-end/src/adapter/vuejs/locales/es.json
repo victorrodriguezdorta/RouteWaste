@@ -71,6 +71,7 @@
       "title": "Agregar Vehículo",
       "cardTitle": "Información del Vehículo",
       "fields": {
+        "name": "Nombre",
         "vehicleType": "Tipo de Vehículo",
         "capacityValue": "Valor de Capacidad",
         "capacityUnit": "Unidad (ej: tons, kg)",
@@ -90,6 +91,7 @@
       "cardTitle": "Información del Vehículo",
       "loading": "Cargando vehículo...",
       "fields": {
+        "name": "Nombre",
         "vehicleType": "Tipo de Vehículo",
         "capacityValue": "Valor de Capacidad",
         "capacityUnit": "Unidad (ej: tons, kg)",
@@ -104,6 +106,7 @@
       "cardTitle": "Información del Vehículo",
       "loading": "Cargando vehículo...",
       "fields": {
+        "name": "Nombre",
         "vehicleType": "Tipo de Vehículo",
         "capacityValue": "Valor de Capacidad",
         "capacityUnit": "Unidad",
@@ -120,6 +123,7 @@
       "filterAll": "Todos los tipos",
       "table": {
         "headers": {
+          "name": "Nombre",
           "type": "Tipo de Vehículo",
           "capacityKilograms": "Capacidad (kg)",
           "capacityLiters": "Capacidad (L)",
@@ -146,6 +150,7 @@
       "title": "Agregar Contenedor",
       "cardTitle": "Información del Contenedor",
       "fields": {
+        "name": "Nombre",
         "latitude": "Latitud",
         "longitude": "Longitud",
         "postalAddress": "Dirección Postal",
@@ -176,6 +181,7 @@
       "cardTitle": "Información del Contenedor",
       "loading": "Cargando contenedor...",
       "fields": {
+        "name": "Nombre",
         "latitude": "Latitud",
         "longitude": "Longitud",
         "postalAddress": "Dirección Postal",
@@ -195,6 +201,7 @@
         "eyebrow": "Ubicacion del contenedor"
       },
       "fields": {
+        "name": "Nombre",
         "latitude": "Latitud",
         "longitude": "Longitud",
         "postalAddress": "Dirección Postal",
@@ -216,6 +223,7 @@
       "notAssigned": "No asignada",
       "table": {
         "headers": {
+          "name": "Nombre",
           "wasteType": "Tipo de Residuo",
           "location": "Ubicación",
           "capacity": "Capacidad (L)",
@@ -242,6 +250,7 @@
       "title": "Agregar Instalación",
       "cardTitle": "Información de la Instalación",
       "fields": {
+        "name": "Nombre",
         "facilityType": "Tipo de Instalación",
         "latitude": "Latitud",
         "longitude": "Longitud",
@@ -271,6 +280,7 @@
       "cardTitle": "Información de la Instalación",
       "loading": "Cargando instalación...",
       "fields": {
+        "name": "Nombre",
         "facilityType": "Tipo de Instalación",
         "latitude": "Latitud",
         "longitude": "Longitud",
@@ -292,6 +302,7 @@
         "eyebrow": "Ubicación de la instalación"
       },
       "fields": {
+        "name": "Nombre",
         "facilityType": "Tipo de Instalación",
         "latitude": "Latitud",
         "longitude": "Longitud",
@@ -314,6 +325,7 @@
       "filterByLocation": "Buscar por ubicación",
       "table": {
         "headers": {
+          "name": "Nombre",
           "type": "Tipo de Instalación",
           "location": "Ubicación",
           "storageCapacity": "Almacenamiento (kg)",
@@ -380,6 +392,9 @@
           "title": "Navegación por Día",
           "dayLabel": "Día {current}/{total}",
           "serviceDate": "Fecha de servicio"
+        },
+        "display": {
+          "unnamedEntity": "Sin nombre"
         },
         "content": {
           "title": "JSON del día",

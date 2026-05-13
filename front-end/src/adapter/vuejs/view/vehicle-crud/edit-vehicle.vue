@@ -126,14 +126,7 @@ watch(locale, () => {
  */
 const setVehicle = () => {
   if (vehicle.value) {
-    editVehicle.value = new VehicleEdit(
-      vehicle.value.getId().toString(),
-      vehicle.value.getVehicleType(),
-      vehicle.value.getCapacityKilograms().getKilograms(),
-      vehicle.value.getCapacityLiters().getLiters(),
-      vehicle.value.getCostPerKilometer().getAmount(),
-      vehicle.value.getCostPerKilometer().getCurrency().getCode()
-    );
+    editVehicle.value = VehicleEdit.fromVehicle(vehicle.value);
 
     // Update title
     title.value = t('vehicle.edit.title');

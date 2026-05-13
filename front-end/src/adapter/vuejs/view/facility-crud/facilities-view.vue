@@ -220,6 +220,12 @@ const currentSortOrder = ref<'asc' | 'desc'>('asc');
 
 const headers = computed(() => [
   {
+    title: t('facility.list.table.headers.name'),
+    align: 'start' as const,
+    sortable: false,
+    key: 'name',
+  },
+  {
     title: t('facility.list.table.headers.type'),
     align: 'start' as const,
     sortable: true,
@@ -283,6 +289,7 @@ const facilityItems = computed(() => {
 
     return {
       id: facility.getId().toString(),
+      name: facility.getName().getValue(),
       rawFacilityType: facility.getFacilityType(),
       rawStatus: facility.getStatus(),
       type: t(`facility.add.facilityTypes.${facility.getFacilityType()}`),

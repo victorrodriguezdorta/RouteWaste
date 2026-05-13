@@ -17,6 +17,7 @@ import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 
 
 class FacilityTests {
@@ -50,6 +51,7 @@ class FacilityTests {
     
     private static Facility randomFacility() {
         return new Facility(
+            randomName(),
             FacilityType.random(),
             randomLocation(),
             randomStorageCapacity(),
@@ -58,6 +60,10 @@ class FacilityTests {
             randomOpeningFixedCost(),
             FacilityStatus.random()
         );
+    }
+
+    private static Name randomName() {
+        return new Name("facility-" + ((int) (Math.random() * 10000)));
     }
     
     // ========== PUBLIC CONSTRUCTORS ==========
@@ -72,7 +78,9 @@ class FacilityTests {
         OpeningFixedCost openingFixedCost = randomOpeningFixedCost();
         FacilityStatus status = FacilityStatus.random();
         
+        Name name = randomName();
         Facility facility = new Facility(
+            name,
             facilityType,
             location,
             storageCapacity,
@@ -109,7 +117,7 @@ class FacilityTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
+            () -> new Facility(randomName(), facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.TYPE_NOT_DEFINED, exception.getMessage());
@@ -127,7 +135,7 @@ class FacilityTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
+            () -> new Facility(randomName(), facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.LOCATION_NOT_DEFINED, exception.getMessage());
@@ -145,7 +153,7 @@ class FacilityTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
+            () -> new Facility(randomName(), facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.STORAGE_CAPACITY_NOT_DEFINED, exception.getMessage());
@@ -163,7 +171,7 @@ class FacilityTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
+            () -> new Facility(randomName(), facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.PROCESSING_CAPACITY_NOT_DEFINED, exception.getMessage());
@@ -181,7 +189,7 @@ class FacilityTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
+            () -> new Facility(randomName(), facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.UNLOADING_TIME_NOT_DEFINED, exception.getMessage());
@@ -199,7 +207,7 @@ class FacilityTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
+            () -> new Facility(randomName(), facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.OPENING_COST_NOT_DEFINED, exception.getMessage());
@@ -217,7 +225,7 @@ class FacilityTests {
         
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Facility(facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
+            () -> new Facility(randomName(), facilityType, location, storageCapacity, processingCapacity, unloadingTime, openingFixedCost, status)
         );
         
         assertEquals(Facility.STATUS_NOT_DEFINED, exception.getMessage());
@@ -229,6 +237,7 @@ class FacilityTests {
     void equalsMethod() {
         Facility facility1 = randomFacility();
         Facility facility2 = new Facility(
+            randomName(),
             facility1.getFacilityType(),
             facility1.getLocation(),
             facility1.getStorageCapacity(),
@@ -254,6 +263,7 @@ class FacilityTests {
     void hashCodeMethod() {
         Facility facility1 = randomFacility();
         Facility facility2 = new Facility(
+            randomName(),
             facility1.getFacilityType(),
             facility1.getLocation(),
             facility1.getStorageCapacity(),
@@ -297,6 +307,7 @@ class FacilityTests {
     @Test
     void assignWasteDemand_valid() {
         Facility facility = new Facility(
+            randomName(),
             FacilityType.random(),
             randomLocation(),
             randomStorageCapacity(),
@@ -315,6 +326,7 @@ class FacilityTests {
     @Test
     void assignWasteDemand_multiple() {
         Facility facility = new Facility(
+            randomName(),
             FacilityType.random(),
             randomLocation(),
             randomStorageCapacity(),
@@ -336,6 +348,7 @@ class FacilityTests {
     @Test
     void assignWasteDemand_facilityDiscarded() {
         Facility facility = new Facility(
+            randomName(),
             FacilityType.random(),
             randomLocation(),
             randomStorageCapacity(),
@@ -362,8 +375,9 @@ class FacilityTests {
         Facility facility = randomFacility();
         
         String expectedValue = String.format(
-            "Facility={id=%s, type=%s, location=%s, storageCapacity=%s, processingCapacity=%s, unloadingTime=%s, currentFillingLevel=%s, openingCost=%s, status=%s}",
+            "Facility={id=%s, name=%s, type=%s, location=%s, storageCapacity=%s, processingCapacity=%s, unloadingTime=%s, currentFillingLevel=%s, openingCost=%s, status=%s}",
             facility.getId(),
+            facility.getName(),
             facility.getFacilityType(),
             facility.getLocation(),
             facility.getStorageCapacity(),

@@ -1,11 +1,14 @@
 package es.ull.project.adapter.rest.mapper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.ContainerDailyStateResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
+import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.ContainerDailyState;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
@@ -52,10 +55,17 @@ public class InfrastructurePlanResponseMapper {
         }
         responseBody.dailyPlans = dailyPlans;
         responseBody.containerStateMonitoring = new ArrayList<>();
+        Map<String, String> containerIdToName = new HashMap<>();
+        for (ServiceAssignment assignment : plan.getServiceAssignments()) {
+            for (Container container : assignment.getAssignedContainers()) {
+                containerIdToName.put(container.getId().toString(), container.getName().getValue());
+            }
+        }
         for (ContainerDailyState state : plan.getContainerDailyStates()) {
             ContainerDailyStateResponseBody stateResponse = new ContainerDailyStateResponseBody();
             stateResponse.id = state.getId();
             stateResponse.containerId = state.getContainerId();
+            stateResponse.containerName = containerIdToName.get(state.getContainerId());
             stateResponse.planDay = state.getPlanDay();
             stateResponse.dailyFillingLiters = state.getDailyFillingLiters();
             stateResponse.containerCapacityLiters = state.getContainerCapacityLiters();

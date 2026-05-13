@@ -4,6 +4,8 @@ import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
+
 
 /**
  * VehiclePostRequestBody
@@ -21,6 +23,8 @@ import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
  * Deserialization is handled by VehiclePostRequestBodyDeserializer registered in RestConfiguration.
  */
 public class VehiclePostRequestBody {
+
+    public Name name;
 
     /**
      * Type of the vehicle (e.g., COLLECTION_TRUCK, TRANSFER_TRUCK).
@@ -54,7 +58,8 @@ public class VehiclePostRequestBody {
     @Override
     public String toString() {
         return String.format(
-                "VehiclePostRequestBody={vehicleType=%s, capacityKilograms=%s, capacityLiters=%s, costPerKilometer=%s}",
+                "VehiclePostRequestBody={name=%s, vehicleType=%s, capacityKilograms=%s, capacityLiters=%s, costPerKilometer=%s}",
+                this.name,
                 this.vehicleType,
                 this.capacityKilograms,
                 this.capacityLiters,

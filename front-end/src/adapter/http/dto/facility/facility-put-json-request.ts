@@ -10,6 +10,11 @@ import type { UpdateFacilityCommand } from '@/application/usecase/facility-manag
 export class FacilityPutJsonRequest {
 
   /**
+   * Human-readable facility name (optional).
+   */
+  name?: string;
+
+  /**
    * Type of facility (optional).
    */
   facilityType?: string;
@@ -45,6 +50,7 @@ export class FacilityPutJsonRequest {
   status?: string;
 
   constructor(
+    name?: string,
     facilityType?: string,
     location?: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
     storageCapacity?: { value: number },
@@ -53,6 +59,7 @@ export class FacilityPutJsonRequest {
     openingFixedCost?: { amount: number; currency: string },
     status?: string
   ) {
+    this.name = name;
     this.facilityType = facilityType;
     this.location = location;
     this.storageCapacity = storageCapacity;
@@ -71,6 +78,7 @@ export class FacilityPutJsonRequest {
   public static toRequest(data: UpdateFacilityCommand): FacilityPutJsonRequest {
     const f = data.updatedFields;
     return new FacilityPutJsonRequest(
+      f.name?.getValue(),
       f.facilityType,
       f.location
         ? {

@@ -28,6 +28,7 @@ public class FacilityResponseMapper {
     public static FacilityResponseBody toResponseBody(Facility facility) {
         FacilityResponseBody responseBody = new FacilityResponseBody();
         responseBody.id = facility.getId();
+        responseBody.name = facility.getName();
         responseBody.facilityType = facility.getFacilityType();
         responseBody.location = facility.getLocation();
         responseBody.storageCapacity = facility.getStorageCapacity();

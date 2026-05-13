@@ -7,6 +7,7 @@ import { UnloadingTime } from '@/domain/valueobject/capacity/unloading-time';
 import { OpeningFixedCost } from '@/domain/valueobject/cost/opening-fixed-cost';
 import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { Location } from '@/domain/valueobject/location/location';
+import { Name } from '@/domain/valueobject/name/name';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -23,6 +24,10 @@ export class FacilityJsonResponse {
    * Identificador único de la instalación.
    */
   id: string;
+  /**
+   * Nombre legible de la instalación.
+   */
+  name: string;
   /**
    * Tipo de instalación.
    */
@@ -71,6 +76,7 @@ export class FacilityJsonResponse {
    */
   constructor(
     id: string,
+    name: string,
     facilityType: string,
     location: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
     storageCapacity: number | { value: number },
@@ -81,6 +87,7 @@ export class FacilityJsonResponse {
     currentFillingLevel?: number | { value: number } | { wasteDemandValue: number }
   ) {
     this.id = id;
+    this.name = name;
     this.facilityType = facilityType;
     this.location = location;
     this.storageCapacity = storageCapacity;
@@ -142,6 +149,7 @@ export class FacilityJsonResponse {
       console.log('[FacilityJsonResponse.toFacility] Starting deserialization:', data);
       
       const id = new UllUUID(data.id);
+      const name = new Name(data.name);
       const loc = new Location(
         data.location.latitude,
         data.location.longitude,
@@ -173,6 +181,7 @@ export class FacilityJsonResponse {
       console.log('[FacilityJsonResponse.toFacility] Created VOs, constructing Facility');
 
       const facility = new Facility(
+        name,
         facilityType,
         loc,
         storageCapacity,

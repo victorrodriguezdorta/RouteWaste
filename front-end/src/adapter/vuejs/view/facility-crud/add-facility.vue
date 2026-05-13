@@ -68,6 +68,7 @@ const newFacility = ref<FacilityAdd>(
     0,
     '',
     '',
+    'Facility',
     0,
     0,
     0,

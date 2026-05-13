@@ -23,6 +23,7 @@ public class VehicleFieldMapper {
      * API field name for vehicle type (frontend alias).
      */
     private static final String FIELD_TYPE = "type";
+    private static final String FIELD_NAME = "name";
 
     /**
      * API field name for vehicle type (camelCase).
@@ -153,6 +154,7 @@ public class VehicleFieldMapper {
      */
     private static void registerBasicFields() {
         FIELD_MAPPING.put(FIELD_ID, FIELD_ID);
+        FIELD_MAPPING.put(FIELD_NAME, FIELD_NAME);
         FIELD_MAPPING.put(FIELD_TYPE, MONGO_VEHICLE_TYPE);
         FIELD_MAPPING.put(FIELD_VEHICLE_TYPE, MONGO_VEHICLE_TYPE);
         FIELD_MAPPING.put(FIELD_VEHICLE_TYPE_SNAKE, MONGO_VEHICLE_TYPE);

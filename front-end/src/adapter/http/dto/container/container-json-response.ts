@@ -4,6 +4,7 @@ import { wasteTypeFromString } from '@/domain/enumerate/waste-type';
 import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-capacity-liters';
 import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { Location } from '@/domain/valueobject/location/location';
+import { Name } from '@/domain/valueobject/name/name';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -16,6 +17,9 @@ import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 export class ContainerJsonResponse {
   /** Unique identifier of the container */
   id: string;
+
+  /** Human-readable name */
+  name: string;
 
   /** Geographic location information of the container */
   location: {
@@ -43,6 +47,7 @@ export class ContainerJsonResponse {
 
   constructor(
     id: string,
+    name: string,
     location: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
     wasteType: string,
     capacityLiters: { liters: number },
@@ -50,6 +55,7 @@ export class ContainerJsonResponse {
     serviceZone?: string | null
   ) {
     this.id = id;
+    this.name = name;
     this.location = location;
     this.wasteType = wasteType;
     this.capacityLiters = capacityLiters;
@@ -66,6 +72,7 @@ export class ContainerJsonResponse {
    */
   public static toContainer(data: ContainerJsonResponse): Container {
     const id = new UllUUID(data.id);
+    const name = new Name(data.name);
     const loc = new Location(
       data.location.latitude,
       data.location.longitude,
@@ -77,6 +84,6 @@ export class ContainerJsonResponse {
     const dailyDemandLitersPerDay = new DailyWasteDemandLitersPerDay(data.dailyDemandLitersPerDay.litersPerDay);
     const serviceZone = data.serviceZone ? serviceZoneFromString(data.serviceZone) : undefined;
 
-    return new Container(loc, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone, id);
+    return new Container(name, loc, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone, id);
   }
 }

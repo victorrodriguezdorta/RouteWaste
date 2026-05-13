@@ -7,6 +7,8 @@ import type { CreateVehicleCommand } from '@/application/usecase/vehicle-managem
  * Uses primitive types for all fields so it can be serialized directly to JSON.
  */
 export class VehiclePostJsonRequest {
+  /** Human-readable vehicle name. */
+  name: string;
   /** Vehicle type as enum key string. */
   vehicleType: string;
   /** Capacity in kilograms. */
@@ -27,11 +29,13 @@ export class VehiclePostJsonRequest {
    * @param costPerKilometer cost parts
    */
   constructor(
+    name: string,
     vehicleType: string,
     capacityKilograms: number,
     CapacityLiters: number,
     costPerKilometer: { amount: number; currency?: string }
   ) {
+    this.name = name;
     this.vehicleType = vehicleType;
     this.capacityKilograms = capacityKilograms;
     this.CapacityLiters = CapacityLiters;
@@ -47,6 +51,7 @@ export class VehiclePostJsonRequest {
    */
   public static toRequest(data: CreateVehicleCommand): VehiclePostJsonRequest {
     return new VehiclePostJsonRequest(
+      data.name.getValue(),
       data.vehicleType,
       data.capacityKilograms.getKilograms(),
       data.capacityLiters.getLiters(),

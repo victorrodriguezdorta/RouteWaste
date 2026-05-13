@@ -3,6 +3,7 @@ import { vehicleTypeFromString } from '@/domain/enumerate/vehicle-type';
 import { VehicleCapacityKilograms } from '@/domain/valueobject/capacity/vehicle-capacity-kilograms';
 import { VehicleCapacityLiters } from '@/domain/valueobject/capacity/vehicle-capacity-liters';
 import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
+import { Name } from '@/domain/valueobject/name/name';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -16,6 +17,8 @@ import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 export class VehicleJsonResponse {
   /** Resource identifier as string (UUID). */
   id: string;
+  /** Human-readable vehicle name. */
+  name: string;
   /** Optional vehicle type as string (enum key). */
   vehicleType?: string;
   /** Capacity in kilograms. */
@@ -42,12 +45,14 @@ export class VehicleJsonResponse {
    */
   constructor(
     id: string,
+    name: string,
     capacityKilograms: { Kilograms: number },
     capacityLiters: { liters: number },
     costPerKilometer: { amount: number; currency?: string },
     vehicleType?: string
   ) {
     this.id = id;
+    this.name = name;
     this.vehicleType = vehicleType;
     this.capacityKilograms = capacityKilograms;
     this.capacityLiters = capacityLiters;
@@ -63,6 +68,7 @@ export class VehicleJsonResponse {
    */
   public static toVehicle(data: VehicleJsonResponse): Vehicle {
     const id = new UllUUID(data.id);
+    const name = new Name(data.name);
     const capacityKg = new VehicleCapacityKilograms(data.capacityKilograms.Kilograms);
     const capacityL = new VehicleCapacityLiters(data.capacityLiters.liters);
     const cost = new TransportationVariableCost(data.costPerKilometer.amount, data.costPerKilometer.currency);
@@ -72,6 +78,6 @@ export class VehicleJsonResponse {
       throw new Error('Vehicle type is required in response');
     }
 
-    return new Vehicle(vehicleType, capacityKg, capacityL, cost, id);
+    return new Vehicle(name, vehicleType, capacityKg, capacityL, cost, id);
   }
 }

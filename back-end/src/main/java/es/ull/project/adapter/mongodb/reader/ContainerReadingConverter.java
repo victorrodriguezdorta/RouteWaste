@@ -8,6 +8,7 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.UUID;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -51,6 +52,7 @@ public class ContainerReadingConverter implements Converter<Document, Container>
     public Container convert(@NonNull Document document) {
         logger.info("Container to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
+        Name name = new Name(document.getString(MongoFields.NAME));
         Document locationDocument = (Document) document.get(MongoFields.LOCATION);
         double latitude = locationDocument.getDouble(MongoFields.LATITUDE);
         double longitude = locationDocument.getDouble(MongoFields.LONGITUDE);
@@ -77,7 +79,7 @@ public class ContainerReadingConverter implements Converter<Document, Container>
         if (document.containsKey(MongoFields.SERVICE_ZONE)) {
             serviceZone = ServiceZone.fromString(document.getString(MongoFields.SERVICE_ZONE));
         }
-        Container container = new Container(id, location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone);
+        Container container = new Container(id, name, location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone);
         return container;
     }
 }

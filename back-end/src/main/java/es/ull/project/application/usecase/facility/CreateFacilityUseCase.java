@@ -8,6 +8,7 @@ import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 
 /**
  * Use case for creating a new facility.
@@ -26,6 +27,7 @@ public interface CreateFacilityUseCase {
      * @return the created facility
      */
     Facility create(
+        Name name,
         FacilityType facilityType,
         Location location,
         StorageCapacityKilograms storageCapacity,

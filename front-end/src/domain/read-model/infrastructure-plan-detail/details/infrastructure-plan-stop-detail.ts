@@ -1,6 +1,7 @@
 import { CollectedVolumeLiters } from '@/domain/valueobject/capacity/collected-volume-liters';
 import { CollectedWeightKilograms } from '@/domain/valueobject/capacity/collected-weight-kilograms';
 import { Distance } from '@/domain/valueobject/location/distance';
+import { Name } from '@/domain/valueobject/name/name';
 import { RouteSequence } from '@/domain/valueobject/location/route-sequence';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import type { InfrastructurePlanStopAlertDetail } from './infrastructure-plan-stop-alert-detail';
@@ -20,5 +21,6 @@ export class InfrastructurePlanStopDetail {
     public readonly cumulativeDistanceMeters: Distance,
     public readonly containerActualLiters: number | null = null,
     public readonly alerts: InfrastructurePlanStopAlertDetail[] = [],
+    public readonly containerName: Name | null = null,
   ) {}
 }

@@ -42,6 +42,7 @@ public class VehicleResponseBodySerializer extends StdSerializer<VehicleResponse
     public void serialize(VehicleResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
         gen.writeStringField(JsonFields.ID, value.id.toString());
+        gen.writeStringField(JsonFields.NAME, value.name.getValue());
         gen.writeStringField(JsonFields.VEHICLE_TYPE, value.vehicleType.name());
         gen.writeObjectFieldStart(FIELD_CAPACITY_KILOGRAMS);
         gen.writeNumberField(FIELD_KILOGRAMS, value.capacityKilograms.getKilograms());

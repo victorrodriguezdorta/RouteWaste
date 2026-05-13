@@ -15,6 +15,7 @@ public class MongoFields {
      * Common fields.
      */
     public static final String ID = "_id";
+    public static final String NAME = "name";
     public static final String INFRASTRUCTURE_PLAN_ID = "infrastructurePlanId";
 
     /**

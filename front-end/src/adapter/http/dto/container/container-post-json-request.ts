@@ -7,6 +7,9 @@ import type { CreateContainerCommand } from '@/application/usecase/container-man
  * Contains primitive types only so it can be serialized directly.
  */
 export class ContainerPostJsonRequest {
+  /** Human-readable name for the container. */
+  name: string;
+
   /**
    * Geographic location of the container including latitude, longitude, postal address, and GIS reference.
    */
@@ -33,12 +36,14 @@ export class ContainerPostJsonRequest {
   serviceZone?: string | null;
 
   constructor(
+    name: string,
     location: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
     wasteType: string,
     capacityLiters: { liters: number },
     dailyDemandLitersPerDay: { litersPerDay: number },
     serviceZone?: string | null
   ) {
+    this.name = name;
     this.location = location;
     this.wasteType = wasteType;
     this.capacityLiters = capacityLiters;
@@ -54,6 +59,7 @@ export class ContainerPostJsonRequest {
    */
   public static toRequest(data: CreateContainerCommand): ContainerPostJsonRequest {
     return new ContainerPostJsonRequest(
+      data.name.getValue(),
       {
         latitude: data.location.latitude,
         longitude: data.location.longitude,

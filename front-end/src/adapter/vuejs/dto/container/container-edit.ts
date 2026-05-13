@@ -4,6 +4,7 @@ import { WasteType, wasteTypeFromString } from '@/domain/enumerate/waste-type';
 import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-capacity-liters';
 import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { Location } from '@/domain/valueobject/location/location';
+import { Name } from '@/domain/valueobject/name/name';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -24,6 +25,11 @@ export class ContainerEdit {
    * Unique identifier of the container being edited.
    */
   public id: string;
+
+  /**
+   * Human-readable name for the container.
+   */
+  public name: string;
 
   /**
    * Latitude coordinate of the container location (-90 to 90).
@@ -69,6 +75,7 @@ export class ContainerEdit {
    * Create a new ContainerEdit DTO.
    * 
    * @param id Unique identifier of the container
+   * @param name Human-readable name
    * @param latitude Latitude coordinate
    * @param longitude Longitude coordinate
    * @param postalAddress Postal address
@@ -81,6 +88,7 @@ export class ContainerEdit {
    */
   constructor(
     id: string,
+    name: string,
     latitude: number,
     longitude: number,
     postalAddress: string,
@@ -91,6 +99,7 @@ export class ContainerEdit {
     serviceZone?: string
   ) {
     this.validate<string>(id, 'Container id is not defined');
+    this.validate<string>(name, 'Name is not defined');
     this.validate<number>(latitude, 'Latitude is not defined');
     this.validate<number>(longitude, 'Longitude is not defined');
     this.validate<string>(postalAddress, 'Postal address is not defined');
@@ -100,6 +109,7 @@ export class ContainerEdit {
     this.validate<number>(dailyDemandLitersPerDay, 'Daily demand in liters per day is not defined');
 
     this.id = id;
+    this.name = name;
     this.latitude = latitude;
     this.longitude = longitude;
     this.postalAddress = postalAddress;
@@ -306,6 +316,7 @@ export class ContainerEdit {
 
     return new ContainerEdit(
       randomId,
+      `Container ${Math.floor(Math.random() * 10000)}`,
       randomLatitude,
       randomLongitude,
       randomPostalAddress,
@@ -325,6 +336,7 @@ export class ContainerEdit {
    * @throws Error if any value object validation fails
    */
   static toContainer(containerEdit: ContainerEdit): Container {
+    const name = new Name(containerEdit.name);
     const location = new Location(
       containerEdit.latitude,
       containerEdit.longitude,
@@ -337,7 +349,7 @@ export class ContainerEdit {
     const serviceZone = containerEdit.serviceZone ? serviceZoneFromString(containerEdit.serviceZone) : null;
     const id = new UllUUID(containerEdit.id);
 
-    return new Container(location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone, id);
+    return new Container(name, location, wasteType, capacityLiters, dailyDemandLitersPerDay, serviceZone, id);
   }
 
   /**
@@ -354,6 +366,7 @@ export class ContainerEdit {
 
     return new ContainerEdit(
       container.getId().getValue(),
+      container.getName().getValue(),
       location.latitude,
       location.longitude,
       location.postalAddress,

@@ -7,6 +7,26 @@
 -->
 <template>
   <div>
+    <v-row>
+      <v-col cols="12">
+        <InputTooltip
+          :data="vehicle.name"
+          input-type="text"
+          :text="t('vehicle.add.fields.name')"
+          :tooltip="t('vehicle.add.fields.name')"
+          counter="120"
+          :rules="[
+            (value: string) =>
+              VehicleAdd.externalValidateName(value),
+          ]"
+          :required="!readonly"
+          :readonly="readonly"
+          :disabled="readonly"
+          @updateData="(v) => updateName(String(v ?? ''))"
+        />
+      </v-col>
+    </v-row>
+
     <!-- Vehicle type selector (editable) or text field (read-only) -->
     <v-row>
       <v-col cols="12">
@@ -168,6 +188,10 @@ const translatedVehicleType = computed(() => {
   if (!props.vehicle.vehicleType) return '';
   return t(`vehicle.add.vehicleTypes.${props.vehicle.vehicleType}`);
 });
+
+const updateName = (value: string) => {
+  emit('update:vehicle', { ...props.vehicle, name: value });
+};
 
 /**
  * Update vehicle type and emit change event

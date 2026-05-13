@@ -13,6 +13,7 @@ export class InfrastructurePlanDailyPlanDetail {
     public readonly id: UllUUID | null,
     public readonly infrastructurePlanId: UllUUID | null,
     public readonly facilityId: UllUUID,
+    public readonly facilityName: string | null,
     public readonly serviceDate: string,
     public readonly planDay: number,
     public readonly vehicleId: UllUUID,

@@ -15,10 +15,10 @@
           class="route-section"
         >
           <v-card-text>
-            <div class="route-section__header">
+                <div class="route-section__header">
               <div>
                 <div class="route-section__title">
-                  <span>{{ t('infrastructurePlan.show.daily.route.vehicleLabel') }}: {{ route.vehicleId }}</span>
+                  <span>{{ t('infrastructurePlan.show.daily.route.vehicleLabel') }}: {{ route.vehicleLabel }}</span>
                   <ButtonTooltip
                     text=""
                     :tooltip="viewTooltip"
@@ -31,7 +31,7 @@
                   />
                 </div>
                 <div class="route-section__meta">
-                  <span>{{ t('infrastructurePlan.show.daily.route.facilityLabel') }}: {{ route.facilityId }}</span>
+                  <span>{{ t('infrastructurePlan.show.daily.route.facilityLabel') }}: {{ route.facilityLabel }}</span>
                   <ButtonTooltip
                     text=""
                     :tooltip="viewTooltip"
@@ -75,7 +75,7 @@
                     </div>
                     <div v-else class="route-stop__container-row">
                       <span class="route-stop__container">
-                        {{ t('infrastructurePlan.show.daily.route.containerLabel') }}: {{ stop.containerId ?? '-' }}
+                        {{ t('infrastructurePlan.show.daily.route.containerLabel') }}: {{ stop.containerDisplay }}
                       </span>
                       <ButtonTooltip
                         v-if="stop.containerId"
@@ -110,6 +110,7 @@
 <script lang="ts" setup>
 import { StopType } from '@/domain/enumerate/stop-type';
 import type { InfrastructurePlanDailyPlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
+import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -126,6 +127,7 @@ interface NormalizedStop {
   sequence: number;
   type: StopType;
   containerId: string | null;
+  containerDisplay: string;
   collectedKilograms?: number;
   collectedLiters?: number;
   distanceFromPreviousMeters?: number;
@@ -137,7 +139,9 @@ interface NormalizedStop {
 interface NormalizedRoute {
   key: string;
   vehicleId: string;
+  vehicleLabel: string;
   facilityId: string;
+  facilityLabel: string;
   totalDistanceMeters?: number;
   stops: NormalizedStop[];
 }
@@ -147,32 +151,81 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
+
+function unnamedEntityLabel(): string {
+  const key = 'infrastructurePlan.show.daily.display.unnamedEntity';
+  const translated = t(key);
+  return translated === key ? '—' : translated;
+}
+
+function formatVehicleTypeLabel(value: unknown): string {
+  if (value == null || value === '') {
+    return '';
+  }
+
+  return String(value)
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
 const viewTooltip = computed(() => {
   const translated = t('algorithm.list.table.tooltips.view');
   return translated === 'algorithm.list.table.tooltips.view' ? 'View details' : translated;
 });
 
 const normalizedRoutes = computed<NormalizedRoute[]>(() =>
-  props.routes.map((route) => ({
-    key: route.key,
-    vehicleId: route.vehicleId,
-    facilityId: route.facilityId,
-    totalDistanceMeters: route.dailyPlan.totalDistanceMeters.getValue(),
-    stops: normalizeStops(route.dailyPlan.stops),
-  })),
+  props.routes.map((route) => {
+    const vehicleName = route.dailyPlan.vehicle?.name?.getValue()?.trim();
+    const vehicleTypeStr = formatVehicleTypeLabel(route.dailyPlan.vehicle?.vehicleType);
+    const facilityName = route.dailyPlan.facilityName?.trim();
+    return {
+      key: route.key,
+      vehicleId: route.vehicleId,
+      vehicleLabel:
+        vehicleName && vehicleName.length > 0
+          ? vehicleName
+          : vehicleTypeStr.length > 0
+            ? vehicleTypeStr
+            : unnamedEntityLabel(),
+      facilityId: route.facilityId,
+      facilityLabel:
+        facilityName && facilityName.length > 0 ? facilityName : unnamedEntityLabel(),
+      totalDistanceMeters: route.dailyPlan.totalDistanceMeters.getValue(),
+      stops: normalizeStops(route.dailyPlan.stops),
+    };
+  }),
 );
 
 function normalizeStops(stops: InfrastructurePlanDailyPlanDetail['stops']): NormalizedStop[] {
   const sorted = [...stops]
-    .map((stop) => ({
-      sequence: stop.sequence.getValue(),
-      type: stop.type,
-      containerId: stop.containerId ? stop.containerId.getValue() : null,
-      collectedKilograms: stop.collectedKilograms.getKilograms(),
-      collectedLiters: stop.collectedLiters.getLiters(),
-      distanceFromPreviousMeters: stop.distanceFromPreviousMeters.getValue(),
-      cumulativeDistanceMeters: stop.cumulativeDistanceMeters.getValue(),
-    }))
+    .map((stop) => {
+      const containerId = stop.containerId ? stop.containerId.getValue() : null;
+      const nameStr = stop.containerName?.getValue()?.trim();
+      let containerDisplay: string;
+      if (nameStr && nameStr.length > 0) {
+        if (
+          nameStr === infrastructurePlanDetailFallbackDisplayNames.facility
+          || nameStr === infrastructurePlanDetailFallbackDisplayNames.container
+        ) {
+          containerDisplay = unnamedEntityLabel();
+        } else {
+          containerDisplay = nameStr;
+        }
+      } else {
+        containerDisplay = unnamedEntityLabel();
+      }
+      return {
+        sequence: stop.sequence.getValue(),
+        type: stop.type,
+        containerId,
+        containerDisplay,
+        collectedKilograms: stop.collectedKilograms.getKilograms(),
+        collectedLiters: stop.collectedLiters.getLiters(),
+        distanceFromPreviousMeters: stop.distanceFromPreviousMeters.getValue(),
+        cumulativeDistanceMeters: stop.cumulativeDistanceMeters.getValue(),
+      };
+    })
     .sort((left, right) => left.sequence - right.sequence);
 
   // Calculate cumulative kilograms and liters

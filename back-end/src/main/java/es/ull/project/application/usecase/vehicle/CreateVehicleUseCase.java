@@ -5,6 +5,7 @@ import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
 
 /**
  * Use case for creating a new vehicle.
@@ -19,5 +20,5 @@ public interface CreateVehicleUseCase {
      * @param costPerKilometer   the cost per kilometer for transportation
      * @return the created vehicle
      */
-    Vehicle create(VehicleType vehicleType, VehicleCapacityKilograms capacityKilograms, VehicleCapacityLiters capacityLiters, TransportationVariableCost costPerKilometer);
+    Vehicle create(Name name, VehicleType vehicleType, VehicleCapacityKilograms capacityKilograms, VehicleCapacityLiters capacityLiters, TransportationVariableCost costPerKilometer);
 }

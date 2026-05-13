@@ -8,6 +8,9 @@ import type { UpdateContainerCommand } from '@/application/usecase/container-man
  * straightforward serialization.
  */
 export class ContainerPutJsonRequest {
+  /** Human-readable name for the container */
+  name?: string;
+
   /** Geographic location of the container including coordinates and address information */
   location?: { latitude: number; longitude: number; postalAddress: string; gisReference: string };
 
@@ -24,12 +27,14 @@ export class ContainerPutJsonRequest {
   serviceZone?: string | null;
 
   constructor(
+    name?: string,
     location?: { latitude: number; longitude: number; postalAddress: string; gisReference: string },
     wasteType?: string,
     capacityLiters?: { liters: number },
     dailyDemandLitersPerDay?: { litersPerDay: number },
     serviceZone?: string | null
   ) {
+    this.name = name;
     this.location = location;
     this.wasteType = wasteType;
     this.capacityLiters = capacityLiters;
@@ -46,6 +51,7 @@ export class ContainerPutJsonRequest {
   public static toRequest(data: UpdateContainerCommand): ContainerPutJsonRequest {
     const f = data.updatedFields;
     return new ContainerPutJsonRequest(
+      f.name?.getValue(),
       f.location
         ? {
             latitude: f.location.latitude,

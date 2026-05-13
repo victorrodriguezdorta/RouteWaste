@@ -26,6 +26,11 @@ export class FacilityInfo {
   public id: string;
 
   /**
+   * Human-readable facility name.
+   */
+  public name: string;
+
+  /**
    * Type of the facility (e.g., OPERATIONAL_BASE, TRANSFER_STATION, TREATMENT_PLANT).
    */
   public facilityType: string;
@@ -89,6 +94,7 @@ export class FacilityInfo {
    * Create a new FacilityInfo DTO.
    * 
    * @param id Unique identifier of the facility
+   * @param name Human-readable name
    * @param facilityType Type of the facility
    * @param latitude Latitude coordinate
    * @param longitude Longitude coordinate
@@ -105,6 +111,7 @@ export class FacilityInfo {
    */
   constructor(
     id: string,
+    name: string,
     facilityType: string,
     latitude: number,
     longitude: number,
@@ -119,6 +126,7 @@ export class FacilityInfo {
     currentFillingLevel: number
   ) {
     this.validate<string>(id, 'Facility id is not defined');
+    this.validate<string>(name, 'Name is not defined');
     this.validate<string>(facilityType, 'Facility type is not defined');
     this.validate<number>(latitude, 'Latitude is not defined');
     this.validate<number>(longitude, 'Longitude is not defined');
@@ -133,6 +141,7 @@ export class FacilityInfo {
     this.validate<number>(currentFillingLevel, 'Current filling level is not defined');
 
     this.id = id;
+    this.name = name;
     this.facilityType = facilityType;
     this.latitude = latitude;
     this.longitude = longitude;
@@ -187,6 +196,7 @@ export class FacilityInfo {
 
     return new FacilityInfo(
       randomId,
+      `Facility ${Math.floor(Math.random() * 10000)}`,
       randomFacilityType as string,
       randomLatitude,
       randomLongitude,
@@ -218,6 +228,7 @@ export class FacilityInfo {
 
     return new FacilityInfo(
       facility.getId().getValue(),
+      facility.getName().getValue(),
       facility.getFacilityType(),
       location.latitude,
       location.longitude,

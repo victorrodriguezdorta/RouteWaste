@@ -5,6 +5,7 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 
 /**
  * ContainerPostRequestBody
@@ -20,6 +21,8 @@ import es.ull.project.domain.valueobject.location.Location;
  * This class contains no business logic, only data representation.
  */
 public class ContainerPostRequestBody {
+
+    public Name name;
 
     /**
      * Physical location of the container.
@@ -59,7 +62,8 @@ public class ContainerPostRequestBody {
     @Override
     public String toString() {
         return String.format(
-                "ContainerPostRequestBody={location=%s, wasteType=%s, capacityLiters=%s, dailyDemandLitersPerDay=%s, serviceZone=%s}",
+                "ContainerPostRequestBody={name=%s, location=%s, wasteType=%s, capacityLiters=%s, dailyDemandLitersPerDay=%s, serviceZone=%s}",
+                this.name,
                 this.location,
                 this.wasteType,
                 this.capacityLiters,

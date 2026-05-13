@@ -44,6 +44,7 @@ public class FacilityWritingConverter implements Converter<Facility, Document> {
         logger.info("Facility with id '{}' to be written", facility.getId());
         Document document = new Document();
         document.put(MongoFields.ID, facility.getId());
+        document.put(MongoFields.NAME, facility.getName().getValue());
         document.put(MongoFields.FACILITY_TYPE, facility.getFacilityType().toString());
         Document locationDocument = new Document();
         locationDocument.put(MongoFields.LATITUDE, facility.getLocation().getLatitude());

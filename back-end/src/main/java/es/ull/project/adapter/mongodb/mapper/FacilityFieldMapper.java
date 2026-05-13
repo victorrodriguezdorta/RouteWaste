@@ -23,6 +23,7 @@ public class FacilityFieldMapper {
      * API field name for facility type (short alias).
      */
     private static final String FIELD_TYPE = "type";
+    private static final String FIELD_NAME = "name";
 
     /**
      * API and MongoDB field name for the facility type.
@@ -129,6 +130,7 @@ public class FacilityFieldMapper {
      */
     private static void registerBasicFields() {
         FIELD_MAPPING.put(FIELD_ID, FIELD_ID);
+        FIELD_MAPPING.put(FIELD_NAME, FIELD_NAME);
         FIELD_MAPPING.put(FIELD_TYPE, FIELD_FACILITY_TYPE);
         FIELD_MAPPING.put(FIELD_FACILITY_TYPE, FIELD_FACILITY_TYPE);
         FIELD_MAPPING.put(FIELD_STATUS, FIELD_STATUS);

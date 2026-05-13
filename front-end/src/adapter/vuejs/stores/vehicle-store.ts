@@ -173,6 +173,7 @@ export const useVehicleStore = defineStore('Vehicle', {
       
       // Execute the create operation with vehicle properties
       const result = await createService.execute({
+        name: vehicle.getName(),
         vehicleType: vehicle.getVehicleType(),
         capacityKilograms: vehicle.getCapacityKilograms(),
         capacityLiters: vehicle.getCapacityLiters(),
@@ -215,6 +216,7 @@ export const useVehicleStore = defineStore('Vehicle', {
       const result = await updateService.execute({ 
         vehicleId, 
         updatedFields: {
+          name: vehicle.getName(),
           vehicleType: vehicle.getVehicleType(),
           capacityKilograms: vehicle.getCapacityKilograms(),
           capacityLiters: vehicle.getCapacityLiters(),

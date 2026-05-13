@@ -71,6 +71,7 @@
       "title": "Add Vehicle",
       "cardTitle": "Vehicle Information",
       "fields": {
+        "name": "Name",
         "vehicleType": "Vehicle Type",
         "capacityValue": "Capacity Value",
         "capacityUnit": "Unit (e.g., tons, kg)",
@@ -90,6 +91,7 @@
       "cardTitle": "Vehicle Information",
       "loading": "Loading vehicle...",
       "fields": {
+        "name": "Name",
         "vehicleType": "Vehicle Type",
         "capacityValue": "Capacity Value",
         "capacityUnit": "Unit (e.g., tons, kg)",
@@ -104,6 +106,7 @@
       "cardTitle": "Vehicle Information",
       "loading": "Loading vehicle...",
       "fields": {
+        "name": "Name",
         "vehicleType": "Vehicle Type",
         "capacityValue": "Capacity Value",
         "capacityUnit": "Unit",
@@ -120,6 +123,7 @@
       "filterAll": "All types",
       "table": {
         "headers": {
+          "name": "Name",
           "type": "Vehicle Type",
           "capacityKilograms": "Capacity (kg)",
           "capacityLiters": "Capacity (L)",
@@ -146,6 +150,7 @@
       "title": "Add Container",
       "cardTitle": "Container Information",
       "fields": {
+        "name": "Name",
         "latitude": "Latitude",
         "longitude": "Longitude",
         "postalAddress": "Postal Address",
@@ -176,6 +181,7 @@
       "cardTitle": "Container Information",
       "loading": "Loading container...",
       "fields": {
+        "name": "Name",
         "latitude": "Latitude",
         "longitude": "Longitude",
         "postalAddress": "Postal Address",
@@ -195,6 +201,7 @@
         "eyebrow": "Container location"
       },
       "fields": {
+        "name": "Name",
         "latitude": "Latitude",
         "longitude": "Longitude",
         "postalAddress": "Postal Address",
@@ -216,6 +223,7 @@
       "notAssigned": "Not assigned",
       "table": {
         "headers": {
+          "name": "Name",
           "wasteType": "Waste Type",
           "location": "Location",
           "capacity": "Capacity (L)",
@@ -242,6 +250,7 @@
       "title": "Add Facility",
       "cardTitle": "Facility Information",
       "fields": {
+        "name": "Name",
         "facilityType": "Facility Type",
         "latitude": "Latitude",
         "longitude": "Longitude",
@@ -271,6 +280,7 @@
       "cardTitle": "Facility Information",
       "loading": "Loading facility...",
       "fields": {
+        "name": "Name",
         "facilityType": "Facility Type",
         "latitude": "Latitude",
         "longitude": "Longitude",
@@ -292,6 +302,7 @@
         "eyebrow": "Facility location"
       },
       "fields": {
+        "name": "Name",
         "facilityType": "Facility Type",
         "latitude": "Latitude",
         "longitude": "Longitude",
@@ -314,6 +325,7 @@
       "filterByLocation": "Search by location",
       "table": {
         "headers": {
+          "name": "Name",
           "type": "Facility Type",
           "location": "Location",
           "storageCapacity": "Storage (kg)",
@@ -380,6 +392,9 @@
           "title": "Day Navigation",
           "dayLabel": "Day {current}/{total}",
           "serviceDate": "Service date"
+        },
+        "display": {
+          "unnamedEntity": "Unnamed"
         },
         "content": {
           "title": "Day JSON",

@@ -14,6 +14,7 @@ import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
             throws IOException {
         JsonNode rootNode = parser.getCodec().readTree(parser);
         List<FieldError> errors = new ArrayList<>();
+        Name name = parseName(rootNode, errors);
         VehicleType vehicleType = parseVehicleType(rootNode, errors);
         VehicleCapacityKilograms capacityKilograms = parseCapacityKilograms(rootNode, errors);
         VehicleCapacityLiters capacityLiters = parseCapacityLiters(rootNode, errors);
@@ -60,11 +62,30 @@ public class VehiclePostRequestBodyDeserializer extends JsonDeserializer<Vehicle
             throw new ValidationException(errors);
         }
         VehiclePostRequestBody requestBody = new VehiclePostRequestBody();
+        requestBody.name = name;
         requestBody.vehicleType = vehicleType;
         requestBody.capacityKilograms = capacityKilograms;
         requestBody.capacityLiters = capacityLiters;
         requestBody.costPerKilometer = costPerKilometer;
         return requestBody;
+    }
+
+    private Name parseName(JsonNode rootNode, List<FieldError> errors) {
+        if (!rootNode.has(JsonFields.NAME)) {
+            errors.add(new FieldError(JsonFields.NAME, "Field is required"));
+            return null;
+        }
+        JsonNode node = rootNode.get(JsonFields.NAME);
+        if (node.isNull() || !node.isTextual()) {
+            errors.add(new FieldError(JsonFields.NAME, "Must be a non-null string"));
+            return null;
+        }
+        try {
+            return new Name(node.asText());
+        } catch (Exception e) {
+            errors.add(new FieldError(JsonFields.NAME, e.getMessage()));
+            return null;
+        }
     }
 
     /**

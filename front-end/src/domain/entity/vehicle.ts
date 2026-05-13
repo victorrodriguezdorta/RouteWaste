@@ -2,6 +2,7 @@ import { VehicleType } from '@/domain/enumerate/vehicle-type';
 import { VehicleCapacityKilograms } from '@/domain/valueobject/capacity/vehicle-capacity-kilograms';
 import { VehicleCapacityLiters } from '@/domain/valueobject/capacity/vehicle-capacity-liters';
 import { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
+import { Name } from '@/domain/valueobject/name/name';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -15,6 +16,8 @@ import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 export class Vehicle {
   /** The unique identifier of the vehicle. */
   readonly id: UllUUID;
+  /** Human-readable vehicle name. */
+  private name: Name;
   /** The type of vehicle (e.g., COLLECTION_TRUCK, TRANSFER_TRUCK). */
   private vehicleType: VehicleType;
   /** The capacity of the vehicle in kilograms. */
@@ -26,6 +29,7 @@ export class Vehicle {
 
   /**
    * Create a new `Vehicle` aggregate.
+   * @param name human-readable name
    * @param vehicleType vehicle classification
    * @param capacityKilograms capacity in kilograms value object
    * @param capacityLiters capacity in liters value object
@@ -33,17 +37,20 @@ export class Vehicle {
    * @param id optional explicit id (generated when omitted)
    */
   constructor(
+    name: Name,
     vehicleType: VehicleType,
     capacityKilograms: VehicleCapacityKilograms,
     capacityLiters: VehicleCapacityLiters,
     costPerKilometer: TransportationVariableCost,
     id?: UllUUID
   ) {
+    if (!name) throw new Error('Vehicle name is not defined');
     if (!vehicleType) throw new Error('Vehicle type is not defined');
     if (!capacityKilograms) throw new Error('Vehicle capacity in kilograms is not defined');
     if (!capacityLiters) throw new Error('Vehicle capacity in liters is not defined');
     if (!costPerKilometer) throw new Error('Transportation variable cost is not defined');
     this.id = id ?? UllUUID.random();
+    this.name = name;
     this.vehicleType = vehicleType;
     this.capacityKilograms = capacityKilograms;
     this.capacityLiters = capacityLiters;
@@ -55,6 +62,12 @@ export class Vehicle {
    * @returns The unique identifier of this vehicle.
    */
   getId(): UllUUID { return this.id; }
+
+  /** Return the vehicle display name. */
+  getName(): Name { return this.name; }
+
+  /** Update the vehicle name. */
+  updateName(name: Name): void { if (!name) throw new Error('Vehicle name is not defined'); this.name = name; }
 
   /**
    * Return the vehicle type.
@@ -115,5 +128,5 @@ export class Vehicle {
    * Human-readable representation for debugging.
    * @returns A string representation of the vehicle.
    */
-  toString(): string { return `Vehicle={id=${this.id}, type=${this.vehicleType}, capacityKg=${this.capacityKilograms}, capacityL=${this.capacityLiters}, costPerKm=${this.costPerKilometer}}`; }
+  toString(): string { return `Vehicle={id=${this.id}, name=${this.name}, type=${this.vehicleType}, capacityKg=${this.capacityKilograms}, capacityL=${this.capacityLiters}, costPerKm=${this.costPerKilometer}}`; }
 }

@@ -12,6 +12,7 @@ import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
 
 import java.io.IOException;
 
@@ -57,10 +58,12 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
         JsonNode rootNode = parser.getCodec().readTree(parser);
         try {
             VehicleType vehicleType = parseVehicleType(rootNode);
+            Name name = parseName(rootNode);
             VehicleCapacityKilograms capacityKilograms = parseCapacityKilograms(rootNode);
             VehicleCapacityLiters capacityLiters = parseCapacityLiters(rootNode);
             TransportationVariableCost costPerKilometer = parseCost(rootNode);
             VehiclePutRequestBody requestBody = new VehiclePutRequestBody();
+            requestBody.name = name;
             requestBody.vehicleType = vehicleType;
             requestBody.capacityKilograms = capacityKilograms;
             requestBody.capacityLiters = capacityLiters;
@@ -69,6 +72,17 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
         } catch (Exception e) {
             throw new IOException("Failed to deserialize VehiclePutRequestBody: " + e.getMessage(), e);
         }
+    }
+
+    private Name parseName(JsonNode rootNode) {
+        if (!rootNode.has(JsonFields.NAME)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.NAME + "' is missing");
+        }
+        JsonNode node = rootNode.get(JsonFields.NAME);
+        if (node.isNull() || !node.isTextual()) {
+            throw new IllegalArgumentException("Field '" + JsonFields.NAME + "' must be a non-null string");
+        }
+        return new Name(node.asText());
     }
 
     /**

@@ -24,6 +24,7 @@ import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
@@ -64,11 +65,12 @@ class ServiceAssignmentTests {
     }
 
     private static Container randomContainer() {
-        return new Container(randomLocation(), WasteType.random(), randomCapacityLiters(), randomDailyDemandLitersPerDay(), ServiceZone.random());
+        return new Container(randomName("container"), randomLocation(), WasteType.random(), randomCapacityLiters(), randomDailyDemandLitersPerDay(), ServiceZone.random());
     }
 
     private static Facility randomFacility() {
         return new Facility(
+            randomName("facility"),
             FacilityType.random(),
             randomLocation(),
             randomStorageCapacity(),
@@ -77,6 +79,10 @@ class ServiceAssignmentTests {
             randomOpeningFixedCost(),
             FacilityStatus.random()
         );
+    }
+
+    private static Name randomName(String prefix) {
+        return new Name(prefix + "-" + ((int) (Math.random() * 10000)));
     }
     
     private static InfrastructurePlan randomInfrastructurePlan() {

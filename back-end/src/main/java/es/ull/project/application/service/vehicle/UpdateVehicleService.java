@@ -7,6 +7,7 @@ import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -44,8 +45,11 @@ public class UpdateVehicleService implements UpdateVehicleUseCase {
      * @throws NoSuchElementException if no vehicle is found with the given identifier
      */
     @Override
-    public Vehicle update(UUID id, VehicleType newVehicleType, VehicleCapacityKilograms newCapacityKilograms, VehicleCapacityLiters newCapacityLiters, TransportationVariableCost newCostPerKilometer) {
+    public Vehicle update(UUID id, Name newName, VehicleType newVehicleType, VehicleCapacityKilograms newCapacityKilograms, VehicleCapacityLiters newCapacityLiters, TransportationVariableCost newCostPerKilometer) {
         Vehicle existing = this.repository.findById(id).orElseThrow(() -> new NoSuchElementException("Vehicle not found"));
+        if (newName != null) {
+            existing.updateName(newName);
+        }
         if (newVehicleType != null) {
             existing.updateVehicleType(newVehicleType);
         }

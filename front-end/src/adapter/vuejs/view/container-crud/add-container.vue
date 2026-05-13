@@ -66,6 +66,7 @@ const newContainer = ref<ContainerAdd>(
     0,
     '',
     '',
+    'Container',
     WasteType.ORGANIC,
     100,
     50

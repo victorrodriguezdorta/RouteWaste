@@ -11,6 +11,7 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.io.IOException;
 
 /**
@@ -46,11 +47,13 @@ public class ContainerPutRequestBodyDeserializer extends JsonDeserializer<Contai
         JsonNode rootNode = parser.getCodec().readTree(parser);
         try {
             Location location = parseLocation(rootNode);
+            Name name = parseName(rootNode);
             WasteType wasteType = parseWasteType(rootNode);
             ContainerCapacityLiters capacityLiters = parseCapacityLiters(rootNode);
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay = parseDailyDemandLitersPerDay(rootNode);
             ServiceZone serviceZone = parseServiceZone(rootNode);
             ContainerPutRequestBody requestBody = new ContainerPutRequestBody();
+            requestBody.name = name;
             requestBody.location = location;
             requestBody.wasteType = wasteType;
             requestBody.capacityLiters = capacityLiters;
@@ -60,6 +63,17 @@ public class ContainerPutRequestBodyDeserializer extends JsonDeserializer<Contai
         } catch (Exception e) {
             throw new IOException("Failed to deserialize ContainerPutRequestBody: " + e.getMessage(), e);
         }
+    }
+
+    private Name parseName(JsonNode rootNode) {
+        if (!rootNode.has(JsonFields.NAME)) {
+            throw new IllegalArgumentException("Required field '" + JsonFields.NAME + "' is missing");
+        }
+        JsonNode node = rootNode.get(JsonFields.NAME);
+        if (node.isNull() || !node.isTextual()) {
+            throw new IllegalArgumentException("Field '" + JsonFields.NAME + "' must be a non-null string");
+        }
+        return new Name(node.asText());
     }
 
     /**

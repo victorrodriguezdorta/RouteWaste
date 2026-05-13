@@ -34,6 +34,7 @@ public class ContainerResponseBodySerializer extends StdSerializer<ContainerResp
     public void serialize(ContainerResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
         gen.writeStringField(JsonFields.ID, value.id.toString());
+        gen.writeStringField(JsonFields.NAME, value.name.getValue());
         gen.writeObjectFieldStart(JsonFields.LOCATION);
         gen.writeNumberField(JsonFields.LATITUDE, value.location.getLatitude());
         gen.writeNumberField(JsonFields.LONGITUDE, value.location.getLongitude());

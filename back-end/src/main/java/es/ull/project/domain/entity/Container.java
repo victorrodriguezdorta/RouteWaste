@@ -5,6 +5,7 @@ import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +23,7 @@ public class Container {
     public static final String WASTE_TYPE_NOT_DEFINED = "Waste type is not defined";
     public static final String CAPACITY_LITERS_NOT_DEFINED = "Container capacity in liters is not defined";
     public static final String DAILY_DEMAND_LITERS_NOT_DEFINED = "Daily waste demand in liters is not defined";
+    public static final String NAME_NOT_DEFINED = "Container name is not defined";
 
     /**
      * Identifier of the container.
@@ -29,6 +31,7 @@ public class Container {
      * It is a computed attribute.
      */
     private final UUID id;
+    private Name name;
 
     /**
      * Physical location of the container.
@@ -70,16 +73,19 @@ public class Container {
      * @param serviceZone Service zone (optional).
      */
     public Container(
+            Name name,
             Location location,
             WasteType wasteType,
             ContainerCapacityLiters capacityLiters,
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
             ServiceZone serviceZone) {
+        this.validateName(name);
         this.validateLocation(location);
         this.validateWasteType(wasteType);
         this.validateCapacityLiters(capacityLiters);
         this.validateDailyDemandLitersPerDay(dailyDemandLitersPerDay);
         this.id = UUID.randomUUID();
+        this.name = name;
         this.location = location;
         this.wasteType = wasteType;
         this.capacityLiters = capacityLiters;
@@ -96,11 +102,12 @@ public class Container {
      * @param dailyDemandLitersPerDay Approximate daily waste demand in liters per day.
      */
     public Container(
+            Name name,
             Location location,
             WasteType wasteType,
             ContainerCapacityLiters capacityLiters,
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay) {
-        this(location, wasteType, capacityLiters, dailyDemandLitersPerDay, null);
+        this(name, location, wasteType, capacityLiters, dailyDemandLitersPerDay, null);
     }
 
     /**
@@ -111,6 +118,7 @@ public class Container {
      */
     public Container(Container otherObject) {
         this.id = otherObject.id;
+        this.name = otherObject.name;
         this.location = otherObject.location;
         this.wasteType = otherObject.wasteType;
         this.capacityLiters = otherObject.capacityLiters;
@@ -130,16 +138,19 @@ public class Container {
      * @param serviceZone the service zone (optional)
      */
     public Container(UUID id,
+            Name name,
             Location location,
             WasteType wasteType,
             ContainerCapacityLiters capacityLiters,
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
             ServiceZone serviceZone) {
+        this.validateName(name);
         this.validateLocation(location);
         this.validateWasteType(wasteType);
         this.validateCapacityLiters(capacityLiters);
         this.validateDailyDemandLitersPerDay(dailyDemandLitersPerDay);
         this.id = id;
+        this.name = name;
         this.location = location;
         this.wasteType = wasteType;
         this.capacityLiters = capacityLiters;
@@ -193,6 +204,26 @@ public class Container {
         if (dailyDemandLitersPerDay == null) {
             throw new IllegalArgumentException(DAILY_DEMAND_LITERS_NOT_DEFINED);
         }
+    }
+
+    /**
+     * Returns the container identifier.
+     *
+     * @return ContainerId.
+     */
+    private void validateName(Name name) {
+        if (name == null) {
+            throw new IllegalArgumentException(NAME_NOT_DEFINED);
+        }
+    }
+
+    public Name getName() {
+        return this.name;
+    }
+
+    public void updateName(Name name) {
+        this.validateName(name);
+        this.name = name;
     }
 
     /**
@@ -337,8 +368,9 @@ public class Container {
     @Override
     public String toString() {
         return String.format(
-                "Container={id=%s, location=%s, wasteType=%s, capacityLiters=%s, dailyDemandLitersPerDay=%s, serviceZone=%s}",
+                "Container={id=%s, name=%s, location=%s, wasteType=%s, capacityLiters=%s, dailyDemandLitersPerDay=%s, serviceZone=%s}",
                 this.id,
+                this.name,
                 this.location,
                 this.wasteType,
                 this.capacityLiters,

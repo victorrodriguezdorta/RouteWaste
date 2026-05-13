@@ -137,7 +137,7 @@
       <!-- Vehicles selector for selected facility - Card -->
       <v-card v-if="selectedFacilityForVehicles" class="mt-6" elevation="2">
         <v-card-title class="text-h6 bg-primary text-surface">
-          Seleccionar Vehículos - {{ selectedFacilityForVehicles?.location }}
+          Seleccionar Vehículos - {{ selectedFacilityForVehicles?.name }}
         </v-card-title>
 
         <v-card-text class="pt-6">

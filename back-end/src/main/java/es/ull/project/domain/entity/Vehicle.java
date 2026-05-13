@@ -4,6 +4,7 @@ import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
+import es.ull.project.domain.valueobject.name.Name;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -20,6 +21,7 @@ public class Vehicle {
     public static final String CAPACITY_Kilograms_NOT_DEFINED = "Vehicle capacity in kilograms is not defined";
     public static final String CAPACITY_liters_NOT_DEFINED = "Vehicle capacity in liters is not defined";
     public static final String COST_NOT_DEFINED = "Transportation variable cost is not defined";
+    public static final String NAME_NOT_DEFINED = "Vehicle name is not defined";
 
     /**
      * Identifier of the vehicle.
@@ -27,6 +29,7 @@ public class Vehicle {
      * It is a computed attribute.
      */
     private final UUID id;
+    private Name name;
 
     /**
      * Enumeration of vehicle type (e.g., LIGHT_TRUCK, HEAVY_TRUCK...)
@@ -61,15 +64,18 @@ public class Vehicle {
      * @param costPerKilometer  the cost per kilometer of operation
      */
     public Vehicle(
+            Name name,
             VehicleType vehicleType,
             VehicleCapacityKilograms capacityKilograms,
             VehicleCapacityLiters capacityLiters,
             TransportationVariableCost costPerKilometer) {
+        validateName(name);
         validateVehicleType(vehicleType);
         validateCapacityKilograms(capacityKilograms);
         validateCapacityLiters(capacityLiters);
         validateCost(costPerKilometer);
         this.id = UUID.randomUUID();
+        this.name = name;
         this.vehicleType = vehicleType;
         this.capacityKilograms = capacityKilograms;
         this.capacityLiters = capacityLiters;
@@ -84,6 +90,7 @@ public class Vehicle {
      */
     public Vehicle(Vehicle otherObject) {
         this.id = otherObject.id;
+        this.name = otherObject.name;
         this.vehicleType = otherObject.vehicleType;
         this.capacityKilograms = otherObject.capacityKilograms;
         this.capacityLiters = otherObject.capacityLiters;
@@ -101,15 +108,18 @@ public class Vehicle {
      * @param costPerKilometer  the cost per kilometer
      */
     public Vehicle(UUID id,
+            Name name,
             VehicleType vehicleType,
             VehicleCapacityKilograms capacityKilograms,
             VehicleCapacityLiters capacityLiters,
             TransportationVariableCost costPerKilometer) {
+        validateName(name);
         validateVehicleType(vehicleType);
         validateCapacityKilograms(capacityKilograms);
         validateCapacityLiters(capacityLiters);
         validateCost(costPerKilometer);
         this.id = id;
+        this.name = name;
         this.vehicleType = vehicleType;
         this.capacityKilograms = capacityKilograms;
         this.capacityLiters = capacityLiters;
@@ -162,6 +172,26 @@ public class Vehicle {
         if (cost == null) {
             throw new IllegalArgumentException(COST_NOT_DEFINED);
         }
+    }
+
+    /**
+     * Returns the vehicle identifier.
+     *
+     * @return the unique identifier of the vehicle
+     */
+    private void validateName(Name name) {
+        if (name == null) {
+            throw new IllegalArgumentException(NAME_NOT_DEFINED);
+        }
+    }
+
+    public Name getName() {
+        return this.name;
+    }
+
+    public void updateName(Name name) {
+        validateName(name);
+        this.name = name;
     }
 
     /**
@@ -285,8 +315,9 @@ public class Vehicle {
     @Override
     public String toString() {
         return String.format(
-                "Vehicle={id=%s, type=%s, capacityKilograms=%s, CapacityLiters=%s, costPerKm=%s}",
+                "Vehicle={id=%s, name=%s, type=%s, capacityKilograms=%s, CapacityLiters=%s, costPerKm=%s}",
                 this.id,
+                this.name,
                 this.vehicleType,
                 this.capacityKilograms,
                 this.capacityLiters,
