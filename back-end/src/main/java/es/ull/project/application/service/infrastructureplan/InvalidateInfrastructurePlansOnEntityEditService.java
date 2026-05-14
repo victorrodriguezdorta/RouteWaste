@@ -21,17 +21,18 @@ public class InvalidateInfrastructurePlansOnEntityEditService {
     }
 
     /**
-     * Convenience check: whether any stored execution-request snapshot references the entity.
+     * Convenience check: whether any plan references the entity in any persisted association.
      *
      * @param entityId facility, vehicle, or container id
-     * @return true if at least one plan snapshot contains the id
+     * @return true if at least one plan is linked to that id
      */
     public boolean existsAnyPlanReferencingEntity(UUID entityId) {
         return this.infrastructurePlanRepository.existsAnyPlanReferencingEntityInExecutionRequest(entityId);
     }
 
     /**
-     * Marks every still-valid plan whose stored execution request JSON references the entity as obsolete.
+     * Marks every still-valid plan that references the entity (snapshot JSON, selected facilities,
+     * service assignments, or daily plans) as obsolete.
      *
      * @param editedEntityId id of the facility, vehicle, or container that was updated
      */

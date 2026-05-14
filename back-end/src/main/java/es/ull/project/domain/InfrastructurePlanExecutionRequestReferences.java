@@ -23,6 +23,7 @@ public final class InfrastructurePlanExecutionRequestReferences {
         if (executionRequestJson == null || executionRequestJson.isEmpty() || entityId == null) {
             return false;
         }
-        return executionRequestJson.contains("\"" + entityId + "\"");
+        String needle = "\"" + entityId.toString().toLowerCase() + "\"";
+        return executionRequestJson.toLowerCase().contains(needle);
     }
 }

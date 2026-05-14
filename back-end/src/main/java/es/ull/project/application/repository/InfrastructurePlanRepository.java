@@ -62,7 +62,8 @@ public interface InfrastructurePlanRepository {
 
     /**
      * Finds plans that are still {@link es.ull.project.domain.enumerate.InfrastructurePlanValidityState#VALID}
-     * and whose stored execution-request JSON references the given entity id.
+     * and that reference the given master entity (execution-request JSON snapshot, selected facilities,
+     * service assignments, or daily plans — see persistence layer).
      *
      * @param entityId edited facility, vehicle, or container id
      * @return matching plans (may be empty)
@@ -70,17 +71,17 @@ public interface InfrastructurePlanRepository {
     List<InfrastructurePlan> findValidPlansReferencingEntityInExecutionRequest(UUID entityId);
 
     /**
-     * Returns true if any plan stores an execution request snapshot that references the entity id
-     * (including plans already marked obsolete).
+     * Returns true if any plan references the entity id in any persisted association (including obsolete plans).
      *
-     * @param entityId entity id to search for inside stored JSON
-     * @return true when at least one snapshot contains the id
+     * @param entityId facility, vehicle, or container id
+     * @return true when at least one plan is linked to that id
      */
     boolean existsAnyPlanReferencingEntityInExecutionRequest(UUID entityId);
 
     /**
-     * All infrastructure plans whose stored execution-request JSON references the given entity id
-     * (any {@link es.ull.project.domain.enumerate.InfrastructurePlanValidityState validity}).
+     * All infrastructure plans that reference the given master entity id anywhere in the stored snapshot graph
+     * (execution-request JSON, selected facility ids, service assignments, daily plans and route stops),
+     * regardless of {@link es.ull.project.domain.enumerate.InfrastructurePlanValidityState validity}.
      *
      * @param entityId facility, vehicle, or container id
      * @return matching plans (empty when none or {@code entityId} is null)

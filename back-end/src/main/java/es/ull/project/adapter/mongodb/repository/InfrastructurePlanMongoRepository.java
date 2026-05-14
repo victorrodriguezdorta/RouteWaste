@@ -1,10 +1,13 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -32,7 +35,8 @@ import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepository {
 
     public static final String COLLECTION_NAME = "infrastructureplans";
-    private static final String FIELD_ID = "id";
+    private static final String SERVICE_ASSIGNMENTS_COLLECTION = "serviceassignments";
+    private static final String DAILY_PLANS_COLLECTION = "daily_plans";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -63,7 +67,7 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
     /**
      * Find all infrastructure plans (alias for compatibility).
      *
-     * @return list of infrastructure plans
+     * @return list of all infrastructure plans
      */
     @Override
     public List<InfrastructurePlan> findAll() {
@@ -106,7 +110,7 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
      */
     @Override
     public Optional<InfrastructurePlan> findById(UUID id) {
-        Query query = new Query(Criteria.where(FIELD_ID).is(id));
+        Query query = new Query(Criteria.where(MongoFields.ID).is(id));
         InfrastructurePlan infrastructurePlan = this.mongoTemplate.findOne(query, InfrastructurePlan.class, COLLECTION_NAME);
         return Optional.ofNullable(infrastructurePlan);
     }
@@ -116,14 +120,9 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
         if (entityId == null) {
             return List.of();
         }
-        String token = "\"" + entityId + "\"";
-        Criteria referencesEntity = Criteria.where(MongoFields.EXECUTION_REQUEST_JSON).regex(Pattern.quote(token));
-        Criteria stillValid = new Criteria().orOperator(
-                Criteria.where(MongoFields.VALIDITY_STATE).is(InfrastructurePlanValidityState.VALID.name()),
-                Criteria.where(MongoFields.VALIDITY_STATE).exists(false),
-                Criteria.where(MongoFields.VALIDITY_STATE).is(null));
-        Query query = new Query(new Criteria().andOperator(referencesEntity, stillValid));
-        return this.mongoTemplate.find(query, InfrastructurePlan.class, COLLECTION_NAME);
+        return findPlansReferencingEntityInExecutionRequest(entityId).stream()
+                .filter(p -> p.getValidityState() == InfrastructurePlanValidityState.VALID)
+                .toList();
     }
 
     @Override
@@ -131,9 +130,7 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
         if (entityId == null) {
             return false;
         }
-        String token = "\"" + entityId + "\"";
-        Query query = new Query(Criteria.where(MongoFields.EXECUTION_REQUEST_JSON).regex(Pattern.quote(token)));
-        return this.mongoTemplate.count(query, InfrastructurePlan.class, COLLECTION_NAME) > 0;
+        return !collectInfrastructurePlanIdsReferencingEntity(entityId).isEmpty();
     }
 
     @Override
@@ -141,8 +138,57 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
         if (entityId == null) {
             return List.of();
         }
-        String token = "\"" + entityId + "\"";
-        Query query = new Query(Criteria.where(MongoFields.EXECUTION_REQUEST_JSON).regex(Pattern.quote(token)));
+        Set<UUID> ids = collectInfrastructurePlanIdsReferencingEntity(entityId);
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+        Query query = new Query(Criteria.where(MongoFields.ID).in(ids));
         return this.mongoTemplate.find(query, InfrastructurePlan.class, COLLECTION_NAME);
+    }
+
+    /**
+     * Resolves infrastructure plan ids that reference a facility, container, or vehicle anywhere
+     * in the persisted snapshot (execution JSON, selected facilities, service assignments, daily plans).
+     */
+    private Set<UUID> collectInfrastructurePlanIdsReferencingEntity(UUID entityId) {
+        Set<UUID> planIds = new LinkedHashSet<>();
+        String quotedToken = "\"" + entityId + "\"";
+        Pattern jsonPattern = Pattern.compile(Pattern.quote(quotedToken), Pattern.CASE_INSENSITIVE);
+        Criteria jsonMatch = Criteria.where(MongoFields.EXECUTION_REQUEST_JSON).regex(jsonPattern);
+        Criteria selectedFacilitiesMatch = Criteria.where(MongoFields.SELECTED_FACILITIES).is(entityId);
+        Query infraQuery = new Query(new Criteria().orOperator(jsonMatch, selectedFacilitiesMatch));
+        infraQuery.fields().include(MongoFields.ID);
+        for (Document doc : this.mongoTemplate.find(infraQuery, Document.class, COLLECTION_NAME)) {
+            addIdIfPresent(doc.get(MongoFields.ID), planIds);
+        }
+
+        Query saByFacility = new Query(Criteria.where(MongoFields.FACILITY_ID).is(entityId));
+        saByFacility.fields().include(MongoFields.INFRASTRUCTURE_PLAN_ID);
+        for (Document doc : this.mongoTemplate.find(saByFacility, Document.class, SERVICE_ASSIGNMENTS_COLLECTION)) {
+            addIdIfPresent(doc.get(MongoFields.INFRASTRUCTURE_PLAN_ID), planIds);
+        }
+        Query saByContainer = new Query(Criteria.where(MongoFields.ASSIGNED_CONTAINERS).is(entityId));
+        saByContainer.fields().include(MongoFields.INFRASTRUCTURE_PLAN_ID);
+        for (Document doc : this.mongoTemplate.find(saByContainer, Document.class, SERVICE_ASSIGNMENTS_COLLECTION)) {
+            addIdIfPresent(doc.get(MongoFields.INFRASTRUCTURE_PLAN_ID), planIds);
+        }
+
+        Criteria dailyVehicleOrFacility = new Criteria().orOperator(
+                Criteria.where(MongoFields.VEHICLE).is(entityId),
+                Criteria.where(MongoFields.FACILITY_ID).is(entityId));
+        Criteria dailyStopContainer = Criteria.where(MongoFields.STOPS)
+                .elemMatch(Criteria.where("containerId").is(entityId));
+        Query dailyQuery = new Query(new Criteria().orOperator(dailyVehicleOrFacility, dailyStopContainer));
+        dailyQuery.fields().include(MongoFields.INFRASTRUCTURE_PLAN_ID);
+        for (Document doc : this.mongoTemplate.find(dailyQuery, Document.class, DAILY_PLANS_COLLECTION)) {
+            addIdIfPresent(doc.get(MongoFields.INFRASTRUCTURE_PLAN_ID), planIds);
+        }
+        return planIds;
+    }
+
+    private static void addIdIfPresent(Object rawPlanId, Set<UUID> planIds) {
+        if (rawPlanId instanceof UUID uuid) {
+            planIds.add(uuid);
+        }
     }
 }

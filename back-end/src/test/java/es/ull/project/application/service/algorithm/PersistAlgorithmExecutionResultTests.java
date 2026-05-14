@@ -25,7 +25,7 @@ import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.repository.VehicleRepository;
-import es.ull.project.domain.InfrastructurePlanExecutionRequestReferences;
+import es.ull.project.domain.InfrastructurePlanAggregateReferences;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.ContainerDailyState;
 import es.ull.project.domain.entity.DailyPlan;
@@ -389,8 +389,7 @@ class PersistAlgorithmExecutionResultTests {
                 if (p.getValidityState() != InfrastructurePlanValidityState.VALID) {
                     continue;
                 }
-                String json = p.getExecutionRequestJson().orElse(null);
-                if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+                if (InfrastructurePlanAggregateReferences.referencesEntity(p, entityId)) {
                     matches.add(p);
                 }
             }
@@ -403,8 +402,7 @@ class PersistAlgorithmExecutionResultTests {
                 return false;
             }
             for (InfrastructurePlan p : saved.values()) {
-                String json = p.getExecutionRequestJson().orElse(null);
-                if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+                if (InfrastructurePlanAggregateReferences.referencesEntity(p, entityId)) {
                     return true;
                 }
             }
@@ -418,8 +416,7 @@ class PersistAlgorithmExecutionResultTests {
             }
             List<InfrastructurePlan> matches = new ArrayList<>();
             for (InfrastructurePlan p : saved.values()) {
-                String json = p.getExecutionRequestJson().orElse(null);
-                if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+                if (InfrastructurePlanAggregateReferences.referencesEntity(p, entityId)) {
                     matches.add(p);
                 }
             }

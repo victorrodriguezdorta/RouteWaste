@@ -11,7 +11,8 @@ import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructur
 import es.ull.project.domain.entity.InfrastructurePlan;
 
 /**
- * Removes infrastructure plans whose stored client execution snapshot references a deleted master entity.
+ * Removes infrastructure plans whose persisted snapshot (execution request JSON, selected facilities,
+ * service assignments, or daily plans) references a deleted master entity.
  */
 public class DeleteInfrastructurePlansReferencingEntityService {
 
@@ -30,7 +31,7 @@ public class DeleteInfrastructurePlansReferencingEntityService {
     }
 
     /**
-     * Deletes every infrastructure plan whose {@code executionRequestJson} contains the given entity id.
+     * Deletes every infrastructure plan that references the given entity id in any persisted association.
      * Should be invoked before deleting the facility, vehicle, or container from persistence.
      *
      * @param deletedEntityId id of the entity about to be removed

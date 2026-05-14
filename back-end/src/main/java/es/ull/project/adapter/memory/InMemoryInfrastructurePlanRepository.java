@@ -1,7 +1,7 @@
 package es.ull.project.adapter.memory;
 
 import es.ull.project.application.repository.InfrastructurePlanRepository;
-import es.ull.project.domain.InfrastructurePlanExecutionRequestReferences;
+import es.ull.project.domain.InfrastructurePlanAggregateReferences;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import java.util.ArrayList;
@@ -165,8 +165,7 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
             if (plan.getValidityState() != InfrastructurePlanValidityState.VALID) {
                 continue;
             }
-            String json = plan.getExecutionRequestJson().orElse(null);
-            if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+            if (InfrastructurePlanAggregateReferences.referencesEntity(plan, entityId)) {
                 matches.add(plan);
             }
         }
@@ -179,8 +178,7 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
             return false;
         }
         for (InfrastructurePlan plan : store.values()) {
-            String json = plan.getExecutionRequestJson().orElse(null);
-            if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+            if (InfrastructurePlanAggregateReferences.referencesEntity(plan, entityId)) {
                 return true;
             }
         }
@@ -194,8 +192,7 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
         }
         List<InfrastructurePlan> matches = new ArrayList<>();
         for (InfrastructurePlan plan : store.values()) {
-            String json = plan.getExecutionRequestJson().orElse(null);
-            if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+            if (InfrastructurePlanAggregateReferences.referencesEntity(plan, entityId)) {
                 matches.add(plan);
             }
         }
