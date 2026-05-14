@@ -75,4 +75,18 @@ public class InMemoryServiceAssignmentRepository implements ServiceAssignmentRep
     public Optional<ServiceAssignment> findById(UUID id) {
         return Optional.ofNullable(store.get(id));
     }
+
+    @Override
+    public List<ServiceAssignment> findByInfrastructurePlanId(UUID infrastructurePlanId) {
+        if (infrastructurePlanId == null) {
+            return List.of();
+        }
+        List<ServiceAssignment> matches = new ArrayList<>();
+        for (ServiceAssignment assignment : store.values()) {
+            if (infrastructurePlanId.equals(assignment.getInfrastructurePlan().getId())) {
+                matches.add(assignment);
+            }
+        }
+        return matches;
+    }
 }

@@ -42,6 +42,20 @@ public class InMemoryContainerDailyStateRepository implements ContainerDailyStat
     }
 
     @Override
+    public List<ContainerDailyState> findByInfrastructurePlanId(UUID infrastructurePlanId) {
+        if (infrastructurePlanId == null) {
+            return List.of();
+        }
+        List<ContainerDailyState> matches = new ArrayList<>();
+        for (ContainerDailyState state : states.values()) {
+            if (infrastructurePlanId.equals(state.getInfrastructurePlanId())) {
+                matches.add(state);
+            }
+        }
+        return matches;
+    }
+
+    @Override
     public void delete(ContainerDailyState entity) {
         if (entity != null) {
             states.remove(entity.getId());

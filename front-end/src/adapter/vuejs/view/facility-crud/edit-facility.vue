@@ -27,17 +27,32 @@
         :show-go-back="true"
         :go-back="goBack"
       >
-        <v-form ref="facilityForm">
-          <FacilityFormFields
-            v-if="editFacility"
-            :facility="editFacility"
-            @update:facility="editFacility = $event"
-          />
+        <v-row class="show-entity-detail-layout ma-0" align="start">
+          <v-col cols="12" md="6" lg="5" class="pa-0 pr-md-4">
+            <v-form ref="facilityForm">
+              <FacilityFormFields
+                v-if="editFacility"
+                :facility="editFacility"
+                map-picker-aside
+                @update:facility="editFacility = $event"
+              />
 
-          <v-alert type="info" variant="tonal" class="mt-4">
-            {{ t('common.alerts.requiredFields') }}
-          </v-alert>
-        </v-form>
+              <v-alert type="info" variant="tonal" class="mt-4">
+                {{ t('common.alerts.requiredFields') }}
+              </v-alert>
+            </v-form>
+          </v-col>
+
+          <v-col cols="12" md="6" lg="7" class="pa-0 pl-md-4">
+            <LocationPickerMap
+              v-if="editFacility"
+              class="mt-6 mt-md-0"
+              :latitude="editFacility.latitude"
+              :longitude="editFacility.longitude"
+              @update:location="onPickerLocation"
+            />
+          </v-col>
+        </v-row>
 
         <template #toolbar-append>
           <ButtonTooltip
@@ -62,6 +77,7 @@ import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import CrudLayout from '../../components/common/CrudLayout.vue';
+import LocationPickerMap from '../../components/common/LocationPickerMap.vue';
 import FacilityFormFields from '../../components/facility/facility-form-fields.vue';
 import { FacilityEdit } from '../../dto/facility/facility-edit';
 import router from '../../router/router';
@@ -99,6 +115,14 @@ const setFacility = () => {
     editFacility.value = FacilityEdit.fromFacility(facility.value);
     title.value = t('facility.edit.title');
   }
+};
+
+const onPickerLocation = (value: { latitude: number; longitude: number }) => {
+  if (!editFacility.value) {
+    return;
+  }
+  editFacility.value.latitude = value.latitude;
+  editFacility.value.longitude = value.longitude;
 };
 
 const updateFacility = async () => {

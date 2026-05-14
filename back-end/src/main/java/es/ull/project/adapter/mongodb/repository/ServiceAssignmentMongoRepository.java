@@ -1,5 +1,6 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.domain.entity.ServiceAssignment;
 
@@ -89,5 +90,20 @@ public class ServiceAssignmentMongoRepository implements ServiceAssignmentReposi
         Query query = new Query(Criteria.where(FIELD_ID).is(id));
         ServiceAssignment serviceAssignment = this.mongoTemplate.findOne(query, ServiceAssignment.class, COLLECTION_NAME);
         return Optional.ofNullable(serviceAssignment);
+    }
+
+    /**
+     * Finds all service assignments for an infrastructure plan.
+     *
+     * @param infrastructurePlanId parent plan id
+     * @return assignments whose {@code infrastructurePlanId} field matches
+     */
+    @Override
+    public List<ServiceAssignment> findByInfrastructurePlanId(UUID infrastructurePlanId) {
+        if (infrastructurePlanId == null) {
+            return List.of();
+        }
+        Query query = new Query(Criteria.where(MongoFields.INFRASTRUCTURE_PLAN_ID).is(infrastructurePlanId));
+        return this.mongoTemplate.find(query, ServiceAssignment.class, COLLECTION_NAME);
     }
 }

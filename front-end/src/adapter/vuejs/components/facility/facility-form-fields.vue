@@ -17,7 +17,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="!readonly">
+    <v-row v-if="!readonly && !mapPickerAside">
       <v-col cols="12">
         <v-btn
           color="primary"
@@ -262,10 +262,15 @@ import LocationPickerMap from '../common/LocationPickerMap.vue';
 
 const { t } = useI18n();
 
-const props = defineProps<{
-  facility: any;
-  readonly?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    facility: any;
+    readonly?: boolean;
+    /** When true, the parent renders LocationPickerMap beside the form (e.g. edit view). */
+    mapPickerAside?: boolean;
+  }>(),
+  { mapPickerAside: false },
+);
 
 const emit = defineEmits<{
   (e: 'update:facility', value: any): void;

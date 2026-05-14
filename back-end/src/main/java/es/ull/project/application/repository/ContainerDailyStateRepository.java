@@ -17,5 +17,13 @@ public interface ContainerDailyStateRepository {
 
     List<ContainerDailyState> findAll();
 
+    /**
+     * Finds container daily state snapshots linked to an infrastructure plan.
+     *
+     * @param infrastructurePlanId parent plan id
+     * @return matching entities, empty if id is null
+     */
+    List<ContainerDailyState> findByInfrastructurePlanId(UUID infrastructurePlanId);
+
     void delete(ContainerDailyState entity);
 }

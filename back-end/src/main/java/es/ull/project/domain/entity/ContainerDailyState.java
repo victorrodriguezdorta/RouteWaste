@@ -7,10 +7,15 @@ import es.ull.project.domain.enumerate.ContainerStatus;
 
 /**
  * Domain entity representing a container daily state snapshot persisted in MongoDB.
+ * <p>{@link #infrastructurePlanId} may be null for documents stored before parent linkage was added.</p>
  */
 public class ContainerDailyState {
 
     private final UUID id;
+    /**
+     * Parent infrastructure plan; null only for legacy persisted rows without this field.
+     */
+    private final UUID infrastructurePlanId;
     private final String containerId;
     private final int planDay;
     private final double dailyFillingLiters;
@@ -19,6 +24,7 @@ public class ContainerDailyState {
     private final ContainerStatus status;
 
     public ContainerDailyState(UUID id,
+            UUID infrastructurePlanId,
             String containerId,
             int planDay,
             double dailyFillingLiters,
@@ -26,6 +32,7 @@ public class ContainerDailyState {
             double dailyDemandLitersPerDay,
             ContainerStatus status) {
         if (id == null) throw new IllegalArgumentException("id is required");
+        this.infrastructurePlanId = infrastructurePlanId;
         if (containerId == null || containerId.isBlank()) throw new IllegalArgumentException("containerId is required");
         if (planDay < 1) throw new IllegalArgumentException("planDay must be >= 1");
         if (dailyFillingLiters < 0.0) throw new IllegalArgumentException("dailyFillingLiters must be >= 0");
@@ -41,6 +48,13 @@ public class ContainerDailyState {
     }
 
     public UUID getId() { return id; }
+
+    /**
+     * @return parent plan id, or null for legacy snapshots without persisted linkage
+     */
+    public UUID getInfrastructurePlanId() {
+        return infrastructurePlanId;
+    }
 
     public String getContainerId() { return containerId; }
 
@@ -69,7 +83,7 @@ public class ContainerDailyState {
 
     @Override
     public String toString() {
-        return String.format("ContainerDailyState{id=%s,containerId=%s,planDay=%d,dailyFilling=%.2f,capacity=%.2f,dailyDemand=%.2f,status=%s}",
-            id, containerId, planDay, dailyFillingLiters, containerCapacityLiters, dailyDemandLitersPerDay, status);
+        return String.format("ContainerDailyState{id=%s,infrastructurePlanId=%s,containerId=%s,planDay=%d,dailyFilling=%.2f,capacity=%.2f,dailyDemand=%.2f,status=%s}",
+            id, infrastructurePlanId, containerId, planDay, dailyFillingLiters, containerCapacityLiters, dailyDemandLitersPerDay, status);
     }
 }

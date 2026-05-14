@@ -30,6 +30,7 @@ class InfrastructurePlanResponseMapperTests {
 
         ContainerDailyState state = new ContainerDailyState(
             UUID.randomUUID(),
+            plan.getId(),
             "2dd7627e-f357-42e1-b257-2cf1160440d3",
             2,
             850.0,

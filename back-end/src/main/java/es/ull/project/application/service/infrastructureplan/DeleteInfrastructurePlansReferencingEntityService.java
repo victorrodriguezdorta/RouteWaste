@@ -21,7 +21,7 @@ public class DeleteInfrastructurePlansReferencingEntityService {
 
     /**
      * @param infrastructurePlanRepository repository to find affected plans
-     * @param deleteInfrastructurePlanUseCase use case that cascades daily plans and service assignments
+     * @param deleteInfrastructurePlanUseCase use case that cascades daily plans, service assignments, and container daily states
      */
     public DeleteInfrastructurePlansReferencingEntityService(
             InfrastructurePlanRepository infrastructurePlanRepository,

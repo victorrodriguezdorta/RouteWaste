@@ -1,9 +1,11 @@
 package es.ull.project.application.service.infrastructureplan;
 
+import es.ull.project.application.repository.ContainerDailyStateRepository;
 import es.ull.project.application.repository.DailyPlanRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
+import es.ull.project.domain.entity.ContainerDailyState;
 import es.ull.project.domain.entity.DailyPlan;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
@@ -22,21 +24,25 @@ public class DeleteInfrastructurePlanService implements DeleteInfrastructurePlan
     private final InfrastructurePlanRepository repository;
     private final DailyPlanRepository dailyPlanRepository;
     private final ServiceAssignmentRepository serviceAssignmentRepository;
+    private final ContainerDailyStateRepository containerDailyStateRepository;
 
     /**
      * Constructs a new DeleteInfrastructurePlanService with the specified repositories.
      *
-     * @param repository                  the infrastructure plan repository
-     * @param dailyPlanRepository         the daily plan repository for cascading deletes
-     * @param serviceAssignmentRepository the service assignment repository for cascading deletes
+     * @param repository                    the infrastructure plan repository
+     * @param dailyPlanRepository           the daily plan repository for cascading deletes
+     * @param serviceAssignmentRepository   the service assignment repository for cascading deletes
+     * @param containerDailyStateRepository the container daily state repository for cascading deletes
      */
     public DeleteInfrastructurePlanService(
             InfrastructurePlanRepository repository,
             DailyPlanRepository dailyPlanRepository,
-            ServiceAssignmentRepository serviceAssignmentRepository) {
+            ServiceAssignmentRepository serviceAssignmentRepository,
+            ContainerDailyStateRepository containerDailyStateRepository) {
         this.repository = repository;
         this.dailyPlanRepository = dailyPlanRepository;
         this.serviceAssignmentRepository = serviceAssignmentRepository;
+        this.containerDailyStateRepository = containerDailyStateRepository;
     }
 
     /**
@@ -56,10 +62,21 @@ public class DeleteInfrastructurePlanService implements DeleteInfrastructurePlan
                 dailyPlanRepository.delete(dp);
             }
         }
-        List<ServiceAssignment> assignments = existing.getServiceAssignments();
+        List<ServiceAssignment> assignments = serviceAssignmentRepository.findByInfrastructurePlanId(id);
         if (assignments != null) {
             for (ServiceAssignment sa : assignments) {
                 serviceAssignmentRepository.delete(sa);
+            }
+        }
+        List<ContainerDailyState> containerDailyStates = containerDailyStateRepository.findByInfrastructurePlanId(id);
+        if (containerDailyStates != null) {
+            for (ContainerDailyState cds : containerDailyStates) {
+                containerDailyStateRepository.delete(cds);
+            }
+        }
+        for (ContainerDailyState cds : existing.getContainerDailyStates()) {
+            if (cds.getInfrastructurePlanId() == null) {
+                containerDailyStateRepository.delete(cds);
             }
         }
         this.repository.delete(existing);

@@ -95,6 +95,9 @@ class PersistAlgorithmExecutionResultTests {
         assertEquals(new AveragePickupTimeMinutes(15), plan.getAveragePickupTimeMinutes().get());
         assertEquals(new ExecutedAt("2026-04-29T10:30:32.420542549Z"), plan.getExecutedAt().get());
         assertEquals(2, plan.getContainerDailyStates().size());
+        for (ContainerDailyState cds : plan.getContainerDailyStates()) {
+            assertEquals(plan.getId(), cds.getInfrastructurePlanId());
+        }
         assertEquals(1, infrastructurePlanRepository.saved.size());
         assertEquals(1, serviceAssignmentRepository.saved.size());
         assertEquals(2, dailyPlanRepository.saved.size());
@@ -454,6 +457,20 @@ class PersistAlgorithmExecutionResultTests {
         public Optional<ServiceAssignment> findById(UUID id) {
             return Optional.ofNullable(saved.get(id));
         }
+
+        @Override
+        public List<ServiceAssignment> findByInfrastructurePlanId(UUID infrastructurePlanId) {
+            if (infrastructurePlanId == null) {
+                return List.of();
+            }
+            List<ServiceAssignment> matches = new ArrayList<>();
+            for (ServiceAssignment a : saved.values()) {
+                if (infrastructurePlanId.equals(a.getInfrastructurePlan().getId())) {
+                    matches.add(a);
+                }
+            }
+            return matches;
+        }
     }
 
     private static final class InMemoryDailyPlanRepository implements DailyPlanRepository {
@@ -506,6 +523,20 @@ class PersistAlgorithmExecutionResultTests {
       @Override
       public List<ContainerDailyState> findAll() {
         return new ArrayList<>(saved.values());
+      }
+
+      @Override
+      public List<ContainerDailyState> findByInfrastructurePlanId(UUID infrastructurePlanId) {
+        if (infrastructurePlanId == null) {
+          return List.of();
+        }
+        List<ContainerDailyState> matches = new ArrayList<>();
+        for (ContainerDailyState s : saved.values()) {
+          if (infrastructurePlanId.equals(s.getInfrastructurePlanId())) {
+            matches.add(s);
+          }
+        }
+        return matches;
       }
 
       @Override

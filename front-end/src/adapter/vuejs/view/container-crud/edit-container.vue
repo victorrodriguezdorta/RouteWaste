@@ -27,17 +27,32 @@
         :show-go-back="true"
         :go-back="goBack"
       >
-        <v-form ref="containerForm">
-          <ContainerFormFields
-            v-if="editContainer"
-            :container="editContainer"
-            @update:container="editContainer = $event"
-          />
+        <v-row class="show-entity-detail-layout ma-0" align="start">
+          <v-col cols="12" md="6" lg="5" class="pa-0 pr-md-4">
+            <v-form ref="containerForm">
+              <ContainerFormFields
+                v-if="editContainer"
+                :container="editContainer"
+                map-picker-aside
+                @update:container="editContainer = $event"
+              />
 
-          <v-alert type="info" variant="tonal" class="mt-4">
-            {{ t('common.alerts.requiredFields') }}
-          </v-alert>
-        </v-form>
+              <v-alert type="info" variant="tonal" class="mt-4">
+                {{ t('common.alerts.requiredFields') }}
+              </v-alert>
+            </v-form>
+          </v-col>
+
+          <v-col cols="12" md="6" lg="7" class="pa-0 pl-md-4">
+            <LocationPickerMap
+              v-if="editContainer"
+              class="mt-6 mt-md-0"
+              :latitude="editContainer.latitude"
+              :longitude="editContainer.longitude"
+              @update:location="onPickerLocation"
+            />
+          </v-col>
+        </v-row>
 
         <template #toolbar-append>
           <ButtonTooltip
@@ -61,8 +76,9 @@ import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import ContainerFormFields from '../../components/container/container-form-fields.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
+import LocationPickerMap from '../../components/common/LocationPickerMap.vue';
+import ContainerFormFields from '../../components/container/container-form-fields.vue';
 import { ContainerEdit } from '../../dto/container/container-edit';
 import router from '../../router/router';
 import { useContainerStore } from '../../stores/container-store';
@@ -99,6 +115,14 @@ const setContainer = () => {
     editContainer.value = ContainerEdit.fromContainer(container.value);
     title.value = t('container.edit.title');
   }
+};
+
+const onPickerLocation = (value: { latitude: number; longitude: number }) => {
+  if (!editContainer.value) {
+    return;
+  }
+  editContainer.value.latitude = value.latitude;
+  editContainer.value.longitude = value.longitude;
 };
 
 const updateContainer = async () => {

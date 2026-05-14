@@ -22,6 +22,7 @@ public class ContainerDailyStateReadingConverter implements Converter<Document, 
     public ContainerDailyState convert(@NonNull Document document) {
         logger.info("Reading ContainerDailyState from document");
         UUID id = (UUID) document.get(MongoFields.ID);
+        UUID infrastructurePlanId = document.get(MongoFields.INFRASTRUCTURE_PLAN_ID, UUID.class);
         String containerId = document.getString(MongoFields.CONTAINER_ID);
         Integer planDay = document.getInteger(MongoFields.PLAN_DAY);
         Double dailyFilling = document.getDouble(MongoFields.DAILY_FILLING_LITERS);
@@ -31,6 +32,7 @@ public class ContainerDailyStateReadingConverter implements Converter<Document, 
         ContainerStatus status = ContainerStatus.fromString(statusRaw);
         return new ContainerDailyState(
             id,
+            infrastructurePlanId,
             containerId,
             planDay != null ? planDay : 1,
             dailyFilling != null ? dailyFilling : 0.0,

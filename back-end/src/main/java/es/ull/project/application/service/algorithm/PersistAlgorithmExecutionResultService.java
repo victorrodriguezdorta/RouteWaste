@@ -261,7 +261,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			logger.warn("No daily plans found in algorithm response");
 		}
 		JSONArray containerStateMonitoringNode = algorithmResponse.optJSONArray(FIELD_CONTAINER_STATE_MONITORING);
-		List<ContainerDailyState> containerDailyStates = readContainerDailyStates(containerStateMonitoringNode);
+		List<ContainerDailyState> containerDailyStates = readContainerDailyStates(containerStateMonitoringNode, plan.getId());
 		for (ContainerDailyState containerDailyState : containerDailyStates) {
 			plan.addContainerDailyState(containerDailyState);
 			if (this.containerDailyStateRepository != null) {
@@ -412,9 +412,10 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * Reads container daily state monitoring entries from the algorithm response.
 	 *
 	 * @param containerStateMonitoringNode JSON array with container daily states
+	 * @param infrastructurePlanId         parent plan id (must match persisted plan)
 	 * @return list of parsed ContainerDailyState entities
 	 */
-	private List<ContainerDailyState> readContainerDailyStates(JSONArray containerStateMonitoringNode) {
+	private List<ContainerDailyState> readContainerDailyStates(JSONArray containerStateMonitoringNode, UUID infrastructurePlanId) {
 		List<ContainerDailyState> containerDailyStates = new ArrayList<>();
 		if (containerStateMonitoringNode == null) {
 			return containerDailyStates;
@@ -444,6 +445,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			try {
 				ContainerDailyState containerDailyState = new ContainerDailyState(
 						UUID.randomUUID(),
+						infrastructurePlanId,
 						containerId,
 						planDay,
 						dailyFillingLiters,

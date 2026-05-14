@@ -16,32 +16,38 @@
         :show-go-back="true"
         :go-back="goBack"
       >
-        <v-form>
-          <ContainerFormFields
-            :container="containerInfo"
-            :readonly="true"
-          />
+        <v-row class="show-entity-detail-layout ma-0" align="start">
+          <v-col cols="12" md="6" lg="5" class="pa-0 pr-md-4">
+            <v-form>
+              <ContainerFormFields
+                :container="containerInfo"
+                :readonly="true"
+              />
 
-          <v-text-field
-            :model-value="containerInfo.id"
-            :label="t('container.show.fields.containerId')"
-            color="primary"
-            prepend-icon="mdi-identifier"
-            disabled
-            readonly
-            variant="outlined"
-            class="mt-4"
-          />
-        </v-form>
+              <v-text-field
+                :model-value="containerInfo.id"
+                :label="t('container.show.fields.containerId')"
+                color="primary"
+                prepend-icon="mdi-identifier"
+                disabled
+                readonly
+                variant="outlined"
+                class="mt-4"
+              />
+            </v-form>
+          </v-col>
 
-        <LocationMap
-          class="mt-6"
-          :latitude="containerInfo.latitude"
-          :longitude="containerInfo.longitude"
-          :title="containerInfo.postalAddress"
-          :subtitle="`GIS: ${containerInfo.gisReference}`"
-          :eyebrow="t('container.show.map.eyebrow')"
-        />
+          <v-col cols="12" md="6" lg="7" class="pa-0 pl-md-4">
+            <LocationMap
+              class="mt-6 mt-md-0"
+              :latitude="containerInfo.latitude"
+              :longitude="containerInfo.longitude"
+              :title="containerInfo.postalAddress"
+              :subtitle="`GIS: ${containerInfo.gisReference}`"
+              :eyebrow="t('container.show.map.eyebrow')"
+            />
+          </v-col>
+        </v-row>
 
         <template #toolbar-append>
           <ButtonTooltip

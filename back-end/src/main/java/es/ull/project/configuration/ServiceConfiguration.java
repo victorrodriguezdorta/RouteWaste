@@ -265,17 +265,20 @@ public class ServiceConfiguration {
     /**
      * Creates the service bean responsible for deleting infrastructure plans.
      *
-     * @param repository                   the infrastructure plan repository
-     * @param dailyPlanRepository          repository for associated daily plans
-     * @param serviceAssignmentRepository  repository for associated service assignments
+     * @param repository                     the infrastructure plan repository
+     * @param dailyPlanRepository            repository for associated daily plans
+     * @param serviceAssignmentRepository    repository for associated service assignments
+     * @param containerDailyStateRepository  repository for container monitoring snapshots
      * @return configured {@link DeleteInfrastructurePlanService} instance
      */
     @Bean
     public DeleteInfrastructurePlanService deleteInfrastructurePlanService(
             InfrastructurePlanRepository repository,
             DailyPlanRepository dailyPlanRepository,
-            ServiceAssignmentRepository serviceAssignmentRepository) {
-        return new DeleteInfrastructurePlanService(repository, dailyPlanRepository, serviceAssignmentRepository);
+            ServiceAssignmentRepository serviceAssignmentRepository,
+            ContainerDailyStateRepository containerDailyStateRepository) {
+        return new DeleteInfrastructurePlanService(
+                repository, dailyPlanRepository, serviceAssignmentRepository, containerDailyStateRepository);
     }
 
     /**

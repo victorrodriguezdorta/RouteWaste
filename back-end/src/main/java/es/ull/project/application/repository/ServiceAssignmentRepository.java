@@ -50,4 +50,12 @@ public interface ServiceAssignmentRepository {
      * @return optional with the assignment if found
      */
     public abstract Optional<ServiceAssignment> findById(UUID id);
+
+    /**
+     * Finds all service assignments linked to the given infrastructure plan.
+     *
+     * @param infrastructurePlanId parent plan id
+     * @return matching assignments, empty if id is null
+     */
+    List<ServiceAssignment> findByInfrastructurePlanId(UUID infrastructurePlanId);
 }

@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.application.repository.ContainerDailyStateRepository;
 import es.ull.project.domain.entity.ContainerDailyState;
 
@@ -20,6 +21,7 @@ public class ContainerDailyStateMongoRepository implements ContainerDailyStateRe
 
     public static final String COLLECTION_NAME = "containerDailyStates";
     private static final String FIELD_ID = "id";
+    private static final String FIELD_INFRASTRUCTURE_PLAN_ID = MongoFields.INFRASTRUCTURE_PLAN_ID;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -40,6 +42,15 @@ public class ContainerDailyStateMongoRepository implements ContainerDailyStateRe
     @Override
     public List<ContainerDailyState> findAll() {
         return this.mongoTemplate.findAll(ContainerDailyState.class, COLLECTION_NAME);
+    }
+
+    @Override
+    public List<ContainerDailyState> findByInfrastructurePlanId(UUID infrastructurePlanId) {
+        if (infrastructurePlanId == null) {
+            return List.of();
+        }
+        Query query = new Query(Criteria.where(FIELD_INFRASTRUCTURE_PLAN_ID).is(infrastructurePlanId));
+        return this.mongoTemplate.find(query, ContainerDailyState.class, COLLECTION_NAME);
     }
 
     @Override

@@ -20,6 +20,9 @@ public class ContainerDailyStateWritingConverter implements Converter<ContainerD
         logger.info("Writing ContainerDailyState {} to document", state.getId());
         Document document = new Document();
         document.put(MongoFields.ID, state.getId());
+        if (state.getInfrastructurePlanId() != null) {
+            document.put(MongoFields.INFRASTRUCTURE_PLAN_ID, state.getInfrastructurePlanId());
+        }
         document.put(MongoFields.CONTAINER_ID, state.getContainerId());
         document.put(MongoFields.PLAN_DAY, state.getPlanDay());
         document.put(MongoFields.DAILY_FILLING_LITERS, state.getDailyFillingLiters());
