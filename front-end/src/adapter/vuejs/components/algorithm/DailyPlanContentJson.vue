@@ -10,7 +10,7 @@
           <v-btn
             icon="mdi-chevron-left"
             variant="text"
-            color="white"
+            color="on-primary"
             size="large"
             :disabled="!canGoPrevious"
             @click="emit('go-previous')"
@@ -18,7 +18,7 @@
 
           <div class="navigator-controller__body">
             <div class="navigator-controller__title">
-              <v-icon icon="mdi-calendar-range" color="white" size="22" />
+              <v-icon icon="mdi-calendar-range" color="on-primary" size="22" />
               <span class="navigator-controller__date">{{ serviceDate ?? '—' }}</span>
             </div>
             <div class="navigator-controller__day">
@@ -29,7 +29,7 @@
           <v-btn
             icon="mdi-chevron-right"
             variant="text"
-            color="white"
+            color="on-primary"
             size="large"
             :disabled="!canGoNext"
             @click="emit('go-next')"
@@ -70,7 +70,7 @@
                 icon=""
                 size="small"
                 variant="flat"
-                color="white"
+                color="on-primary"
                 class="entity-button flex-grow-1 text-truncate"
                 :class="{ 'entity-button-selected': isFacilitySelected(facility.id.getValue()) }"
                 :eventclick="() => toggleFacilitySelection(facility.id.getValue())"
@@ -81,7 +81,7 @@
                 icon="mdi-eye"
                 size="small"
                 variant="flat"
-                color="white"
+                color="on-primary"
                 class="entity-view-button"
                 :eventclick="() => openFacility(facility.id.getValue())"
               />
@@ -122,7 +122,7 @@
                 icon=""
                 size="small"
                 variant="flat"
-                color="white"
+                color="on-primary"
                 class="entity-button flex-grow-1 text-truncate"
                 :class="{ 'entity-button-selected': isVehicleRouteSelected(route.key) }"
                 :eventclick="() => toggleVehicleRouteSelection(route.key)"
@@ -133,7 +133,7 @@
                 icon="mdi-eye"
                 size="small"
                 variant="flat"
-                color="white"
+                color="on-primary"
                 class="entity-view-button"
                 :eventclick="() => openVehicle(route.vehicleId)"
               />
@@ -221,6 +221,7 @@ import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useTheme } from 'vuetify';
 import router from '../../router/router';
 import DailyPlanContainerMonitoring from './DailyPlanContainerMonitoring.vue';
 import DailyPlanRouteTimeline from './DailyPlanRouteTimeline.vue';
@@ -277,6 +278,17 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const theme = useTheme();
+
+function leafletRouteLineColors(): { returnLeg: string; departureLeg: string; progressionLeg: string } {
+  const colors = theme.global.current.value.colors as Record<string, string | undefined>;
+  return {
+    returnLeg: colors['route-return-leg'] ?? '#b00020',
+    departureLeg: colors['route-departure-leg'] ?? '#1e88e5',
+    progressionLeg: colors['route-progression-leg'] ?? '#00a83a',
+  };
+}
+
 const dailyDetailsTab = ref<'routes' | 'monitoring'>('routes');
 const jsonExpanded = ref(false);
 const mapStageRef = ref<HTMLElement | null>(null);
@@ -755,6 +767,8 @@ function renderMarkers(): void {
 
   layer.clearLayers();
 
+  const lineColors = leafletRouteLineColors();
+
   const boundsPoints: Array<[number, number]> = [];
   const selectedFacilityMap = new Map(selectedFacilities.value.map((facility) => [facility.id.getValue(), facility]));
   const routeContainerLocationMap = new Map<string, [number, number]>();
@@ -826,7 +840,7 @@ function renderMarkers(): void {
           // Draw red line from last container to facility (if both exist)
           if (lastContainerPoint && facilityPoint) {
             L.polyline([lastContainerPoint, facilityPoint], {
-              color: '#b00020',
+              color: lineColors.returnLeg,
               weight: 4,
               opacity: 0.95,
             }).addTo(layer);
@@ -847,7 +861,7 @@ function renderMarkers(): void {
         // If we have a facility departure pending, draw a blue line to this container
         if (lastFacilityPoint && containerPoint) {
           L.polyline([lastFacilityPoint, containerPoint], {
-            color: '#1e88e5',
+            color: lineColors.departureLeg,
             weight: 4,
             opacity: 0.95,
           }).addTo(layer);
@@ -862,7 +876,7 @@ function renderMarkers(): void {
 
       if (containerRoutePoints.length >= 2) {
         L.polyline(containerRoutePoints, {
-          color: '#00a83a',
+          color: lineColors.progressionLeg,
           weight: 5,
           opacity: 0.95,
         }).addTo(layer);
@@ -885,11 +899,15 @@ function renderMarkers(): void {
 }
 
 .map-stage {
-  background: linear-gradient(145deg, #e8eef5 0%, #dfe7f0 100%);
+  background: linear-gradient(
+    145deg,
+    rgb(var(--v-theme-panel-gradient-start)) 0%,
+    rgb(var(--v-theme-panel-gradient-end)) 100%
+  );
   border-radius: 20px;
   box-shadow:
-    0 16px 48px rgba(15, 23, 42, 0.12),
-    0 0 0 1px rgba(15, 23, 42, 0.04);
+    0 16px 48px rgba(var(--v-theme-shadow-slate), 0.12),
+    0 0 0 1px rgba(var(--v-theme-shadow-slate), 0.04);
   overflow: hidden;
   position: relative;
 }
@@ -911,8 +929,8 @@ function renderMarkers(): void {
   align-items: center;
   background: rgb(var(--v-theme-primary));
   border-radius: 999px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(var(--v-theme-neutral-base), 0.15);
+  color: rgb(var(--v-theme-on-primary));
   display: inline-flex;
   flex-shrink: 0;
   gap: 6px;
@@ -938,7 +956,7 @@ function renderMarkers(): void {
 
 .navigator-controller__title {
   align-items: center;
-  color: #ffffff;
+  color: rgb(var(--v-theme-on-primary));
   display: inline-flex;
   font-size: 1.05rem;
   font-weight: 700;
@@ -953,7 +971,7 @@ function renderMarkers(): void {
 }
 
 .navigator-controller__day {
-  color: #ffffff;
+  color: rgb(var(--v-theme-on-primary));
   font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.2;
@@ -990,10 +1008,10 @@ function renderMarkers(): void {
 
 .drawer-card {
   backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.97) !important;
-  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  background: rgba(var(--v-theme-surface), 0.97) !important;
+  border: 1px solid rgba(var(--v-theme-shadow-slate), 0.12) !important;
   border-radius: 14px !important;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06) !important;
+  box-shadow: 0 2px 12px rgba(var(--v-theme-shadow-slate), 0.06) !important;
   display: flex;
   flex: 1 1 0;
   flex-direction: column;
@@ -1040,7 +1058,7 @@ function renderMarkers(): void {
   overflow-x: hidden;
   overflow-y: auto;
   padding: 4px 10px 12px;
-  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+  scrollbar-color: rgba(var(--v-theme-neutral-base), 0.25) transparent;
   scrollbar-width: thin;
 }
 
@@ -1051,7 +1069,7 @@ function renderMarkers(): void {
 
 .entity-button,
 .entity-view-button {
-  background: #ffffff !important;
+  background: rgb(var(--v-theme-surface)) !important;
   color: rgb(var(--v-theme-primary)) !important;
 }
 
@@ -1076,7 +1094,7 @@ function renderMarkers(): void {
 
 .details-shell {
   background: rgb(var(--v-theme-surface)) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(var(--v-theme-neutral-base), 0.08);
   border-radius: 16px;
   overflow: hidden;
 }
@@ -1090,11 +1108,11 @@ function renderMarkers(): void {
 }
 
 .details-shell__window {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(var(--v-theme-surface), 0.5);
 }
 
 .route-visualizer__json-toggle {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(var(--v-theme-neutral-base), 0.08);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -1128,10 +1146,10 @@ function renderMarkers(): void {
 }
 
 :global(.facility-red-icon span) {
-  background: #d32f2f;
-  border: 3px solid #ffffff;
+  background: rgb(var(--v-theme-facility-marker-fill));
+  border: 3px solid rgb(var(--v-theme-surface));
   border-radius: 999px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0 1px rgba(var(--v-theme-neutral-base), 0.25);
   display: block;
   height: 24px;
   width: 24px;
@@ -1151,8 +1169,12 @@ function renderMarkers(): void {
   }
 
   .map-stage__drawer {
-    background: linear-gradient(180deg, #f4f6f9 0%, #ffffff 100%);
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    background: linear-gradient(
+      180deg,
+      rgb(var(--v-theme-drawer-backdrop-gradient-start)) 0%,
+      rgb(var(--v-theme-surface)) 100%
+    );
+    border-top: 1px solid rgba(var(--v-theme-neutral-base), 0.06);
     bottom: auto;
     flex-direction: column;
     gap: 12px;

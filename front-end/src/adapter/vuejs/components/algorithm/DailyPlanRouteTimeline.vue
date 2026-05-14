@@ -22,7 +22,7 @@
                     icon="mdi-eye"
                     size="small"
                     variant="flat"
-                    color="white"
+                    color="on-primary"
                     class="route-section__view-button"
                     :eventclick="() => openVehicle(route.vehicleId)"
                   />
@@ -35,7 +35,7 @@
                     icon="mdi-eye"
                     size="small"
                     variant="flat"
-                    color="white"
+                    color="on-primary"
                     class="route-section__view-button"
                     :eventclick="() => openFacility(route.facilityId)"
                   />
@@ -81,7 +81,7 @@
                         icon="mdi-eye"
                         size="small"
                         variant="flat"
-                        color="white"
+                        color="on-primary"
                         class="route-stop__view-button"
                         :eventclick="() => openContainer(stop.containerId)"
                       />
@@ -306,9 +306,9 @@ function openFacility(facilityId: string): void {
 }
 
 .route-section {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(var(--v-theme-neutral-base), 0.1);
   border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 4px 16px rgba(var(--v-theme-shadow-slate), 0.06);
 }
 
 .route-section__header {
@@ -330,7 +330,7 @@ function openFacility(facilityId: string): void {
 
 .route-section__meta,
 .route-section__summary {
-  color: rgba(0, 0, 0, 0.7);
+  color: rgba(var(--v-theme-neutral-base), 0.7);
   font-size: 0.92rem;
   display: flex;
   align-items: center;
@@ -338,7 +338,7 @@ function openFacility(facilityId: string): void {
 }
 
 .route-section__view-button {
-  background: #ffffff !important;
+  background: rgb(var(--v-theme-surface)) !important;
   color: rgb(var(--v-theme-primary)) !important;
 }
 
@@ -384,7 +384,7 @@ function openFacility(facilityId: string): void {
 }
 
 .route-stop:not(:last-child) .route-stop__dot::after {
-  background: rgba(49, 87, 44, 0.3);
+  background: rgba(var(--v-theme-primary), 0.3);
   content: '';
   left: 50%;
   position: absolute;
@@ -395,8 +395,8 @@ function openFacility(facilityId: string): void {
 }
 
 .route-stop__content {
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  background: rgb(var(--v-theme-surface));
+  box-shadow: 0 2px 8px rgba(var(--v-theme-neutral-base), 0.04);
   border-radius: 10px;
   padding: 12px 14px;
 }
@@ -422,7 +422,7 @@ function openFacility(facilityId: string): void {
 }
 
 .route-stop__container {
-  color: rgba(0, 0, 0, 0.72);
+  color: rgba(var(--v-theme-neutral-base), 0.72);
   word-break: break-word;
 }
 
@@ -434,12 +434,12 @@ function openFacility(facilityId: string): void {
 }
 
 .route-stop__view-button {
-  background: #ffffff !important;
+  background: rgb(var(--v-theme-surface)) !important;
   color: rgb(var(--v-theme-primary)) !important;
 }
 
 .route-stop__metrics {
-  color: rgba(0, 0, 0, 0.78);
+  color: rgba(var(--v-theme-neutral-base), 0.78);
   display: grid;
   gap: 6px;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));

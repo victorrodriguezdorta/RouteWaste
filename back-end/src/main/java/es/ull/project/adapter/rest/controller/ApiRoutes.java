@@ -66,4 +66,10 @@ public final class ApiRoutes {
      * Full path: /api/v1/algorithms
      */
     public static final String ALGORITHMS = API_BASE + "/algorithms";
+
+    /**
+     * Dashboard-style aggregate read (entity counts and recent infrastructure plans).
+     * Full path: /api/v1/application-overview
+     */
+    public static final String APPLICATION_OVERVIEW = API_BASE + "/application-overview";
 }

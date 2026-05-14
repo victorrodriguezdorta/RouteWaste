@@ -381,7 +381,7 @@
     },
     "show": {
       "actions": {
-        "editAsNewRun": "Edit (new run)",
+        "editAsNewRun": "Edit",
         "editAsNewRunTooltip": "Opens the wizard with the same selection (facilities, vehicles, containers, and parameters). Executing will create a new plan."
       },
       "replayLoadedTitle": "Selection loaded",
@@ -529,6 +529,27 @@
   "selection": {
     "welcome": "Welcome to Route Waste",
     "welcomeDescription": "Optimize and manage waste collection routes efficiently",
+    "dashboard": {
+      "snapshotTitle": "Data snapshot",
+      "refresh": "Refresh",
+      "inCatalog": "saved in the system",
+      "manage": "Manage",
+      "infrastructurePlansTitle": "Infrastructure plans",
+      "infrastructurePlansDescription": "Review algorithm results and your plan history.",
+      "recentTitle": "Latest algorithm runs",
+      "recentSubtitle": "The three most recent plans by execution time.",
+      "viewPlan": "View plan",
+      "emptyRecent": "No saved plans yet. Run the algorithm to create the first one.",
+      "runAlgorithm": "Run algorithm",
+      "loadError": "Could not load the overview. Check the server connection and try again.",
+      "daysAbbr": "days",
+      "validity": {
+        "valid": "Valid",
+        "obsolete": "Obsolete"
+      },
+      "totalPlansLabel": "{count} plans in total",
+      "viewAllPlans": "View all plans"
+    },
     "title": "Entity Management",
     "subtitle": "Select the module you want to manage",
     "types": {

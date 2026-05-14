@@ -6,31 +6,31 @@
     color="primary"
   >
     <v-list-item class="pa-4">
-      <v-list-item-title class="text-h6 text-white font-weight-bold">
+      <v-list-item-title class="text-h6 text-on-primary font-weight-bold">
         {{ $t('nav.menu') }}
       </v-list-item-title>
     </v-list-item>
 
-    <v-divider color="white" class="mb-2"></v-divider>
+    <v-divider color="on-primary" class="mb-2"></v-divider>
 
     <v-list density="compact" nav>
       <v-list-item
         prepend-icon="mdi-home"
         :title="t('nav.menu')"
         value="selection"
-        active-color="white"
-        class="text-white"
+        active-color="on-primary"
+        class="text-on-primary"
         @click="navigateTo('Selection')"
       ></v-list-item>
       
-      <v-divider color="white" class="my-2" opacity="0.3"></v-divider>
+      <v-divider color="on-primary" class="my-2" opacity="0.3"></v-divider>
       
       <v-list-item
         prepend-icon="mdi-truck"
         :title="t('selection.types.vehicles.title')"
         value="vehicles"
-        active-color="white"
-        class="text-white"
+        active-color="on-primary"
+        class="text-on-primary"
         @click="navigateTo('Vehicles')"
       ></v-list-item>
       
@@ -38,8 +38,8 @@
         prepend-icon="mdi-trash-can"
         :title="t('selection.types.containers.title')"
         value="containers"
-        active-color="white"
-        class="text-white"
+        active-color="on-primary"
+        class="text-on-primary"
         @click="navigateTo('Containers')"
       ></v-list-item>
       
@@ -47,19 +47,19 @@
         prepend-icon="mdi-office-building"
         :title="t('selection.types.facilities.title')"
         value="facilities"
-        active-color="white"
-        class="text-white"
+        active-color="on-primary"
+        class="text-on-primary"
         @click="navigateTo('Facilities')"
       ></v-list-item>
       
-      <v-divider color="white" class="my-2" opacity="0.3"></v-divider>
+      <v-divider color="on-primary" class="my-2" opacity="0.3"></v-divider>
       
       <v-list-item
         prepend-icon="mdi-router"
         :title="t('selection.types.algorithm.title')"
         value="algorithm"
-        active-color="white"
-        class="text-white"
+        active-color="on-primary"
+        class="text-on-primary"
         @click="navigateTo('Algorithm')"
       ></v-list-item>
 
@@ -67,8 +67,8 @@
         prepend-icon="mdi-play-circle-outline"
         :title="t('algorithm.list.runButton')"
         value="execute-algorithm"
-        active-color="white"
-        class="text-white"
+        active-color="on-primary"
+        class="text-on-primary"
         @click="navigateTo('ExecuteAlgorithm')"
       ></v-list-item>
     </v-list>

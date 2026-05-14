@@ -20,7 +20,7 @@ function navigateToSelection(): void {
       icon="mdi-menu"
       text=""
       tooltip="Main Menu"
-      color="white"
+      color="on-primary"
       variant="text"
       :eventclick="() => emit('toggleDrawer')"
     />

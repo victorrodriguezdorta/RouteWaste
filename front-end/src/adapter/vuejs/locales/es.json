@@ -381,7 +381,7 @@
     },
     "show": {
       "actions": {
-        "editAsNewRun": "Editar (nueva ejecución)",
+        "editAsNewRun": "Editar",
         "editAsNewRunTooltip": "Abre el asistente con la misma selección (instalaciones, vehículos, contenedores y parámetros). Al ejecutar se creará un plan nuevo."
       },
       "replayLoadedTitle": "Selección cargada",
@@ -529,6 +529,27 @@
   "selection": {
     "welcome": "Bienvenido a Route Waste",
     "welcomeDescription": "Optimiza y gestiona las rutas de recolección de residuos de forma eficiente",
+    "dashboard": {
+      "snapshotTitle": "Resumen de datos",
+      "refresh": "Actualizar",
+      "inCatalog": "registrados en el sistema",
+      "manage": "Gestionar",
+      "infrastructurePlansTitle": "Planes de infraestructura",
+      "infrastructurePlansDescription": "Consulta y revisa los resultados del algoritmo y el histórico de planes.",
+      "recentTitle": "Últimos algoritmos ejecutados",
+      "recentSubtitle": "Los tres planes más recientes según la fecha de ejecución.",
+      "viewPlan": "Ver plan",
+      "emptyRecent": "Todavía no hay planes guardados. Ejecuta el algoritmo para generar el primero.",
+      "runAlgorithm": "Ejecutar algoritmo",
+      "loadError": "No se pudo cargar el resumen. Comprueba la conexión con el servidor e inténtalo de nuevo.",
+      "daysAbbr": "días",
+      "validity": {
+        "valid": "Vigente",
+        "obsolete": "Obsoleto"
+      },
+      "totalPlansLabel": "{count} planes en total",
+      "viewAllPlans": "Ver todos los planes"
+    },
     "title": "Gestión de Entidades",
     "subtitle": "Selecciona el módulo que deseas gestionar",
     "types": {

@@ -44,7 +44,7 @@
                     icon="mdi-eye"
                     size="small"
                     variant="flat"
-                    color="white"
+                    color="on-primary"
                     class="monitoring-item__view-button inline-view-button"
                     :eventclick="() => openContainer(containerMonitoring.container.id.getValue())"
                   />
@@ -248,9 +248,9 @@ function formatFacilityType(value?: FacilityType | string): string {
 
 .monitoring-facility {
   background: rgb(var(--v-theme-surface));
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(var(--v-theme-neutral-base), 0.1);
   border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 4px 16px rgba(var(--v-theme-shadow-slate), 0.06);
   padding: 16px;
 }
 
@@ -270,15 +270,15 @@ function formatFacilityType(value?: FacilityType | string): string {
 
 .monitoring-item {
   background: rgb(var(--v-theme-surface));
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(var(--v-theme-neutral-base), 0.1);
   border-radius: 12px;
   min-height: 160px;
   padding: 16px;
 }
 
 .monitoring-item-overflowed {
-  background: rgba(136,13,30,0.08);
-  border-color: rgba(88,13,30,0.55);
+  background: rgba(var(--v-theme-error), 0.08);
+  border-color: rgba(var(--v-theme-danger-dark), 0.55);
 }
 
 .monitoring-item__header {
@@ -295,7 +295,7 @@ function formatFacilityType(value?: FacilityType | string): string {
 }
 
 .monitoring-item__view-button {
-  background: #ffffff !important;
+  background: rgb(var(--v-theme-surface)) !important;
   color: rgb(var(--v-theme-primary)) !important;
 }
 

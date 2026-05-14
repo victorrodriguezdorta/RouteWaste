@@ -27,7 +27,9 @@ import es.ull.project.application.service.infrastructureplan.DeleteInfrastructur
 import es.ull.project.application.service.infrastructureplan.DeleteInfrastructurePlansReferencingEntityService;
 import es.ull.project.application.service.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditService;
 import es.ull.project.application.service.infrastructureplan.ReadInfrastructurePlanService;
+import es.ull.project.application.service.overview.GetApplicationOverviewService;
 import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
 import es.ull.project.application.service.vehicle.CreateVehicleService;
 import es.ull.project.application.service.vehicle.DeleteVehicleService;
 import es.ull.project.application.service.vehicle.ReadVehicleService;
@@ -260,6 +262,25 @@ public class ServiceConfiguration {
     @Bean
     public ReadInfrastructurePlanService readInfrastructurePlanService(InfrastructurePlanRepository repository, DailyPlanRepository dailyPlanRepository) {
         return new ReadInfrastructurePlanService(repository, dailyPlanRepository);
+    }
+
+    /**
+     * Overview for home or dashboard: entity totals and latest infrastructure plans.
+     *
+     * @param containerRepository           container persistence
+     * @param vehicleRepository             vehicle persistence
+     * @param facilityRepository            facility persistence
+     * @param readInfrastructurePlanUseCase paginated infrastructure plan reads
+     * @return overview service bean
+     */
+    @Bean
+    public GetApplicationOverviewService getApplicationOverviewService(
+            ContainerRepository containerRepository,
+            VehicleRepository vehicleRepository,
+            FacilityRepository facilityRepository,
+            ReadInfrastructurePlanUseCase readInfrastructurePlanUseCase) {
+        return new GetApplicationOverviewService(
+                containerRepository, vehicleRepository, facilityRepository, readInfrastructurePlanUseCase);
     }
 
     /**

@@ -3,10 +3,10 @@
  */
 export interface InfrastructurePlanSummaryJsonResponse {
   id: string;
-  executedAt: string;
-  estimatedTotalCost: { amount: number; currency?: string };
-  numberOfDays: number;
-  averagePickupTimeMinutes: number;
+  executedAt: string | null;
+  estimatedTotalCost: { amount: number; currency?: string } | null;
+  numberOfDays: number | null;
+  averagePickupTimeMinutes: number | null;
   /** Backend: VALID | OBSOLETE */
   validityState?: string;
 }

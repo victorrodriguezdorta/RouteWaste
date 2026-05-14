@@ -113,7 +113,7 @@ const handleExecuteAlgorithm = async () => {
 .algorithm-loader-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(var(--v-theme-surface), 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,9 +122,9 @@ const handleExecuteAlgorithm = async () => {
 }
 
 .algorithm-loader-card {
-  background: #ffffff;
+  background: rgb(var(--v-theme-surface));
   border-radius: 16px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 16px 40px rgba(var(--v-theme-neutral-base), 0.12);
   padding: 24px 32px;
   text-align: center;
   min-width: 240px;
