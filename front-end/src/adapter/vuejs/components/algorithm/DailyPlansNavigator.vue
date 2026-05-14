@@ -1,5 +1,5 @@
 <template>
-  <div class="daily-plans-navigator mt-4">
+  <div class="daily-plans-navigator mt-2">
     <div class="navigator-content">
       <DailyPlanContentJson
         :plan-day="currentDay"

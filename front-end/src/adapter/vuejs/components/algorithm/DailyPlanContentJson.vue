@@ -1,193 +1,209 @@
 <template>
-  <div class="mt-4">
-    <v-row class="ma-0" dense>
-      <v-col cols="12" md="3">
-        <v-card variant="flat" class="selector-card">
-          <v-card-title class="d-flex align-center ga-2">
-            <v-icon icon="mdi-factory" color="primary" />
-            <span>{{ t('infrastructurePlan.show.daily.content.selectorTitle') }}</span>
-          </v-card-title>
-          <v-divider />
-          <v-card-text>
-            <p class="text-body-2 text-medium-emphasis mb-3">
-              {{ t('infrastructurePlan.show.daily.content.selectorHint') }}
-            </p>
+  <div class="route-visualizer">
+    <section ref="mapStageRef" class="map-stage" aria-label="Mapa de rutas">
+      <div class="map-stage__map-wrap">
+        <div ref="mapContainer" class="map-stage__leaflet" />
+      </div>
 
-            <div v-if="selectableFacilities.length === 0" class="text-body-2 text-medium-emphasis">
-              {{ t('infrastructurePlan.show.daily.content.noFacilities') }}
+      <aside class="map-stage__drawer">
+        <div class="navigator-controller navigator-controller--drawer">
+          <v-btn
+            icon="mdi-chevron-left"
+            variant="text"
+            color="white"
+            size="large"
+            :disabled="!canGoPrevious"
+            @click="emit('go-previous')"
+          />
+
+          <div class="navigator-controller__body">
+            <div class="navigator-controller__title">
+              <v-icon icon="mdi-calendar-range" color="white" size="22" />
+              <span class="navigator-controller__date">{{ serviceDate ?? '—' }}</span>
             </div>
-
-            <div v-else class="entity-list">
-              <div
-                v-for="facility in selectableFacilities"
-                :key="facility.id.getValue()"
-                class="entity-action-row mb-2"
-              >
-                <v-checkbox
-                  :model-value="isFacilitySelected(facility.id.getValue())"
-                  color="primary"
-                  density="compact"
-                  hide-details
-                  class="entity-checkbox"
-                  @update:model-value="toggleFacilitySelection(facility.id.getValue())"
-                />
-                <ButtonTooltip
-                  :text="facilityButtonLabel(facility)"
-                  :tooltip="facilityTooltip(facility)"
-                  icon=""
-                  size="small"
-                  variant="flat"
-                  color="white"
-                  class="entity-button flex-grow-1"
-                  :class="{ 'entity-button-selected': isFacilitySelected(facility.id.getValue()) }"
-                  :eventclick="() => toggleFacilitySelection(facility.id.getValue())"
-                />
-                <ButtonTooltip
-                  text=""
-                  :tooltip="viewTooltip"
-                  icon="mdi-eye"
-                  size="small"
-                  variant="flat"
-                  color="white"
-                  class="entity-view-button"
-                  :eventclick="() => openFacility(facility.id.getValue())"
-                />
-              </div>
+            <div class="navigator-controller__day">
+              {{ t('infrastructurePlan.show.daily.navigator.dayLabel', { current: currentDay, total: totalDays }) }}
             </div>
-          </v-card-text>
-        </v-card>
+          </div>
 
-        <v-card variant="flat" class="selector-card mt-4">
-          <v-card-title class="d-flex align-center ga-2">
-            <v-icon icon="mdi-truck" color="primary" />
-            <span>{{ t('infrastructurePlan.show.daily.content.vehiclesTitle') }}</span>
-          </v-card-title>
-          <v-divider />
-          <v-card-text>
-            <p class="text-body-2 text-medium-emphasis mb-3">
-              {{ t('infrastructurePlan.show.daily.content.vehiclesHint') }}
-            </p>
+          <v-btn
+            icon="mdi-chevron-right"
+            variant="text"
+            color="white"
+            size="large"
+            :disabled="!canGoNext"
+            @click="emit('go-next')"
+          />
+        </div>
 
-            <div v-if="selectableVehicleRoutes.length === 0" class="text-body-2 text-medium-emphasis">
-              {{ t('infrastructurePlan.show.daily.content.noVehicles') }}
-            </div>
+        <div class="map-stage__drawer-cards">
+        <v-card elevation="3" variant="flat" class="drawer-card">
+          <div class="drawer-card__head">
+            <v-icon icon="mdi-factory" color="primary" size="24" class="drawer-card__head-icon" />
+            <span class="drawer-card__title text-truncate">{{ t('infrastructurePlan.show.daily.content.selectorTitle') }}</span>
+          </div>
+          <p class="drawer-card__hint text-medium-emphasis">
+            {{ t('infrastructurePlan.show.daily.content.selectorHint') }}
+          </p>
 
-            <div v-else class="entity-list">
-              <div
-                v-for="route in selectableVehicleRoutes"
-                :key="route.key"
-                class="entity-action-row mb-2"
-              >
-                <v-checkbox
-                  :model-value="isVehicleRouteSelected(route.key)"
-                  color="primary"
-                  density="compact"
-                  hide-details
-                  class="entity-checkbox"
-                  @update:model-value="toggleVehicleRouteSelection(route.key)"
-                />
-                <ButtonTooltip
-                  :text="vehicleButtonLabel(route)"
-                  :tooltip="vehicleRouteTooltip(route)"
-                  icon=""
-                  size="small"
-                  variant="flat"
-                  color="white"
-                  class="entity-button flex-grow-1"
-                  :class="{ 'entity-button-selected': isVehicleRouteSelected(route.key) }"
-                  :eventclick="() => toggleVehicleRouteSelection(route.key)"
-                />
-                <ButtonTooltip
-                  text=""
-                  :tooltip="viewTooltip"
-                  icon="mdi-eye"
-                  size="small"
-                  variant="flat"
-                  color="white"
-                  class="entity-view-button"
-                  :eventclick="() => openVehicle(route.vehicleId)"
-                />
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
+          <div v-if="selectableFacilities.length === 0" class="text-body-2 text-medium-emphasis px-3 pb-3">
+            {{ t('infrastructurePlan.show.daily.content.noFacilities') }}
+          </div>
 
-      <v-col cols="12" md="9">
-        <v-card variant="flat" class="map-card">
-          <v-card-title class="map-card__header">
-            <div class="d-flex align-center ga-2">
-              <v-icon icon="mdi-map" color="primary" />
-              <span>{{ t('infrastructurePlan.show.daily.content.mapTitle') }}</span>
-            </div>
-
-            <div class="navigator-controller">
-              <v-btn
-                icon="mdi-chevron-left"
-                variant="text"
+          <div v-else class="entity-list entity-list--facilities">
+            <div
+              v-for="facility in selectableFacilities"
+              :key="facility.id.getValue()"
+              class="entity-action-row"
+            >
+              <v-checkbox
+                :model-value="isFacilitySelected(facility.id.getValue())"
+                color="primary"
+                density="compact"
+                hide-details
+                class="entity-checkbox"
+                @update:model-value="toggleFacilitySelection(facility.id.getValue())"
+              />
+              <ButtonTooltip
+                :text="facilityButtonLabel(facility)"
+                :tooltip="facilityTooltip(facility)"
+                icon=""
+                size="small"
+                variant="flat"
                 color="white"
-                :disabled="!canGoPrevious"
-                @click="emit('go-previous')"
+                class="entity-button flex-grow-1 text-truncate"
+                :class="{ 'entity-button-selected': isFacilitySelected(facility.id.getValue()) }"
+                :eventclick="() => toggleFacilitySelection(facility.id.getValue())"
               />
-
-              <div class="navigator-controller__title">
-                <v-icon icon="mdi-calendar-range" color="white" />
-                <span>{{ serviceDate ?? '-' }}</span>
-              </div>
-
-              <div class="day-indicator">
-                {{ t('infrastructurePlan.show.daily.navigator.dayLabel', { current: currentDay, total: totalDays }) }}
-              </div>
-
-              <v-btn
-                icon="mdi-chevron-right"
-                variant="text"
+              <ButtonTooltip
+                text=""
+                :tooltip="viewTooltip"
+                icon="mdi-eye"
+                size="small"
+                variant="flat"
                 color="white"
-                :disabled="!canGoNext"
-                @click="emit('go-next')"
+                class="entity-view-button"
+                :eventclick="() => openFacility(facility.id.getValue())"
               />
             </div>
-          </v-card-title>
-          <v-divider />
-          <v-card-text>
-            <div ref="mapContainer" class="daily-map" />
-          </v-card-text>
+          </div>
         </v-card>
 
-        <v-card variant="flat" class="mt-4 daily-details-card">
-          <v-tabs v-model="dailyDetailsTab" bg-color="transparent" color="primary" grow class="daily-details-tabs">
-            <v-tab value="routes">{{ t('infrastructurePlan.show.daily.route.title') }}</v-tab>
-            <v-tab value="monitoring">{{ t('infrastructurePlan.show.daily.monitoring.title', { day: planDay }) }}</v-tab>
-          </v-tabs>
+        <v-card elevation="3" variant="flat" class="drawer-card">
+          <div class="drawer-card__head">
+            <v-icon icon="mdi-truck" color="primary" size="24" class="drawer-card__head-icon" />
+            <span class="drawer-card__title text-truncate">{{ t('infrastructurePlan.show.daily.content.vehiclesTitle') }}</span>
+          </div>
+          <p class="drawer-card__hint text-medium-emphasis">
+            {{ t('infrastructurePlan.show.daily.content.vehiclesHint') }}
+          </p>
 
-          <v-window v-model="dailyDetailsTab" class="daily-details-window">
-            <v-window-item value="routes">
-              <DailyPlanRouteTimeline :routes="selectedVehicleRoutes" />
-            </v-window-item>
+          <div v-if="selectableVehicleRoutes.length === 0" class="text-body-2 text-medium-emphasis px-3 pb-3">
+            {{ t('infrastructurePlan.show.daily.content.noVehicles') }}
+          </div>
 
-            <v-window-item value="monitoring">
-              <DailyPlanContainerMonitoring
-                :plan-day="planDay"
-                :selected-facilities="selectedFacilities"
-                :container-state-monitoring="containerStateMonitoring"
+          <div v-else class="entity-list entity-list--vehicles">
+            <div
+              v-for="route in selectableVehicleRoutes"
+              :key="route.key"
+              class="entity-action-row"
+            >
+              <v-checkbox
+                :model-value="isVehicleRouteSelected(route.key)"
+                color="primary"
+                density="compact"
+                hide-details
+                class="entity-checkbox"
+                @update:model-value="toggleVehicleRouteSelection(route.key)"
               />
-            </v-window-item>
-          </v-window>
+              <ButtonTooltip
+                :text="vehicleButtonLabel(route)"
+                :tooltip="vehicleRouteTooltip(route)"
+                icon=""
+                size="small"
+                variant="flat"
+                color="white"
+                class="entity-button flex-grow-1 text-truncate"
+                :class="{ 'entity-button-selected': isVehicleRouteSelected(route.key) }"
+                :eventclick="() => toggleVehicleRouteSelection(route.key)"
+              />
+              <ButtonTooltip
+                text=""
+                :tooltip="viewTooltip"
+                icon="mdi-eye"
+                size="small"
+                variant="flat"
+                color="white"
+                class="entity-view-button"
+                :eventclick="() => openVehicle(route.vehicleId)"
+              />
+            </div>
+          </div>
         </v-card>
-      </v-col>
-    </v-row>
+        </div>
+      </aside>
+    </section>
 
-    <v-card variant="flat" class="mt-4">
-      <v-card-title class="d-flex align-center ga-2">
-        <v-icon icon="mdi-code-json" color="primary" />
-        <span>{{ t('infrastructurePlan.show.daily.content.title') }}</span>
-      </v-card-title>
+    <section class="route-visualizer__details">
+      <v-card elevation="2" variant="flat" class="details-shell">
+        <div class="details-shell__intro">
+          <div>
+            <h3 class="text-h6 font-weight-bold">{{ detailsSectionHeadline }}</h3>
+            <p class="text-caption text-medium-emphasis mb-0">
+              {{ t('infrastructurePlan.show.daily.navigator.dayLabel', { current: currentDay, total: totalDays }) }}
+              · {{ serviceDate ?? '—' }}
+            </p>
+          </div>
+        </div>
 
-      <v-divider />
+        <v-tabs
+          v-model="dailyDetailsTab"
+          bg-color="transparent"
+          color="primary"
+          class="details-shell__tabs"
+          density="comfortable"
+          align-tabs="start"
+        >
+          <v-tab value="routes">{{ t('infrastructurePlan.show.daily.route.title') }}</v-tab>
+          <v-tab value="monitoring">{{ t('infrastructurePlan.show.daily.monitoring.title', { day: planDay }) }}</v-tab>
+        </v-tabs>
 
-      <v-card-text>
-        <pre class="json-block">{{ jsonContent }}</pre>
-      </v-card-text>
+        <v-divider class="mb-0" />
+
+        <v-window v-model="dailyDetailsTab" class="details-shell__window">
+          <v-window-item value="routes" class="pa-4">
+            <DailyPlanRouteTimeline :routes="selectedVehicleRoutes" />
+          </v-window-item>
+
+          <v-window-item value="monitoring" class="pa-4">
+            <DailyPlanContainerMonitoring
+              :plan-day="planDay"
+              :selected-facilities="selectedFacilities"
+              :container-state-monitoring="containerStateMonitoring"
+            />
+          </v-window-item>
+        </v-window>
+      </v-card>
+    </section>
+
+    <v-card elevation="1" variant="flat" class="route-visualizer__json-toggle">
+      <v-btn
+        block
+        variant="text"
+        color="primary"
+        class="json-toggle-btn text-none"
+        :append-icon="jsonExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+        @click="jsonExpanded = !jsonExpanded"
+      >
+        <v-icon start icon="mdi-code-json" />
+        {{ technicalJsonTitle }}
+      </v-btn>
+
+      <v-expand-transition>
+        <div v-show="jsonExpanded" class="px-4 pb-4">
+          <pre class="json-block">{{ jsonContent }}</pre>
+        </div>
+      </v-expand-transition>
     </v-card>
   </div>
 </template>
@@ -203,7 +219,7 @@ import type {
 } from '@/domain/read-model/infrastructure-plan-detail';
 import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import router from '../../router/router';
 import DailyPlanContainerMonitoring from './DailyPlanContainerMonitoring.vue';
@@ -262,6 +278,22 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const dailyDetailsTab = ref<'routes' | 'monitoring'>('routes');
+const jsonExpanded = ref(false);
+const mapStageRef = ref<HTMLElement | null>(null);
+let mapStageResizeObserver: ResizeObserver | null = null;
+
+const technicalJsonTitle = computed(() => {
+  const key = 'infrastructurePlan.show.daily.content.technicalJsonTitle';
+  const translated = t(key);
+  return translated === key ? 'Datos técnicos (JSON)' : translated;
+});
+
+const detailsSectionHeadline = computed(() => {
+  const key = 'infrastructurePlan.show.daily.content.visualizerDetailsTitle';
+  const translated = t(key);
+  return translated === key ? 'Detalle operativo del día' : translated;
+});
+
 const viewTooltip = computed(() => {
   const translated = t('algorithm.list.table.tooltips.view');
   return translated === 'algorithm.list.table.tooltips.view' ? 'View details' : translated;
@@ -345,6 +377,14 @@ watch(
   },
 );
 
+watch(jsonExpanded, (open) => {
+  if (open) {
+    void nextTick(() => {
+      mapInstance.value?.invalidateSize();
+    });
+  }
+});
+
 watch(
   () => props.facilities,
   () => {
@@ -353,11 +393,20 @@ watch(
   { deep: true },
 );
 
-onMounted(() => {
+onMounted(async () => {
   void initializeMap();
+  await nextTick();
+  mapStageResizeObserver = new ResizeObserver(() => {
+    mapInstance.value?.invalidateSize();
+  });
+  if (mapStageRef.value) {
+    mapStageResizeObserver.observe(mapStageRef.value);
+  }
 });
 
 onUnmounted(() => {
+  mapStageResizeObserver?.disconnect();
+  mapStageResizeObserver = null;
   mapInstance.value?.remove();
   mapInstance.value = null;
   markersLayer.value = null;
@@ -829,66 +878,170 @@ function renderMarkers(): void {
 </script>
 
 <style scoped>
-.map-card,
-.selector-card {
-  border-radius: 12px;
-}
-
-.selector-card {
-  background: rgb(var(--v-theme-surface-border-light));
-}
-
-.daily-map {
-  width: 100%;
-  height: 420px;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.map-card__header {
-  align-items: center;
+.route-visualizer {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.map-stage {
+  background: linear-gradient(145deg, #e8eef5 0%, #dfe7f0 100%);
+  border-radius: 20px;
+  box-shadow:
+    0 16px 48px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+  position: relative;
+}
+
+.map-stage__map-wrap {
+  height: min(74vh, 900px);
+  min-height: 420px;
+  position: relative;
+  width: 100%;
+}
+
+.map-stage__leaflet {
+  inset: 0;
+  position: absolute;
+  z-index: 0;
 }
 
 .navigator-controller {
-  display: inline-flex;
   align-items: center;
-  gap: 8px;
   background: rgb(var(--v-theme-primary));
   border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   color: #ffffff;
-  padding: 8px 12px;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.navigator-controller--drawer {
+  border-radius: 18px;
+  padding: 10px 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.navigator-controller__body {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+  min-width: 0;
+  padding-inline: 4px;
 }
 
 .navigator-controller__title {
-  display: inline-flex;
   align-items: center;
-  gap: 8px;
   color: #ffffff;
-  font-weight: 600;
+  display: inline-flex;
+  font-size: 1.05rem;
+  font-weight: 700;
+  gap: 8px;
+  line-height: 1.2;
   white-space: nowrap;
 }
 
-.day-indicator {
+.navigator-controller__date {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navigator-controller__day {
   color: #ffffff;
+  font-size: 0.9rem;
   font-weight: 600;
-  min-width: 120px;
+  line-height: 1.2;
+  opacity: 0.95;
   text-align: center;
 }
 
-.entity-action-row {
+.map-stage__drawer {
+  bottom: 16px;
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  left: 16px;
+  max-height: calc(100% - 32px);
+  pointer-events: none;
+  position: absolute;
+  top: 16px;
+  width: min(320px, 32vw);
+  z-index: 1000;
+}
+
+.map-stage__drawer > * {
+  pointer-events: auto;
+}
+
+.map-stage__drawer-cards {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.drawer-card {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.97) !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06) !important;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.drawer-card__head {
   align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+  padding: 14px 14px 0;
+}
+
+.drawer-card__head-icon {
+  flex-shrink: 0;
+}
+
+.drawer-card__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.drawer-card__hint {
+  flex-shrink: 0;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  margin: 0;
+  padding: 4px 14px 0;
+}
+
+.entity-action-row {
+  align-items: center;
+  display: flex;
   gap: 2px;
 }
 
 .entity-list {
-  max-height: 225px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
-  padding-right: 4px;
+  padding: 4px 10px 12px;
+  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+  scrollbar-width: thin;
 }
 
 .entity-checkbox {
@@ -904,8 +1057,9 @@ function renderMarkers(): void {
 
 .entity-button {
   justify-content: flex-start;
-  text-transform: none;
+  min-width: 0;
   padding-inline-start: 0 !important;
+  text-transform: none;
 }
 
 .entity-button-selected {
@@ -916,28 +1070,50 @@ function renderMarkers(): void {
   margin-left: -0.35rem;
 }
 
-.daily-details-card {
-  border-radius: 12px;
+.route-visualizer__details {
+  width: 100%;
 }
 
-.daily-details-tabs {
-  padding-inline: 4px;
+.details-shell {
+  background: rgb(var(--v-theme-surface)) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
 }
 
-.daily-details-window {
-  padding-top: 12px;
+.details-shell__intro {
+  padding: 20px 20px 4px;
+}
+
+.details-shell__tabs {
+  padding-inline: 12px;
+}
+
+.details-shell__window {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.route-visualizer__json-toggle {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.json-toggle-btn {
+  justify-content: center;
+  letter-spacing: 0.01em;
 }
 
 .json-block {
   background: rgb(var(--v-theme-surface-variant));
-  border-radius: 8px;
+  border-radius: 10px;
   font-family: Consolas, 'Courier New', monospace;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   line-height: 1.45;
   margin: 0;
-  max-height: 420px;
+  max-height: min(50vh, 480px);
   overflow: auto;
-  padding: 12px;
+  padding: 14px;
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -952,29 +1128,65 @@ function renderMarkers(): void {
 }
 
 :global(.facility-red-icon span) {
-  width: 24px;
-  height: 24px;
-  display: block;
-  border-radius: 999px;
   background: #d32f2f;
   border: 3px solid #ffffff;
+  border-radius: 999px;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+  display: block;
+  height: 24px;
+  width: 24px;
 }
 
 @media (max-width: 960px) {
-  .daily-map {
-    height: 320px;
-  }
-
-  .map-card__header {
-    align-items: stretch;
+  .map-stage {
+    display: flex;
     flex-direction: column;
   }
 
-  .navigator-controller {
-    flex-wrap: wrap;
-    justify-content: center;
+  .map-stage__map-wrap {
+    flex-shrink: 0;
+    height: 50vh;
+    max-height: 520px;
+    min-height: 300px;
+  }
+
+  .map-stage__drawer {
+    background: linear-gradient(180deg, #f4f6f9 0%, #ffffff 100%);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    bottom: auto;
+    flex-direction: column;
+    gap: 12px;
+    left: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 12px;
+    pointer-events: auto;
+    position: relative;
+    top: auto;
     width: 100%;
+  }
+
+  .navigator-controller--drawer {
+    max-width: 100%;
+  }
+
+  .map-stage__drawer-cards {
+    flex-direction: row;
+    flex: 0 0 auto;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 4px;
+    width: 100%;
+  }
+
+  .map-stage__drawer-cards .drawer-card {
+    flex: 0 0 min(300px, 85vw);
+    max-height: 260px;
+  }
+
+  .entity-list {
+    max-height: 160px;
   }
 }
 </style>

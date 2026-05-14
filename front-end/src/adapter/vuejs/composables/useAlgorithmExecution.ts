@@ -643,6 +643,22 @@ export function useAlgorithmExecution() {
     });
   });
 
+  /** Pins for Step 2 map: current container page, primary vs muted by algorithm selection. */
+  const step2ContainerMapPins = computed(() =>
+    allContainers.value.map((container) => {
+      const location = container.getLocation();
+      const id = container.getId().toString();
+      const selected = algorithmStore.selectedContainerIds.includes(id);
+      return {
+        id,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        label: container.getName().getValue(),
+        markerTone: selected ? ('primary' as const) : ('muted' as const),
+      };
+    }),
+  );
+
   /**
    * Validate that step 2 has at least one container selected
    */
@@ -891,6 +907,7 @@ export function useAlgorithmExecution() {
     wasteTypeFilterOptions,
     serviceZoneFilterOptions,
     step2ContainerItems,
+    step2ContainerMapPins,
     isStep2Valid,
     
     // Computed - Step 3

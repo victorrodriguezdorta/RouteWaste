@@ -21,10 +21,11 @@
         </div>
       </div>
 
-      <v-stepper 
+      <v-stepper
         v-model="currentStep"
         :items="stepperItems"
-        class="elevation-0"
+        class="execute-algorithm-stepper elevation-0"
+        flat
         hide-actions
       >
         <template v-slot:default>
@@ -107,5 +108,39 @@ const handleExecuteAlgorithm = async () => {
   padding: 24px 32px;
   text-align: center;
   min-width: 240px;
+}
+
+/* Stepper header: sin sombra duplicada y líneas de unión más claras */
+.execute-algorithm-stepper :deep(.v-stepper-header) {
+  box-shadow: none;
+  background: color-mix(in srgb, rgb(var(--v-theme-surface)) 92%, rgb(var(--v-theme-primary)) 8%);
+  border-radius: 12px;
+  padding-block: 8px 12px;
+  padding-inline: 4px;
+  margin-bottom: 4px;
+}
+
+.execute-algorithm-stepper :deep(.v-stepper-header .v-divider) {
+  align-self: center;
+  flex: 1 1 auto;
+  height: 4px;
+  min-height: 4px;
+  max-height: 4px;
+  margin-block: 0;
+  margin-inline: 4px;
+  border: none;
+  opacity: 1;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, rgb(var(--v-theme-primary)) 18%, transparent),
+    color-mix(in srgb, rgb(var(--v-theme-primary)) 55%, transparent),
+    color-mix(in srgb, rgb(var(--v-theme-primary)) 18%, transparent)
+  );
+  box-shadow: 0 1px 2px color-mix(in srgb, rgb(var(--v-theme-primary)) 12%, transparent);
+}
+
+.execute-algorithm-stepper :deep(.v-stepper-window) {
+  margin-top: 0.5rem;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <v-card flat class="mt-4" :title="t('algorithm.execute.step3.title')">
+  <v-card flat class="mt-4">
     <v-card-actions>
-      <v-btn variant="outlined" :disabled="loading" @click="emit('back')">
+      <v-btn variant="outlined" prepend-icon="mdi-chevron-left" :disabled="loading" @click="emit('back')">
         {{ t('common.buttons.back') }}
       </v-btn>
       <v-spacer />

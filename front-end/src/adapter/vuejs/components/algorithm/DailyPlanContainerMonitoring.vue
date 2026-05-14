@@ -1,8 +1,5 @@
 <template>
-  <v-card variant="flat" class="monitoring-card">
-    <v-divider />
-
-    <v-card-text>
+  <div class="monitoring-root">
       <div v-if="selectedFacilityMonitoring.length === 0" class="text-body-2 text-medium-emphasis">
         {{ t('infrastructurePlan.show.daily.monitoring.noFacilities') }}
       </div>
@@ -85,8 +82,7 @@
           </div>
         </div>
       </div>
-    </v-card-text>
-  </v-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -246,16 +242,16 @@ function formatFacilityType(value?: FacilityType | string): string {
 </script>
 
 <style scoped>
-.monitoring-card {
-  border-radius: 12px;
+.monitoring-root {
+  width: 100%;
 }
 
 .monitoring-facility {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.24);
-  border-radius: 12px;
+  background: rgb(var(--v-theme-surface));
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
   padding: 16px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .monitoring-facility__header {
@@ -273,11 +269,11 @@ function formatFacilityType(value?: FacilityType | string): string {
 }
 
 .monitoring-item {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.24);
+  background: rgb(var(--v-theme-surface));
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  padding: 16px;
   min-height: 160px;
+  padding: 16px;
 }
 
 .monitoring-item-overflowed {

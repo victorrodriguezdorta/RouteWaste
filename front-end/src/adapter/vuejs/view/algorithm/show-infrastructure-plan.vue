@@ -69,9 +69,3 @@ function goBack(): void {
   router.push({ name: 'Algorithm' });
 }
 </script>
-
-<style scoped>
-.v-card {
-  border-radius: 8px;
-}
-</style>

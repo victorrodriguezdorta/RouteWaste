@@ -1,8 +1,5 @@
 <template>
-  <v-card variant="flat" class="route-timeline-card mt-4">
-    <v-divider />
-
-    <v-card-text>
+  <div class="route-timeline">
       <div v-if="routes.length === 0" class="text-body-2 text-medium-emphasis">
         {{ t('infrastructurePlan.show.daily.route.noRoutes') }}
       </div>
@@ -103,8 +100,7 @@
           </v-card-text>
         </v-card>
       </div>
-    </v-card-text>
-  </v-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -299,8 +295,8 @@ function openFacility(facilityId: string): void {
 </script>
 
 <style scoped>
-.route-timeline-card {
-  border-radius: 12px;
+.route-timeline {
+  width: 100%;
 }
 
 .route-list {
@@ -310,9 +306,9 @@ function openFacility(facilityId: string): void {
 }
 
 .route-section {
-  border: 1px solid rgba(0, 0, 0, 0.24);
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
 }
 
 .route-section__header {

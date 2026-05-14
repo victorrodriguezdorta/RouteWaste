@@ -1,8 +1,14 @@
 <template>
-  <v-card flat class="mt-4" :title="t('algorithm.execute.step1.title')">
+  <v-card flat class="mt-4">
     <v-card-actions>
       <v-spacer />
-      <v-btn variant="elevated" color="primary" @click="emit('next')" :disabled="!isStep1Valid">
+      <v-btn
+        variant="elevated"
+        color="primary"
+        append-icon="mdi-chevron-right"
+        @click="emit('next')"
+        :disabled="!isStep1Valid"
+      >
         {{ t('common.buttons.next') }}
       </v-btn>
     </v-card-actions>
@@ -132,9 +138,9 @@
             </v-card-title>
 
             <v-card-text class="pt-6">
-              <!-- Filtros de Vehículos -->
-              <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px; margin-bottom: 16px;">
-                <div style="width: 180px;">
+              <!-- Filtros + Confirmar (misma fila: filtro a la izquierda, botón arriba a la derecha) -->
+              <div class="step1-vehicle-toolbar">
+                <div class="step1-vehicle-toolbar__filter">
                   <v-select
                     v-model="selectedVehicleTypeFilterDialog"
                     :items="vehicleTypeFilterOptions"
@@ -148,6 +154,14 @@
                     @update:model-value="onVehicleTypeFilterDialogChange"
                   />
                 </div>
+                <v-btn
+                  class="step1-vehicle-toolbar__confirm"
+                  variant="elevated"
+                  color="primary"
+                  @click="confirmVehicleSelection"
+                >
+                  {{ t('common.buttons.confirm') }}
+                </v-btn>
               </div>
 
               <!-- Tabla de Vehículos -->
@@ -223,12 +237,6 @@
                 </p>
               </div>
             </v-card-text>
-
-            <v-card-actions class="pa-4 justify-end">
-              <v-btn variant="elevated" color="primary" @click="confirmVehicleSelection">
-                {{ t('common.buttons.confirm') }}
-              </v-btn>
-            </v-card-actions>
           </v-card>
         </div>
 
@@ -344,6 +352,24 @@ const {
 
 .step1-vehicle-card {
   margin-top: 0;
+}
+
+.step1-vehicle-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 0;
+  margin-bottom: 16px;
+}
+
+.step1-vehicle-toolbar__filter {
+  width: 180px;
+  flex: 0 0 auto;
+}
+
+.step1-vehicle-toolbar__confirm {
+  margin-left: auto;
 }
 
 .step1-facilities-layout__map {

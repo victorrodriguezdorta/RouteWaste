@@ -52,7 +52,7 @@ export interface MapLocationPin {
   longitude: number;
   label: string;
   /**
-   * Custom circle marker: gray (`muted`) or theme primary (`primary`).
+   * Colored map-pin marker: gray (`muted`) or theme primary (`primary`).
    * When omitted, the default Leaflet marker is used (list views).
    */
   markerTone?: 'muted' | 'primary';
@@ -209,12 +209,13 @@ const canNavigateFromPin = (pin: MapLocationPin) =>
   Boolean(props.detailRouteName && pin.id && String(pin.id).length > 0);
 
 const toneMarkerIcon = (L: LeafletNamespace, tone: 'muted' | 'primary') => {
-  const backgroundColor = tone === 'primary' ? 'rgb(var(--v-theme-primary))' : '#9e9e9e';
+  const fill = tone === 'primary' ? 'rgb(var(--v-theme-primary))' : '#9e9e9e';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="28" height="42" aria-hidden="true" style="display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))"><path fill="${fill}" stroke="#fff" stroke-width="1.1" stroke-linejoin="round" d="M12 1C6.48 1 2 5.48 2 11c0 7.75 10 23 10 23s10-15.25 10-23C22 5.48 17.52 1 12 1z"/><circle cx="12" cy="11" r="3.6" fill="#fff"/></svg>`;
   return L.divIcon({
     className: 'locations-list-map__tone-marker',
-    html: `<div class="locations-list-map__tone-marker-dot" style="background-color:${backgroundColor};"></div>`,
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
+    html: `<div class="locations-list-map__tone-marker-pin">${svg}</div>`,
+    iconSize: [28, 42],
+    iconAnchor: [14, 40],
   });
 };
 
@@ -413,12 +414,10 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.locations-list-map__map .locations-list-map__tone-marker-dot {
-  width: 16px;
-  height: 16px;
-  margin: 3px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+.locations-list-map__map .locations-list-map__tone-marker-pin {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  line-height: 0;
 }
 </style>
