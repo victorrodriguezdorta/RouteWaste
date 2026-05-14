@@ -1,4 +1,5 @@
 import { FacilityStatus } from '@/domain/enumerate/facility-status';
+import type { InfrastructurePlanValidityState } from '@/domain/enumerate/infrastructure-plan-validity-state';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import type { InfrastructurePlanContainerDailyStateDetail } from './details/infrastructure-plan-container-daily-state-detail';
 import type { InfrastructurePlanDailyPlanDetail } from './details/infrastructure-plan-daily-plan-detail';
@@ -18,6 +19,8 @@ export class InfrastructurePlanDetail {
     public readonly metrics: InfrastructurePlanMetricsDetail,
     public readonly facilities: InfrastructurePlanFacilityDetail[],
     public readonly containerStateMonitoring: InfrastructurePlanContainerDailyStateDetail[],
+    public readonly validityState: InfrastructurePlanValidityState,
+    public readonly executionRequestJson: string | null,
   ) {}
 
   /**

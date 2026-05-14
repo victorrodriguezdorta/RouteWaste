@@ -1,10 +1,10 @@
 package es.ull.project.adapter.mongodb.repository;
 
-import es.ull.project.application.repository.InfrastructurePlanRepository;
-import es.ull.project.domain.entity.InfrastructurePlan;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -14,6 +14,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.application.repository.InfrastructurePlanRepository;
+import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 
 /**
  * MongoDB implementation of the InfrastructurePlanRepository interface.
@@ -104,5 +109,40 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
         Query query = new Query(Criteria.where(FIELD_ID).is(id));
         InfrastructurePlan infrastructurePlan = this.mongoTemplate.findOne(query, InfrastructurePlan.class, COLLECTION_NAME);
         return Optional.ofNullable(infrastructurePlan);
+    }
+
+    @Override
+    public List<InfrastructurePlan> findValidPlansReferencingEntityInExecutionRequest(UUID entityId) {
+        if (entityId == null) {
+            return List.of();
+        }
+        String token = "\"" + entityId + "\"";
+        Criteria referencesEntity = Criteria.where(MongoFields.EXECUTION_REQUEST_JSON).regex(Pattern.quote(token));
+        Criteria stillValid = new Criteria().orOperator(
+                Criteria.where(MongoFields.VALIDITY_STATE).is(InfrastructurePlanValidityState.VALID.name()),
+                Criteria.where(MongoFields.VALIDITY_STATE).exists(false),
+                Criteria.where(MongoFields.VALIDITY_STATE).is(null));
+        Query query = new Query(new Criteria().andOperator(referencesEntity, stillValid));
+        return this.mongoTemplate.find(query, InfrastructurePlan.class, COLLECTION_NAME);
+    }
+
+    @Override
+    public boolean existsAnyPlanReferencingEntityInExecutionRequest(UUID entityId) {
+        if (entityId == null) {
+            return false;
+        }
+        String token = "\"" + entityId + "\"";
+        Query query = new Query(Criteria.where(MongoFields.EXECUTION_REQUEST_JSON).regex(Pattern.quote(token)));
+        return this.mongoTemplate.count(query, InfrastructurePlan.class, COLLECTION_NAME) > 0;
+    }
+
+    @Override
+    public List<InfrastructurePlan> findPlansReferencingEntityInExecutionRequest(UUID entityId) {
+        if (entityId == null) {
+            return List.of();
+        }
+        String token = "\"" + entityId + "\"";
+        Query query = new Query(Criteria.where(MongoFields.EXECUTION_REQUEST_JSON).regex(Pattern.quote(token)));
+        return this.mongoTemplate.find(query, InfrastructurePlan.class, COLLECTION_NAME);
     }
 }

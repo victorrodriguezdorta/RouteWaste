@@ -23,12 +23,9 @@ import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
-import es.ull.project.domain.valueobject.cost.MaximumBudget;
-import es.ull.project.domain.valueobject.cost.TotalCost;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.route.RouteSequence;
 import es.ull.project.domain.valueobject.time.PlanDay;
-import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
 /**
  * DailyPlanReadingConverter
@@ -70,13 +67,7 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
         logger.info("DailyPlan to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         UUID planId = (UUID) document.get(MongoFields.INFRASTRUCTURE_PLAN_ID);
-        InfrastructurePlan infrastructurePlan = new InfrastructurePlan(
-                planId,
-            new PlanningPeriod(String.valueOf(LocalDate.now().getYear())),
-                null, null, null, null, null,
-                new MaximumBudget(1.0),
-                new TotalCost(0.0),
-                null, null, null, null, null, null);
+        InfrastructurePlan infrastructurePlan = InfrastructurePlan.forIdReferenceOnly(planId);
         UUID facilityId = (UUID) document.get(MongoFields.FACILITY_ID);
         Facility facility = mongoConfiguration.facilityRepository().findById(facilityId)
                 .orElseThrow(() -> new IllegalStateException(String.format(ERR_FACILITY_SNAPSHOT, facilityId)));

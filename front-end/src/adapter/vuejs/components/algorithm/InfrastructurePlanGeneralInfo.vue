@@ -23,6 +23,33 @@
             />
           </v-col>
 
+          <v-col cols="12" md="6">
+            <div class="text-caption text-medium-emphasis mb-1">
+              {{ t('infrastructurePlan.show.generalInfo.fields.validityState') }}
+            </div>
+            <v-chip
+              v-if="plan"
+              :color="plan.validityState === InfrastructurePlanValidityState.VALID ? 'success' : 'error'"
+              size="default"
+              variant="flat"
+              prepend-icon="mdi-state-machine"
+            >
+              {{ validityLabel }}
+            </v-chip>
+          </v-col>
+
+          <v-col v-if="plan?.executionRequestJson" cols="12">
+            <v-textarea
+              :model-value="plan.executionRequestJson"
+              :label="t('infrastructurePlan.show.generalInfo.fields.executionRequestJson')"
+              prepend-icon="mdi-code-json"
+              variant="outlined"
+              readonly
+              auto-grow
+              rows="4"
+            />
+          </v-col>
+
           <v-col cols="12" md="4">
             <v-text-field
               :model-value="formatNumber(generalInfo.totalCollectedKilograms, 'kg')"
@@ -120,6 +147,9 @@
 
 <script lang="ts" setup>
 import type { InfrastructurePlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
+import {
+  InfrastructurePlanValidityState,
+} from '@/domain/enumerate/infrastructure-plan-validity-state';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -129,6 +159,13 @@ const props = defineProps<{
 
 const { t } = useI18n();
 const isExpanded = ref(false);
+
+const validityLabel = computed(() => {
+  if (!props.plan) return '';
+  return props.plan.validityState === InfrastructurePlanValidityState.OBSOLETE
+    ? t('infrastructurePlan.list.table.validity.OBSOLETE')
+    : t('infrastructurePlan.list.table.validity.VALID');
+});
 
 const generalInfo = computed(() => {
   const plan = props.plan;

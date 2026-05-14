@@ -73,8 +73,28 @@ const {
   executeAlgorithm,
 } = useAlgorithmExecution();
 
-onMounted(() => {
-  initializeData();
+onMounted(async () => {
+  const pendingJson = algorithmStore.dequeuePendingExecutionRequestJson();
+  algorithmStore.resetForm();
+  await initializeData();
+  if (pendingJson) {
+    const applied = algorithmStore.applyExecutionRequestFromJson(pendingJson);
+    if (applied) {
+      algorithmStore.setNotification(
+        t('infrastructurePlan.show.replayLoadedTitle'),
+        t('infrastructurePlan.show.replayLoadedMessage'),
+        'mdi-playlist-check',
+        'success',
+      );
+    } else {
+      algorithmStore.setNotification(
+        t('infrastructurePlan.show.replayFailedTitle'),
+        t('infrastructurePlan.show.replayFailedMessage'),
+        'mdi-alert',
+        'warning',
+      );
+    }
+  }
 });
 
 const handleExecuteAlgorithm = async () => {

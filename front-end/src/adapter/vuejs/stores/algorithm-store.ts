@@ -87,6 +87,12 @@ export const useAlgorithmStore = defineStore('Algorithm', {
       timeout: 4000,        // Auto-hide duration in milliseconds
       color: '',            // Color theme (e.g., 'success', 'error')
     },
+
+    /**
+     * When set, execute-algorithm view will apply this JSON (same shape as the execute API payload)
+     * after reset + initial data load, then clear it.
+     */
+    pendingExecutionRequestJson: null as string | null,
   }),
 
   /**
@@ -321,6 +327,90 @@ export const useAlgorithmStore = defineStore('Algorithm', {
         maxBudgetAmount: 100,
       };
       this.executionResult = undefined;
+    },
+
+    /**
+     * Queue a replay of a previous run's client payload (e.g. from an infrastructure plan detail).
+     */
+    queueExecutionRequestReplay(json: string) {
+      this.pendingExecutionRequestJson = json.trim().length > 0 ? json : null;
+    },
+
+    /**
+     * Remove and return queued execution JSON.
+     */
+    dequeuePendingExecutionRequestJson(): string | null {
+      const value = this.pendingExecutionRequestJson;
+      this.pendingExecutionRequestJson = null;
+      return value;
+    },
+
+    /**
+     * Parses execution request JSON and writes facilities, containers, and extra parameters.
+     * Expects the same structure as {@link CreateAlgorithmCommand} serialization.
+     *
+     * @returns true when the payload was applied and passes {@link isFormValid}
+     */
+    applyExecutionRequestFromJson(json: string): boolean {
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(json) as unknown;
+      } catch {
+        return false;
+      }
+      if (!parsed || typeof parsed !== 'object') {
+        return false;
+      }
+      const root = parsed as Record<string, unknown>;
+
+      const rawFacilities = root.facilitiesWithVehicles;
+      if (!Array.isArray(rawFacilities)) {
+        return false;
+      }
+      const facilities: FacilityVehicleSelection[] = [];
+      for (const entry of rawFacilities) {
+        if (!entry || typeof entry !== 'object') {
+          continue;
+        }
+        const row = entry as Record<string, unknown>;
+        const facilityId = typeof row.facilityId === 'string' ? row.facilityId : null;
+        const vehicleIdsRaw = row.selectedVehicleIds;
+        if (!facilityId || !Array.isArray(vehicleIdsRaw)) {
+          continue;
+        }
+        const selectedVehicleIds = vehicleIdsRaw.filter((id): id is string => typeof id === 'string');
+        facilities.push({ facilityId, selectedVehicleIds });
+      }
+
+      const rawContainers = root.selectedContainerIds;
+      const selectedContainerIds = Array.isArray(rawContainers)
+        ? rawContainers.filter((id): id is string => typeof id === 'string')
+        : [];
+
+      const numberOfDays =
+        typeof root.numberOfDays === 'number' && Number.isFinite(root.numberOfDays) && root.numberOfDays > 0
+          ? Math.floor(root.numberOfDays)
+          : 7;
+      const averagePickupTimeMinutes =
+        typeof root.averagePickupTimeMinutes === 'number' &&
+        Number.isFinite(root.averagePickupTimeMinutes) &&
+        root.averagePickupTimeMinutes > 0
+          ? Math.floor(root.averagePickupTimeMinutes)
+          : 15;
+
+      this.setFacilitiesWithVehicles(facilities);
+      this.setSelectedContainers(selectedContainerIds);
+      this.setExtraData(numberOfDays, averagePickupTimeMinutes);
+
+      const maxBudget = root.maxBudget;
+      if (maxBudget && typeof maxBudget === 'object') {
+        const amount = (maxBudget as Record<string, unknown>).amount;
+        if (typeof amount === 'number' && Number.isFinite(amount) && amount >= 0) {
+          this.setMaxBudgetAmount(amount);
+        }
+      }
+
+      return this.isFormValid;
     },
 
     /**

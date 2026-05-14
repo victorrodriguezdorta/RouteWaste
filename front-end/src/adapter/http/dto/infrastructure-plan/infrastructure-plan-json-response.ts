@@ -134,6 +134,10 @@ export interface InfrastructurePlanDetailJsonResponse {
   status?: string;
   dailyPlans?: InfrastructurePlanDailyPlanJsonResponse[];
   containerStateMonitoring?: ContainerDailyStateJsonResponse[];
+  /** Backend: VALID | OBSOLETE */
+  validityState?: string;
+  /** JSON snapshot of the client execution request */
+  executionRequestJson?: string;
 }
 
 /**

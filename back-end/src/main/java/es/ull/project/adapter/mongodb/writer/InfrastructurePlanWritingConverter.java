@@ -115,6 +115,8 @@ public class InfrastructurePlanWritingConverter implements Converter<Infrastruct
         plan.getExecutedAt().ifPresent(executedAt -> 
             document.put(MongoFields.EXECUTED_AT, executedAt.getTimestamp())
         );
+        document.put(MongoFields.VALIDITY_STATE, plan.getValidityState().name());
+        plan.getExecutionRequestJson().ifPresent(json -> document.put(MongoFields.EXECUTION_REQUEST_JSON, json));
         return document;
     }
 }

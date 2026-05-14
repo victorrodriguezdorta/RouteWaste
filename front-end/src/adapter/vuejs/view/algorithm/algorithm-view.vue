@@ -64,6 +64,17 @@
           {{ item.averagePickupTimeMinutes }}
         </template>
 
+        <template v-slot:item.validityState="{ item }">
+          <v-chip
+            :color="item.validityState === InfrastructurePlanValidityState.VALID ? 'success' : 'error'"
+            size="small"
+            variant="flat"
+            class="font-weight-medium"
+          >
+            {{ item.validityLabel }}
+          </v-chip>
+        </template>
+
         <template v-slot:item.actions="{ item }">
           <ButtonTooltip
             text=""
@@ -131,6 +142,10 @@ import { useI18n } from 'vue-i18n';
 import CrudLayout from '../../components/common/CrudLayout.vue';
 import router from '../../router/router';
 import { useInfrastructurePlanStore } from '../../stores/infrastructure-plan-store';
+import {
+  InfrastructurePlanValidityState,
+  infrastructurePlanValidityStateFromString,
+} from '@/domain/enumerate/infrastructure-plan-validity-state';
 
 // Vue I18n composable for translations
 const { t } = useI18n();
@@ -173,6 +188,12 @@ const headers = computed(() => [
     key: 'averagePickupTimeMinutes',
   },
   {
+    title: t('infrastructurePlan.list.table.headers.validityState') || 'Plan status',
+    align: 'center' as const,
+    sortable: false,
+    key: 'validityState',
+  },
+  {
     title: t('algorithm.list.table.headers.actions'),
     align: 'center' as const,
     sortable: false,
@@ -182,12 +203,19 @@ const headers = computed(() => [
 
 const infrastructureItems = computed(() => {
   return infrastructurePlans.value.map((plan) => {
+    const validityState = infrastructurePlanValidityStateFromString(plan.validityState);
+    const validityLabel =
+      validityState === InfrastructurePlanValidityState.OBSOLETE
+        ? t('infrastructurePlan.list.table.validity.OBSOLETE')
+        : t('infrastructurePlan.list.table.validity.VALID');
     return {
       id: plan.id,
       executedAt: plan.executedAt ? new Date(plan.executedAt).toLocaleString() : '-',
       estimatedTotalCost: plan.estimatedTotalCost ? `${plan.estimatedTotalCost.amount} ${plan.estimatedTotalCost.currency}` : '-',
       numberOfDays: plan.numberOfDays ?? '-',
       averagePickupTimeMinutes: plan.averagePickupTimeMinutes ?? '-',
+      validityState,
+      validityLabel,
     };
   });
 });

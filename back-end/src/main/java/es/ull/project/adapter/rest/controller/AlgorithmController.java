@@ -59,6 +59,7 @@ public class AlgorithmController {
     private static final String MSG_PERSIST_FAILED = "Failed to persist the algorithm response";
     private static final String MSG_PERSIST_SUCCESS = "Algorithm executed and persisted successfully";
     private static final String ERR_SERIALIZE = "Failed to serialize the processed algorithm payload";
+    private static final String ERR_SERIALIZE_REQUEST = "Failed to serialize the algorithm execution request";
     private static final String ERR_PARSE = "Failed to parse the algorithm response";
     private static final String ERR_PERSIST = "Failed to persist the algorithm response";
     private static final String ERR_NO_FACILITIES = "facilitiesWithVehicles is required";
@@ -161,7 +162,18 @@ public class AlgorithmController {
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         try {
-            es.ull.project.domain.entity.InfrastructurePlan persisted = this.persistAlgorithmExecutionResultUseCase.persist(algorithmJsonPayload, numberOfDaysVo, averagePickupTimeMinutesVo, providedMaxBudget);
+            String executionRequestJson;
+            try {
+                executionRequestJson = this.objectMapper.writeValueAsString(requestBody);
+            } catch (JsonProcessingException e) {
+                ObjectNode error = this.objectMapper.createObjectNode();
+                error.put(KEY_STATUS, STATUS_ERROR);
+                error.put(KEY_MESSAGE, ERR_SERIALIZE_REQUEST);
+                error.put(KEY_DETAILS, e.getMessage() != null ? e.getMessage() : EMPTY_STRING);
+                return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            es.ull.project.domain.entity.InfrastructurePlan persisted = this.persistAlgorithmExecutionResultUseCase.persist(
+                    algorithmJsonPayload, numberOfDaysVo, averagePickupTimeMinutesVo, providedMaxBudget, executionRequestJson);
             ObjectNode success = this.objectMapper.createObjectNode();
             success.put(KEY_STATUS, STATUS_SUCCESS);
             success.put(KEY_MESSAGE, MSG_PERSIST_SUCCESS);
@@ -216,7 +228,7 @@ public class AlgorithmController {
      */
     private void persistAlgorithmResult(AlgorithmJsonPayload responseBody, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget) {
         try {
-            this.persistAlgorithmExecutionResultUseCase.persist(responseBody, numberOfDays, averagePickupTimeMinutes, providedMaxBudget);
+            this.persistAlgorithmExecutionResultUseCase.persist(responseBody, numberOfDays, averagePickupTimeMinutes, providedMaxBudget, null);
         } catch (RuntimeException e) {
             throw new AlgorithmExecutionException(ERR_PERSIST, e);
         }

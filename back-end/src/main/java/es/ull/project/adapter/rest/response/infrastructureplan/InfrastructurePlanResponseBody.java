@@ -93,6 +93,16 @@ public class InfrastructurePlanResponseBody {
     public String executedAt;
 
     /**
+     * Whether the plan is still valid or obsolete because referenced entities were edited.
+     */
+    public String validityState;
+
+    /**
+     * JSON snapshot of the client request used to execute the algorithm.
+     */
+    public String executionRequestJson;
+
+    /**
      * Computed or stored status for the plan (e.g. SUBOPTIMAL, OPTIMAL)
      */
     public String status;

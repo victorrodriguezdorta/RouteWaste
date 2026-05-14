@@ -1,6 +1,7 @@
 package es.ull.project.application.service.container;
 
 import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.application.service.infrastructureplan.DeleteInfrastructurePlansReferencingEntityService;
 import es.ull.project.application.usecase.container.DeleteContainerUseCase;
 import es.ull.project.domain.entity.Container;
 
@@ -14,13 +15,18 @@ import java.util.UUID;
 public class DeleteContainerService implements DeleteContainerUseCase {
 
     private final ContainerRepository repository;
+    private final DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService;
 
     /**
      * Constructs a new DeleteContainerService with the specified repository.
      * @param repository the container repository for persistence operations
+     * @param deleteInfrastructurePlansReferencingEntityService removes plans that referenced this container in their execution snapshot
      */
-    public DeleteContainerService(ContainerRepository repository) {
+    public DeleteContainerService(
+            ContainerRepository repository,
+            DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService) {
         this.repository = repository;
+        this.deleteInfrastructurePlansReferencingEntityService = deleteInfrastructurePlansReferencingEntityService;
     }
 
     /**
@@ -32,6 +38,7 @@ public class DeleteContainerService implements DeleteContainerUseCase {
     @Override
     public Container delete(UUID id) {
         Container existing = this.repository.findById(id).orElseThrow(() -> new NoSuchElementException("Container not found"));
+        this.deleteInfrastructurePlansReferencingEntityService.deletePlansWhoseExecutionRequestReferencesEntity(id);
         this.repository.delete(existing);
         return existing;
     }

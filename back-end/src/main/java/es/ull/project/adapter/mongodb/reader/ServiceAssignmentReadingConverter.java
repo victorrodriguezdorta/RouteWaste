@@ -1,6 +1,5 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,9 +17,6 @@ import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
-import es.ull.project.domain.valueobject.cost.MaximumBudget;
-import es.ull.project.domain.valueobject.cost.TotalCost;
-import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
 /**
  * ServiceAssignmentReadingConverter
@@ -62,15 +58,7 @@ public class ServiceAssignmentReadingConverter implements Converter<Document, Se
         logger.info("ServiceAssignment to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         UUID planId = (UUID) document.get(MongoFields.INFRASTRUCTURE_PLAN_ID);
-        InfrastructurePlan infrastructurePlan = new InfrastructurePlan(
-            planId,
-            new PlanningPeriod(String.valueOf(LocalDate.now().getYear())),
-            null, null, null, null, null,
-            new MaximumBudget(1.0),
-            new TotalCost(0.0),
-            null, null, null,
-            null, null, null
-        );
+        InfrastructurePlan infrastructurePlan = InfrastructurePlan.forIdReferenceOnly(planId);
         UUID facilityId = (UUID) document.get(MongoFields.FACILITY_ID);
         Facility facility = mongoConfiguration.facilityRepository().findById(facilityId)
                 .orElseThrow(() -> new IllegalStateException(String.format(ERR_FACILITY_SNAPSHOT, facilityId)));

@@ -30,6 +30,7 @@ public class InfrastructurePlanListResponseMapper {
         responseBody.estimatedTotalCost = plan.getEstimatedTotalCost();
         responseBody.numberOfDays = plan.getNumberOfDays().orElse(null);
         responseBody.averagePickupTimeMinutes = plan.getAveragePickupTimeMinutes().orElse(null);
+        responseBody.validityState = plan.getValidityState().name();
         return responseBody;
     }
 }

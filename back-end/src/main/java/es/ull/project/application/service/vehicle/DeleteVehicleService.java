@@ -1,6 +1,7 @@
 package es.ull.project.application.service.vehicle;
 
 import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.application.service.infrastructureplan.DeleteInfrastructurePlansReferencingEntityService;
 import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 
@@ -15,14 +16,19 @@ import java.util.UUID;
 public class DeleteVehicleService implements DeleteVehicleUseCase {
 
     private final VehicleRepository repository;
+    private final DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService;
 
     /**
      * Constructs a new DeleteVehicleService with the specified repository.
      *
      * @param repository the vehicle repository used for persistence operations
+     * @param deleteInfrastructurePlansReferencingEntityService removes plans that referenced this vehicle in their execution snapshot
      */
-    public DeleteVehicleService(VehicleRepository repository) {
+    public DeleteVehicleService(
+            VehicleRepository repository,
+            DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService) {
         this.repository = repository;
+        this.deleteInfrastructurePlansReferencingEntityService = deleteInfrastructurePlansReferencingEntityService;
     }
 
     /**
@@ -35,6 +41,7 @@ public class DeleteVehicleService implements DeleteVehicleUseCase {
     @Override
     public Vehicle delete(UUID id) {
         Vehicle existing = this.repository.findById(id).orElseThrow(() -> new NoSuchElementException("Vehicle not found"));
+        this.deleteInfrastructurePlansReferencingEntityService.deletePlansWhoseExecutionRequestReferencesEntity(id);
         this.repository.delete(existing);
         return existing;
     }

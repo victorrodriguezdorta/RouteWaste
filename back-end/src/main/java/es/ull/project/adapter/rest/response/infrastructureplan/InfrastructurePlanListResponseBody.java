@@ -36,4 +36,9 @@ public class InfrastructurePlanListResponseBody {
      * Average pickup time in minutes.
      */
     public AveragePickupTimeMinutes averagePickupTimeMinutes;
+
+    /**
+     * Whether the plan is still valid or obsolete because referenced entities were edited.
+     */
+    public String validityState;
 }

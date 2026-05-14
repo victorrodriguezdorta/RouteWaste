@@ -77,18 +77,22 @@
               { value: 25, title: '25' },
               { value: 50, title: '50' }
             ]"
+            :row-props="step1FacilityRowProps"
             @update:options="onTableOptionsUpdate"
+            @click:row="onFacilityTableRowClick"
             item-value="id"
             hover
-            class="elevation-2"
+            class="elevation-2 step1-facility-table"
           >
             <!-- Checkbox column -->
             <template v-slot:item.select="{ item }">
-              <v-checkbox
-                :model-value="isFacilitySelected(item.id)"
-                @update:model-value="toggleFacility(item.id)"
-                class="mt-0"
-              />
+              <div class="d-flex justify-center align-center" @click.stop>
+                <v-checkbox
+                  :model-value="isFacilitySelected(item.id)"
+                  @update:model-value="toggleFacility(item.id)"
+                  class="mt-0"
+                />
+              </div>
             </template>
 
             <!-- Type column -->
@@ -281,6 +285,12 @@ import { useAlgorithmExecution } from '../../composables/useAlgorithmExecution';
 
 const { t } = useI18n();
 
+/** Vuetify row click payload: `item` or `internalItem.raw` depending on version. */
+type FacilityTableRowClickPayload = {
+  item?: { id: string };
+  internalItem?: { raw?: { id: string } };
+};
+
 const emit = defineEmits<{
   next: [];
 }>();
@@ -325,6 +335,7 @@ const {
   onTableOptionsUpdate,
   isFacilitySelected,
   toggleFacility,
+  openFacilityVehiclesPanel,
   isVehicleSelectedInDialog,
   toggleVehicleInDialog,
   isVehicleSelectedInOtherFacility,
@@ -332,9 +343,25 @@ const {
   onVehicleTableOptionsUpdate,
   onVehicleTypeFilterDialogChange,
 } = useAlgorithmExecution();
+
+const step1FacilityRowProps = () => ({
+  class: 'step1-facility-table__row',
+});
+
+const onFacilityTableRowClick = (_event: MouseEvent, row: FacilityTableRowClickPayload) => {
+  const id = row.item?.id ?? row.internalItem?.raw?.id;
+  if (!id) {
+    return;
+  }
+  void openFacilityVehiclesPanel(id);
+};
 </script>
 
 <style scoped>
+.step1-facility-table :deep(tr.step1-facility-table__row) {
+  cursor: pointer;
+}
+
 .step1-facilities-layout {
   display: flex;
   flex-direction: row;

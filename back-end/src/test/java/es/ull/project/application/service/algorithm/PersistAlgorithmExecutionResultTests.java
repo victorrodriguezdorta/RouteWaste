@@ -25,6 +25,7 @@ import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.domain.InfrastructurePlanExecutionRequestReferences;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.ContainerDailyState;
 import es.ull.project.domain.entity.DailyPlan;
@@ -34,6 +35,7 @@ import es.ull.project.domain.entity.ServiceAssignment;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.enumerate.VehicleType;
@@ -79,9 +81,12 @@ class PersistAlgorithmExecutionResultTests {
           vehicleRepository);
 
         AlgorithmJsonPayload payload = new AlgorithmJsonPayload(sampleAlgorithmJson());
-        InfrastructurePlan plan = service.persist(payload, new NumberOfDays(7), new AveragePickupTimeMinutes(15), null);
+        String requestSnap = "{\"facilityId\":\"ce3d2863-eabe-4c6c-a31b-1c3b3ea72038\"}";
+        InfrastructurePlan plan = service.persist(payload, new NumberOfDays(7), new AveragePickupTimeMinutes(15), null, requestSnap);
 
         assertNotNull(plan);
+        assertEquals(requestSnap, plan.getExecutionRequestJson().orElse(null));
+        assertEquals(InfrastructurePlanValidityState.VALID, plan.getValidityState());
         assertEquals(1, plan.getSelectedFacilities().size());
         assertEquals(1, plan.getServiceAssignments().size());
         assertEquals(2, plan.getDailyPlanIds().size());
@@ -372,6 +377,53 @@ class PersistAlgorithmExecutionResultTests {
         @Override
         public Optional<InfrastructurePlan> findById(UUID id) {
             return Optional.ofNullable(saved.get(id));
+        }
+
+        @Override
+        public List<InfrastructurePlan> findValidPlansReferencingEntityInExecutionRequest(UUID entityId) {
+            if (entityId == null) {
+                return List.of();
+            }
+            List<InfrastructurePlan> matches = new ArrayList<>();
+            for (InfrastructurePlan p : saved.values()) {
+                if (p.getValidityState() != InfrastructurePlanValidityState.VALID) {
+                    continue;
+                }
+                String json = p.getExecutionRequestJson().orElse(null);
+                if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+                    matches.add(p);
+                }
+            }
+            return matches;
+        }
+
+        @Override
+        public boolean existsAnyPlanReferencingEntityInExecutionRequest(UUID entityId) {
+            if (entityId == null) {
+                return false;
+            }
+            for (InfrastructurePlan p : saved.values()) {
+                String json = p.getExecutionRequestJson().orElse(null);
+                if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public List<InfrastructurePlan> findPlansReferencingEntityInExecutionRequest(UUID entityId) {
+            if (entityId == null) {
+                return List.of();
+            }
+            List<InfrastructurePlan> matches = new ArrayList<>();
+            for (InfrastructurePlan p : saved.values()) {
+                String json = p.getExecutionRequestJson().orElse(null);
+                if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+                    matches.add(p);
+                }
+            }
+            return matches;
         }
     }
 

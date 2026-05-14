@@ -17,6 +17,7 @@ public class InfrastructurePlanListResponseBodySerializer extends StdSerializer<
     private static final String FIELD_ESTIMATED_TOTAL_COST = "estimatedTotalCost";
     private static final String FIELD_NUMBER_OF_DAYS = "numberOfDays";
     private static final String FIELD_AVERAGE_PICKUP_TIME_MINUTES = "averagePickupTimeMinutes";
+    private static final String FIELD_VALIDITY_STATE = "validityState";
 
     /**
      * Default constructor for the serializer.
@@ -52,6 +53,9 @@ public class InfrastructurePlanListResponseBodySerializer extends StdSerializer<
         }
         if (value.averagePickupTimeMinutes != null) {
             gen.writeNumberField(FIELD_AVERAGE_PICKUP_TIME_MINUTES, value.averagePickupTimeMinutes.getValue());
+        }
+        if (value.validityState != null) {
+            gen.writeStringField(FIELD_VALIDITY_STATE, value.validityState);
         }
         gen.writeEndObject();
     }

@@ -1,6 +1,7 @@
 package es.ull.project.application.service.facility;
 
 import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.application.service.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditService;
 import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
@@ -21,14 +22,19 @@ import java.util.UUID;
 public class UpdateFacilityService implements UpdateFacilityUseCase {
 
     private final FacilityRepository repository;
+    private final InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation;
 
     /**
      * Constructs a new UpdateFacilityService with the specified repository.
      * 
      * @param repository the facility repository for persistence operations
+     * @param infrastructurePlanInvalidation service that marks affected infrastructure plans obsolete
      */
-    public UpdateFacilityService(FacilityRepository repository) {
+    public UpdateFacilityService(
+            FacilityRepository repository,
+            InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation) {
         this.repository = repository;
+        this.infrastructurePlanInvalidation = infrastructurePlanInvalidation;
     }
 
     /**
@@ -84,6 +90,7 @@ public class UpdateFacilityService implements UpdateFacilityUseCase {
             existing.updateStatus(newStatus);
         }
         Facility saved = this.repository.save(existing);
+        this.infrastructurePlanInvalidation.invalidateValidPlansReferencingEntity(id);
         return saved;
     }
 }

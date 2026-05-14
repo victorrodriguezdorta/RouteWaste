@@ -16,6 +16,19 @@
         :show-go-back="true"
         :go-back="goBack"
       >
+        <template #title-actions>
+          <ButtonTooltip
+            color="primary"
+            icon="mdi-pencil"
+            size="default"
+            variant="elevated"
+            :disabled="!canOpenExecuteWithReplay"
+            :eventclick="goToExecuteWithReplay"
+            :text="t('infrastructurePlan.show.actions.editAsNewRun')"
+            :tooltip="t('infrastructurePlan.show.actions.editAsNewRunTooltip')"
+            class="ml-2"
+          />
+        </template>
         <InfrastructurePlanGeneralInfo :plan="infrastructurePlan" />
         <DailyPlansNavigator :plan="infrastructurePlan" />
       </CrudLayout>
@@ -24,22 +37,28 @@
 </template>
 
 <script lang="ts" setup>
-import { LoaderDialog } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip, LoaderDialog } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import DailyPlansNavigator from '../../components/algorithm/DailyPlansNavigator.vue';
 import InfrastructurePlanGeneralInfo from '../../components/algorithm/InfrastructurePlanGeneralInfo.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
 import router from '../../router/router';
+import { useAlgorithmStore } from '../../stores/algorithm-store';
 import { useInfrastructurePlanStore } from '../../stores/infrastructure-plan-store';
 
 const { t, locale } = useI18n();
 
 const route = useRoute();
 const infrastructurePlanStore = useInfrastructurePlanStore();
+const algorithmStore = useAlgorithmStore();
 const { infrastructurePlan } = storeToRefs(infrastructurePlanStore);
+
+const canOpenExecuteWithReplay = computed(
+  () => Boolean(infrastructurePlan.value?.executionRequestJson?.trim().length),
+);
 
 const loading = ref(true);
 const title = ref(label('infrastructurePlan.show.title', 'Detalle del plan de infraestructura'));
@@ -67,5 +86,14 @@ function label(key: string, fallback: string): string {
 
 function goBack(): void {
   router.push({ name: 'Algorithm' });
+}
+
+function goToExecuteWithReplay(): void {
+  const json = infrastructurePlan.value?.executionRequestJson;
+  if (!json?.trim()) {
+    return;
+  }
+  algorithmStore.queueExecutionRequestReplay(json);
+  void router.push({ name: 'ExecuteAlgorithm' });
 }
 </script>

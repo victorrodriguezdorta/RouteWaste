@@ -18,11 +18,13 @@ public interface PersistAlgorithmExecutionResultUseCase {
      * @param numberOfDays number of days for the planning period
      * @param averagePickupTimeMinutes average pickup time in minutes
      * @param providedMaxBudget optional maximum budget provided in the request
+     * @param executionRequestJson JSON snapshot of the client request used to run the algorithm (may be null)
      * @return the persisted infrastructure plan
      */
     InfrastructurePlan persist(
             AlgorithmJsonPayload algorithmResponse,
             NumberOfDays numberOfDays,
             AveragePickupTimeMinutes averagePickupTimeMinutes,
-            MaximumBudget providedMaxBudget);
+            MaximumBudget providedMaxBudget,
+            String executionRequestJson);
 }

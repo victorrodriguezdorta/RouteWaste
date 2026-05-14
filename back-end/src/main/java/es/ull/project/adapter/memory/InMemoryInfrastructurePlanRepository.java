@@ -1,7 +1,9 @@
 package es.ull.project.adapter.memory;
 
 import es.ull.project.application.repository.InfrastructurePlanRepository;
+import es.ull.project.domain.InfrastructurePlanExecutionRequestReferences;
 import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -151,5 +153,52 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
     @Override
     public Optional<InfrastructurePlan> findById(UUID id) {
         return Optional.ofNullable(store.get(id));
+    }
+
+    @Override
+    public List<InfrastructurePlan> findValidPlansReferencingEntityInExecutionRequest(UUID entityId) {
+        if (entityId == null) {
+            return List.of();
+        }
+        List<InfrastructurePlan> matches = new ArrayList<>();
+        for (InfrastructurePlan plan : store.values()) {
+            if (plan.getValidityState() != InfrastructurePlanValidityState.VALID) {
+                continue;
+            }
+            String json = plan.getExecutionRequestJson().orElse(null);
+            if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+                matches.add(plan);
+            }
+        }
+        return matches;
+    }
+
+    @Override
+    public boolean existsAnyPlanReferencingEntityInExecutionRequest(UUID entityId) {
+        if (entityId == null) {
+            return false;
+        }
+        for (InfrastructurePlan plan : store.values()) {
+            String json = plan.getExecutionRequestJson().orElse(null);
+            if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public List<InfrastructurePlan> findPlansReferencingEntityInExecutionRequest(UUID entityId) {
+        if (entityId == null) {
+            return List.of();
+        }
+        List<InfrastructurePlan> matches = new ArrayList<>();
+        for (InfrastructurePlan plan : store.values()) {
+            String json = plan.getExecutionRequestJson().orElse(null);
+            if (InfrastructurePlanExecutionRequestReferences.containsQuotedEntityId(json, entityId)) {
+                matches.add(plan);
+            }
+        }
+        return matches;
     }
 }

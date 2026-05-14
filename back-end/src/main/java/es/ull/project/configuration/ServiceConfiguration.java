@@ -24,7 +24,10 @@ import es.ull.project.application.service.facility.DeleteFacilityService;
 import es.ull.project.application.service.facility.ReadFacilityService;
 import es.ull.project.application.service.facility.UpdateFacilityService;
 import es.ull.project.application.service.infrastructureplan.DeleteInfrastructurePlanService;
+import es.ull.project.application.service.infrastructureplan.DeleteInfrastructurePlansReferencingEntityService;
+import es.ull.project.application.service.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditService;
 import es.ull.project.application.service.infrastructureplan.ReadInfrastructurePlanService;
+import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
 import es.ull.project.application.service.vehicle.CreateVehicleService;
 import es.ull.project.application.service.vehicle.DeleteVehicleService;
 import es.ull.project.application.service.vehicle.ReadVehicleService;
@@ -37,6 +40,18 @@ import es.ull.project.application.service.vehicle.UpdateVehicleService;
  */
 @Configuration
 public class ServiceConfiguration {
+
+    /**
+     * Marks infrastructure plans obsolete when facilities, vehicles, or containers are edited.
+     *
+     * @param infrastructurePlanRepository plan persistence
+     * @return invalidation helper
+     */
+    @Bean
+    public InvalidateInfrastructurePlansOnEntityEditService invalidateInfrastructurePlansOnEntityEditService(
+            InfrastructurePlanRepository infrastructurePlanRepository) {
+        return new InvalidateInfrastructurePlansOnEntityEditService(infrastructurePlanRepository);
+    }
 
     /**
      * Creates the service bean that collects input data for the algorithm.
@@ -121,8 +136,10 @@ public class ServiceConfiguration {
      * @return configured {@link UpdateContainerService} instance
      */
     @Bean
-    public UpdateContainerService updateContainerService(ContainerRepository repository) {
-        return new UpdateContainerService(repository);
+    public UpdateContainerService updateContainerService(
+            ContainerRepository repository,
+            InvalidateInfrastructurePlansOnEntityEditService invalidateInfrastructurePlansOnEntityEditService) {
+        return new UpdateContainerService(repository, invalidateInfrastructurePlansOnEntityEditService);
     }
 
     /**
@@ -132,8 +149,10 @@ public class ServiceConfiguration {
      * @return configured {@link DeleteContainerService} instance
      */
     @Bean
-    public DeleteContainerService deleteContainerService(ContainerRepository repository) {
-        return new DeleteContainerService(repository);
+    public DeleteContainerService deleteContainerService(
+            ContainerRepository repository,
+            DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService) {
+        return new DeleteContainerService(repository, deleteInfrastructurePlansReferencingEntityService);
     }
 
     /**
@@ -165,8 +184,10 @@ public class ServiceConfiguration {
      * @return configured {@link UpdateFacilityService} instance
      */
     @Bean
-    public UpdateFacilityService updateFacilityService(FacilityRepository repository) {
-        return new UpdateFacilityService(repository);
+    public UpdateFacilityService updateFacilityService(
+            FacilityRepository repository,
+            InvalidateInfrastructurePlansOnEntityEditService invalidateInfrastructurePlansOnEntityEditService) {
+        return new UpdateFacilityService(repository, invalidateInfrastructurePlansOnEntityEditService);
     }
 
     /**
@@ -176,8 +197,10 @@ public class ServiceConfiguration {
      * @return configured {@link DeleteFacilityService} instance
      */
     @Bean
-    public DeleteFacilityService deleteFacilityService(FacilityRepository repository) {
-        return new DeleteFacilityService(repository);
+    public DeleteFacilityService deleteFacilityService(
+            FacilityRepository repository,
+            DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService) {
+        return new DeleteFacilityService(repository, deleteInfrastructurePlansReferencingEntityService);
     }
 
     /**
@@ -209,8 +232,10 @@ public class ServiceConfiguration {
      * @return configured {@link UpdateVehicleService} instance
      */
     @Bean
-    public UpdateVehicleService updateVehicleService(VehicleRepository repository) {
-        return new UpdateVehicleService(repository);
+    public UpdateVehicleService updateVehicleService(
+            VehicleRepository repository,
+            InvalidateInfrastructurePlansOnEntityEditService invalidateInfrastructurePlansOnEntityEditService) {
+        return new UpdateVehicleService(repository, invalidateInfrastructurePlansOnEntityEditService);
     }
 
     /**
@@ -220,8 +245,10 @@ public class ServiceConfiguration {
      * @return configured {@link DeleteVehicleService} instance
      */
     @Bean
-    public DeleteVehicleService deleteVehicleService(VehicleRepository repository) {
-        return new DeleteVehicleService(repository);
+    public DeleteVehicleService deleteVehicleService(
+            VehicleRepository repository,
+            DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService) {
+        return new DeleteVehicleService(repository, deleteInfrastructurePlansReferencingEntityService);
     }
 
     /**
@@ -249,6 +276,20 @@ public class ServiceConfiguration {
             DailyPlanRepository dailyPlanRepository,
             ServiceAssignmentRepository serviceAssignmentRepository) {
         return new DeleteInfrastructurePlanService(repository, dailyPlanRepository, serviceAssignmentRepository);
+    }
+
+    /**
+     * Deletes infrastructure plans whose execution snapshot references a deleted master entity.
+     *
+     * @param infrastructurePlanRepository      plan persistence
+     * @param deleteInfrastructurePlanUseCase   cascade delete of plans
+     * @return helper invoked from delete-facility/container/vehicle services
+     */
+    @Bean
+    public DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService(
+            InfrastructurePlanRepository infrastructurePlanRepository,
+            DeleteInfrastructurePlanUseCase deleteInfrastructurePlanUseCase) {
+        return new DeleteInfrastructurePlansReferencingEntityService(infrastructurePlanRepository, deleteInfrastructurePlanUseCase);
     }
 
     /**

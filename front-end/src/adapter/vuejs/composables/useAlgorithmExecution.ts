@@ -443,6 +443,18 @@ export function useAlgorithmExecution() {
   };
 
   /**
+   * Open the vehicle panel for a facility that is already part of the execution selection,
+   * without toggling the facility checkbox (row click vs checkbox).
+   */
+  const openFacilityVehiclesPanel = async (facilityId: string) => {
+    if (!isFacilitySelected(facilityId)) {
+      return;
+    }
+    selectedFacilityForVehiclesId.value = facilityId;
+    await openVehicleDialog(facilityId);
+  };
+
+  /**
    * Close vehicle selection card without saving
    */
   const closeVehicleDialog = () => {
@@ -883,6 +895,7 @@ export function useAlgorithmExecution() {
     getVehiclesForFacility,
     loadVehiclesForDialog,
     openVehicleDialog,
+    openFacilityVehiclesPanel,
     closeVehicleDialog,
     confirmVehicleSelection,
     isVehicleSelectedInDialog,

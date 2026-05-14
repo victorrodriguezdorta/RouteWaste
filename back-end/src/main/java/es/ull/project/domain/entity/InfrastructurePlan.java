@@ -1,5 +1,6 @@
 package es.ull.project.domain.entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
@@ -118,6 +120,16 @@ public class InfrastructurePlan {
     private ExecutedAt executedAt;
 
     /**
+     * Whether this plan is still aligned with master data for referenced entities.
+     */
+    private InfrastructurePlanValidityState validityState;
+
+    /**
+     * JSON snapshot of the client execution request used to run the algorithm (identifiers and parameters).
+     */
+    private String executionRequestJson;
+
+    /**
      * Container daily state snapshots associated with this plan (domain view).
      */
     private List<ContainerDailyState> containerDailyStates;
@@ -156,6 +168,8 @@ public class InfrastructurePlan {
         this.totalCollectedLiters = CollectedVolumeLiters.fromLiters(0.0);
         this.totalDistanceMeters = Distance.fromMeters(0.0);
         this.containerDailyStates = new ArrayList<>();
+        this.validityState = InfrastructurePlanValidityState.VALID;
+        this.executionRequestJson = null;
     }
 
     /**
@@ -180,6 +194,8 @@ public class InfrastructurePlan {
         this.totalCollectedLiters = otherObject.totalCollectedLiters;
         this.totalDistanceMeters = otherObject.totalDistanceMeters;
         this.containerDailyStates = new ArrayList<>(otherObject.containerDailyStates);
+        this.validityState = otherObject.validityState;
+        this.executionRequestJson = otherObject.executionRequestJson;
     }
 
     /**
@@ -200,6 +216,8 @@ public class InfrastructurePlan {
      * @param numberOfDays       the number of days for planning
      * @param averagePickupTimeMinutes the average pickup time in minutes
      * @param executedAt         the timestamp of algorithm execution
+     * @param validityState      persisted validity state (null treated as {@link InfrastructurePlanValidityState#VALID})
+     * @param executionRequestJson persisted client request JSON snapshot (may be null for legacy rows)
      */
         public InfrastructurePlan(UUID id,
             PlanningPeriod period,
@@ -215,7 +233,9 @@ public class InfrastructurePlan {
             Distance totalDistanceMeters,
             NumberOfDays numberOfDays,
             AveragePickupTimeMinutes averagePickupTimeMinutes,
-            ExecutedAt executedAt) {
+            ExecutedAt executedAt,
+            InfrastructurePlanValidityState validityState,
+            String executionRequestJson) {
         validatePeriod(period);
         validateMaxBudget(maxBudget);
         this.id = id;
@@ -233,6 +253,8 @@ public class InfrastructurePlan {
         this.numberOfDays = numberOfDays;
         this.averagePickupTimeMinutes = averagePickupTimeMinutes;
         this.executedAt = executedAt;
+        this.validityState = validityState != null ? validityState : InfrastructurePlanValidityState.VALID;
+        this.executionRequestJson = executionRequestJson;
     }
 
     /**
@@ -253,7 +275,36 @@ public class InfrastructurePlan {
             NumberOfDays numberOfDays,
             AveragePickupTimeMinutes averagePickupTimeMinutes,
             ExecutedAt executedAt) {
-        this(id, period, selectedFacilities, serviceAssignments, dailyPlans, null, servicePolicies, maxBudget, estimatedTotalCost, totalCollectedKilograms, totalCollectedLiters, totalDistanceMeters, numberOfDays, averagePickupTimeMinutes, executedAt);
+        this(id, period, selectedFacilities, serviceAssignments, dailyPlans, null, servicePolicies, maxBudget, estimatedTotalCost, totalCollectedKilograms, totalCollectedLiters, totalDistanceMeters, numberOfDays, averagePickupTimeMinutes, executedAt,
+                InfrastructurePlanValidityState.VALID, null);
+    }
+
+    /**
+     * Minimal aggregate reference used when loading nested documents (for example a {@link DailyPlan})
+     * where only the infrastructure plan identifier is required.
+     *
+     * @param infrastructurePlanId parent plan id
+     * @return placeholder plan carrying only the id and default scalar placeholders
+     */
+    public static InfrastructurePlan forIdReferenceOnly(UUID infrastructurePlanId) {
+        return new InfrastructurePlan(
+                infrastructurePlanId,
+                new PlanningPeriod(String.valueOf(LocalDate.now().getYear())),
+                null,
+                null,
+                null,
+                null,
+                null,
+                new MaximumBudget(1.0),
+                new TotalCost(0.0),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                InfrastructurePlanValidityState.VALID,
+                null);
     }
 
     /**
@@ -566,6 +617,42 @@ public class InfrastructurePlan {
      */
     public Optional<ExecutedAt> getExecutedAt() {
         return Optional.ofNullable(executedAt);
+    }
+
+    /**
+     * Returns whether this plan is considered obsolete because underlying entities changed.
+     *
+     * @return current validity state (never null)
+     */
+    public InfrastructurePlanValidityState getValidityState() {
+        return validityState != null ? validityState : InfrastructurePlanValidityState.VALID;
+    }
+
+    /**
+     * Returns the client execution request JSON snapshot stored when the plan was produced.
+     *
+     * @return optional raw JSON text
+     */
+    public Optional<String> getExecutionRequestJson() {
+        return Optional.ofNullable(executionRequestJson);
+    }
+
+    /**
+     * Attaches the client request JSON used to execute the algorithm (for later reference checks).
+     *
+     * @param json raw JSON text, or null to clear
+     */
+    public void assignExecutionRequestSnapshot(String json) {
+        this.executionRequestJson = json;
+    }
+
+    /**
+     * Marks this plan obsolete when it is still {@link InfrastructurePlanValidityState#VALID}.
+     */
+    public void markObsoleteIfStillValid() {
+        if (getValidityState() == InfrastructurePlanValidityState.VALID) {
+            this.validityState = InfrastructurePlanValidityState.OBSOLETE;
+        }
     }
 
     /**

@@ -7,4 +7,6 @@ export interface InfrastructurePlanSummaryJsonResponse {
   estimatedTotalCost: { amount: number; currency?: string };
   numberOfDays: number;
   averagePickupTimeMinutes: number;
+  /** Backend: VALID | OBSOLETE */
+  validityState?: string;
 }

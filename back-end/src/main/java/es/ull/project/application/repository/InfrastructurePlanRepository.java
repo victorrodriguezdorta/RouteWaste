@@ -59,4 +59,31 @@ public interface InfrastructurePlanRepository {
      * @return optional with the plan if present
      */
     public abstract Optional<InfrastructurePlan> findById(UUID id);
+
+    /**
+     * Finds plans that are still {@link es.ull.project.domain.enumerate.InfrastructurePlanValidityState#VALID}
+     * and whose stored execution-request JSON references the given entity id.
+     *
+     * @param entityId edited facility, vehicle, or container id
+     * @return matching plans (may be empty)
+     */
+    List<InfrastructurePlan> findValidPlansReferencingEntityInExecutionRequest(UUID entityId);
+
+    /**
+     * Returns true if any plan stores an execution request snapshot that references the entity id
+     * (including plans already marked obsolete).
+     *
+     * @param entityId entity id to search for inside stored JSON
+     * @return true when at least one snapshot contains the id
+     */
+    boolean existsAnyPlanReferencingEntityInExecutionRequest(UUID entityId);
+
+    /**
+     * All infrastructure plans whose stored execution-request JSON references the given entity id
+     * (any {@link es.ull.project.domain.enumerate.InfrastructurePlanValidityState validity}).
+     *
+     * @param entityId facility, vehicle, or container id
+     * @return matching plans (empty when none or {@code entityId} is null)
+     */
+    List<InfrastructurePlan> findPlansReferencingEntityInExecutionRequest(UUID entityId);
 }

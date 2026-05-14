@@ -17,6 +17,7 @@ import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
+import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.Currency;
@@ -163,6 +164,9 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
         es.ull.project.domain.valueobject.algorithm.NumberOfDays numberOfDays = numberOfDaysRaw != null ? new es.ull.project.domain.valueobject.algorithm.NumberOfDays(numberOfDaysRaw) : null;
         es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes averagePickupTimeMinutes = averagePickupTimeMinutesRaw != null ? new es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes(averagePickupTimeMinutesRaw) : null;
         es.ull.project.domain.valueobject.time.ExecutedAt executedAt = executedAtRaw != null ? new es.ull.project.domain.valueobject.time.ExecutedAt(executedAtRaw) : null;
+        String validityStateRaw = document.getString(MongoFields.VALIDITY_STATE);
+        InfrastructurePlanValidityState validityState = InfrastructurePlanValidityState.fromStoredString(validityStateRaw);
+        String executionRequestJson = document.getString(MongoFields.EXECUTION_REQUEST_JSON);
         InfrastructurePlan plan = new InfrastructurePlan(
             id,
             period,
@@ -178,7 +182,9 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
             distance,
             numberOfDays,
             averagePickupTimeMinutes,
-            executedAt
+            executedAt,
+            validityState,
+            executionRequestJson
         );
         if (kg != null && liters != null && distance != null) {
             plan.updateAlgorithmMetrics(kg, liters, distance);

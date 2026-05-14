@@ -1,6 +1,7 @@
 package es.ull.project.application.service.vehicle;
 
 import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.application.service.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditService;
 import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
@@ -19,14 +20,19 @@ import java.util.UUID;
 public class UpdateVehicleService implements UpdateVehicleUseCase {
 
     private final VehicleRepository repository;
+    private final InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation;
 
     /**
      * Constructs a new UpdateVehicleService with the specified repository.
      *
      * @param repository the vehicle repository used for persistence operations
+     * @param infrastructurePlanInvalidation service that marks affected infrastructure plans obsolete
      */
-    public UpdateVehicleService(VehicleRepository repository) {
+    public UpdateVehicleService(
+            VehicleRepository repository,
+            InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation) {
         this.repository = repository;
+        this.infrastructurePlanInvalidation = infrastructurePlanInvalidation;
     }
 
     /**
@@ -63,6 +69,7 @@ public class UpdateVehicleService implements UpdateVehicleUseCase {
             existing.updateCostPerKilometer(newCostPerKilometer);
         }
         Vehicle saved = this.repository.save(existing);
+        this.infrastructurePlanInvalidation.invalidateValidPlansReferencingEntity(id);
         return saved;
     }
 }

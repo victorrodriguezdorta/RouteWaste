@@ -9,6 +9,7 @@ import type {
   StopAlertJsonResponse,
 } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-json-response';
 import { containerStatusFromString } from '@/domain/enumerate/container-status';
+import { infrastructurePlanValidityStateFromString } from '@/domain/enumerate/infrastructure-plan-validity-state';
 import { facilityStatusFromString } from '@/domain/enumerate/facility-status';
 import { facilityTypeFromString } from '@/domain/enumerate/facility-type';
 import { serviceZoneFromString } from '@/domain/enumerate/service-zone';
@@ -64,6 +65,12 @@ export class InfrastructurePlanDetailMapper {
       .flatMap((facility) => facility.dailyPlans)
       .reduce((max, dailyPlan) => Math.max(max, dailyPlan.planDay), 0);
 
+    const validityState = infrastructurePlanValidityStateFromString(data.validityState);
+    const executionRequestJson =
+      typeof data.executionRequestJson === 'string' && data.executionRequestJson.length > 0
+        ? data.executionRequestJson
+        : null;
+
     return new InfrastructurePlanDetail(
       this.parseOptionalUuid(data.id),
       data.executedAt,
@@ -75,6 +82,8 @@ export class InfrastructurePlanDetailMapper {
       metrics,
       facilities,
       (data.containerStateMonitoring ?? []).map((state) => this.mapContainerDailyState(state)),
+      validityState,
+      executionRequestJson,
     );
   }
 

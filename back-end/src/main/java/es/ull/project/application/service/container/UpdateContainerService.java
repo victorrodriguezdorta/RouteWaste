@@ -1,6 +1,7 @@
 package es.ull.project.application.service.container;
 
 import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.application.service.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditService;
 import es.ull.project.application.usecase.container.UpdateContainerUseCase;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.ServiceZone;
@@ -19,13 +20,18 @@ import java.util.UUID;
 public class UpdateContainerService implements UpdateContainerUseCase {
 
     private final ContainerRepository repository;
+    private final InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation;
 
     /**
      * Constructs a new UpdateContainerService with the specified repository.
      * @param repository the container repository for persistence operations
+     * @param infrastructurePlanInvalidation service that marks affected infrastructure plans obsolete
      */
-    public UpdateContainerService(ContainerRepository repository) {
+    public UpdateContainerService(
+            ContainerRepository repository,
+            InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation) {
         this.repository = repository;
+        this.infrastructurePlanInvalidation = infrastructurePlanInvalidation;
     }
 
     /**
@@ -59,6 +65,7 @@ public class UpdateContainerService implements UpdateContainerUseCase {
         }
         existing.updateServiceZone(newServiceZone);
         Container saved = this.repository.save(existing);
+        this.infrastructurePlanInvalidation.invalidateValidPlansReferencingEntity(id);
         return saved;
     }
 }

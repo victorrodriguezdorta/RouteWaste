@@ -361,7 +361,12 @@
           "executedAt": "Executed At",
           "estimatedTotalCost": "Estimated Total Cost",
           "numberOfDays": "Number of Days",
-          "averagePickupTimeMinutes": "Average Pickup Time (min)"
+          "averagePickupTimeMinutes": "Average Pickup Time (min)",
+          "validityState": "Plan status"
+        },
+        "validity": {
+          "VALID": "Valid",
+          "OBSOLETE": "Obsolete"
         },
         "tooltips": {
           "view": "View details",
@@ -375,6 +380,14 @@
       }
     },
     "show": {
+      "actions": {
+        "editAsNewRun": "Edit (new run)",
+        "editAsNewRunTooltip": "Opens the wizard with the same selection (facilities, vehicles, containers, and parameters). Executing will create a new plan."
+      },
+      "replayLoadedTitle": "Selection loaded",
+      "replayLoadedMessage": "The steps reflect the request stored with this plan. You can change it and run again.",
+      "replayFailedTitle": "Could not restore selection",
+      "replayFailedMessage": "The stored JSON is invalid or does not match the current format.",
       "generalInfo": {
         "title": "General Information",
         "fields": {
@@ -389,7 +402,9 @@
           "maxBudget": "Maximum Budget",
           "facilityCount": "Number of Facilities",
           "dailyPlanCount": "Daily Plans",
-          "numberOfDays": "Number of Days"
+          "numberOfDays": "Number of Days",
+          "validityState": "Plan validity",
+          "executionRequestJson": "Execution request (JSON)"
         }
       },
       "daily": {

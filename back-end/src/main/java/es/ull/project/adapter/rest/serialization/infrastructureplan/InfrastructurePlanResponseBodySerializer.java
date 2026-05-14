@@ -38,6 +38,12 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
     public void serialize(InfrastructurePlanResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
         gen.writeStringField("id", value.id.toString());
+        if (value.validityState != null) {
+            gen.writeStringField("validityState", value.validityState);
+        }
+        if (value.executionRequestJson != null) {
+            gen.writeStringField("executionRequestJson", value.executionRequestJson);
+        }
         if (value.executedAt != null) {
             gen.writeStringField("executedAt", value.executedAt);
         }

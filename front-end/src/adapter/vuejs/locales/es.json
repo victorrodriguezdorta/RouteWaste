@@ -361,7 +361,12 @@
           "executedAt": "Fecha de Ejecución",
           "estimatedTotalCost": "Costo Total Estimado",
           "numberOfDays": "Número de Días",
-          "averagePickupTimeMinutes": "Tiempo Promedio de Recogida (min)"
+          "averagePickupTimeMinutes": "Tiempo Promedio de Recogida (min)",
+          "validityState": "Estado del plan"
+        },
+        "validity": {
+          "VALID": "Correcto",
+          "OBSOLETE": "Obsoleto"
         },
         "tooltips": {
           "view": "Ver detalles",
@@ -375,6 +380,14 @@
       }
     },
     "show": {
+      "actions": {
+        "editAsNewRun": "Editar (nueva ejecución)",
+        "editAsNewRunTooltip": "Abre el asistente con la misma selección (instalaciones, vehículos, contenedores y parámetros). Al ejecutar se creará un plan nuevo."
+      },
+      "replayLoadedTitle": "Selección cargada",
+      "replayLoadedMessage": "Los pasos reflejan la petición guardada con este plan. Puedes modificarla y ejecutar de nuevo.",
+      "replayFailedTitle": "No se pudo restaurar la selección",
+      "replayFailedMessage": "El JSON guardado no es válido o no coincide con el formato actual.",
       "generalInfo": {
         "title": "Información General",
         "fields": {
@@ -389,7 +402,9 @@
           "maxBudget": "Presupuesto Máximo",
           "facilityCount": "Número de Instalaciones",
           "dailyPlanCount": "Planes Diarios",
-          "numberOfDays": "Número de Días"
+          "numberOfDays": "Número de Días",
+          "validityState": "Vigencia del plan",
+          "executionRequestJson": "Petición de ejecución (JSON)"
         }
       },
       "daily": {

@@ -106,6 +106,8 @@ public class MongoFields {
     public static final String NUMBER_OF_DAYS = "numberOfDays";
     public static final String AVERAGE_PICKUP_TIME_MINUTES = "averagePickupTimeMinutes";
     public static final String EXECUTED_AT = "executedAt";
+    public static final String EXECUTION_REQUEST_JSON = "executionRequestJson";
+    public static final String VALIDITY_STATE = "validityState";
 
     /**
      * DailyPlan fields.

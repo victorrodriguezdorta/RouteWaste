@@ -138,7 +138,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @return the persisted InfrastructurePlan
 	 */
 	@Override
-	public InfrastructurePlan persist(AlgorithmJsonPayload algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget) {
+	public InfrastructurePlan persist(AlgorithmJsonPayload algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget, String executionRequestJson) {
 		logger.info("=== PERSIST START ===");
 		if (algorithmResponse == null) {
 			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE);
@@ -154,7 +154,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE, e);
 		}
 		logger.info("Successfully parsed JSON. Starting persistence...");
-		return this.persistFromNode(root, numberOfDays, averagePickupTimeMinutes, providedMaxBudget);
+		return this.persistFromNode(root, numberOfDays, averagePickupTimeMinutes, providedMaxBudget, executionRequestJson);
 	}
 
 	/**
@@ -164,9 +164,10 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @param numberOfDays               the number of days in the planning period
 	 * @param averagePickupTimeMinutes   average pickup time per stop in minutes
 	 * @param providedMaxBudget          optional maximum budget override
+	 * @param executionRequestJson       client request JSON snapshot (optional)
 	 * @return the persisted InfrastructurePlan
 	 */
-	private InfrastructurePlan persistFromNode(JSONObject algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget) {
+	private InfrastructurePlan persistFromNode(JSONObject algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget, String executionRequestJson) {
 		if (algorithmResponse == null) {
 			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE);
 		}
@@ -271,6 +272,9 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 				CollectedWeightKilograms.fromKilograms(algorithmResponse.optDouble(FIELD_TOTAL_COLLECTED_KILOGRAMS, 0.0)),
 				CollectedVolumeLiters.fromLiters(algorithmResponse.optDouble(FIELD_TOTAL_COLLECTED_LITERS, 0.0)),
 				Distance.fromMeters(algorithmResponse.optDouble(FIELD_TOTAL_DISTANCE_METERS, 0.0)));
+		if (executionRequestJson != null && !executionRequestJson.isBlank()) {
+			plan.assignExecutionRequestSnapshot(executionRequestJson);
+		}
 		for (ServiceAssignment serviceAssignment : serviceAssignments) {
 			logger.debug("Saving ServiceAssignment for facility: {}", serviceAssignment.getFacility().getId());
 			this.serviceAssignmentRepository.save(serviceAssignment);
