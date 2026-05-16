@@ -18,7 +18,7 @@
         prepend-icon="mdi-home"
         :title="t('nav.menu')"
         value="selection"
-        active-color="on-primary"
+        base-color="on-primary"
         class="text-on-primary"
         @click="navigateTo('Selection')"
       ></v-list-item>
@@ -29,7 +29,7 @@
         prepend-icon="mdi-truck"
         :title="t('selection.types.vehicles.title')"
         value="vehicles"
-        active-color="on-primary"
+        base-color="on-primary"
         class="text-on-primary"
         @click="navigateTo('Vehicles')"
       ></v-list-item>
@@ -38,7 +38,7 @@
         prepend-icon="mdi-trash-can"
         :title="t('selection.types.containers.title')"
         value="containers"
-        active-color="on-primary"
+        base-color="on-primary"
         class="text-on-primary"
         @click="navigateTo('Containers')"
       ></v-list-item>
@@ -47,7 +47,7 @@
         prepend-icon="mdi-office-building"
         :title="t('selection.types.facilities.title')"
         value="facilities"
-        active-color="on-primary"
+        base-color="on-primary"
         class="text-on-primary"
         @click="navigateTo('Facilities')"
       ></v-list-item>
@@ -58,7 +58,7 @@
         prepend-icon="mdi-router"
         :title="t('selection.types.algorithm.title')"
         value="algorithm"
-        active-color="on-primary"
+        base-color="on-primary"
         class="text-on-primary"
         @click="navigateTo('Algorithm')"
       ></v-list-item>
@@ -67,7 +67,7 @@
         prepend-icon="mdi-play-circle-outline"
         :title="t('algorithm.list.runButton')"
         value="execute-algorithm"
-        active-color="on-primary"
+        base-color="on-primary"
         class="text-on-primary"
         @click="navigateTo('ExecuteAlgorithm')"
       ></v-list-item>

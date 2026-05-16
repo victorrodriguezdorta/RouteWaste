@@ -19,6 +19,7 @@ import {
   VContainer,
   VDataTableServer,
   VDivider,
+  VExpandTransition,
   VFooter,
   VForm,
   VIcon,
@@ -40,6 +41,7 @@ import {
   VTab,
   VTabs,
   VTextField,
+  VTextarea,
   VToolbar,
   VToolbarTitle,
   VTooltip,
@@ -53,6 +55,8 @@ import en from './adapter/vuejs/locales/en.json';
 import es from './adapter/vuejs/locales/es.json';
 import router from './adapter/vuejs/router/router';
 import App from './App.vue';
+/** Colores del tema: edítalos en `src/theme/professional-light-colors.ts` */
+import { professionalLightColors } from './theme/professional-light-colors';
 import './style.css';
 
 const vuetify = createVuetify({
@@ -72,6 +76,7 @@ const vuetify = createVuetify({
     VContainer,
     VDataTableServer,
     VDivider,
+    VExpandTransition,
     VFooter,
     VForm,
     VIcon,
@@ -91,6 +96,7 @@ const vuetify = createVuetify({
     VStepperWindow,
     VStepperWindowItem,
     VTextField,
+    VTextarea,
     VToolbar,
     VToolbarTitle,
     VTooltip,
@@ -115,37 +121,7 @@ const vuetify = createVuetify({
     themes: {
       professionalLight: {
         dark: false,
-        colors: {
-          primary: '#31572c',      // Slate oscuro elegante
-          secondary: '#4f772d',    // Slate oscuro medio
-          accent: '#90a955',       // Azul moderno para resaltar
-          error: '#880d1e',        // Rojo claro
-          'danger-dark': '#5c0f1b', // Rojo oscuro para estados críticos
-          info: '#4f772d',         // Azul claro
-          success: '#90a955',      // Verde esmeralda
-          warning: '#ffca3a',      // Ámbar
-          'on-primary': '#ffffff',
-          'text-muted': '#757575',
-          'neutral-base': '#000000',
-          'surface-soft': '#f5f5f5',
-          'surface-variant': '#eeeeee',
-          'surface-border-light': 'rgba(255, 255, 255, 0.7)',
-          'border-light': 'rgba(0, 0, 0, 0.08)',
-          background: '#ffffffef',   // Gris muy claro con tono frío
-          surface: '#FFFFFF',      // Color de las tarjetas (blanco)
-          /** UI neutrals (sombras, bordes, texto secundario vía rgba sobre neutral-base) */
-          'shadow-slate': '#0f172a',
-          /** Mapas Leaflet / pins secundarios */
-          'map-pin-muted': '#9e9e9e',
-          'route-return-leg': '#b00020',
-          'route-departure-leg': '#1e88e5',
-          'route-progression-leg': '#00a83a',
-          'facility-marker-fill': '#d32f2f',
-          /** Contenedores visuales (mapa, drawer móvil) */
-          'panel-gradient-start': '#e8eef5',
-          'panel-gradient-end': '#dfe7f0',
-          'drawer-backdrop-gradient-start': '#f4f6f9',
-        }
+        colors: professionalLightColors,
       }
     }
   }

@@ -380,6 +380,8 @@
       }
     },
     "show": {
+      "title": "Detalle del plan de infraestructura",
+      "loading": "Cargando plan de infraestructura...",
       "actions": {
         "editAsNewRun": "Editar",
         "editAsNewRunTooltip": "Abre el asistente con la misma selección (instalaciones, vehículos, contenedores y parámetros). Al ejecutar se creará un plan nuevo."
@@ -401,10 +403,26 @@
           "estimatedTotalCost": "Costo Total Estimado",
           "maxBudget": "Presupuesto Máximo",
           "facilityCount": "Número de Instalaciones",
+          "containerCount": "Número de Contenedores",
+          "vehicleCount": "Número de Vehículos",
           "dailyPlanCount": "Planes Diarios",
           "numberOfDays": "Número de Días",
           "validityState": "Vigencia del plan",
           "executionRequestJson": "Petición de ejecución (JSON)"
+        },
+        "charts": {
+          "sectionTitle": "Resumen analítico",
+          "vehiclesByType": "Vehículos por tipo",
+          "containersByType": "Contenedores por tipo de residuo",
+          "facilityAssignments": "Vehículos y contenedores por instalación",
+          "noData": "No hay datos suficientes para mostrar gráficas en este plan.",
+          "noVehicles": "No hay vehículos en el plan.",
+          "noContainers": "No hay contenedores asignados.",
+          "noFacilities": "No hay instalaciones en el plan.",
+          "series": {
+            "vehicles": "Vehículos",
+            "containers": "Contenedores"
+          }
         }
       },
       "daily": {
@@ -424,7 +442,9 @@
           "noFacilities": "No hay instalaciones disponibles para este día.",
           "vehiclesTitle": "Vehículos",
           "vehiclesHint": "Selecciona los vehículos para mostrar su ruta sobre el mapa.",
-          "noVehicles": "No hay vehículos para las instalaciones seleccionadas."
+          "noVehicles": "No hay vehículos para las instalaciones seleccionadas.",
+          "technicalJsonTitle": "Datos técnicos (JSON)",
+          "visualizerDetailsTitle": "Detalle operativo del día"
         },
         "route": {
           "title": "Ruta del vehículo",
@@ -439,7 +459,20 @@
           "collectedKilogramsLabel": "Kg recogidos",
           "collectedLitersLabel": "Litros recogidos",
           "distanceFromPreviousLabel": "Distancia desde la anterior",
-          "cumulativeDistanceLabel": "Distancia acumulada"
+          "cumulativeDistanceLabel": "Distancia acumulada",
+          "summary": {
+            "totalDistance": "Distancia total",
+            "estimatedCost": "Coste estimado",
+            "capacityKg": "Capacidad kg",
+            "capacityLiters": "Capacidad L"
+          },
+          "charts": {
+            "collectionTitle": "Kg y litros acumulados",
+            "distanceTitle": "Metros acumulados",
+            "kilogramsSeries": "Kilogramos",
+            "litersSeries": "Litros",
+            "distanceSeries": "Metros"
+          }
         },
         "monitoring": {
           "title": "Monitoreo de contenedores para el día {day}",
@@ -450,6 +483,7 @@
           "fillingLabel": "Llenado",
           "capacityLabel": "Capacidad",
           "demandPerDayLabel": "Demanda/día",
+          "fillEvolutionChartTitle": "Evolución del porcentaje de llenado por contenedor",
           "noData": "Sin datos",
           "statuses": {
             "OVERFLOWED": "Desbordado",

@@ -20,50 +20,28 @@
 </template>
 
 <script lang="ts" setup>
-/**
- * LanguageSwitcher Component
- * 
- * Provides a dropdown selector for changing the application language.
- * Uses vue-i18n's locale property to switch between available translations.
- */
-
-import { inject, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useLocale } from 'vuetify';
 
-// Get i18n composable
 const { locale } = useI18n();
+const vuetifyLocale = useLocale();
 
-// Get Vuetify instance injected globally
-const vuetify = inject('vuetify') as any;
-
-// Current selected locale
 const currentLocale = ref(locale.value);
 
-// Available languages configuration
 const languages = [
   { code: 'en', name: 'English' },
   { code: 'es', name: 'Español' },
 ];
 
-/**
- * Change the application language
- * @param selectedLanguage - Language code (e.g., 'en', 'es')
- */
-const changeLanguage = (selectedLanguage: string) => {
+function changeLanguage(selectedLanguage: string): void {
   locale.value = selectedLanguage;
-  if (vuetify?.locale) {
-    vuetify.locale.current.value = selectedLanguage;
-  }
-};
+  vuetifyLocale.current.value = selectedLanguage;
+}
 
-/**
- * Watch locale changes to keep currentLocale in sync
- */
 watch(locale, (newLocale) => {
   currentLocale.value = newLocale;
-  if (vuetify?.locale) {
-    vuetify.locale.current.value = newLocale;
-  }
+  vuetifyLocale.current.value = newLocale;
 });
 </script>
 

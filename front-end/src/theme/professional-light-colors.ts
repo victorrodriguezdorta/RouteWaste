@@ -1,0 +1,36 @@
+/**
+ * Colores del tema Vuetify `professionalLight`.
+ * `main.ts` los pasa a Vuetify; mapa y monitorización importan el mismo objeto (mismos hex).
+ */
+export const professionalLightColors = {
+  primary: '#31572c',
+  secondary: '#4f772d',
+  accent: '#90a955',
+  error: '#880d1e',
+  'danger-dark': '#5c0f1b',
+  info: '#4f772d',
+  success: '#90a955',
+  warning: '#ffca3a',
+  'on-primary': '#ffffff',
+  'text-muted': '#757575',
+  'neutral-base': '#000000',
+  'surface-soft': '#f5f5f5',
+  'surface-variant': '#eeeeee',
+  'on-surface-variant': '#424242',
+  'surface-border-light': 'rgba(255, 255, 255, 0.7)',
+  'border-light': 'rgba(0, 0, 0, 0.08)',
+  background: '#ffffffef',
+  surface: '#FFFFFF',
+  'shadow-slate': '#0f172a',
+  'map-pin-muted': '#9e9e9e',
+  'route-return-leg': '#b00020',
+  'route-departure-leg': '#1e88e5',
+  'route-progression-leg': '#00a83a',
+  'facility-marker-fill': '#d32f2f',
+  'container-marker-fill-normal': '#009B00',
+  'container-marker-fill-medium': '#FF8000',
+  'container-marker-fill-overflow': '#9C0000',
+  'panel-gradient-start': '#e8eef5',
+  'panel-gradient-end': '#dfe7f0',
+  'drawer-backdrop-gradient-start': '#f4f6f9',
+} as const satisfies Record<string, string>;

@@ -221,8 +221,18 @@ import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useTheme } from 'vuetify';
 import router from '../../router/router';
+import {
+  type ContainerFillMarkerTone,
+  buildContainerFillThemePalette,
+  computeContainerFillPercent,
+  containerFillColorForTone,
+  hexToRgba,
+  normalizePlanDay,
+  resolveContainerFillMarkerTone,
+} from '../../utils/container-fill-level';
+import { professionalLightColors } from '@/theme/professional-light-colors';
+import { loadLeaflet } from '../../utils/leaflet';
 import DailyPlanContainerMonitoring from './DailyPlanContainerMonitoring.vue';
 import DailyPlanRouteTimeline from './DailyPlanRouteTimeline.vue';
 
@@ -278,16 +288,16 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
-const theme = useTheme();
 
 function leafletRouteLineColors(): { returnLeg: string; departureLeg: string; progressionLeg: string } {
-  const colors = theme.global.current.value.colors as Record<string, string | undefined>;
   return {
-    returnLeg: colors['route-return-leg'] ?? '#b00020',
-    departureLeg: colors['route-departure-leg'] ?? '#1e88e5',
-    progressionLeg: colors['route-progression-leg'] ?? '#00a83a',
+    returnLeg: professionalLightColors['route-return-leg'],
+    departureLeg: professionalLightColors['route-departure-leg'],
+    progressionLeg: professionalLightColors['route-progression-leg'],
   };
 }
+
+const containerFillPalette = computed(() => buildContainerFillThemePalette());
 
 const dailyDetailsTab = ref<'routes' | 'monitoring'>('routes');
 const jsonExpanded = ref(false);
@@ -318,8 +328,6 @@ const leaflet = ref<LeafletNamespace | null>(null);
 const selectedFacilityIds = ref<string[]>([]);
 const selectedVehicleRouteKeys = ref<string[]>([]);
 
-const LEAFLET_CSS_ID = 'leaflet-stylesheet';
-const LEAFLET_SCRIPT_ID = 'leaflet-script';
 const DEFAULT_CENTER: [number, number] = [28.4636, -16.2518];
 const DEFAULT_ZOOM = 12;
 
@@ -405,6 +413,18 @@ watch(
   { deep: true },
 );
 
+watch(
+  () => [props.planDay, props.containerStateMonitoring] as const,
+  () => {
+    renderMarkers();
+  },
+  { deep: true },
+);
+
+watch(containerFillPalette, () => {
+  renderMarkers();
+});
+
 onMounted(async () => {
   void initializeMap();
   await nextTick();
@@ -413,6 +433,12 @@ onMounted(async () => {
   });
   if (mapStageRef.value) {
     mapStageResizeObserver.observe(mapStageRef.value);
+  }
+
+  if (import.meta.hot) {
+    import.meta.hot.accept('@/theme/professional-light-colors', () => {
+      renderMarkers();
+    });
   }
 });
 
@@ -680,53 +706,31 @@ function extractStopSequence(stop: InfrastructurePlanDailyPlanDetail['stops'][nu
   return stop.sequence.getValue();
 }
 
-async function ensureLeafletAssets(): Promise<LeafletNamespace> {
-  const leafletWindow = window as Window & { L?: LeafletNamespace; __leafletLoader?: Promise<LeafletNamespace> };
+function normalizeIdentifier(value: string | null | undefined): string {
+  return String(value ?? '').trim().toLowerCase();
+}
 
-  if (leafletWindow.L) {
-    return leafletWindow.L;
-  }
+function containerMonitoringByContainerId(): Map<string, InfrastructurePlanContainerDailyStateDetail> {
+  const selectedDay = normalizePlanDay(props.planDay);
+  return new Map(
+    props.containerStateMonitoring
+      .filter((state) => normalizePlanDay(state.planDay) === selectedDay)
+      .map((state) => [normalizeIdentifier(state.containerId.getValue()), state]),
+  );
+}
 
-  if (!document.getElementById(LEAFLET_CSS_ID)) {
-    const link = document.createElement('link');
-    link.id = LEAFLET_CSS_ID;
-    link.rel = 'stylesheet';
-    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-    document.head.appendChild(link);
-  }
-
-  if (!leafletWindow.__leafletLoader) {
-    leafletWindow.__leafletLoader = new Promise((resolve, reject) => {
-      const existingScript = document.getElementById(LEAFLET_SCRIPT_ID) as HTMLScriptElement | null;
-      if (existingScript) {
-        existingScript.addEventListener('load', () => {
-          if (leafletWindow.L) {
-            resolve(leafletWindow.L);
-            return;
-          }
-          reject(new Error('Leaflet failed to initialize'));
-        });
-        existingScript.addEventListener('error', () => reject(new Error('Leaflet failed to load')));
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.id = LEAFLET_SCRIPT_ID;
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.async = true;
-      script.onload = () => {
-        if (leafletWindow.L) {
-          resolve(leafletWindow.L);
-          return;
-        }
-        reject(new Error('Leaflet failed to initialize'));
-      };
-      script.onerror = () => reject(new Error('Leaflet failed to load'));
-      document.body.appendChild(script);
-    });
-  }
-
-  return leafletWindow.__leafletLoader;
+function containerMarkerIcon(L: LeafletNamespace, tone: ContainerFillMarkerTone): unknown {
+  const palette = containerFillPalette.value;
+  const fill = containerFillColorForTone(palette, tone);
+  const surface = professionalLightColors.surface;
+  const shadow = hexToRgba(professionalLightColors['neutral-base'], 0.35);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="28" height="42" aria-hidden="true" style="display:block;filter:drop-shadow(0 2px 3px ${shadow})"><path fill="${fill}" stroke="${surface}" stroke-width="1.1" stroke-linejoin="round" d="M12 1C6.48 1 2 5.48 2 11c0 7.75 10 23 10 23s10-15.25 10-23C22 5.48 17.52 1 12 1z"/><circle cx="12" cy="11" r="3.6" fill="${surface}"/></svg>`;
+  return L.divIcon({
+    className: 'container-fill-marker',
+    html: '<div class="container-fill-marker__pin">' + svg + '</div>',
+    iconSize: [28, 42],
+    iconAnchor: [14, 40],
+  });
 }
 
 async function initializeMap(): Promise<void> {
@@ -734,7 +738,7 @@ async function initializeMap(): Promise<void> {
     return;
   }
 
-  const L = await ensureLeafletAssets();
+  const L = (await loadLeaflet()) as unknown as LeafletNamespace;
   leaflet.value = L;
 
   const map = L.map(mapContainer.value).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
@@ -748,6 +752,8 @@ async function initializeMap(): Promise<void> {
 
   setTimeout(() => map.invalidateSize(), 0);
   renderMarkers();
+  await nextTick();
+  requestAnimationFrame(() => renderMarkers());
 }
 
 function renderMarkers(): void {
@@ -772,6 +778,7 @@ function renderMarkers(): void {
   const boundsPoints: Array<[number, number]> = [];
   const selectedFacilityMap = new Map(selectedFacilities.value.map((facility) => [facility.id.getValue(), facility]));
   const routeContainerLocationMap = new Map<string, [number, number]>();
+  const monitoringByContainerId = containerMonitoringByContainerId();
 
   selectedFacilities.value.forEach((facility) => {
     if (hasCoordinates(facility.location)) {
@@ -803,10 +810,18 @@ function renderMarkers(): void {
         containerTitle === 'infrastructurePlan.show.daily.route.containerLabel' ? 'Container' : containerTitle,
       );
       const containerNameHtml = escapeHtml(displayEntityNameOrUnnamed(container.name.getValue()));
+      const state = containerId
+        ? monitoringByContainerId.get(normalizeIdentifier(containerId))
+        : undefined;
+      const fillPercent = computeContainerFillPercent({ container, state });
+      const fillTone = resolveContainerFillMarkerTone(fillPercent);
+      const fillPercentHtml = fillPercent !== null
+        ? `<br>${escapeHtml(String(fillPercent))}%`
+        : '';
       boundsPoints.push(point);
-      L.marker(point)
+      L.marker(point, { icon: containerMarkerIcon(L, fillTone) })
         .addTo(layer)
-        .bindPopup(`<strong>${containerTitleHtml}</strong><br>${containerNameHtml}`);
+        .bindPopup(`<strong>${containerTitleHtml}</strong><br>${containerNameHtml}${fillPercentHtml}`);
     });
   });
 
@@ -1153,6 +1168,18 @@ function renderMarkers(): void {
   display: block;
   height: 24px;
   width: 24px;
+}
+
+:global(.leaflet-div-icon.container-fill-marker) {
+  background: transparent !important;
+  border: none !important;
+}
+
+:global(.container-fill-marker__pin) {
+  align-items: flex-start;
+  display: flex;
+  justify-content: center;
+  line-height: 0;
 }
 
 @media (max-width: 960px) {

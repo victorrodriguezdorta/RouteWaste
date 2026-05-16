@@ -515,11 +515,16 @@ const navigateTo = (routeName: string) => {
   height: 2.75rem;
   padding: 0 0.35rem;
   border-radius: 9999px;
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
+  background: rgba(var(--v-theme-primary), 0.05);
+  color: rgb(var(--v-theme-primary));
   font-size: 1.125rem;
   font-weight: 800;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(var(--v-theme-neutral-base), 0.12);
+  transition: background 0.3s ease;
+}
+
+.selection-card:hover .entity-count-badge,
+.algorithm-card:hover .entity-count-badge {
+  background: rgba(var(--v-theme-primary), 0.1);
 }
 </style>

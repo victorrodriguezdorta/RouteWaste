@@ -64,6 +64,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteRecordNameGeneric } from 'vue-router';
 import router from '../../router/router';
+import { loadLeaflet } from '../../utils/leaflet';
 
 interface Props {
   locations: MapLocationPin[];
@@ -131,9 +132,6 @@ interface LeafletNamespace {
   latLngBounds(points: [number, number][] | [number, number]): LeafletLatLngBounds;
 }
 
-const LEAFLET_CSS_ID = 'leaflet-stylesheet';
-const LEAFLET_SCRIPT_ID = 'leaflet-script';
-
 const clampLatitude = (value: number) => Math.min(Math.max(value, -90), 90);
 const clampLongitude = (value: number) => Math.min(Math.max(value, -180), 180);
 
@@ -143,55 +141,6 @@ const escapeHtml = (value: string) =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
-
-const ensureLeafletAssets = async (): Promise<LeafletNamespace> => {
-  const leafletWindow = window as Window & { L?: LeafletNamespace; __leafletLoader?: Promise<LeafletNamespace> };
-
-  if (leafletWindow.L) {
-    return leafletWindow.L;
-  }
-
-  if (!document.getElementById(LEAFLET_CSS_ID)) {
-    const link = document.createElement('link');
-    link.id = LEAFLET_CSS_ID;
-    link.rel = 'stylesheet';
-    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-    document.head.appendChild(link);
-  }
-
-  if (!leafletWindow.__leafletLoader) {
-    leafletWindow.__leafletLoader = new Promise((resolve, reject) => {
-      const existingScript = document.getElementById(LEAFLET_SCRIPT_ID) as HTMLScriptElement | null;
-      if (existingScript) {
-        existingScript.addEventListener('load', () => {
-          if (leafletWindow.L) {
-            resolve(leafletWindow.L);
-            return;
-          }
-          reject(new Error('Leaflet failed to initialize'));
-        });
-        existingScript.addEventListener('error', () => reject(new Error('Leaflet failed to load')));
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.id = LEAFLET_SCRIPT_ID;
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.async = true;
-      script.onload = () => {
-        if (leafletWindow.L) {
-          resolve(leafletWindow.L);
-          return;
-        }
-        reject(new Error('Leaflet failed to initialize'));
-      };
-      script.onerror = () => reject(new Error('Leaflet failed to load'));
-      document.body.appendChild(script);
-    });
-  }
-
-  return leafletWindow.__leafletLoader;
-};
 
 const validLocations = computed(() =>
   props.locations.filter(
@@ -278,7 +227,7 @@ const initializeMap = async () => {
     return;
   }
 
-  const L = await ensureLeafletAssets();
+  const L = (await loadLeaflet()) as unknown as LeafletNamespace;
   leafletRef.value = L;
 
   const first = validLocations.value[0];

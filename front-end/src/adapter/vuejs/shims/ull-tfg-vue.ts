@@ -6,3 +6,9 @@
 // @ts-expect-error Published bundle has no .d.ts next to ull-tfg-vue.es.js; typings come from package root.
 export * from '../../../../node_modules/@ull-tfg/ull-tfg-vue/dist/ull-tfg-vue.es.js';
 export { default as Footer } from '../../../../../../ull-tfg-vue/ull-tfg-vue/src/components/footer/Footer.vue';
+// @ts-expect-error Course library SFC; typings via src/types/ull-tfg-vue-footer-augment.ts
+export { default as PieChart } from '../../../../../../ull-tfg-vue/ull-tfg-vue/src/components/pie-chart/PieChart.vue';
+// @ts-expect-error Course library SFC; typings via src/types/ull-tfg-vue-footer-augment.ts
+export { default as StackedBarPlot } from '../../../../../../ull-tfg-vue/ull-tfg-vue/src/components/bar-plot/StackedBarPlot.vue';
+// @ts-expect-error Course library SFC; typings via src/types/ull-tfg-vue-footer-augment.ts
+export { default as LinePlot } from '../../../../../../ull-tfg-vue/ull-tfg-vue/src/components/line-plot/LinePlot.vue';

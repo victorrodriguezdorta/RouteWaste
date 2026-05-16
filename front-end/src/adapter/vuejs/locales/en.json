@@ -380,6 +380,8 @@
       }
     },
     "show": {
+      "title": "Infrastructure plan details",
+      "loading": "Loading infrastructure plan...",
       "actions": {
         "editAsNewRun": "Edit",
         "editAsNewRunTooltip": "Opens the wizard with the same selection (facilities, vehicles, containers, and parameters). Executing will create a new plan."
@@ -401,10 +403,26 @@
           "estimatedTotalCost": "Estimated Total Cost",
           "maxBudget": "Maximum Budget",
           "facilityCount": "Number of Facilities",
+          "containerCount": "Number of Containers",
+          "vehicleCount": "Number of Vehicles",
           "dailyPlanCount": "Daily Plans",
           "numberOfDays": "Number of Days",
           "validityState": "Plan validity",
           "executionRequestJson": "Execution request (JSON)"
+        },
+        "charts": {
+          "sectionTitle": "Analytics overview",
+          "vehiclesByType": "Vehicles by type",
+          "containersByType": "Containers by waste type",
+          "facilityAssignments": "Vehicles and containers per facility",
+          "noData": "Not enough data to display charts for this plan.",
+          "noVehicles": "No vehicles in the plan.",
+          "noContainers": "No assigned containers.",
+          "noFacilities": "No facilities in the plan.",
+          "series": {
+            "vehicles": "Vehicles",
+            "containers": "Containers"
+          }
         }
       },
       "daily": {
@@ -424,7 +442,9 @@
           "noFacilities": "No facilities available for this day.",
           "vehiclesTitle": "Vehicles",
           "vehiclesHint": "Select vehicles to display their route on the map.",
-          "noVehicles": "No vehicles for the selected facilities."
+          "noVehicles": "No vehicles for the selected facilities.",
+          "technicalJsonTitle": "Technical data (JSON)",
+          "visualizerDetailsTitle": "Operational details for the day"
         },
         "route": {
           "title": "Vehicle route",
@@ -439,7 +459,20 @@
           "collectedKilogramsLabel": "Collected kg",
           "collectedLitersLabel": "Collected liters",
           "distanceFromPreviousLabel": "Distance from previous",
-          "cumulativeDistanceLabel": "Cumulative distance"
+          "cumulativeDistanceLabel": "Cumulative distance",
+          "summary": {
+            "totalDistance": "Total distance",
+            "estimatedCost": "Estimated cost",
+            "capacityKg": "Kg capacity",
+            "capacityLiters": "L capacity"
+          },
+          "charts": {
+            "collectionTitle": "Cumulative kg and liters",
+            "distanceTitle": "Cumulative meters",
+            "kilogramsSeries": "Kilograms",
+            "litersSeries": "Liters",
+            "distanceSeries": "Meters"
+          }
         },
         "monitoring": {
           "title": "Container monitoring for day {day}",
@@ -450,6 +483,7 @@
           "fillingLabel": "Filling",
           "capacityLabel": "Capacity",
           "demandPerDayLabel": "Demand/day",
+          "fillEvolutionChartTitle": "Fill percentage evolution by container",
           "noData": "No data",
           "statuses": {
             "OVERFLOWED": "Overflowed",
