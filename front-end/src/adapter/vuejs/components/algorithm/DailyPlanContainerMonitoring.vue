@@ -102,10 +102,9 @@
               </span>
             </div>
             <div class="monitoring-chart__canvas">
-              <LinePlot
-                :id="facilityMonitoring.chartId"
-                :width_props="chartWidth"
-                :height_props="chartHeight"
+              <SimpleLineChart
+                :width="chartWidth"
+                :height="chartHeight"
                 :data="facilityMonitoring.fillChartData"
               />
             </div>
@@ -123,7 +122,8 @@ import type {
     InfrastructurePlanFacilityDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
 import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
-import { ButtonTooltip, LinePlot } from '@ull-tfg/ull-tfg-vue';
+import SimpleLineChart from '@/adapter/vuejs/components/common/SimpleLineChart.vue';
+import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import router from '../../router/router';

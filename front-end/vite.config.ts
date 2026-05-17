@@ -8,8 +8,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@ull-tfg/ull-tfg-vue': path.resolve(__dirname, './src/adapter/vuejs/shims/ull-tfg-vue.ts'),
-      d3: path.resolve(__dirname, '../../ull-tfg-vue/ull-tfg-vue/node_modules/d3'),
     },
   },
 })

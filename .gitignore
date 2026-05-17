@@ -9,6 +9,9 @@ sheriff_log.json
 yarn-error.log
 yarn.lock
 
+# Local package registry credentials
+front-end/.npmrc
+
 # Logs
 logs
 *.log

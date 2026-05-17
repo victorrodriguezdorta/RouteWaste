@@ -125,11 +125,11 @@
                     </span>
                   </div>
                   <div class="chart-panel__canvas">
-                    <LinePlot
-                      :id="route.chartIds.collection"
-                      :width_props="chartWidth"
-                      :height_props="chartHeight"
+                    <SimpleLineChart
+                      :width="chartWidth"
+                      :height="chartHeight"
                       :data="route.collectionChart"
+                      :colors="['#4e79a7', '#f28e2b']"
                     />
                   </div>
                 </div>
@@ -140,10 +140,9 @@
                     {{ t('infrastructurePlan.show.daily.route.charts.distanceTitle') }}
                   </div>
                   <div class="chart-panel__canvas">
-                    <LinePlot
-                      :id="route.chartIds.distance"
-                      :width_props="chartWidth"
-                      :height_props="chartHeight"
+                    <SimpleLineChart
+                      :width="chartWidth"
+                      :height="chartHeight"
                       :data="route.distanceChart"
                     />
                   </div>
@@ -166,9 +165,10 @@ import {
 } from '@/adapter/vuejs/analytics/infrastructure-plan/build-route-progress-charts';
 import type { RouteLinePlotDatum } from '@/adapter/vuejs/analytics/infrastructure-plan/build-route-progress-charts';
 import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
+import SimpleLineChart from '@/adapter/vuejs/components/common/SimpleLineChart.vue';
 import { StopType } from '@/domain/enumerate/stop-type';
 import type { InfrastructurePlanDailyPlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
-import { ButtonTooltip, LinePlot } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import router from '../../router/router';
