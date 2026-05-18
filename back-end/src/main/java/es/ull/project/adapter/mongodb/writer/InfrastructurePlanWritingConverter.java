@@ -1,21 +1,19 @@
 package es.ull.project.adapter.mongodb.writer;
 
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.entity.ServiceAssignment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.lang.NonNull;
-
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.configuration.MongoConfiguration;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.entity.InfrastructurePlan;
-import es.ull.project.domain.entity.ServiceAssignment;
 
 /**
  * InfrastructurePlanWritingConverter

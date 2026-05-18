@@ -27,10 +27,12 @@ public class GetApplicationOverviewService implements GetApplicationOverviewUseC
     private final ReadInfrastructurePlanUseCase readInfrastructurePlanUseCase;
 
     /**
-     * @param containerRepository          container persistence
-     * @param vehicleRepository            vehicle persistence
-     * @param facilityRepository           facility persistence
-     * @param readInfrastructurePlanUseCase  paginated plan reads (totals and recent slice)
+     * Creates the overview service with the repositories required to compute summary totals.
+     *
+     * @param containerRepository           container persistence
+     * @param vehicleRepository             vehicle persistence
+     * @param facilityRepository            facility persistence
+     * @param readInfrastructurePlanUseCase paginated plan reads (totals and recent slice)
      */
     public GetApplicationOverviewService(
             ContainerRepository containerRepository,
@@ -43,6 +45,11 @@ public class GetApplicationOverviewService implements GetApplicationOverviewUseC
         this.readInfrastructurePlanUseCase = readInfrastructurePlanUseCase;
     }
 
+    /**
+     * Fetches the application overview with entity totals and the latest infrastructure plans.
+     *
+     * @return application overview read model
+     */
     @Override
     public ApplicationOverview fetch() {
         Pageable countProbe = PageRequest.of(0, 1);
@@ -50,14 +57,12 @@ public class GetApplicationOverviewService implements GetApplicationOverviewUseC
         long vehicleCount = this.vehicleRepository.findAll(countProbe).getTotalElements();
         long facilityCount = this.facilityRepository.findAll(countProbe).getTotalElements();
         long infrastructurePlanCount = this.readInfrastructurePlanUseCase.fetchAll(countProbe).getTotalElements();
-
         Pageable recentPageable = PageRequest.of(
                 0,
                 RECENT_PLANS_PAGE_SIZE,
                 Sort.by(Sort.Direction.DESC, SORT_PROPERTY_EXECUTED_AT));
         Page<InfrastructurePlan> recentPage = this.readInfrastructurePlanUseCase.fetchAll(recentPageable);
         List<InfrastructurePlan> recentPlans = recentPage.getContent();
-
         return new ApplicationOverview(containerCount, vehicleCount, facilityCount, infrastructurePlanCount, recentPlans);
     }
 }

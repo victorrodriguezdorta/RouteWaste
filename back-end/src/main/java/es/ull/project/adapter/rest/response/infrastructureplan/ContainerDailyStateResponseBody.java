@@ -1,5 +1,11 @@
 package es.ull.project.adapter.rest.response.infrastructureplan;
 
+import es.ull.project.domain.enumerate.ContainerStatus;
+import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
+import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.name.Name;
+import es.ull.project.domain.valueobject.time.PlanDay;
 import java.util.UUID;
 
 /**
@@ -8,14 +14,14 @@ import java.util.UUID;
 public class ContainerDailyStateResponseBody {
 
     public UUID id;
-    public String containerId;
+    public UUID containerId;
     /**
      * Human-readable container name (denormalized for clients).
      */
-    public String containerName;
-    public Integer planDay;
-    public Double dailyFillingLiters;
-    public Double containerCapacityLiters;
-    public Double dailyDemandLitersPerDay;
-    public String status;
+    public Name containerName;
+    public PlanDay planDay;
+    public CollectedVolumeLiters dailyFillingLiters;
+    public ContainerCapacityLiters containerCapacityLiters;
+    public DailyWasteDemandLitersPerDay dailyDemandLitersPerDay;
+    public ContainerStatus status;
 }

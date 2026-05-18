@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -68,19 +69,19 @@ public class DailyPlan {
      * Total weight collected.
      * It is a computed attribute.
      */
-    private final CollectedWeightKilograms totalCollectedKilograms;
+    private CollectedWeightKilograms totalCollectedKilograms;
 
     /**
      * Total volume collected.
      * It is a computed attribute.
      */
-    private final CollectedVolumeLiters totalCollectedLiters;
+    private CollectedVolumeLiters totalCollectedLiters;
 
     /**
      * Total distance of the route.
      * It is a computed attribute.
      */
-    private final Distance totalDistanceMeters;
+    private Distance totalDistanceMeters;
 
     /**
      * List of stops in the route.
@@ -96,31 +97,23 @@ public class DailyPlan {
      * @param serviceDate             The date when the service is executed.
     * @param planDay                 The planning day within the execution horizon.
      * @param vehicle                 The vehicle assigned to the route.
-     * @param totalCollectedKilograms Total weight collected.
-     * @param totalCollectedLiters    Total volume collected.
-     * @param totalDistanceMeters     Total distance of the route.
-     * @param stops                   List of stops in the route.
      */
     public DailyPlan(InfrastructurePlan infrastructurePlan,
                      Facility facility,
                      LocalDate serviceDate,
                      PlanDay planDay,
-                     Vehicle vehicle,
-                     CollectedWeightKilograms totalCollectedKilograms,
-                     CollectedVolumeLiters totalCollectedLiters,
-                     Distance totalDistanceMeters,
-                     List<Stop> stops) {
-        validate(infrastructurePlan, facility, serviceDate, vehicle, totalCollectedKilograms, totalCollectedLiters, totalDistanceMeters);
+                     Vehicle vehicle) {
+        validate(infrastructurePlan, facility, serviceDate, vehicle);
         this.id = UUID.randomUUID();
         this.infrastructurePlan = infrastructurePlan;
         this.facility = facility;
         this.serviceDate = serviceDate;
         this.planDay = planDay;
         this.vehicle = vehicle;
-        this.totalCollectedKilograms = totalCollectedKilograms;
-        this.totalCollectedLiters = totalCollectedLiters;
-        this.totalDistanceMeters = totalDistanceMeters;
-        this.stops = stops != null ? new ArrayList<>(stops) : new ArrayList<>();
+        this.totalCollectedKilograms = CollectedWeightKilograms.fromKilograms(0.0);
+        this.totalCollectedLiters = CollectedVolumeLiters.fromLiters(0.0);
+        this.totalDistanceMeters = Distance.fromMeters(0.0);
+        this.stops = new ArrayList<>();
     }
 
     /**
@@ -167,7 +160,8 @@ public class DailyPlan {
                      CollectedVolumeLiters totalCollectedLiters,
                      Distance totalDistanceMeters,
                      List<Stop> stops) {
-        validate(infrastructurePlan, facility, serviceDate, vehicle, totalCollectedKilograms, totalCollectedLiters, totalDistanceMeters);
+        validate(infrastructurePlan, facility, serviceDate, vehicle);
+        validateRouteMetrics(totalCollectedKilograms, totalCollectedLiters, totalDistanceMeters);
         this.id = id;
         this.infrastructurePlan = infrastructurePlan;
         this.facility = facility;
@@ -192,9 +186,7 @@ public class DailyPlan {
      * @param totalDistanceMeters     total route distance
      * @throws IllegalArgumentException if any required parameter is null
      */
-    private void validate(InfrastructurePlan infrastructurePlan, Facility facility, LocalDate serviceDate, Vehicle vehicle,
-                          CollectedWeightKilograms totalCollectedKilograms, CollectedVolumeLiters totalCollectedLiters,
-                          Distance totalDistanceMeters) {
+    private void validate(InfrastructurePlan infrastructurePlan, Facility facility, LocalDate serviceDate, Vehicle vehicle) {
         if (infrastructurePlan == null) {
             throw new IllegalArgumentException(INFRASTRUCTURE_PLAN_NOT_DEFINED);
         }
@@ -207,6 +199,20 @@ public class DailyPlan {
         if (vehicle == null) {
             throw new IllegalArgumentException(VEHICLE_NOT_DEFINED);
         }
+    }
+
+    /**
+     * Validates that route metric values are non-null.
+     *
+     * @param totalCollectedKilograms total weight collected
+     * @param totalCollectedLiters    total volume collected
+     * @param totalDistanceMeters     total route distance
+     * @throws IllegalArgumentException if any metric is null
+     */
+    private void validateRouteMetrics(
+            CollectedWeightKilograms totalCollectedKilograms,
+            CollectedVolumeLiters totalCollectedLiters,
+            Distance totalDistanceMeters) {
         if (totalCollectedKilograms == null) {
             throw new IllegalArgumentException(TOTAL_KILOGRAMS_NOT_DEFINED);
         }
@@ -229,6 +235,23 @@ public class DailyPlan {
             throw new IllegalArgumentException(INVALID_STOP);
         }
         this.stops.add(stop);
+    }
+
+    /**
+     * Updates computed route metrics after route calculation.
+     *
+     * @param totalCollectedKilograms total weight collected
+     * @param totalCollectedLiters    total volume collected
+     * @param totalDistanceMeters     total route distance
+     */
+    public void updateRouteMetrics(
+            CollectedWeightKilograms totalCollectedKilograms,
+            CollectedVolumeLiters totalCollectedLiters,
+            Distance totalDistanceMeters) {
+        validateRouteMetrics(totalCollectedKilograms, totalCollectedLiters, totalDistanceMeters);
+        this.totalCollectedKilograms = totalCollectedKilograms;
+        this.totalCollectedLiters = totalCollectedLiters;
+        this.totalDistanceMeters = totalDistanceMeters;
     }
 
     /**
@@ -270,10 +293,10 @@ public class DailyPlan {
     /**
      * Returns the planning day within the execution horizon.
      *
-     * @return the plan day number
+     * @return optional plan day number
      */
-    public PlanDay getPlanDay() {
-        return planDay;
+    public Optional<PlanDay> getPlanDay() {
+        return Optional.ofNullable(planDay);
     }
 
     /**

@@ -3,8 +3,6 @@ package es.ull.project.adapter.mongodb.writer;
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +57,4 @@ public class ServiceAssignmentWritingConverter implements Converter<ServiceAssig
         document.put(MongoFields.ASSIGNED_CONTAINERS, containerIds);
         return document;
     }
-
-
 }

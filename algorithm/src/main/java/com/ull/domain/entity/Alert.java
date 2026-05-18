@@ -7,6 +7,9 @@ package com.ull.domain.entity;
  * during the greedy routing algorithm execution.
  */
 public class Alert {
+
+  public static final String TYPE_NOT_DEFINED = "Alert type is not defined";
+  public static final String MESSAGE_NOT_DEFINED = "Alert message is not defined";
   
   /**
    * Type of alert that occurred.
@@ -31,10 +34,10 @@ public class Alert {
    */
   public Alert(String type, String message, Double value) {
     if (type == null || type.isBlank()) {
-      throw new IllegalArgumentException("Alert type is not defined");
+      throw new IllegalArgumentException(TYPE_NOT_DEFINED);
     }
     if (message == null || message.isBlank()) {
-      throw new IllegalArgumentException("Alert message is not defined");
+      throw new IllegalArgumentException(MESSAGE_NOT_DEFINED);
     }
     this.type = type;
     this.message = message;
@@ -74,6 +77,11 @@ public class Alert {
     return value;
   }
 
+  /**
+   * Returns a readable representation of this alert.
+   *
+   * @return text containing type, message, and optional value
+   */
   @Override
   public String toString() {
     return "Alert{" +

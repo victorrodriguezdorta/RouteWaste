@@ -114,16 +114,22 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
         return switch (property) {
             case FIELD_ID_MONGO, FIELD_ID -> java.util.Comparator.comparing(InfrastructurePlan::getId, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             case FIELD_EXECUTED_AT -> java.util.Comparator.comparing(
-                    plan -> plan.getExecutedAt().isPresent() ? plan.getExecutedAt().get().getTimestamp() : null,
+                    plan -> plan.getExecutedAt()
+                            .map(executedAt -> executedAt.getTimestamp())
+                            .orElse(null),
                     java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             case FIELD_ESTIMATED_TOTAL_COST -> java.util.Comparator.comparing(
                     plan -> plan.getEstimatedTotalCost() != null ? plan.getEstimatedTotalCost().getAmount() : null,
                     java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             case FIELD_NUMBER_OF_DAYS -> java.util.Comparator.comparing(
-                    plan -> plan.getNumberOfDays().isPresent() ? plan.getNumberOfDays().get().getValue() : null,
+                    plan -> plan.getNumberOfDays()
+                            .map(numberOfDays -> numberOfDays.getValue())
+                            .orElse(null),
                     java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             case FIELD_AVERAGE_PICKUP_TIME -> java.util.Comparator.comparing(
-                    plan -> plan.getAveragePickupTimeMinutes().isPresent() ? plan.getAveragePickupTimeMinutes().get().getValue() : null,
+                    plan -> plan.getAveragePickupTimeMinutes()
+                            .map(averagePickupTimeMinutes -> averagePickupTimeMinutes.getValue())
+                            .orElse(null),
                     java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
             default -> null;
         };
@@ -155,6 +161,12 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
         return Optional.ofNullable(store.get(id));
     }
 
+    /**
+     * Finds valid infrastructure plans referencing an entity.
+     *
+     * @param entityId referenced entity id
+     * @return valid plans that reference the entity
+     */
     @Override
     public List<InfrastructurePlan> findValidPlansReferencingEntityInExecutionRequest(UUID entityId) {
         if (entityId == null) {
@@ -172,6 +184,12 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
         return matches;
     }
 
+    /**
+     * Checks whether any infrastructure plan references an entity.
+     *
+     * @param entityId referenced entity id
+     * @return true when at least one plan references the entity
+     */
     @Override
     public boolean existsAnyPlanReferencingEntityInExecutionRequest(UUID entityId) {
         if (entityId == null) {
@@ -185,6 +203,12 @@ public class InMemoryInfrastructurePlanRepository implements InfrastructurePlanR
         return false;
     }
 
+    /**
+     * Finds all infrastructure plans referencing an entity.
+     *
+     * @param entityId referenced entity id
+     * @return plans that reference the entity
+     */
     @Override
     public List<InfrastructurePlan> findPlansReferencingEntityInExecutionRequest(UUID entityId) {
         if (entityId == null) {

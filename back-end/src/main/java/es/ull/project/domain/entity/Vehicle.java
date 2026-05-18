@@ -29,6 +29,11 @@ public class Vehicle {
      * It is a computed attribute.
      */
     private final UUID id;
+
+    /**
+     * Name that identifies the vehicle in the application.
+     * It is a required attribute.
+     */
     private Name name;
 
     /**
@@ -58,6 +63,7 @@ public class Vehicle {
     /**
      * Creates a new Vehicle with the specified parameters.
      *
+     * @param name              the vehicle name
      * @param vehicleType       the type of vehicle
      * @param capacityKilograms the capacity of the vehicle in kilograms
      * @param capacityLiters    the capacity of the vehicle in liters
@@ -102,6 +108,7 @@ public class Vehicle {
      * Restores a Vehicle from persistence with all its attributes.
      *
      * @param id                the vehicle identifier
+     * @param name              the vehicle name
      * @param vehicleType       the type of vehicle
      * @param capacityKilograms the capacity in kilograms
      * @param capacityLiters    the capacity in liters
@@ -175,9 +182,10 @@ public class Vehicle {
     }
 
     /**
-     * Returns the vehicle identifier.
+     * Validates that the vehicle name is not null.
      *
-     * @return the unique identifier of the vehicle
+     * @param name the vehicle name to validate
+     * @throws IllegalArgumentException if the vehicle name is null
      */
     private void validateName(Name name) {
         if (name == null) {
@@ -185,10 +193,20 @@ public class Vehicle {
         }
     }
 
+    /**
+     * Returns the vehicle name.
+     *
+     * @return the vehicle name
+     */
     public Name getName() {
         return this.name;
     }
 
+    /**
+     * Updates the vehicle name.
+     *
+     * @param name the new vehicle name
+     */
     public void updateName(Name name) {
         validateName(name);
         this.name = name;

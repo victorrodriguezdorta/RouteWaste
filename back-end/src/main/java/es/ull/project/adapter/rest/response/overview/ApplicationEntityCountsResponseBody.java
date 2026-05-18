@@ -1,5 +1,7 @@
 package es.ull.project.adapter.rest.response.overview;
 
+import es.ull.project.domain.valueobject.page.TotalElements;
+
 /**
  * Persisted entity totals exposed on the application overview endpoint.
  */
@@ -8,20 +10,20 @@ public class ApplicationEntityCountsResponseBody {
     /**
      * Number of containers stored.
      */
-    public long containers;
+    public TotalElements containers;
 
     /**
      * Number of vehicles stored.
      */
-    public long vehicles;
+    public TotalElements vehicles;
 
     /**
      * Number of facilities stored.
      */
-    public long facilities;
+    public TotalElements facilities;
 
     /**
      * Number of infrastructure plans stored.
      */
-    public long infrastructurePlans;
+    public TotalElements infrastructurePlans;
 }

@@ -22,6 +22,7 @@ public class Vehicle {
   public static final String CURRENT_LOAD_LITERS_NOT_VALID = "Current load in liters is not valid";
   public static final String CURRENT_LOAD_KILOGRAMS_EXCEEDED = "Current load in kilograms exceeds vehicle capacity";
   public static final String CURRENT_LOAD_LITERS_EXCEEDED = "Current load in liters exceeds vehicle capacity";
+  private static final double ZERO_LOAD = 0.0;
 
   private final String id;
   private String vehicleType;
@@ -88,42 +89,72 @@ public class Vehicle {
     this.capacityLiters = capacityLiters;
     this.costPerKilometer = costPerKilometer;
     this.currentWasteType = null;
-    this.currentLoadKilograms = 0.0;
-    this.currentLoadLiters = 0.0;
+    this.currentLoadKilograms = ZERO_LOAD;
+    this.currentLoadLiters = ZERO_LOAD;
   }
 
+  /**
+   * Validates that the vehicle identifier is present.
+   *
+   * @param id identifier to validate
+   */
   private void validateId(String id) {
     if (id == null || id.isBlank()) {
       throw new IllegalArgumentException(ID_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that the vehicle type is present.
+   *
+   * @param type vehicle type to validate
+   */
   private void validateVehicleType(String type) {
     if (type == null || type.isBlank()) {
       throw new IllegalArgumentException(TYPE_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that kilogram capacity is not negative.
+   *
+   * @param capacity capacity in kilograms to validate
+   */
   private void validateCapacityKilograms(double capacity) {
-    if (capacity < 0) {
+    if (capacity < ZERO_LOAD) {
       throw new IllegalArgumentException(CAPACITY_KILOGRAMS_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that liter capacity is not negative.
+   *
+   * @param capacity capacity in liters to validate
+   */
   private void validateCapacityLiters(double capacity) {
-    if (capacity < 0) {
+    if (capacity < ZERO_LOAD) {
       throw new IllegalArgumentException(CAPACITY_LITERS_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that cost per kilometer is not negative.
+   *
+   * @param cost cost per kilometer to validate
+   */
   private void validateCost(double cost) {
-    if (cost < 0) {
+    if (cost < ZERO_LOAD) {
       throw new IllegalArgumentException(COST_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that current kilogram load is within capacity.
+   *
+   * @param currentLoadKilograms current load in kilograms to validate
+   */
   private void validateCurrentLoadKilograms(double currentLoadKilograms) {
-    if (currentLoadKilograms < 0) {
+    if (currentLoadKilograms < ZERO_LOAD) {
       throw new IllegalArgumentException(CURRENT_LOAD_KILOGRAMS_NOT_VALID);
     }
     if (currentLoadKilograms > this.capacityKilograms) {
@@ -131,8 +162,13 @@ public class Vehicle {
     }
   }
 
+  /**
+   * Validates that current liter load is within capacity.
+   *
+   * @param currentLoadLiters current load in liters to validate
+   */
   private void validateCurrentLoadLiters(double currentLoadLiters) {
-    if (currentLoadLiters < 0) {
+    if (currentLoadLiters < ZERO_LOAD) {
       throw new IllegalArgumentException(CURRENT_LOAD_LITERS_NOT_VALID);
     }
     if (currentLoadLiters > this.capacityLiters) {
@@ -140,23 +176,48 @@ public class Vehicle {
     }
   }
 
+  /**
+   * Returns the vehicle identifier.
+   *
+   * @return vehicle identifier
+   */
   public String getId() {
     return this.id;
   }
 
+  /**
+   * Returns the vehicle type.
+   *
+   * @return vehicle type
+   */
   public String getVehicleType() {
     return this.vehicleType;
   }
 
+  /**
+   * Updates the vehicle type.
+   *
+   * @param vehicleType new vehicle type
+   */
   public void updateVehicleType(String vehicleType) {
     validateVehicleType(vehicleType);
     this.vehicleType = vehicleType;
   }
 
+  /**
+   * Returns the capacity in kilograms.
+   *
+   * @return capacity in kilograms
+   */
   public double getCapacityKilograms() {
     return this.capacityKilograms;
   }
 
+  /**
+   * Updates the capacity in kilograms.
+   *
+   * @param capacityKilograms new capacity in kilograms
+   */
   public void updateCapacityKilograms(double capacityKilograms) {
     validateCapacityKilograms(capacityKilograms);
     if (this.currentLoadKilograms > capacityKilograms) {
@@ -165,10 +226,20 @@ public class Vehicle {
     this.capacityKilograms = capacityKilograms;
   }
 
+  /**
+   * Returns the capacity in liters.
+   *
+   * @return capacity in liters
+   */
   public double getCapacityLiters() {
     return this.capacityLiters;
   }
 
+  /**
+   * Updates the capacity in liters.
+   *
+   * @param capacityLiters new capacity in liters
+   */
   public void updateCapacityLiters(double capacityLiters) {
     validateCapacityLiters(capacityLiters);
     if (this.currentLoadLiters > capacityLiters) {
@@ -177,71 +248,146 @@ public class Vehicle {
     this.capacityLiters = capacityLiters;
   }
 
+  /**
+   * Returns the operating cost per kilometer.
+   *
+   * @return cost per kilometer
+   */
   public double getCostPerKilometer() {
     return this.costPerKilometer;
   }
 
+  /**
+   * Updates the operating cost per kilometer.
+   *
+   * @param costPerKilometer new cost per kilometer
+   */
   public void updateCostPerKilometer(double costPerKilometer) {
     validateCost(costPerKilometer);
     this.costPerKilometer = costPerKilometer;
   }
 
+  /**
+   * Returns the waste type currently loaded by the vehicle.
+   *
+   * @return current waste type, or null when unloaded
+   */
   public WasteType getCurrentWasteType() {
     return this.currentWasteType;
   }
 
+  /**
+   * Updates the waste type currently loaded by the vehicle.
+   *
+   * @param currentWasteType current waste type
+   */
   public void updateCurrentWasteType(WasteType currentWasteType) {
     this.currentWasteType = currentWasteType;
   }
 
+  /**
+   * Returns the current load in kilograms.
+   *
+   * @return current kilogram load
+   */
   public double getCurrentLoadKilograms() {
     return this.currentLoadKilograms;
   }
 
+  /**
+   * Updates the current load in kilograms.
+   *
+   * @param currentLoadKilograms new kilogram load
+   */
   public void updateCurrentLoadKilograms(double currentLoadKilograms) {
     validateCurrentLoadKilograms(currentLoadKilograms);
     this.currentLoadKilograms = currentLoadKilograms;
   }
 
+  /**
+   * Adds kilograms to the current vehicle load.
+   *
+   * @param kilogramsToAdd kilograms to add
+   */
   public void addLoadKilograms(double kilogramsToAdd) {
     updateCurrentLoadKilograms(this.currentLoadKilograms + kilogramsToAdd);
   }
 
+  /**
+   * Removes kilograms from the current vehicle load.
+   *
+   * @param kilogramsToRemove kilograms to remove
+   */
   public void removeLoadKilograms(double kilogramsToRemove) {
     updateCurrentLoadKilograms(this.currentLoadKilograms - kilogramsToRemove);
   }
 
+  /**
+   * Empties the current kilogram load.
+   */
   public void emptyLoadKilograms() {
-    this.currentLoadKilograms = 0.0;
+    this.currentLoadKilograms = ZERO_LOAD;
   }
 
+  /**
+   * Returns the current load in liters.
+   *
+   * @return current liter load
+   */
   public double getCurrentLoadLiters() {
     return this.currentLoadLiters;
   }
 
+  /**
+   * Updates the current load in liters.
+   *
+   * @param currentLoadLiters new liter load
+   */
   public void updateCurrentLoadLiters(double currentLoadLiters) {
     validateCurrentLoadLiters(currentLoadLiters);
     this.currentLoadLiters = currentLoadLiters;
   }
 
+  /**
+   * Adds liters to the current vehicle load.
+   *
+   * @param litersToAdd liters to add
+   */
   public void addLoadLiters(double litersToAdd) {
     updateCurrentLoadLiters(this.currentLoadLiters + litersToAdd);
   }
 
+  /**
+   * Removes liters from the current vehicle load.
+   *
+   * @param litersToRemove liters to remove
+   */
   public void removeLoadLiters(double litersToRemove) {
     updateCurrentLoadLiters(this.currentLoadLiters - litersToRemove);
   }
 
+  /**
+   * Empties the current liter load.
+   */
   public void emptyLoadLiters() {
-    this.currentLoadLiters = 0.0;
+    this.currentLoadLiters = ZERO_LOAD;
   }
 
+  /**
+   * Empties every current load metric and clears waste type.
+   */
   public void emptyLoad() {
     this.currentWasteType = null;
     emptyLoadKilograms();
     emptyLoadLiters();
   }
 
+  /**
+   * Compares this vehicle with another object by identifier.
+   *
+   * @param otherObject object to compare
+   * @return true when both vehicles share the same identifier
+   */
   @Override
   public boolean equals(Object otherObject) {
     if (this == otherObject) {
@@ -254,11 +400,21 @@ public class Vehicle {
     return Objects.equals(this.id, otherVehicle.id);
   }
 
+  /**
+   * Returns a hash code based on the vehicle identifier.
+   *
+   * @return hash code for this vehicle
+   */
   @Override
   public int hashCode() {
     return Objects.hash(this.id);
   }
 
+  /**
+   * Returns a readable representation of this vehicle.
+   *
+   * @return text containing the main vehicle attributes
+   */
   @Override
   public String toString() {
     return String.format(

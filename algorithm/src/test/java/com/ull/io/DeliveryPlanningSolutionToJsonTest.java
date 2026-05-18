@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import com.ull.domain.DeliveryPlanningSolution;
+import com.ull.domain.DeliveryPlanningStatus;
 import com.ull.domain.entity.Alert;
 import com.ull.domain.entity.Container;
 import com.ull.domain.entity.ContainerDailyState;
@@ -28,7 +29,7 @@ class DeliveryPlanningSolutionToJsonTest {
   @Test
   void shouldSerializeContainerStateMonitoringAndStopDetails() {
     DeliveryPlanningSolution solution = new DeliveryPlanningSolution();
-    solution.updateStatus(DeliveryPlanningSolution.Status.SUBOPTIMAL);
+    solution.updateStatus(DeliveryPlanningStatus.SUBOPTIMAL);
     solution.updateMaxBudget(new MaximumBudget(5000.0, "EUR"));
 
     Location facilityLocation = new Location(28.4636, -16.2518, "Santa Cruz de Tenerife", "SC-001");

@@ -12,6 +12,12 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import es.ull.project.domain.enumerate.ContainerStatus;
+import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
+import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.identifier.ContainerId;
+import es.ull.project.domain.valueobject.identifier.InfrastructurePlanId;
+import es.ull.project.domain.valueobject.time.PlanDay;
 
 class ContainerDailyStateTests {
 
@@ -21,13 +27,12 @@ class ContainerDailyStateTests {
 
     private static ContainerDailyState randomState() {
         return new ContainerDailyState(
-            randomId(),
-            randomId(),
-            "container-" + UUID.randomUUID(),
-            1 + (int) (Math.random() * 30),
-            10.0 + Math.random() * 900.0,
-            100.0 + Math.random() * 900.0,
-            1.0 + Math.random() * 100.0,
+            new InfrastructurePlanId(randomId()),
+            new ContainerId(randomId()),
+            new PlanDay(1 + (int) (Math.random() * 30)),
+            CollectedVolumeLiters.fromLiters(10.0 + Math.random() * 900.0),
+            new ContainerCapacityLiters(100.0 + Math.random() * 900.0),
+            new DailyWasteDemandLitersPerDay(1.0 + Math.random() * 100.0),
             ContainerStatus.random()
         );
     }
@@ -36,7 +41,7 @@ class ContainerDailyStateTests {
     void constructorRight() {
         UUID id = randomId();
         UUID planId = randomId();
-        String containerId = "container-1";
+        UUID containerId = randomId();
         int planDay = 3;
         double dailyFillingLiters = 42.5;
         double containerCapacityLiters = 100.0;
@@ -45,18 +50,18 @@ class ContainerDailyStateTests {
 
         ContainerDailyState state = new ContainerDailyState(
             id,
-            planId,
-            containerId,
-            planDay,
-            dailyFillingLiters,
-            containerCapacityLiters,
-            dailyDemandLitersPerDay,
+            new InfrastructurePlanId(planId),
+            new ContainerId(containerId),
+            new PlanDay(planDay),
+            CollectedVolumeLiters.fromLiters(dailyFillingLiters),
+            new ContainerCapacityLiters(containerCapacityLiters),
+            new DailyWasteDemandLitersPerDay(dailyDemandLitersPerDay),
             status
         );
 
         assertEquals(id, state.getId());
-        assertEquals(planId, state.getInfrastructurePlanId());
-        assertEquals(containerId, state.getContainerId());
+        assertEquals(planId, state.getInfrastructurePlanId().orElse(null));
+        assertEquals(containerId.toString(), state.getContainerId());
         assertEquals(planDay, state.getPlanDay());
         assertEquals(dailyFillingLiters, state.getDailyFillingLiters());
         assertEquals(containerCapacityLiters, state.getContainerCapacityLiters());
@@ -68,13 +73,12 @@ class ContainerDailyStateTests {
     @Test
     void constructorDefaultsStatusWhenNull() {
         ContainerDailyState state = new ContainerDailyState(
-            randomId(),
-            randomId(),
-            "container-1",
-            1,
-            12.0,
-            100.0,
-            5.0,
+            new InfrastructurePlanId(randomId()),
+            new ContainerId(randomId()),
+            new PlanDay(1),
+            CollectedVolumeLiters.fromLiters(12.0),
+            new ContainerCapacityLiters(100.0),
+            new DailyWasteDemandLitersPerDay(5.0),
             null
         );
 
@@ -82,50 +86,74 @@ class ContainerDailyStateTests {
     }
 
     @Test
-    void constructorRejectsNullId() {
+    void constructorRejectsNullContainerId() {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new ContainerDailyState(null, randomId(), "container-1", 1, 12.0, 100.0, 5.0, ContainerStatus.CORRECT)
+            () -> new ContainerDailyState(
+                new InfrastructurePlanId(randomId()),
+                null,
+                new PlanDay(1),
+                CollectedVolumeLiters.fromLiters(12.0),
+                new ContainerCapacityLiters(100.0),
+                new DailyWasteDemandLitersPerDay(5.0),
+                ContainerStatus.CORRECT)
         );
 
-        assertEquals("id is required", exception.getMessage());
+        assertEquals("container id is required", exception.getMessage());
     }
 
     @Test
-    void constructorRejectsBlankContainerId() {
+    void constructorRejectsNullPlanDay() {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new ContainerDailyState(randomId(), randomId(), "   ", 1, 12.0, 100.0, 5.0, ContainerStatus.CORRECT)
+            () -> new ContainerDailyState(
+                new InfrastructurePlanId(randomId()),
+                new ContainerId(randomId()),
+                null,
+                CollectedVolumeLiters.fromLiters(12.0),
+                new ContainerCapacityLiters(100.0),
+                new DailyWasteDemandLitersPerDay(5.0),
+                ContainerStatus.CORRECT)
         );
 
-        assertEquals("containerId is required", exception.getMessage());
+        assertEquals("plan day is required", exception.getMessage());
     }
 
     @Test
     void constructorRejectsInvalidPlanDay() {
-        IllegalArgumentException exception = assertThrows(
+        assertThrows(
             IllegalArgumentException.class,
-            () -> new ContainerDailyState(randomId(), randomId(), "container-1", 0, 12.0, 100.0, 5.0, ContainerStatus.CORRECT)
+            () -> new ContainerDailyState(
+                new InfrastructurePlanId(randomId()),
+                new ContainerId(randomId()),
+                new PlanDay(0),
+                CollectedVolumeLiters.fromLiters(12.0),
+                new ContainerCapacityLiters(100.0),
+                new DailyWasteDemandLitersPerDay(5.0),
+                ContainerStatus.CORRECT)
         );
-
-        assertEquals("planDay must be >= 1", exception.getMessage());
     }
 
     @Test
     void constructorRejectsNegativeDailyFilling() {
-        IllegalArgumentException exception = assertThrows(
+        assertThrows(
             IllegalArgumentException.class,
-            () -> new ContainerDailyState(randomId(), randomId(), "container-1", 1, -1.0, 100.0, 5.0, ContainerStatus.CORRECT)
+            () -> CollectedVolumeLiters.fromLiters(-1.0)
         );
-
-        assertEquals("dailyFillingLiters must be >= 0", exception.getMessage());
     }
 
     @Test
     void constructorRejectsInvalidCapacity() {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new ContainerDailyState(randomId(), randomId(), "container-1", 1, 1.0, 0.0, 5.0, ContainerStatus.CORRECT)
+            () -> new ContainerDailyState(
+                new InfrastructurePlanId(randomId()),
+                new ContainerId(randomId()),
+                new PlanDay(1),
+                CollectedVolumeLiters.fromLiters(1.0),
+                new ContainerCapacityLiters(0.0),
+                new DailyWasteDemandLitersPerDay(5.0),
+                ContainerStatus.CORRECT)
         );
 
         assertEquals("containerCapacityLiters must be > 0", exception.getMessage());
@@ -133,20 +161,34 @@ class ContainerDailyStateTests {
 
     @Test
     void constructorRejectsNegativeDailyDemand() {
-        IllegalArgumentException exception = assertThrows(
+        assertThrows(
             IllegalArgumentException.class,
-            () -> new ContainerDailyState(randomId(), randomId(), "container-1", 1, 1.0, 100.0, -1.0, ContainerStatus.CORRECT)
+            () -> new DailyWasteDemandLitersPerDay(-1.0)
         );
-
-        assertEquals("dailyDemandLitersPerDay must be >= 0", exception.getMessage());
     }
 
     @Test
     void equalsAndHashCodeUseId() {
         UUID id = randomId();
         UUID planId = randomId();
-        ContainerDailyState state1 = new ContainerDailyState(id, planId, "container-1", 1, 12.0, 100.0, 5.0, ContainerStatus.CORRECT);
-        ContainerDailyState state2 = new ContainerDailyState(id, planId, "container-2", 8, 20.0, 150.0, 7.0, ContainerStatus.OVERFLOWED);
+        ContainerDailyState state1 = new ContainerDailyState(
+            id,
+            new InfrastructurePlanId(planId),
+            new ContainerId(randomId()),
+            new PlanDay(1),
+            CollectedVolumeLiters.fromLiters(12.0),
+            new ContainerCapacityLiters(100.0),
+            new DailyWasteDemandLitersPerDay(5.0),
+            ContainerStatus.CORRECT);
+        ContainerDailyState state2 = new ContainerDailyState(
+            id,
+            new InfrastructurePlanId(planId),
+            new ContainerId(randomId()),
+            new PlanDay(8),
+            CollectedVolumeLiters.fromLiters(20.0),
+            new ContainerCapacityLiters(150.0),
+            new DailyWasteDemandLitersPerDay(7.0),
+            ContainerStatus.OVERFLOWED);
         ContainerDailyState state3 = randomState();
 
         assertTrue(state1.equals(state1));

@@ -1,11 +1,11 @@
 package com.ull.domain.entity;
 
+import com.ull.domain.enumerate.StopType;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import com.ull.domain.enumerate.StopType;
 
 /**
  * Represents the daily route assigned to a vehicle starting from a facility.
@@ -20,6 +20,8 @@ public class DailyPlan {
   public static final String DISTANCE_NOT_VALID = "Distance from previous stop is not valid";
   public static final String COLLECTED_KILOGRAMS_NOT_VALID = "Collected kilograms is not valid";
   public static final String COLLECTED_LITERS_NOT_VALID = "Collected liters is not valid";
+  private static final int MIN_PLAN_DAY = 1;
+  private static final double ZERO_AMOUNT = 0.0;
 
   private final int planDay;
   private final LocalDate serviceDate;
@@ -48,85 +50,165 @@ public class DailyPlan {
     this.originFacility = originFacility;
     this.vehicle = vehicle;
     this.stops = new ArrayList<>();
-    this.totalDistanceMeters = 0.0;
-    this.totalCollectedKilograms = 0.0;
-    this.totalCollectedLiters = 0.0;
+    this.totalDistanceMeters = ZERO_AMOUNT;
+    this.totalCollectedKilograms = ZERO_AMOUNT;
+    this.totalCollectedLiters = ZERO_AMOUNT;
   }
 
+  /**
+   * Validates that the planning day is positive.
+   *
+   * @param planDay planning day to validate
+   */
   private void validatePlanDay(int planDay) {
-    if (planDay < 1) {
+    if (planDay < MIN_PLAN_DAY) {
       throw new IllegalArgumentException(PLAN_DAY_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that the service date is present.
+   *
+   * @param serviceDate service date to validate
+   */
   private void validateServiceDate(LocalDate serviceDate) {
     if (serviceDate == null) {
       throw new IllegalArgumentException(SERVICE_DATE_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that the origin facility is present.
+   *
+   * @param originFacility origin facility to validate
+   */
   private void validateOriginFacility(Facility originFacility) {
     if (originFacility == null) {
       throw new IllegalArgumentException(FACILITY_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that the route vehicle is present.
+   *
+   * @param vehicle vehicle to validate
+   */
   private void validateVehicle(Vehicle vehicle) {
     if (vehicle == null) {
       throw new IllegalArgumentException(VEHICLE_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that the stop container is present.
+   *
+   * @param container container to validate
+   */
   private void validateContainer(Container container) {
     if (container == null) {
       throw new IllegalArgumentException(CONTAINER_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that collected kilograms are not negative.
+   *
+   * @param collectedKilograms collected kilograms to validate
+   */
   private void validateCollectedKilograms(double collectedKilograms) {
-    if (collectedKilograms < 0) {
+    if (collectedKilograms < ZERO_AMOUNT) {
       throw new IllegalArgumentException(COLLECTED_KILOGRAMS_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that collected liters are not negative.
+   *
+   * @param collectedLiters collected liters to validate
+   */
   private void validateCollectedLiters(double collectedLiters) {
-    if (collectedLiters < 0) {
+    if (collectedLiters < ZERO_AMOUNT) {
       throw new IllegalArgumentException(COLLECTED_LITERS_NOT_VALID);
     }
   }
 
+  /**
+   * Returns the planning day.
+   *
+   * @return one-based planning day
+   */
   public int getPlanDay() {
     return this.planDay;
   }
 
+  /**
+   * Returns the service date.
+   *
+   * @return service date
+   */
   public LocalDate getServiceDate() {
     return this.serviceDate;
   }
 
+  /**
+   * Returns the origin facility.
+   *
+   * @return origin facility
+   */
   public Facility getOriginFacility() {
     return this.originFacility;
   }
 
+  /**
+   * Returns the assigned vehicle.
+   *
+   * @return assigned vehicle
+   */
   public Vehicle getVehicle() {
     return this.vehicle;
   }
 
+  /**
+   * Returns the route stops.
+   *
+   * @return unmodifiable stops list
+   */
   public List<DailyPlanStop> getStops() {
     return Collections.unmodifiableList(this.stops);
   }
 
+  /**
+   * Returns the total travelled distance in meters.
+   *
+   * @return total distance in meters
+   */
   public double getTotalDistanceMeters() {
     return this.totalDistanceMeters;
   }
 
+  /**
+   * Returns total collected kilograms.
+   *
+   * @return total collected kilograms
+   */
   public double getTotalCollectedKilograms() {
     return this.totalCollectedKilograms;
   }
 
+  /**
+   * Returns total collected liters.
+   *
+   * @return total collected liters
+   */
   public double getTotalCollectedLiters() {
     return this.totalCollectedLiters;
   }
 
+  /**
+   * Returns the last container stop in the route.
+   *
+   * @return last visited container, or null when no container stop exists
+   */
   public Container getLastContainer() {
     if (this.stops.isEmpty()) {
       return null;
@@ -142,19 +224,16 @@ public class DailyPlan {
    * @param alerts optional alerts for the stop
    */
   public void addFacilityStop(double distanceFromPreviousMeters, List<Alert> alerts) {
-    if (distanceFromPreviousMeters < 0.0) {
+    if (distanceFromPreviousMeters < ZERO_AMOUNT) {
       throw new IllegalArgumentException(DISTANCE_NOT_VALID);
     }
-
     double cumulativeDistanceMeters = this.totalDistanceMeters + distanceFromPreviousMeters;
-    int sequence = this.stops.size() + 1;
-
+    int sequence = this.stops.size() + MIN_PLAN_DAY;
     DailyPlanStop stop = DailyPlanStop.forFacility(
         sequence,
         distanceFromPreviousMeters,
         cumulativeDistanceMeters,
         alerts != null ? alerts : new ArrayList<>());
-
     this.stops.add(stop);
     this.totalDistanceMeters = cumulativeDistanceMeters;
   }
@@ -177,7 +256,6 @@ public class DailyPlan {
     validateContainer(container);
     validateCollectedKilograms(collectedKilograms);
     validateCollectedLiters(collectedLiters);
-
     double distanceFromPreviousMeters;
     if (this.stops.isEmpty()) {
       distanceFromPreviousMeters = this.originFacility.calculateDistanceTo(container);
@@ -187,7 +265,6 @@ public class DailyPlan {
           ? lastContainer.calculateDistanceTo(container)
           : this.originFacility.calculateDistanceTo(container);
     }
-
     addStop(
         container,
         collectedKilograms,
@@ -217,13 +294,11 @@ public class DailyPlan {
     validateContainer(container);
     validateCollectedKilograms(collectedKilograms);
     validateCollectedLiters(collectedLiters);
-    if (distanceFromPreviousMeters < 0.0) {
+    if (distanceFromPreviousMeters < ZERO_AMOUNT) {
       throw new IllegalArgumentException(DISTANCE_NOT_VALID);
     }
-
     double cumulativeDistanceMeters = this.totalDistanceMeters + distanceFromPreviousMeters;
-    int sequence = this.stops.size() + 1;
-
+    int sequence = this.stops.size() + MIN_PLAN_DAY;
     DailyPlanStop stop = new DailyPlanStop(
       sequence,
       StopType.CONTAINER,
@@ -234,7 +309,6 @@ public class DailyPlan {
       collectedLiters,
       containerActualLiters,
       alerts);
-
     this.stops.add(stop);
     this.totalDistanceMeters = cumulativeDistanceMeters;
     this.totalCollectedKilograms += collectedKilograms;
@@ -250,7 +324,7 @@ public class DailyPlan {
    * @param collectedLiters liters collected at the stop
    */
   public void addStop(Container container, double collectedKilograms, double collectedLiters) {
-    addStop(container, collectedKilograms, collectedLiters, 0.0, new ArrayList<>());
+    addStop(container, collectedKilograms, collectedLiters, ZERO_AMOUNT, new ArrayList<>());
   }
 
   /**
@@ -261,7 +335,7 @@ public class DailyPlan {
    * @param distanceMeters distance to add to the route total
    */
   public void addTransitDistance(double distanceMeters) {
-    if (distanceMeters < 0.0) {
+    if (distanceMeters < ZERO_AMOUNT) {
       throw new IllegalArgumentException(DISTANCE_NOT_VALID);
     }
     this.totalDistanceMeters += distanceMeters;
@@ -272,11 +346,17 @@ public class DailyPlan {
    */
   public void clearStops() {
     this.stops.clear();
-    this.totalDistanceMeters = 0.0;
-    this.totalCollectedKilograms = 0.0;
-    this.totalCollectedLiters = 0.0;
+    this.totalDistanceMeters = ZERO_AMOUNT;
+    this.totalCollectedKilograms = ZERO_AMOUNT;
+    this.totalCollectedLiters = ZERO_AMOUNT;
   }
 
+  /**
+   * Compares this daily plan with another object by route identity.
+   *
+   * @param otherObject object to compare
+   * @return true when both plans share day, date, facility, and vehicle
+   */
   @Override
   public boolean equals(Object otherObject) {
     if (this == otherObject) {
@@ -292,11 +372,21 @@ public class DailyPlan {
         && Objects.equals(this.vehicle, otherPlan.vehicle);
   }
 
+  /**
+   * Returns a hash code based on route identity.
+   *
+   * @return hash code for this daily plan
+   */
   @Override
   public int hashCode() {
     return Objects.hash(this.planDay, this.serviceDate, this.originFacility, this.vehicle);
   }
 
+  /**
+   * Returns a readable representation of this daily plan.
+   *
+   * @return text containing route attributes, stops, and totals
+   */
   @Override
   public String toString() {
     return String.format(

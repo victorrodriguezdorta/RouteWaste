@@ -1,9 +1,11 @@
 package es.ull.project.adapter.rest.response.dailyplan;
 
-import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
+import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.location.Distance;
+import es.ull.project.domain.valueobject.name.Name;
+import es.ull.project.domain.valueobject.time.PlanDay;
 import es.ull.project.domain.valueobject.time.ServiceDate;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +35,7 @@ public class DailyPlanResponseBody {
     /**
      * Human-readable facility name (denormalized for clients).
      */
-    public String facilityName;
+    public Name facilityName;
 
     /**
      * The calendar date on which this daily plan is scheduled.
@@ -43,12 +45,12 @@ public class DailyPlanResponseBody {
     /**
      * The day number within the planning horizon.
      */
-    public Integer planDay;
+    public PlanDay planDay;
 
     /**
      * Vehicle assigned to this daily plan (full snapshot for analysis in clients).
      */
-    public VehicleResponseBody vehicle;
+    public Vehicle vehicle;
 
     /**
      * Total weight of waste collected across all stops (value object).

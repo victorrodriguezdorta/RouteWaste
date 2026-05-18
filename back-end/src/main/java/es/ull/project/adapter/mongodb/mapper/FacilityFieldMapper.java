@@ -14,6 +14,9 @@ import java.util.Map;
  */
 public class FacilityFieldMapper {
 
+    private static final String UTILITY_CLASS_EXCEPTION_MESSAGE =
+            "This is a utility class and cannot be instantiated.";
+
     /**
      * MongoDB field name for the facility identifier.
      */
@@ -122,7 +125,7 @@ public class FacilityFieldMapper {
      * Private constructor to prevent instantiation of this utility class.
      */
     private FacilityFieldMapper() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated.");
+        throw new UnsupportedOperationException(UTILITY_CLASS_EXCEPTION_MESSAGE);
     }
 
     /**

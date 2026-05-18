@@ -6,7 +6,6 @@ import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.name.Name;
 
-
 /**
  * VehiclePutRequestBody
  * 

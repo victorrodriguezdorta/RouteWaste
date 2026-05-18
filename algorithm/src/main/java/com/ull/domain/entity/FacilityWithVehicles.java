@@ -32,18 +32,33 @@ public class FacilityWithVehicles {
     this.vehicles = new ArrayList<>(vehicles);
   }
 
+  /**
+   * Validates that the facility reference exists.
+   *
+   * @param facility the facility to validate
+   */
   private void validateFacility(Facility facility) {
     if (facility == null) {
       throw new IllegalArgumentException(FACILITY_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that the vehicle list exists.
+   *
+   * @param vehicles the vehicles list to validate
+   */
   private void validateVehicles(List<Vehicle> vehicles) {
     if (vehicles == null) {
       throw new IllegalArgumentException(VEHICLES_NOT_DEFINED);
     }
   }
 
+  /**
+   * Returns the facility associated with these vehicles.
+   *
+   * @return the facility that owns the vehicle assignment
+   */
   public Facility getFacility() {
     return this.facility;
   }
@@ -57,6 +72,12 @@ public class FacilityWithVehicles {
     return Collections.unmodifiableList(this.vehicles);
   }
 
+  /**
+   * Compares this assignment with another object by facility.
+   *
+   * @param otherObject object to compare
+   * @return true when both assignments refer to the same facility
+   */
   @Override
   public boolean equals(Object otherObject) {
     if (this == otherObject) {
@@ -69,11 +90,21 @@ public class FacilityWithVehicles {
     return Objects.equals(this.facility, other.facility);
   }
 
+  /**
+   * Returns a hash code based on the facility.
+   *
+   * @return hash code for this assignment
+   */
   @Override
   public int hashCode() {
     return Objects.hash(this.facility);
   }
 
+  /**
+   * Returns a readable representation of this facility-vehicles assignment.
+   *
+   * @return text containing the facility and vehicle list
+   */
   @Override
   public String toString() {
     return String.format(

@@ -21,6 +21,9 @@ public class Container {
   public static final String DAILY_DEMAND_LITERS_NOT_DEFINED = "Daily waste demand in liters per day is not defined";
   public static final String CURRENT_LITERS_NOT_VALID = "Current liters is not valid";
   public static final String CURRENT_LITERS_EXCEEDED = "Current liters exceeds container capacity";
+  public static final String FACILITY_NOT_DEFINED = "Facility cannot be null";
+  public static final String OTHER_CONTAINER_NOT_DEFINED = "Other container cannot be null";
+  private static final double ZERO_LITERS = 0.0;
 
   private final String id;
   private Location location;
@@ -113,41 +116,71 @@ public class Container {
     this.capacityLiters = capacityLiters;
     this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
     this.serviceZone = serviceZone;
-    this.currentLiters = 0.0;
+    this.currentLiters = ZERO_LITERS;
   }
 
+  /**
+   * Validates that the container identifier is present.
+   *
+   * @param id identifier to validate
+   */
   private void validateId(String id) {
     if (id == null || id.isBlank()) {
       throw new IllegalArgumentException(ID_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that the container location is present.
+   *
+   * @param location location to validate
+   */
   private void validateLocation(Location location) {
     if (location == null) {
       throw new IllegalArgumentException(LOCATION_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that the waste type is present.
+   *
+   * @param wasteType waste type to validate
+   */
   private void validateWasteType(WasteType wasteType) {
     if (wasteType == null) {
       throw new IllegalArgumentException(WASTE_TYPE_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that capacity in liters is not negative.
+   *
+   * @param capacityLiters capacity to validate
+   */
   private void validateCapacityLiters(double capacityLiters) {
-    if (capacityLiters < 0) {
+    if (capacityLiters < ZERO_LITERS) {
       throw new IllegalArgumentException(CAPACITY_LITERS_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that daily demand in liters is not negative.
+   *
+   * @param dailyDemandLitersPerDay daily demand to validate
+   */
   private void validateDailyDemandLitersPerDay(double dailyDemandLitersPerDay) {
-    if (dailyDemandLitersPerDay < 0) {
+    if (dailyDemandLitersPerDay < ZERO_LITERS) {
       throw new IllegalArgumentException(DAILY_DEMAND_LITERS_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that current liters are within container capacity.
+   *
+   * @param currentLiters current liters to validate
+   */
   private void validateCurrentLiters(double currentLiters) {
-    if (currentLiters < 0) {
+    if (currentLiters < ZERO_LITERS) {
       throw new IllegalArgumentException(CURRENT_LITERS_NOT_VALID);
     }
     if (currentLiters > this.capacityLiters) {
@@ -155,32 +188,67 @@ public class Container {
     }
   }
 
+  /**
+   * Returns the container identifier.
+   *
+   * @return container identifier
+   */
   public String getId() {
     return this.id;
   }
 
+  /**
+   * Returns the container location.
+   *
+   * @return container location
+   */
   public Location getLocation() {
     return this.location;
   }
 
+  /**
+   * Updates the container location.
+   *
+   * @param location new container location
+   */
   public void updateLocation(Location location) {
     validateLocation(location);
     this.location = location;
   }
 
+  /**
+   * Returns the container waste type.
+   *
+   * @return waste type
+   */
   public WasteType getWasteType() {
     return this.wasteType;
   }
 
+  /**
+   * Updates the container waste type.
+   *
+   * @param wasteType new waste type
+   */
   public void updateWasteType(WasteType wasteType) {
     validateWasteType(wasteType);
     this.wasteType = wasteType;
   }
 
+  /**
+   * Returns the container capacity in liters.
+   *
+   * @return capacity in liters
+   */
   public double getCapacityLiters() {
     return this.capacityLiters;
   }
 
+  /**
+   * Updates the container capacity in liters.
+   *
+   * @param capacityLiters new capacity in liters
+   */
   public void updateCapacityLiters(double capacityLiters) {
     validateCapacityLiters(capacityLiters);
     if (this.currentLiters > capacityLiters) {
@@ -189,42 +257,85 @@ public class Container {
     this.capacityLiters = capacityLiters;
   }
 
+  /**
+   * Returns the daily demand in liters per day.
+   *
+   * @return daily demand in liters per day
+   */
   public double getDailyDemandLitersPerDay() {
     return this.dailyDemandLitersPerDay;
   }
 
+  /**
+   * Updates the daily demand in liters per day.
+   *
+   * @param dailyDemandLitersPerDay new daily demand
+   */
   public void updateDailyDemandLitersPerDay(double dailyDemandLitersPerDay) {
     validateDailyDemandLitersPerDay(dailyDemandLitersPerDay);
     this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
   }
 
+  /**
+   * Returns the service zone.
+   *
+   * @return service zone, or null when not assigned
+   */
   public String getServiceZone() {
     return this.serviceZone;
   }
 
+  /**
+   * Updates the service zone.
+   *
+   * @param serviceZone new service zone
+   */
   public void updateServiceZone(String serviceZone) {
     this.serviceZone = serviceZone;
   }
 
+  /**
+   * Returns the current liters stored in the container.
+   *
+   * @return current liters
+   */
   public double getCurrentLiters() {
     return this.currentLiters;
   }
 
+  /**
+   * Updates the current liters stored in the container.
+   *
+   * @param currentLiters new current liters
+   */
   public void updateCurrentLiters(double currentLiters) {
     validateCurrentLiters(currentLiters);
     this.currentLiters = currentLiters;
   }
 
+  /**
+   * Adds liters to the current container filling.
+   *
+   * @param litersToAdd liters to add
+   */
   public void addCurrentLiters(double litersToAdd) {
     updateCurrentLiters(this.currentLiters + litersToAdd);
   }
 
+  /**
+   * Removes liters from the current container filling.
+   *
+   * @param litersToRemove liters to remove
+   */
   public void removeCurrentLiters(double litersToRemove) {
     updateCurrentLiters(this.currentLiters - litersToRemove);
   }
 
+  /**
+   * Empties the current container filling.
+   */
   public void emptyCurrentLiters() {
-    this.currentLiters = 0.0;
+    this.currentLiters = ZERO_LITERS;
   }
 
   /**
@@ -234,7 +345,7 @@ public class Container {
    * @return the distance in meters
    */
   public double calculateDistanceTo(Container otherContainer) {
-    Objects.requireNonNull(otherContainer, "Other container cannot be null");
+    Objects.requireNonNull(otherContainer, OTHER_CONTAINER_NOT_DEFINED);
     return this.location.calculateDistanceTo(otherContainer.location);
   }
 
@@ -245,10 +356,16 @@ public class Container {
    * @return the distance in meters
    */
   public double calculateDistanceTo(Facility facility) {
-    Objects.requireNonNull(facility, "Facility cannot be null");
+    Objects.requireNonNull(facility, FACILITY_NOT_DEFINED);
     return this.location.calculateDistanceTo(facility.getLocation());
   }
 
+  /**
+   * Compares this container with another object by identifier.
+   *
+   * @param otherObject object to compare
+   * @return true when both containers share the same identifier
+   */
   @Override
   public boolean equals(Object otherObject) {
     if (this == otherObject) {
@@ -261,11 +378,21 @@ public class Container {
     return Objects.equals(this.id, otherContainer.id);
   }
 
+  /**
+   * Returns a hash code based on the container identifier.
+   *
+   * @return hash code for this container
+   */
   @Override
   public int hashCode() {
     return Objects.hash(this.id);
   }
 
+  /**
+   * Returns a readable representation of this container.
+   *
+   * @return text containing the main container attributes
+   */
   @Override
   public String toString() {
     return String.format(

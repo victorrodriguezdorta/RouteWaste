@@ -1,8 +1,5 @@
 package es.ull.project.configuration;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import es.ull.project.application.port.algorithm.AlgorithmRunner;
 import es.ull.project.application.repository.ContainerDailyStateRepository;
 import es.ull.project.application.repository.ContainerRepository;
@@ -28,12 +25,33 @@ import es.ull.project.application.service.infrastructureplan.DeleteInfrastructur
 import es.ull.project.application.service.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditService;
 import es.ull.project.application.service.infrastructureplan.ReadInfrastructurePlanService;
 import es.ull.project.application.service.overview.GetApplicationOverviewService;
-import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
-import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
 import es.ull.project.application.service.vehicle.CreateVehicleService;
 import es.ull.project.application.service.vehicle.DeleteVehicleService;
 import es.ull.project.application.service.vehicle.ReadVehicleService;
 import es.ull.project.application.service.vehicle.UpdateVehicleService;
+import es.ull.project.application.usecase.algorithm.ExecuteAlgorithmUseCase;
+import es.ull.project.application.usecase.algorithm.PersistAlgorithmExecutionResultUseCase;
+import es.ull.project.application.usecase.algorithm.RunAlgorithmUseCase;
+import es.ull.project.application.usecase.container.CreateContainerUseCase;
+import es.ull.project.application.usecase.container.DeleteContainerUseCase;
+import es.ull.project.application.usecase.container.ReadContainerUseCase;
+import es.ull.project.application.usecase.container.UpdateContainerUseCase;
+import es.ull.project.application.usecase.dailyplan.ReadDailyPlanUseCase;
+import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
+import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
+import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
+import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
+import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlansReferencingEntityUseCase;
+import es.ull.project.application.usecase.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditUseCase;
+import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.overview.GetApplicationOverviewUseCase;
+import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
+import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration class for application services.
@@ -50,7 +68,7 @@ public class ServiceConfiguration {
      * @return invalidation helper
      */
     @Bean
-    public InvalidateInfrastructurePlansOnEntityEditService invalidateInfrastructurePlansOnEntityEditService(
+    public InvalidateInfrastructurePlansOnEntityEditUseCase invalidateInfrastructurePlansOnEntityEditService(
             InfrastructurePlanRepository infrastructurePlanRepository) {
         return new InvalidateInfrastructurePlansOnEntityEditService(infrastructurePlanRepository);
     }
@@ -64,7 +82,7 @@ public class ServiceConfiguration {
      * @return configured {@link ExecuteAlgorithmService} instance
      */
     @Bean
-    public ExecuteAlgorithmService executeAlgorithmService(
+    public ExecuteAlgorithmUseCase executeAlgorithmService(
             FacilityRepository facilityRepository,
             VehicleRepository vehicleRepository,
             ContainerRepository containerRepository) {
@@ -78,7 +96,7 @@ public class ServiceConfiguration {
      * @return configured {@link RunAlgorithmService} instance
      */
     @Bean
-    public RunAlgorithmService runAlgorithmService(AlgorithmRunner algorithmRunner) {
+    public RunAlgorithmUseCase runAlgorithmService(AlgorithmRunner algorithmRunner) {
         return new RunAlgorithmService(algorithmRunner);
     }
 
@@ -88,10 +106,14 @@ public class ServiceConfiguration {
      * @param infrastructurePlanRepository  repository for infrastructure plan persistence
      * @param serviceAssignmentRepository   repository for service assignment persistence
      * @param dailyPlanRepository           repository for daily plan persistence
+     * @param containerDailyStateRepository repository for container daily state persistence
+     * @param facilityRepository            repository for facility persistence
+     * @param containerRepository           repository for container persistence
+     * @param vehicleRepository             repository for vehicle persistence
      * @return configured {@link PersistAlgorithmExecutionResultService} instance
      */
     @Bean
-    public PersistAlgorithmExecutionResultService persistAlgorithmExecutionResultService(
+    public PersistAlgorithmExecutionResultUseCase persistAlgorithmExecutionResultService(
             InfrastructurePlanRepository infrastructurePlanRepository,
             ServiceAssignmentRepository serviceAssignmentRepository,
             DailyPlanRepository dailyPlanRepository,
@@ -116,7 +138,7 @@ public class ServiceConfiguration {
      * @return configured {@link CreateContainerService} instance
      */
     @Bean
-    public CreateContainerService createContainerService(ContainerRepository repository) {
+    public CreateContainerUseCase createContainerService(ContainerRepository repository) {
         return new CreateContainerService(repository);
     }
 
@@ -127,33 +149,35 @@ public class ServiceConfiguration {
      * @return configured {@link ReadContainerService} instance
      */
     @Bean
-    public ReadContainerService readContainerService(ContainerRepository repository) {
+    public ReadContainerUseCase readContainerService(ContainerRepository repository) {
         return new ReadContainerService(repository);
     }
 
     /**
      * Creates the service bean responsible for updating containers.
      *
-     * @param repository the container repository
+     * @param repository                                      the container repository
+     * @param invalidateInfrastructurePlansOnEntityEditService infrastructure plan invalidation helper
      * @return configured {@link UpdateContainerService} instance
      */
     @Bean
-    public UpdateContainerService updateContainerService(
+    public UpdateContainerUseCase updateContainerService(
             ContainerRepository repository,
-            InvalidateInfrastructurePlansOnEntityEditService invalidateInfrastructurePlansOnEntityEditService) {
+            InvalidateInfrastructurePlansOnEntityEditUseCase invalidateInfrastructurePlansOnEntityEditService) {
         return new UpdateContainerService(repository, invalidateInfrastructurePlansOnEntityEditService);
     }
 
     /**
      * Creates the service bean responsible for deleting containers.
      *
-     * @param repository the container repository
+     * @param repository                                      the container repository
+     * @param deleteInfrastructurePlansReferencingEntityService infrastructure plan deletion helper
      * @return configured {@link DeleteContainerService} instance
      */
     @Bean
-    public DeleteContainerService deleteContainerService(
+    public DeleteContainerUseCase deleteContainerService(
             ContainerRepository repository,
-            DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService) {
+            DeleteInfrastructurePlansReferencingEntityUseCase deleteInfrastructurePlansReferencingEntityService) {
         return new DeleteContainerService(repository, deleteInfrastructurePlansReferencingEntityService);
     }
 
@@ -164,7 +188,7 @@ public class ServiceConfiguration {
      * @return configured {@link CreateFacilityService} instance
      */
     @Bean
-    public CreateFacilityService createFacilityService(FacilityRepository repository) {
+    public CreateFacilityUseCase createFacilityService(FacilityRepository repository) {
         return new CreateFacilityService(repository);
     }
 
@@ -175,33 +199,35 @@ public class ServiceConfiguration {
      * @return configured {@link ReadFacilityService} instance
      */
     @Bean
-    public ReadFacilityService readFacilityService(FacilityRepository repository) {
+    public ReadFacilityUseCase readFacilityService(FacilityRepository repository) {
         return new ReadFacilityService(repository);
     }
 
     /**
      * Creates the service bean responsible for updating facilities.
      *
-     * @param repository the facility repository
+     * @param repository                                      the facility repository
+     * @param invalidateInfrastructurePlansOnEntityEditService infrastructure plan invalidation helper
      * @return configured {@link UpdateFacilityService} instance
      */
     @Bean
-    public UpdateFacilityService updateFacilityService(
+    public UpdateFacilityUseCase updateFacilityService(
             FacilityRepository repository,
-            InvalidateInfrastructurePlansOnEntityEditService invalidateInfrastructurePlansOnEntityEditService) {
+            InvalidateInfrastructurePlansOnEntityEditUseCase invalidateInfrastructurePlansOnEntityEditService) {
         return new UpdateFacilityService(repository, invalidateInfrastructurePlansOnEntityEditService);
     }
 
     /**
      * Creates the service bean responsible for deleting facilities.
      *
-     * @param repository the facility repository
+     * @param repository                                      the facility repository
+     * @param deleteInfrastructurePlansReferencingEntityService infrastructure plan deletion helper
      * @return configured {@link DeleteFacilityService} instance
      */
     @Bean
-    public DeleteFacilityService deleteFacilityService(
+    public DeleteFacilityUseCase deleteFacilityService(
             FacilityRepository repository,
-            DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService) {
+            DeleteInfrastructurePlansReferencingEntityUseCase deleteInfrastructurePlansReferencingEntityService) {
         return new DeleteFacilityService(repository, deleteInfrastructurePlansReferencingEntityService);
     }
 
@@ -212,7 +238,7 @@ public class ServiceConfiguration {
      * @return configured {@link CreateVehicleService} instance
      */
     @Bean
-    public CreateVehicleService createVehicleService(VehicleRepository repository) {
+    public CreateVehicleUseCase createVehicleService(VehicleRepository repository) {
         return new CreateVehicleService(repository);
     }
 
@@ -223,44 +249,47 @@ public class ServiceConfiguration {
      * @return configured {@link ReadVehicleService} instance
      */
     @Bean
-    public ReadVehicleService readVehicleService(VehicleRepository repository) {
+    public ReadVehicleUseCase readVehicleService(VehicleRepository repository) {
         return new ReadVehicleService(repository);
     }
 
     /**
      * Creates the service bean responsible for updating vehicles.
      *
-     * @param repository the vehicle repository
+     * @param repository                                      the vehicle repository
+     * @param invalidateInfrastructurePlansOnEntityEditService infrastructure plan invalidation helper
      * @return configured {@link UpdateVehicleService} instance
      */
     @Bean
-    public UpdateVehicleService updateVehicleService(
+    public UpdateVehicleUseCase updateVehicleService(
             VehicleRepository repository,
-            InvalidateInfrastructurePlansOnEntityEditService invalidateInfrastructurePlansOnEntityEditService) {
+            InvalidateInfrastructurePlansOnEntityEditUseCase invalidateInfrastructurePlansOnEntityEditService) {
         return new UpdateVehicleService(repository, invalidateInfrastructurePlansOnEntityEditService);
     }
 
     /**
      * Creates the service bean responsible for deleting vehicles.
      *
-     * @param repository the vehicle repository
+     * @param repository                                      the vehicle repository
+     * @param deleteInfrastructurePlansReferencingEntityService infrastructure plan deletion helper
      * @return configured {@link DeleteVehicleService} instance
      */
     @Bean
-    public DeleteVehicleService deleteVehicleService(
+    public DeleteVehicleUseCase deleteVehicleService(
             VehicleRepository repository,
-            DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService) {
+            DeleteInfrastructurePlansReferencingEntityUseCase deleteInfrastructurePlansReferencingEntityService) {
         return new DeleteVehicleService(repository, deleteInfrastructurePlansReferencingEntityService);
     }
 
     /**
      * Creates the service bean responsible for reading infrastructure plans.
      *
-     * @param repository the infrastructure plan repository
+     * @param repository          the infrastructure plan repository
+     * @param dailyPlanRepository repository for associated daily plans
      * @return configured {@link ReadInfrastructurePlanService} instance
      */
     @Bean
-    public ReadInfrastructurePlanService readInfrastructurePlanService(InfrastructurePlanRepository repository, DailyPlanRepository dailyPlanRepository) {
+    public ReadInfrastructurePlanUseCase readInfrastructurePlanService(InfrastructurePlanRepository repository, DailyPlanRepository dailyPlanRepository) {
         return new ReadInfrastructurePlanService(repository, dailyPlanRepository);
     }
 
@@ -274,7 +303,7 @@ public class ServiceConfiguration {
      * @return overview service bean
      */
     @Bean
-    public GetApplicationOverviewService getApplicationOverviewService(
+    public GetApplicationOverviewUseCase getApplicationOverviewService(
             ContainerRepository containerRepository,
             VehicleRepository vehicleRepository,
             FacilityRepository facilityRepository,
@@ -293,7 +322,7 @@ public class ServiceConfiguration {
      * @return configured {@link DeleteInfrastructurePlanService} instance
      */
     @Bean
-    public DeleteInfrastructurePlanService deleteInfrastructurePlanService(
+    public DeleteInfrastructurePlanUseCase deleteInfrastructurePlanService(
             InfrastructurePlanRepository repository,
             DailyPlanRepository dailyPlanRepository,
             ServiceAssignmentRepository serviceAssignmentRepository,
@@ -310,7 +339,7 @@ public class ServiceConfiguration {
      * @return helper invoked from delete-facility/container/vehicle services
      */
     @Bean
-    public DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService(
+    public DeleteInfrastructurePlansReferencingEntityUseCase deleteInfrastructurePlansReferencingEntityService(
             InfrastructurePlanRepository infrastructurePlanRepository,
             DeleteInfrastructurePlanUseCase deleteInfrastructurePlanUseCase) {
         return new DeleteInfrastructurePlansReferencingEntityService(infrastructurePlanRepository, deleteInfrastructurePlanUseCase);
@@ -323,7 +352,7 @@ public class ServiceConfiguration {
      * @return configured {@link ReadDailyPlanService} instance
      */
     @Bean
-    public ReadDailyPlanService readDailyPlanService(DailyPlanRepository repository) {
+    public ReadDailyPlanUseCase readDailyPlanService(DailyPlanRepository repository) {
         return new ReadDailyPlanService(repository);
     }
 }

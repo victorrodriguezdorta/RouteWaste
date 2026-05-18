@@ -1,9 +1,8 @@
 package es.ull.project.adapter.rest.response.algorithm;
 
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.entity.Vehicle;
 import java.util.List;
-
-import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
-import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
 
 /**
  * AlgorithmFacilityVehiclesResponseBody
@@ -16,10 +15,10 @@ public class AlgorithmFacilityVehiclesResponseBody {
     /**
      * Fully resolved facility.
      */
-    public FacilityResponseBody facility;
+    public Facility facility;
 
     /**
      * Resolved selected vehicles for the facility.
      */
-    public List<VehicleResponseBody> selectedVehicles;
+    public List<Vehicle> selectedVehicles;
 }

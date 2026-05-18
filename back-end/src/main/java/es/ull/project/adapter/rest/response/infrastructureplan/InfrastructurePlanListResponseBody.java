@@ -1,5 +1,6 @@
 package es.ull.project.adapter.rest.response.infrastructureplan;
 
+import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.TotalCost;
@@ -40,5 +41,5 @@ public class InfrastructurePlanListResponseBody {
     /**
      * Whether the plan is still valid or obsolete because referenced entities were edited.
      */
-    public String validityState;
+    public InfrastructurePlanValidityState validityState;
 }

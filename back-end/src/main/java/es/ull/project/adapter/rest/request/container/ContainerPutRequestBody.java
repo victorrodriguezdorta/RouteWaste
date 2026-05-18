@@ -7,7 +7,6 @@ import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.location.Location;
 import es.ull.project.domain.valueobject.name.Name;
 
-
 /**
  * ContainerPutRequestBody
  * 

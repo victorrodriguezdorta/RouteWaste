@@ -1,23 +1,12 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.ReadingConverter;
-import org.springframework.lang.NonNull;
-
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
+import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.Currency;
@@ -26,6 +15,16 @@ import es.ull.project.domain.valueobject.cost.TotalCost;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * InfrastructurePlanReadingConverter
@@ -173,7 +172,6 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
             selectedFacilities,
             serviceAssignments,
             dailyPlans,
-            containerDailyStates,
             servicePolicies,
             maxBudget,
             estimatedTotalCost,
@@ -184,11 +182,9 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
             averagePickupTimeMinutes,
             executedAt,
             validityState,
-            executionRequestJson
+            executionRequestJson != null && !executionRequestJson.isBlank() ? new AlgorithmJsonPayload(executionRequestJson) : null,
+            containerDailyStates
         );
-        if (kg != null && liters != null && distance != null) {
-            plan.updateAlgorithmMetrics(kg, liters, distance);
-        }
         return plan;
     }
 }

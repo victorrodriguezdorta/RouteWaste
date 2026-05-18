@@ -1,15 +1,23 @@
 package es.ull.project.adapter.rest.response.infrastructureplan;
 
-import java.util.List;
-import java.util.UUID;
-
 import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
 import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
+import es.ull.project.domain.enumerate.InfrastructurePlanStatus;
+import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
+import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
+import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
+import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
+import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.TotalCost;
+import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
+import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Data Transfer Object representing an InfrastructurePlan response
@@ -66,44 +74,44 @@ public class InfrastructurePlanResponseBody {
     /**
      * Total collected kilograms across all routes
      */
-    public double totalCollectedKilograms;
+    public CollectedWeightKilograms totalCollectedKilograms;
 
     /**
      * Total collected liters across all routes
      */
-    public double totalCollectedLiters;
+    public CollectedVolumeLiters totalCollectedLiters;
 
     /**
      * Total distance in meters across all routes
      */
-    public double totalDistanceMeters;
+    public Distance totalDistanceMeters;
     /**
      * Number of days for the planning period
      */
-    public Integer numberOfDays;
+    public NumberOfDays numberOfDays;
 
     /**
      * Average pickup time in minutes
      */
-    public Integer averagePickupTimeMinutes;
+    public AveragePickupTimeMinutes averagePickupTimeMinutes;
 
     /**
      * Timestamp when the algorithm execution was performed (ISO 8601)
      */
-    public String executedAt;
+    public ExecutedAt executedAt;
 
     /**
      * Whether the plan is still valid or obsolete because referenced entities were edited.
      */
-    public String validityState;
+    public InfrastructurePlanValidityState validityState;
 
     /**
      * JSON snapshot of the client request used to execute the algorithm.
      */
-    public String executionRequestJson;
+    public AlgorithmJsonPayload executionRequestJson;
 
     /**
      * Computed or stored status for the plan (e.g. SUBOPTIMAL, OPTIMAL)
      */
-    public String status;
+    public InfrastructurePlanStatus status;
 }

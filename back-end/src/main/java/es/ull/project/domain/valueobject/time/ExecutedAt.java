@@ -17,6 +17,7 @@ public class ExecutedAt {
 
     /**
      * The execution timestamp in ISO-8601 string format.
+     * It is a required attribute.
      */
     private final String timestamp;
 
@@ -49,6 +50,12 @@ public class ExecutedAt {
         return timestamp;
     }
 
+    /**
+     * Compares this execution timestamp with another object.
+     *
+     * @param otherObject object to compare with
+     * @return true when both execution timestamps are equal
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
@@ -61,11 +68,21 @@ public class ExecutedAt {
         return Objects.equals(timestamp, that.timestamp);
     }
 
+    /**
+     * Returns the hash code for this execution timestamp.
+     *
+     * @return hash code based on the timestamp
+     */
     @Override
     public int hashCode() {
         return Objects.hash(timestamp);
     }
 
+    /**
+     * Returns the timestamp as text.
+     *
+     * @return execution timestamp string
+     */
     @Override
     public String toString() {
         return timestamp;

@@ -31,6 +31,11 @@ public class Container {
      * It is a computed attribute.
      */
     private final UUID id;
+
+    /**
+     * Human-readable container name.
+     * It is a required attribute.
+     */
     private Name name;
 
     /**
@@ -66,6 +71,7 @@ public class Container {
     /**
      * Creates a new Container.
      *
+     * @param name        Name of the container.
      * @param location    Location of the container.
      * @param wasteType   Type of waste collected.
      * @param capacityLiters Maximum capacity in liters.
@@ -96,6 +102,7 @@ public class Container {
     /**
      * Creates a new Container without a service zone.
      *
+     * @param name        Name of the container.
      * @param location    Location of the container.
      * @param wasteType   Type of waste collected.
      * @param capacityLiters Maximum capacity in liters.
@@ -131,6 +138,7 @@ public class Container {
      * Restores a Container from persistence with all its attributes.
      *
      * @param id          the container identifier
+     * @param name        the container name
      * @param location    the location of the container
      * @param wasteType   the type of waste collected
      * @param capacityLiters the maximum capacity in liters
@@ -207,9 +215,10 @@ public class Container {
     }
 
     /**
-     * Returns the container identifier.
+     * Validates that the container name is not null.
      *
-     * @return ContainerId.
+     * @param name the container name to validate
+     * @throws IllegalArgumentException if the name is null
      */
     private void validateName(Name name) {
         if (name == null) {
@@ -217,10 +226,20 @@ public class Container {
         }
     }
 
+    /**
+     * Returns the container name.
+     *
+     * @return container name
+     */
     public Name getName() {
         return this.name;
     }
 
+    /**
+     * Updates the container name.
+     *
+     * @param name new container name
+     */
     public void updateName(Name name) {
         this.validateName(name);
         this.name = name;

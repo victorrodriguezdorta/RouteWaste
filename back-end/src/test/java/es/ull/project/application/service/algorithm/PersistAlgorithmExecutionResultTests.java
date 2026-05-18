@@ -25,6 +25,7 @@ import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.application.usecase.algorithm.PersistAlgorithmExecutionResultUseCase;
 import es.ull.project.domain.InfrastructurePlanAggregateReferences;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.ContainerDailyState;
@@ -57,7 +58,7 @@ import es.ull.project.domain.valueobject.name.Name;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanDay;
 
-class PersistAlgorithmExecutionResultTests {
+class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionResultUseCase {
 
     @Test
     void persistAlgorithmResponse_createsPlanAssignmentsAndDailyPlans() throws Exception {
@@ -82,7 +83,12 @@ class PersistAlgorithmExecutionResultTests {
 
         AlgorithmJsonPayload payload = new AlgorithmJsonPayload(sampleAlgorithmJson());
         String requestSnap = "{\"facilityId\":\"ce3d2863-eabe-4c6c-a31b-1c3b3ea72038\"}";
-        InfrastructurePlan plan = service.persist(payload, new NumberOfDays(7), new AveragePickupTimeMinutes(15), null, requestSnap);
+        InfrastructurePlan plan = service.persist(
+                payload,
+                new NumberOfDays(7),
+                new AveragePickupTimeMinutes(15),
+                null,
+                new AlgorithmJsonPayload(requestSnap));
 
         assertNotNull(plan);
         assertEquals(requestSnap, plan.getExecutionRequestJson().orElse(null));
@@ -96,7 +102,7 @@ class PersistAlgorithmExecutionResultTests {
         assertEquals(new ExecutedAt("2026-04-29T10:30:32.420542549Z"), plan.getExecutedAt().get());
         assertEquals(2, plan.getContainerDailyStates().size());
         for (ContainerDailyState cds : plan.getContainerDailyStates()) {
-            assertEquals(plan.getId(), cds.getInfrastructurePlanId());
+            assertEquals(plan.getId(), cds.getInfrastructurePlanId().orElse(null));
         }
         assertEquals(1, infrastructurePlanRepository.saved.size());
         assertEquals(1, serviceAssignmentRepository.saved.size());
@@ -109,11 +115,21 @@ class PersistAlgorithmExecutionResultTests {
 
         DailyPlan firstDailyPlan = dailyPlanRepository.saved.values().iterator().next();
         assertEquals(3, firstDailyPlan.getStops().size());
-        assertEquals(new PlanDay(1), firstDailyPlan.getPlanDay());
+        assertEquals(new PlanDay(1), firstDailyPlan.getPlanDay().orElse(null));
         assertEquals(UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"), firstDailyPlan.getFacility().getId());
         assertEquals(UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"), firstDailyPlan.getStops().get(0).getContainer().getId());
         assertEquals(StopType.FACILITY, firstDailyPlan.getStops().get(2).getType());
         assertNull(firstDailyPlan.getStops().get(2).getContainer());
+    }
+
+    @Override
+    public InfrastructurePlan persist(
+            AlgorithmJsonPayload algorithmResponse,
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes,
+            es.ull.project.domain.valueobject.cost.MaximumBudget providedMaxBudget,
+            AlgorithmJsonPayload executionRequestJson) {
+        throw new UnsupportedOperationException("Test class does not implement production persistence.");
     }
 
         private void seedInfrastructureEntities(
@@ -532,7 +548,7 @@ class PersistAlgorithmExecutionResultTests {
         }
         List<ContainerDailyState> matches = new ArrayList<>();
         for (ContainerDailyState s : saved.values()) {
-          if (infrastructurePlanId.equals(s.getInfrastructurePlanId())) {
+          if (s.getInfrastructurePlanId().filter(infrastructurePlanId::equals).isPresent()) {
             matches.add(s);
           }
         }

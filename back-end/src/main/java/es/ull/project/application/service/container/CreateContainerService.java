@@ -28,6 +28,7 @@ public class CreateContainerService implements CreateContainerUseCase {
 
     /**
      * Creates a new container with the specified attributes.
+     * @param name the container name
      * @param location the geographic location of the container
      * @param wasteType the type of waste the container handles
      * @param capacityLiters the container capacity in liters

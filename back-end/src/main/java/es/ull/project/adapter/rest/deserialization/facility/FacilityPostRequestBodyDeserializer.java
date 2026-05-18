@@ -71,6 +71,13 @@ public class FacilityPostRequestBodyDeserializer extends JsonDeserializer<Facili
         return requestBody;
     }
 
+    /**
+     * Parses the name field from JSON.
+     * 
+     * @param rootNode the root JSON node
+     * @param errors list to accumulate validation errors
+     * @return the parsed Name value object, or null if validation fails
+     */
     private Name parseName(JsonNode rootNode, List<FieldError> errors) {
         if (!rootNode.has(JsonFields.NAME)) {
             errors.add(new FieldError(JsonFields.NAME, "Field is required"));

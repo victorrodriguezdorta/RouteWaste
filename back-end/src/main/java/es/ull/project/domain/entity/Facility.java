@@ -45,6 +45,11 @@ public class Facility {
      * It is a computed attribute.
      */
     private final UUID id;
+
+    /**
+     * Human-readable facility name.
+     * It is a required attribute.
+     */
     private Name name;
 
     /**
@@ -98,6 +103,7 @@ public class Facility {
     /**
      * Creates a new Facility.
      *
+     * @param name                Facility name.
      * @param facilityType        Type of facility.
      * @param location            Facility location.
      * @param storageCapacity     Storage capacity in kilograms.
@@ -159,6 +165,7 @@ public class Facility {
      * Restores a Facility from persistence with all its attributes.
      *
      * @param id                  the facility identifier
+     * @param name                the facility name
      * @param facilityType        the type of facility
      * @param location            the facility location
      * @param storageCapacity     the storage capacity in kilograms
@@ -199,9 +206,10 @@ public class Facility {
     }
 
     /**
-     * Returns the unique identifier of the facility.
+     * Validates that the facility name is not null.
      *
-     * @return Facility UUID.
+     * @param name the facility name to validate
+     * @throws IllegalArgumentException if name is null
      */
     private void validateName(Name name) {
         if (name == null) {
@@ -209,10 +217,20 @@ public class Facility {
         }
     }
 
+    /**
+     * Returns the facility name.
+     *
+     * @return the facility name
+     */
     public Name getName() {
         return this.name;
     }
 
+    /**
+     * Updates the facility name.
+     *
+     * @param name the new facility name
+     */
     public void updateName(Name name) {
         this.validateName(name);
         this.name = name;

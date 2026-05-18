@@ -16,6 +16,7 @@ public interface UpdateVehicleUseCase {
      * Updates a vehicle with the specified attributes.
      *
      * @param id                     the unique identifier of the vehicle to update
+     * @param newName                the new vehicle name
      * @param newVehicleType         the new vehicle type
      * @param newCapacityKilograms  the new capacity in kilograms
      * @param newCapacityLiters      the new capacity in liters

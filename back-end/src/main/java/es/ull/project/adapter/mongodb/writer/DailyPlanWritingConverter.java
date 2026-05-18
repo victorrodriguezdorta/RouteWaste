@@ -2,12 +2,8 @@ package es.ull.project.adapter.mongodb.writer;
 
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
-import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.DailyPlan;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.Stop;
-import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.StopType;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +51,7 @@ public class DailyPlanWritingConverter implements Converter<DailyPlan, Document>
         document.put(MongoFields.INFRASTRUCTURE_PLAN_ID, dailyPlan.getInfrastructurePlan().getId());
         document.put(MongoFields.FACILITY_ID, dailyPlan.getFacility().getId());
         document.put(MongoFields.SERVICE_DATE, dailyPlan.getServiceDate().toString());
-        if (dailyPlan.getPlanDay() != null) {
-            document.put(MongoFields.PLAN_DAY, dailyPlan.getPlanDay().getDay());
-        }
+        dailyPlan.getPlanDay().ifPresent(planDay -> document.put(MongoFields.PLAN_DAY, planDay.getDay()));
         document.put(MongoFields.VEHICLE, dailyPlan.getVehicle().getId());
         document.put(MongoFields.TOTAL_COLLECTED_KILOGRAMS, dailyPlan.getTotalCollectedKilograms().getValue());
         document.put(MongoFields.TOTAL_COLLECTED_LITERS, dailyPlan.getTotalCollectedLiters().getValue());
@@ -69,8 +63,6 @@ public class DailyPlanWritingConverter implements Converter<DailyPlan, Document>
         document.put(MongoFields.STOPS, stopDocuments);
         return document;
     }
-
-
 
     /**
      * Converts a Stop entity to a MongoDB document with all its nested fields.
@@ -89,6 +81,4 @@ public class DailyPlanWritingConverter implements Converter<DailyPlan, Document>
         document.put(CONTAINER_FIELD, stop.getContainer() != null ? stop.getContainer().getId() : null);
         return document;
     }
-
-
 }

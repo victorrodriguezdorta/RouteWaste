@@ -14,10 +14,19 @@ import java.util.UUID;
  */
 public final class InfrastructurePlanAggregateReferences {
 
+    private static final String UTILITY_CLASS_EXCEPTION_MESSAGE =
+            "This is a utility class and cannot be instantiated.";
+
+    /**
+     * Prevents instantiation of this utility class.
+     */
     private InfrastructurePlanAggregateReferences() {
+        throw new UnsupportedOperationException(UTILITY_CLASS_EXCEPTION_MESSAGE);
     }
 
     /**
+     * Checks if a plan references a master entity in its snapshot graph or request JSON.
+     *
      * @param plan     loaded plan (selected facilities, assignments, daily plans may be populated)
      * @param entityId facility, container, or vehicle id
      * @return true if the plan references that id

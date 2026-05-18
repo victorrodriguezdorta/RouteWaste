@@ -1,12 +1,15 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.application.repository.InfrastructurePlanRepository;
+import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
-
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -17,11 +20,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.application.repository.InfrastructurePlanRepository;
-import es.ull.project.domain.entity.InfrastructurePlan;
-import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 
 /**
  * MongoDB implementation of the InfrastructurePlanRepository interface.
@@ -115,6 +113,12 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
         return Optional.ofNullable(infrastructurePlan);
     }
 
+    /**
+     * Finds valid infrastructure plans that reference the given entity in their execution request.
+     *
+     * @param entityId facility, vehicle, or container id
+     * @return valid plans linked to the entity
+     */
     @Override
     public List<InfrastructurePlan> findValidPlansReferencingEntityInExecutionRequest(UUID entityId) {
         if (entityId == null) {
@@ -125,6 +129,12 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
                 .toList();
     }
 
+    /**
+     * Checks whether any infrastructure plan references the given entity in its execution request.
+     *
+     * @param entityId facility, vehicle, or container id
+     * @return true when at least one plan references the entity
+     */
     @Override
     public boolean existsAnyPlanReferencingEntityInExecutionRequest(UUID entityId) {
         if (entityId == null) {
@@ -133,6 +143,12 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
         return !collectInfrastructurePlanIdsReferencingEntity(entityId).isEmpty();
     }
 
+    /**
+     * Finds infrastructure plans that reference the given entity in their execution request.
+     *
+     * @param entityId facility, vehicle, or container id
+     * @return plans linked to the entity
+     */
     @Override
     public List<InfrastructurePlan> findPlansReferencingEntityInExecutionRequest(UUID entityId) {
         if (entityId == null) {
@@ -149,6 +165,9 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
     /**
      * Resolves infrastructure plan ids that reference a facility, container, or vehicle anywhere
      * in the persisted snapshot (execution JSON, selected facilities, service assignments, daily plans).
+     *
+     * @param entityId facility, vehicle, or container id
+     * @return referenced infrastructure plan ids
      */
     private Set<UUID> collectInfrastructurePlanIdsReferencingEntity(UUID entityId) {
         Set<UUID> planIds = new LinkedHashSet<>();
@@ -161,7 +180,6 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
         for (Document doc : this.mongoTemplate.find(infraQuery, Document.class, COLLECTION_NAME)) {
             addIdIfPresent(doc.get(MongoFields.ID), planIds);
         }
-
         Query saByFacility = new Query(Criteria.where(MongoFields.FACILITY_ID).is(entityId));
         saByFacility.fields().include(MongoFields.INFRASTRUCTURE_PLAN_ID);
         for (Document doc : this.mongoTemplate.find(saByFacility, Document.class, SERVICE_ASSIGNMENTS_COLLECTION)) {
@@ -172,12 +190,11 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
         for (Document doc : this.mongoTemplate.find(saByContainer, Document.class, SERVICE_ASSIGNMENTS_COLLECTION)) {
             addIdIfPresent(doc.get(MongoFields.INFRASTRUCTURE_PLAN_ID), planIds);
         }
-
         Criteria dailyVehicleOrFacility = new Criteria().orOperator(
                 Criteria.where(MongoFields.VEHICLE).is(entityId),
                 Criteria.where(MongoFields.FACILITY_ID).is(entityId));
         Criteria dailyStopContainer = Criteria.where(MongoFields.STOPS)
-                .elemMatch(Criteria.where("containerId").is(entityId));
+                .elemMatch(Criteria.where(MongoFields.CONTAINER_ID).is(entityId));
         Query dailyQuery = new Query(new Criteria().orOperator(dailyVehicleOrFacility, dailyStopContainer));
         dailyQuery.fields().include(MongoFields.INFRASTRUCTURE_PLAN_ID);
         for (Document doc : this.mongoTemplate.find(dailyQuery, Document.class, DAILY_PLANS_COLLECTION)) {
@@ -186,6 +203,12 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
         return planIds;
     }
 
+    /**
+     * Adds the raw plan id to the result set when MongoDB returns it as a UUID.
+     *
+     * @param rawPlanId raw id value read from MongoDB
+     * @param planIds plan ids collected so far
+     */
     private static void addIdIfPresent(Object rawPlanId, Set<UUID> planIds) {
         if (rawPlanId instanceof UUID uuid) {
             planIds.add(uuid);

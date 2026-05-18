@@ -31,8 +31,7 @@ public class ApplicationOverviewController {
      */
     @Operation(
             summary = "Application overview",
-            description = "Returns counts of containers, vehicles, facilities, and infrastructure plans, "
-                    + "plus up to the three infrastructure plans with the latest execution timestamps.")
+            description = "Returns counts of containers, vehicles, facilities, infrastructure plans, and the latest executed plans.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Overview returned"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")

@@ -17,6 +17,7 @@ public interface CreateFacilityUseCase {
     /**
      * Creates a new facility with the specified attributes.
      *
+     * @param name                  the facility name
      * @param facilityType          the type of facility
      * @param location              the location of the facility
      * @param storageCapacity       the storage capacity of the facility in kilograms

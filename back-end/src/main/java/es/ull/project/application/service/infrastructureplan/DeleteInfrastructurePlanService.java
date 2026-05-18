@@ -75,7 +75,7 @@ public class DeleteInfrastructurePlanService implements DeleteInfrastructurePlan
             }
         }
         for (ContainerDailyState cds : existing.getContainerDailyStates()) {
-            if (cds.getInfrastructurePlanId() == null) {
+            if (cds.getInfrastructurePlanId().isEmpty()) {
                 containerDailyStateRepository.delete(cds);
             }
         }

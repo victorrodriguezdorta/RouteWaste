@@ -26,5 +26,5 @@ public interface PersistAlgorithmExecutionResultUseCase {
             NumberOfDays numberOfDays,
             AveragePickupTimeMinutes averagePickupTimeMinutes,
             MaximumBudget providedMaxBudget,
-            String executionRequestJson);
+            AlgorithmJsonPayload executionRequestJson);
 }

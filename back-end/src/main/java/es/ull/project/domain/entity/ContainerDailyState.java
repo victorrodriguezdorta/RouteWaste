@@ -1,9 +1,15 @@
 package es.ull.project.domain.entity;
 
-import java.util.Objects;
-import java.util.UUID;
-
 import es.ull.project.domain.enumerate.ContainerStatus;
+import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
+import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.identifier.ContainerId;
+import es.ull.project.domain.valueobject.identifier.InfrastructurePlanId;
+import es.ull.project.domain.valueobject.time.PlanDay;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Domain entity representing a container daily state snapshot persisted in MongoDB.
@@ -11,34 +17,86 @@ import es.ull.project.domain.enumerate.ContainerStatus;
  */
 public class ContainerDailyState {
 
-    private final UUID id;
+    private static final String CONTAINER_ID_REQUIRED = "container id is required";
+    private static final String PLAN_DAY_REQUIRED = "plan day is required";
+    private static final String PLAN_DAY_TOO_LOW = "planDay must be >= 1";
+    private static final String DAILY_FILLING_REQUIRED = "daily filling liters is required";
+    private static final String CONTAINER_CAPACITY_REQUIRED = "container capacity liters is required";
+    private static final String CONTAINER_CAPACITY_NOT_POSITIVE = "containerCapacityLiters must be > 0";
+    private static final String DAILY_DEMAND_REQUIRED = "daily demand liters per day is required";
+    private static final double ZERO_LITERS = 0.0;
+    private static final int MINIMUM_PLAN_DAY = 1;
+
     /**
-     * Parent infrastructure plan; null only for legacy persisted rows without this field.
+     * Daily state identifier.
+     * It is a computed attribute.
      */
-    private final UUID infrastructurePlanId;
-    private final String containerId;
-    private final int planDay;
-    private final double dailyFillingLiters;
-    private final double containerCapacityLiters;
-    private final double dailyDemandLitersPerDay;
+    private final UUID id;
+
+    /**
+     * Parent infrastructure plan identifier.
+     * It is an optional attribute.
+     */
+    private final InfrastructurePlanId infrastructurePlanId;
+
+    /**
+     * Referenced container identifier.
+     * It is a required attribute.
+     */
+    private final ContainerId containerId;
+
+    /**
+     * Planning day represented by this snapshot.
+     * It is a required attribute.
+     */
+    private final PlanDay planDay;
+
+    /**
+     * Container filling level for the day.
+     * It is a required attribute.
+     */
+    private final CollectedVolumeLiters dailyFillingLiters;
+
+    /**
+     * Container capacity at planning time.
+     * It is a required attribute.
+     */
+    private final ContainerCapacityLiters containerCapacityLiters;
+
+    /**
+     * Expected daily demand for the container.
+     * It is a required attribute.
+     */
+    private final DailyWasteDemandLitersPerDay dailyDemandLitersPerDay;
+
+    /**
+     * Computed status for the container on this day.
+     * It is a required attribute.
+     */
     private final ContainerStatus status;
 
-    public ContainerDailyState(UUID id,
-            UUID infrastructurePlanId,
-            String containerId,
-            int planDay,
-            double dailyFillingLiters,
-            double containerCapacityLiters,
-            double dailyDemandLitersPerDay,
+    /**
+     * Creates a new container daily state snapshot.
+     *
+     * @param infrastructurePlanId the parent infrastructure plan identifier
+     * @param containerId the container identifier
+     * @param planDay the planning day represented by the snapshot
+     * @param dailyFillingLiters the container filling level in liters
+     * @param containerCapacityLiters the container capacity in liters
+     * @param dailyDemandLitersPerDay the estimated daily demand in liters per day
+     * @param status the computed container status
+     */
+    public ContainerDailyState(
+            InfrastructurePlanId infrastructurePlanId,
+            ContainerId containerId,
+            PlanDay planDay,
+            CollectedVolumeLiters dailyFillingLiters,
+            ContainerCapacityLiters containerCapacityLiters,
+            DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
             ContainerStatus status) {
-        if (id == null) throw new IllegalArgumentException("id is required");
+        validate(containerId, planDay, dailyFillingLiters, containerCapacityLiters, dailyDemandLitersPerDay);
+        this.id = UUID.randomUUID();
         this.infrastructurePlanId = infrastructurePlanId;
-        if (containerId == null || containerId.isBlank()) throw new IllegalArgumentException("containerId is required");
-        if (planDay < 1) throw new IllegalArgumentException("planDay must be >= 1");
-        if (dailyFillingLiters < 0.0) throw new IllegalArgumentException("dailyFillingLiters must be >= 0");
-        if (containerCapacityLiters <= 0.0) throw new IllegalArgumentException("containerCapacityLiters must be > 0");
-        if (dailyDemandLitersPerDay < 0.0) throw new IllegalArgumentException("dailyDemandLitersPerDay must be >= 0");
-        this.id = id;
         this.containerId = containerId;
         this.planDay = planDay;
         this.dailyFillingLiters = dailyFillingLiters;
@@ -47,43 +105,205 @@ public class ContainerDailyState {
         this.status = status != null ? status : ContainerStatus.CORRECT;
     }
 
-    public UUID getId() { return id; }
-
     /**
-     * @return parent plan id, or null for legacy snapshots without persisted linkage
+     * Copy constructor.
+     *
+     * @param otherObject container daily state to copy
      */
-    public UUID getInfrastructurePlanId() {
-        return infrastructurePlanId;
+    public ContainerDailyState(ContainerDailyState otherObject) {
+        this.id = otherObject.id;
+        this.infrastructurePlanId = otherObject.infrastructurePlanId;
+        this.containerId = otherObject.containerId;
+        this.planDay = otherObject.planDay;
+        this.dailyFillingLiters = otherObject.dailyFillingLiters;
+        this.containerCapacityLiters = otherObject.containerCapacityLiters;
+        this.dailyDemandLitersPerDay = otherObject.dailyDemandLitersPerDay;
+        this.status = otherObject.status;
     }
 
-    public String getContainerId() { return containerId; }
+    /**
+     * Restore constructor.
+     *
+     * @param id the daily state identifier
+     * @param infrastructurePlanId the parent infrastructure plan identifier
+     * @param containerId the container identifier
+     * @param planDay the planning day represented by the snapshot
+     * @param dailyFillingLiters the container filling level in liters
+     * @param containerCapacityLiters the container capacity in liters
+     * @param dailyDemandLitersPerDay the estimated daily demand in liters per day
+     * @param status the computed container status
+     */
+    public ContainerDailyState(UUID id,
+            InfrastructurePlanId infrastructurePlanId,
+            ContainerId containerId,
+            PlanDay planDay,
+            CollectedVolumeLiters dailyFillingLiters,
+            ContainerCapacityLiters containerCapacityLiters,
+            DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
+            ContainerStatus status) {
+        this.infrastructurePlanId = infrastructurePlanId;
+        this.id = id;
+        this.containerId = containerId;
+        this.planDay = planDay;
+        this.dailyFillingLiters = dailyFillingLiters;
+        this.containerCapacityLiters = containerCapacityLiters;
+        this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
+        this.status = status;
+    }
 
-    public int getPlanDay() { return planDay; }
+    /**
+     * Validates required snapshot values.
+     *
+     * @param containerId the container identifier
+     * @param planDay the planning day represented by the snapshot
+     * @param dailyFillingLiters the container filling level in liters
+     * @param containerCapacityLiters the container capacity in liters
+     * @param dailyDemandLitersPerDay the estimated daily demand in liters per day
+     */
+    private void validate(
+            ContainerId containerId,
+            PlanDay planDay,
+            CollectedVolumeLiters dailyFillingLiters,
+            ContainerCapacityLiters containerCapacityLiters,
+            DailyWasteDemandLitersPerDay dailyDemandLitersPerDay) {
+        if (containerId == null) {
+            throw new IllegalArgumentException(CONTAINER_ID_REQUIRED);
+        }
+        if (planDay == null) {
+            throw new IllegalArgumentException(PLAN_DAY_REQUIRED);
+        }
+        if (planDay.getDay() < MINIMUM_PLAN_DAY) {
+            throw new IllegalArgumentException(PLAN_DAY_TOO_LOW);
+        }
+        if (dailyFillingLiters == null) {
+            throw new IllegalArgumentException(DAILY_FILLING_REQUIRED);
+        }
+        if (containerCapacityLiters == null) {
+            throw new IllegalArgumentException(CONTAINER_CAPACITY_REQUIRED);
+        }
+        if (containerCapacityLiters.getLiters() <= ZERO_LITERS) {
+            throw new IllegalArgumentException(CONTAINER_CAPACITY_NOT_POSITIVE);
+        }
+        if (dailyDemandLitersPerDay == null) {
+            throw new IllegalArgumentException(DAILY_DEMAND_REQUIRED);
+        }
+    }
 
-    public double getDailyFillingLiters() { return dailyFillingLiters; }
+    /**
+     * Gets the daily state identifier.
+     *
+     * @return the daily state identifier
+     */
+    public UUID getId() {
+        return id;
+    }
 
-    public double getContainerCapacityLiters() { return containerCapacityLiters; }
+    /**
+     * Gets the parent infrastructure plan identifier.
+     *
+     * @return parent plan id, or empty for legacy snapshots without persisted linkage
+     */
+    public Optional<UUID> getInfrastructurePlanId() {
+        return Optional.ofNullable(infrastructurePlanId).map(InfrastructurePlanId::getValue);
+    }
 
-    public double getDailyDemandLitersPerDay() { return dailyDemandLitersPerDay; }
+    /**
+     * Gets the container identifier.
+     *
+     * @return the container identifier
+     */
+    public String getContainerId() {
+        return containerId.getValue().toString();
+    }
 
-    public ContainerStatus getStatus() { return status; }
+    /**
+     * Gets the planning day represented by this state.
+     *
+     * @return the planning day
+     */
+    public int getPlanDay() {
+        return planDay.getDay();
+    }
 
+    /**
+     * Gets the container filling level in liters.
+     *
+     * @return the filling level in liters
+     */
+    public double getDailyFillingLiters() {
+        return dailyFillingLiters.getValue();
+    }
+
+    /**
+     * Gets the container capacity in liters.
+     *
+     * @return the container capacity in liters
+     */
+    public double getContainerCapacityLiters() {
+        return containerCapacityLiters.getLiters();
+    }
+
+    /**
+     * Gets the estimated daily demand in liters per day.
+     *
+     * @return the estimated daily demand in liters per day
+     */
+    public double getDailyDemandLitersPerDay() {
+        return dailyDemandLitersPerDay.getLitersPerDay();
+    }
+
+    /**
+     * Gets the computed status for the container on this day.
+     *
+     * @return the computed container status
+     */
+    public ContainerStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * Compares daily state snapshots by identifier.
+     *
+     * @param otherObject the object to compare
+     * @return true when both snapshots have the same identifier
+     */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ContainerDailyState that = (ContainerDailyState) o;
+    public boolean equals(Object otherObject) {
+        if (this == otherObject) {
+            return true;
+        }
+        if (otherObject == null || getClass() != otherObject.getClass()) {
+            return false;
+        }
+        ContainerDailyState that = (ContainerDailyState) otherObject;
         return Objects.equals(id, that.id);
     }
 
+    /**
+     * Calculates the hash code from the daily state identifier.
+     *
+     * @return the hash code
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
 
+    /**
+     * Formats this container daily state as text.
+     *
+     * @return the textual representation of this state
+     */
     @Override
     public String toString() {
         return String.format("ContainerDailyState{id=%s,infrastructurePlanId=%s,containerId=%s,planDay=%d,dailyFilling=%.2f,capacity=%.2f,dailyDemand=%.2f,status=%s}",
-            id, infrastructurePlanId, containerId, planDay, dailyFillingLiters, containerCapacityLiters, dailyDemandLitersPerDay, status);
+            id,
+            infrastructurePlanId,
+            containerId,
+            getPlanDay(),
+            getDailyFillingLiters(),
+            getContainerCapacityLiters(),
+            getDailyDemandLitersPerDay(),
+            status);
     }
 }

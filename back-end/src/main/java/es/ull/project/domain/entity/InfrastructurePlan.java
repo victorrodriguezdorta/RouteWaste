@@ -1,14 +1,7 @@
 package es.ull.project.domain.entity;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
+import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
@@ -20,6 +13,13 @@ import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * InfrastructurePlan
@@ -31,6 +31,7 @@ public class InfrastructurePlan {
 
     public static final String PERIOD_NOT_DEFINED = "Planning period is not defined";
     public static final String MAX_BUDGET_NOT_DEFINED = "Maximum budget is not defined";
+    public static final String VALIDITY_STATE_NOT_DEFINED = "Infrastructure plan validity state is not defined";
     public static final String TOTAL_COST_EXCEEDED = "Total cost exceeds maximum budget";
     public static final String INVALID_ASSIGNMENT = "Service assignment is invalid";
     private static final int ZERO = 0;
@@ -121,16 +122,19 @@ public class InfrastructurePlan {
 
     /**
      * Whether this plan is still aligned with master data for referenced entities.
+     * It is a required attribute.
      */
     private InfrastructurePlanValidityState validityState;
 
     /**
      * JSON snapshot of the client execution request used to run the algorithm (identifiers and parameters).
+     * It is an optional attribute.
      */
-    private String executionRequestJson;
+    private AlgorithmJsonPayload executionRequestJson;
 
     /**
      * Container daily state snapshots associated with this plan (domain view).
+     * It is a computed attribute.
      */
     private List<ContainerDailyState> containerDailyStates;
 
@@ -143,6 +147,7 @@ public class InfrastructurePlan {
      * @param numberOfDays             Number of days in the planning horizon
      * @param averagePickupTimeMinutes Average pickup time in minutes
      * @param executedAt               Timestamp of algorithm execution (ISO 8601)
+     * @param validityState            Initial validity state
      */
     public InfrastructurePlan(
             PlanningPeriod period,
@@ -150,9 +155,11 @@ public class InfrastructurePlan {
             ServicePolicies servicePolicies,
             NumberOfDays numberOfDays,
             AveragePickupTimeMinutes averagePickupTimeMinutes,
-            ExecutedAt executedAt) {
+            ExecutedAt executedAt,
+            InfrastructurePlanValidityState validityState) {
         validatePeriod(period);
         validateMaxBudget(maxBudget);
+        validateValidityState(validityState);
         this.id = UUID.randomUUID();
         this.period = period;
         this.maxBudget = maxBudget;
@@ -168,7 +175,7 @@ public class InfrastructurePlan {
         this.totalCollectedLiters = CollectedVolumeLiters.fromLiters(0.0);
         this.totalDistanceMeters = Distance.fromMeters(0.0);
         this.containerDailyStates = new ArrayList<>();
-        this.validityState = InfrastructurePlanValidityState.VALID;
+        this.validityState = validityState;
         this.executionRequestJson = null;
     }
 
@@ -202,64 +209,23 @@ public class InfrastructurePlan {
      * Restore constructor.
      * Restores an InfrastructurePlan from persistence with all its attributes.
      *
-     * @param id                 the plan identifier
-     * @param period             the planning period
-     * @param selectedFacilities the list of selected facilities
-     * @param serviceAssignments the list of service assignments
-     * @param dailyPlans         the list of daily plan entities
-     * @param servicePolicies    the service policies
-     * @param maxBudget          the maximum budget allowed
-     * @param estimatedTotalCost the estimated total cost
-     * @param totalCollectedKilograms the total collected weight in kilograms
-     * @param totalCollectedLiters the total collected volume in liters
-     * @param totalDistanceMeters the total distance in meters
-     * @param numberOfDays       the number of days for planning
+     * @param id                       the plan identifier
+     * @param period                   the planning period
+     * @param selectedFacilities       selected facilities restored for the plan
+     * @param serviceAssignments       service assignments restored for the plan
+     * @param dailyPlans               daily plans restored for the plan
+     * @param servicePolicies          the service policies
+     * @param maxBudget                the maximum budget allowed
+     * @param estimatedTotalCost       estimated total cost restored for the plan
+     * @param totalCollectedKilograms  total collected kilograms restored for the plan
+     * @param totalCollectedLiters     total collected liters restored for the plan
+     * @param totalDistanceMeters      total route distance restored for the plan
+     * @param numberOfDays             the number of days for planning
      * @param averagePickupTimeMinutes the average pickup time in minutes
-     * @param executedAt         the timestamp of algorithm execution
-     * @param validityState      persisted validity state (null treated as {@link InfrastructurePlanValidityState#VALID})
-     * @param executionRequestJson persisted client request JSON snapshot (may be null for legacy rows)
-     */
-        public InfrastructurePlan(UUID id,
-            PlanningPeriod period,
-            List<Facility> selectedFacilities,
-            List<ServiceAssignment> serviceAssignments,
-            List<DailyPlan> dailyPlans,
-                List<ContainerDailyState> containerDailyStates,
-                ServicePolicies servicePolicies,
-            MaximumBudget maxBudget,
-            TotalCost estimatedTotalCost,
-            CollectedWeightKilograms totalCollectedKilograms,
-            CollectedVolumeLiters totalCollectedLiters,
-            Distance totalDistanceMeters,
-            NumberOfDays numberOfDays,
-            AveragePickupTimeMinutes averagePickupTimeMinutes,
-            ExecutedAt executedAt,
-            InfrastructurePlanValidityState validityState,
-            String executionRequestJson) {
-        validatePeriod(period);
-        validateMaxBudget(maxBudget);
-        this.id = id;
-        this.period = period;
-        this.selectedFacilities = selectedFacilities != null ? new ArrayList<>(selectedFacilities) : new ArrayList<>();
-        this.serviceAssignments = serviceAssignments != null ? new ArrayList<>(serviceAssignments) : new ArrayList<>();
-        this.dailyPlans = dailyPlans != null ? new ArrayList<>(dailyPlans) : new ArrayList<>();
-        this.containerDailyStates = containerDailyStates != null ? new ArrayList<>(containerDailyStates) : new ArrayList<>();
-        this.servicePolicies = servicePolicies;
-        this.maxBudget = maxBudget;
-        this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
-        this.totalCollectedKilograms = totalCollectedKilograms != null ? totalCollectedKilograms : CollectedWeightKilograms.fromKilograms(0.0);
-        this.totalCollectedLiters = totalCollectedLiters != null ? totalCollectedLiters : CollectedVolumeLiters.fromLiters(0.0);
-        this.totalDistanceMeters = totalDistanceMeters != null ? totalDistanceMeters : Distance.fromMeters(0.0);
-        this.numberOfDays = numberOfDays;
-        this.averagePickupTimeMinutes = averagePickupTimeMinutes;
-        this.executedAt = executedAt;
-        this.validityState = validityState != null ? validityState : InfrastructurePlanValidityState.VALID;
-        this.executionRequestJson = executionRequestJson;
-    }
-
-    /**
-     * Backwards-compatible restore constructor without containerDailyStates parameter.
-     * Delegates to the main restore constructor passing null for containerDailyStates.
+     * @param executedAt               the timestamp of algorithm execution
+     * @param validityState            persisted validity state
+     * @param executionRequestJson     persisted client request JSON snapshot
+     * @param containerDailyStates     container daily states restored for the plan
      */
     public InfrastructurePlan(UUID id,
             PlanningPeriod period,
@@ -274,9 +240,61 @@ public class InfrastructurePlan {
             Distance totalDistanceMeters,
             NumberOfDays numberOfDays,
             AveragePickupTimeMinutes averagePickupTimeMinutes,
-            ExecutedAt executedAt) {
-        this(id, period, selectedFacilities, serviceAssignments, dailyPlans, null, servicePolicies, maxBudget, estimatedTotalCost, totalCollectedKilograms, totalCollectedLiters, totalDistanceMeters, numberOfDays, averagePickupTimeMinutes, executedAt,
-                InfrastructurePlanValidityState.VALID, null);
+            ExecutedAt executedAt,
+            InfrastructurePlanValidityState validityState,
+            AlgorithmJsonPayload executionRequestJson,
+            List<ContainerDailyState> containerDailyStates) {
+        validatePeriod(period);
+        validateMaxBudget(maxBudget);
+        validateValidityState(validityState);
+        this.id = id;
+        this.period = period;
+        this.selectedFacilities = selectedFacilities != null ? new ArrayList<>(selectedFacilities) : new ArrayList<>();
+        this.serviceAssignments = serviceAssignments != null ? new ArrayList<>(serviceAssignments) : new ArrayList<>();
+        this.dailyPlans = dailyPlans != null ? new ArrayList<>(dailyPlans) : new ArrayList<>();
+        this.containerDailyStates = containerDailyStates != null ? new ArrayList<>(containerDailyStates) : new ArrayList<>();
+        this.servicePolicies = servicePolicies;
+        this.maxBudget = maxBudget;
+        this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
+        this.totalCollectedKilograms = totalCollectedKilograms != null
+                ? totalCollectedKilograms
+                : CollectedWeightKilograms.fromKilograms(0.0);
+        this.totalCollectedLiters = totalCollectedLiters != null
+                ? totalCollectedLiters
+                : CollectedVolumeLiters.fromLiters(0.0);
+        this.totalDistanceMeters = totalDistanceMeters != null ? totalDistanceMeters : Distance.fromMeters(0.0);
+        this.numberOfDays = numberOfDays;
+        this.averagePickupTimeMinutes = averagePickupTimeMinutes;
+        this.executedAt = executedAt;
+        this.validityState = validityState;
+        this.executionRequestJson = executionRequestJson;
+    }
+
+    /**
+     * Restore constructor.
+     * Restores an InfrastructurePlan reference with only required scalar values.
+     *
+     * @param id                       the plan identifier
+     * @param period                   the planning period
+     * @param servicePolicies          the service policies
+     * @param maxBudget                the maximum budget allowed
+     * @param numberOfDays             the number of days for planning
+     * @param averagePickupTimeMinutes the average pickup time in minutes
+     * @param executedAt               the timestamp of algorithm execution
+     * @param validityState            persisted validity state
+     * @param executionRequestJson     persisted client request JSON snapshot
+     */
+    private InfrastructurePlan(UUID id,
+            PlanningPeriod period,
+            ServicePolicies servicePolicies,
+            MaximumBudget maxBudget,
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes,
+            ExecutedAt executedAt,
+            InfrastructurePlanValidityState validityState,
+            AlgorithmJsonPayload executionRequestJson) {
+        this(id, period, null, null, null, servicePolicies, maxBudget, null, null, null, null,
+                numberOfDays, averagePickupTimeMinutes, executedAt, validityState, executionRequestJson, null);
     }
 
     /**
@@ -291,15 +309,7 @@ public class InfrastructurePlan {
                 infrastructurePlanId,
                 new PlanningPeriod(String.valueOf(LocalDate.now().getYear())),
                 null,
-                null,
-                null,
-                null,
-                null,
                 new MaximumBudget(1.0),
-                new TotalCost(0.0),
-                null,
-                null,
-                null,
                 null,
                 null,
                 null,
@@ -328,6 +338,18 @@ public class InfrastructurePlan {
     private void validateMaxBudget(MaximumBudget maxBudget) {
         if (maxBudget == null) {
             throw new IllegalArgumentException(MAX_BUDGET_NOT_DEFINED);
+        }
+    }
+
+    /**
+     * Validates that the infrastructure plan validity state is defined.
+     *
+     * @param validityState validity state to validate
+     * @throws IllegalArgumentException if the validity state is null
+     */
+    private void validateValidityState(InfrastructurePlanValidityState validityState) {
+        if (validityState == null) {
+            throw new IllegalArgumentException(VALIDITY_STATE_NOT_DEFINED);
         }
     }
 
@@ -634,7 +656,7 @@ public class InfrastructurePlan {
      * @return optional raw JSON text
      */
     public Optional<String> getExecutionRequestJson() {
-        return Optional.ofNullable(executionRequestJson);
+        return Optional.ofNullable(executionRequestJson).map(AlgorithmJsonPayload::getJson);
     }
 
     /**
@@ -643,7 +665,45 @@ public class InfrastructurePlan {
      * @param json raw JSON text, or null to clear
      */
     public void assignExecutionRequestSnapshot(String json) {
-        this.executionRequestJson = json;
+        this.executionRequestJson = json != null && !json.isBlank() ? new AlgorithmJsonPayload(json) : null;
+    }
+
+    /**
+     * Restores computed associations loaded by persistence adapters.
+     *
+     * @param selectedFacilities selected facilities
+     * @param serviceAssignments service assignments
+     * @param dailyPlans daily plans
+     * @param containerDailyStates container daily state snapshots
+     */
+    public void restoreComputedAssociations(
+            List<Facility> selectedFacilities,
+            List<ServiceAssignment> serviceAssignments,
+            List<DailyPlan> dailyPlans,
+            List<ContainerDailyState> containerDailyStates) {
+        this.selectedFacilities = selectedFacilities != null ? new ArrayList<>(selectedFacilities) : new ArrayList<>();
+        this.serviceAssignments = serviceAssignments != null ? new ArrayList<>(serviceAssignments) : new ArrayList<>();
+        this.dailyPlans = dailyPlans != null ? new ArrayList<>(dailyPlans) : new ArrayList<>();
+        this.containerDailyStates = containerDailyStates != null ? new ArrayList<>(containerDailyStates) : new ArrayList<>();
+    }
+
+    /**
+     * Restores computed totals loaded by persistence adapters.
+     *
+     * @param estimatedTotalCost estimated total cost
+     * @param totalCollectedKilograms total collected kilograms
+     * @param totalCollectedLiters total collected liters
+     * @param totalDistanceMeters total distance in meters
+     */
+    public void restoreComputedMetrics(
+            TotalCost estimatedTotalCost,
+            CollectedWeightKilograms totalCollectedKilograms,
+            CollectedVolumeLiters totalCollectedLiters,
+            Distance totalDistanceMeters) {
+        this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
+        this.totalCollectedKilograms = totalCollectedKilograms != null ? totalCollectedKilograms : CollectedWeightKilograms.fromKilograms(0.0);
+        this.totalCollectedLiters = totalCollectedLiters != null ? totalCollectedLiters : CollectedVolumeLiters.fromLiters(0.0);
+        this.totalDistanceMeters = totalDistanceMeters != null ? totalDistanceMeters : Distance.fromMeters(0.0);
     }
 
     /**

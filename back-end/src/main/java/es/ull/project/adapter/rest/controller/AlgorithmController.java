@@ -162,9 +162,9 @@ public class AlgorithmController {
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         try {
-            String executionRequestJson;
+            AlgorithmJsonPayload executionRequestJson;
             try {
-                executionRequestJson = this.objectMapper.writeValueAsString(requestBody);
+                executionRequestJson = new AlgorithmJsonPayload(this.objectMapper.writeValueAsString(requestBody));
             } catch (JsonProcessingException e) {
                 ObjectNode error = this.objectMapper.createObjectNode();
                 error.put(KEY_STATUS, STATUS_ERROR);

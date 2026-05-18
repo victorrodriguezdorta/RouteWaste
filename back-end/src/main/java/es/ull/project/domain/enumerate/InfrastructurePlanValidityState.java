@@ -16,6 +16,9 @@ public enum InfrastructurePlanValidityState {
      */
     OBSOLETE;
 
+    private static final String ERROR_STATE_NOT_DEFINED = "Infrastructure plan validity state is not defined";
+    private static final String ERROR_STATE_INVALID = "Infrastructure plan validity state is invalid";
+
     /**
      * Parses a persisted string value into {@link InfrastructurePlanValidityState}.
      *
@@ -32,6 +35,70 @@ public enum InfrastructurePlanValidityState {
                 return value;
             }
         }
+        return VALID;
+    }
+
+    /**
+     * Returns the validity state that matches the given string.
+     *
+     * @param stringToCheck string representation of the validity state
+     * @return validity state matching the string
+     */
+    public static InfrastructurePlanValidityState fromString(String stringToCheck) {
+        if (stringToCheck == null) {
+            throw new IllegalArgumentException(ERROR_STATE_NOT_DEFINED);
+        }
+        String normalized = stringToCheck.trim().toUpperCase();
+        for (InfrastructurePlanValidityState value : values()) {
+            if (value.name().equals(normalized)) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException(ERROR_STATE_INVALID);
+    }
+
+    /**
+     * Returns the index of the validity state with the given name.
+     *
+     * @param stringToCheck string representation of the validity state
+     * @return zero-based enum index
+     */
+    public static int indexOf(String stringToCheck) {
+        InfrastructurePlanValidityState state = fromString(stringToCheck);
+        InfrastructurePlanValidityState[] states = values();
+        for (int index = 0; index < states.length; index++) {
+            if (states[index] == state) {
+                return index;
+            }
+        }
+        throw new IllegalArgumentException(ERROR_STATE_INVALID);
+    }
+
+    /**
+     * Checks whether the given string is a valid validity state.
+     *
+     * @param stringToCheck string to validate
+     * @return true if the value matches a validity state, false otherwise
+     */
+    public static boolean isValid(String stringToCheck) {
+        if (stringToCheck == null) {
+            return false;
+        }
+        String normalized = stringToCheck.trim().toUpperCase();
+        for (InfrastructurePlanValidityState value : values()) {
+            if (value.name().equals(normalized)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns a deterministic sample validity state for tests and seed data.
+     *
+     * @return validity state sample
+     */
+    public static InfrastructurePlanValidityState random() {
         return VALID;
     }
 }

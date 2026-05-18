@@ -22,6 +22,7 @@ public interface UpdateFacilityUseCase {
      * Updates an existing facility with the specified parameters.
      *
      * @param id the unique identifier of the facility to update
+     * @param newName the new facility name, or null to keep current
      * @param newFacilityType the new facility type, or null to keep current
      * @param newLocation the new location, or null to keep current
      * @param newStorageCapacity the new storage capacity in kilograms, or null to keep current

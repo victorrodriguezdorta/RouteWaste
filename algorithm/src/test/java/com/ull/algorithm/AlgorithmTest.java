@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.ull.domain.DeliveryPlanningProblem;
 import com.ull.domain.DeliveryPlanningSolution;
+import com.ull.domain.DeliveryPlanningStatus;
 import com.ull.domain.entity.Container;
 import com.ull.domain.entity.ContainerDailyState;
 import com.ull.domain.entity.DailyPlan;
@@ -89,7 +90,7 @@ class AlgorithmTest {
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
-    assertEquals(DeliveryPlanningSolution.Status.SUBOPTIMAL, solution.getStatus());
+    assertEquals(DeliveryPlanningStatus.SUBOPTIMAL, solution.getStatus());
     assertNotNull(solution.getExecutedAt());
     assertEquals(new MaximumBudget(5000.0, "EUR"), solution.getMaxBudget());
   }
@@ -268,7 +269,7 @@ class AlgorithmTest {
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
-    assertEquals(DeliveryPlanningSolution.Status.INFEASIBLE, solution.getStatus());
+    assertEquals(DeliveryPlanningStatus.INFEASIBLE, solution.getStatus());
     assertTrue(solution.getClusters().isEmpty());
     assertTrue(solution.getDailyPlans().isEmpty());
   }
@@ -287,7 +288,7 @@ class AlgorithmTest {
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
-    assertEquals(DeliveryPlanningSolution.Status.INFEASIBLE, solution.getStatus());
+    assertEquals(DeliveryPlanningStatus.INFEASIBLE, solution.getStatus());
     assertTrue(solution.getClusters().isEmpty());
     assertTrue(solution.getDailyPlans().isEmpty());
   }

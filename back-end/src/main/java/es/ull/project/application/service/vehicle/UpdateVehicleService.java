@@ -1,7 +1,7 @@
 package es.ull.project.application.service.vehicle;
 
 import es.ull.project.application.repository.VehicleRepository;
-import es.ull.project.application.service.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditService;
+import es.ull.project.application.usecase.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditUseCase;
 import es.ull.project.application.usecase.vehicle.UpdateVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
@@ -20,17 +20,17 @@ import java.util.UUID;
 public class UpdateVehicleService implements UpdateVehicleUseCase {
 
     private final VehicleRepository repository;
-    private final InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation;
+    private final InvalidateInfrastructurePlansOnEntityEditUseCase infrastructurePlanInvalidation;
 
     /**
      * Constructs a new UpdateVehicleService with the specified repository.
      *
      * @param repository the vehicle repository used for persistence operations
-     * @param infrastructurePlanInvalidation service that marks affected infrastructure plans obsolete
+     * @param infrastructurePlanInvalidation use case that marks affected infrastructure plans obsolete
      */
     public UpdateVehicleService(
             VehicleRepository repository,
-            InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation) {
+            InvalidateInfrastructurePlansOnEntityEditUseCase infrastructurePlanInvalidation) {
         this.repository = repository;
         this.infrastructurePlanInvalidation = infrastructurePlanInvalidation;
     }
@@ -43,6 +43,7 @@ public class UpdateVehicleService implements UpdateVehicleUseCase {
      * </p>
      *
      * @param id the unique identifier of the vehicle to update
+     * @param newName the new vehicle name, or null to keep the current value
      * @param newVehicleType the new vehicle type, or null to keep the current value
      * @param newCapacityKilograms the new capacity in kilograms, or null to keep the current value
      * @param newCapacityLiters the new capacity in liters, or null to keep the current value

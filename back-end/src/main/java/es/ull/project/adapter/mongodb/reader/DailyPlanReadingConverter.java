@@ -1,17 +1,5 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.ReadingConverter;
-import org.springframework.lang.NonNull;
-
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Container;
@@ -26,6 +14,17 @@ import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.route.RouteSequence;
 import es.ull.project.domain.valueobject.time.PlanDay;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * DailyPlanReadingConverter
@@ -43,6 +42,7 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
     private static final String ERR_FACILITY_SNAPSHOT = "Facility with id '%s' not found when loading DailyPlan";
     private static final String ERR_VEHICLE_SNAPSHOT = "Vehicle with id '%s' not found when loading DailyPlan";
     private static final String ERR_CONTAINER_SNAPSHOT = "Container with id '%s' not found when loading DailyPlan";
+    private static final String ERR_CONTAINER_ID_REQUIRED = "Container id is required for container stops";
 
     @SuppressWarnings("unused")
     private final MongoConfiguration mongoConfiguration;
@@ -99,8 +99,6 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
                 stops);
     }
 
-
-
     /**
      * Reads a Stop snapshot from a nested MongoDB document.
      *
@@ -120,7 +118,7 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
         UUID containerId = (UUID) document.get(CONTAINER_FIELD);
         if (stopType == StopType.CONTAINER) {
             if (containerId == null) {
-            throw new IllegalStateException("Container id is required for container stops");
+                throw new IllegalStateException(ERR_CONTAINER_ID_REQUIRED);
             }
             container = mongoConfiguration.containerRepository().findById(containerId)
                 .orElseThrow(() -> new IllegalStateException(String.format(ERR_CONTAINER_SNAPSHOT, containerId)));
@@ -134,6 +132,4 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
                 Distance.fromMeters(distanceFromPreviousMeters),
                 Distance.fromMeters(cumulativeDistanceMeters));
     }
-
-
 }

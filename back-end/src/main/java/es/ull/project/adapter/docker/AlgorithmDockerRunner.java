@@ -1,5 +1,8 @@
 package es.ull.project.adapter.docker;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.ull.project.application.exception.AlgorithmExecutionException;
+import es.ull.project.application.port.algorithm.AlgorithmRunner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,16 +12,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import es.ull.project.application.exception.AlgorithmExecutionException;
-import es.ull.project.application.port.algorithm.AlgorithmRunner;
 
 /**
  * AlgorithmDockerRunner
@@ -33,6 +30,7 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final int PROCESS_SUCCESS_EXIT_CODE = 0;
+    private static final int DEPTH_ZERO = 0;
     private static final int INDEX_NOT_FOUND = -1;
     private static final String CMD_DOCKER = "docker";
     private static final String CMD_COMPOSE = "compose";
@@ -73,12 +71,9 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
     @Override
     public String run(String processedJson) {
         this.buildAlgorithmImage();
-            logger.info("=== ALGORITHM EXECUTION START ===");
-            logger.info("JSON payload size: {} bytes", processedJson.length());
-            logger.debug("JSON payload being sent to algorithm:\n{}", processedJson);
-
-        // Send JSON through stdin instead of command-line arguments
-        // to avoid exceeding command-line argument size limits
+        logger.info("=== ALGORITHM EXECUTION START ===");
+        logger.info("JSON payload size: {} bytes", processedJson.length());
+        logger.debug("JSON payload being sent to algorithm:\n{}", processedJson);
         CommandResult commandResult = this.executeCommandWithStdin(List.of(
                 CMD_DOCKER,
                 CMD_COMPOSE,
@@ -89,10 +84,9 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
                 this.serviceName),
                 processedJson);
         String jsonOutput = this.extractJsonPayload(commandResult.standardOutput());
-            logger.info("Algorithm response size: {} bytes", jsonOutput.length());
-            logger.debug("Algorithm response received:\n{}", jsonOutput);
-            logger.info("=== ALGORITHM EXECUTION END ===");
-
+        logger.info("Algorithm response size: {} bytes", jsonOutput.length());
+        logger.debug("Algorithm response received:\n{}", jsonOutput);
+        logger.info("=== ALGORITHM EXECUTION END ===");
         if (jsonOutput.isBlank()) {
             throw new AlgorithmExecutionException(ERR_NO_JSON_PAYLOAD);
         }
@@ -153,23 +147,19 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
         processBuilder.redirectErrorStream(true);
         try {
             Process process = processBuilder.start();
-                logger.debug("Docker process started");
-            
-            // Write JSON to stdin
+            logger.debug("Docker process started");
             try (OutputStream stdin = process.getOutputStream()) {
-                    logger.info("Writing JSON to stdin ({} bytes)...", stdinInput.length());
+                logger.info("Writing JSON to stdin ({} bytes)...", stdinInput.length());
                 stdin.write(stdinInput.getBytes(StandardCharsets.UTF_8));
                 stdin.flush();
-                    logger.info("JSON written to stdin successfully");
+                logger.info("JSON written to stdin successfully");
             }
-            
-            // Read output
-                logger.info("Reading algorithm output...");
+            logger.info("Reading algorithm output...");
             String standardOutput = this.readStream(process.getInputStream());
             int exitCode = process.waitFor();
-                logger.info("Docker process exited with code: {}", exitCode);
+            logger.info("Docker process exited with code: {}", exitCode);
             if (exitCode != PROCESS_SUCCESS_EXIT_CODE) {
-                    logger.error("Docker command failed. Raw output:\n{}", standardOutput);
+                logger.error("Docker command failed. Raw output:\n{}", standardOutput);
                 throw new AlgorithmExecutionException(
                         "Docker command failed with exit code " + exitCode + ": " + standardOutput);
             }
@@ -225,58 +215,55 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
         if (trimmedOutput.isBlank()) {
             return "";
         }
-
         String lastValidObject = this.extractLastValidJsonObject(trimmedOutput);
         if (!lastValidObject.isBlank()) {
             return lastValidObject;
         }
-
         String lastValidArray = this.extractLastValidJsonArray(trimmedOutput);
         if (!lastValidArray.isBlank()) {
             return lastValidArray;
         }
-
         return "";
     }
 
+    /**
+     * Extracts the last valid JSON object found in the provided text.
+     *
+     * @param text text that may contain one or more JSON objects
+     * @return last valid JSON object, or an empty string if none is found
+     */
     private String extractLastValidJsonObject(String text) {
-        int depth = 0;
+        int depth = DEPTH_ZERO;
         int start = INDEX_NOT_FOUND;
         boolean inString = false;
         boolean escaped = false;
         String lastValid = "";
-
         for (int i = 0; i < text.length(); i++) {
             char character = text.charAt(i);
-
             if (escaped) {
                 escaped = false;
                 continue;
             }
-
             if (character == '\\') {
                 escaped = inString;
                 continue;
             }
-
             if (character == '"') {
                 inString = !inString;
                 continue;
             }
-
             if (inString) {
                 continue;
             }
-
             if (character == '{') {
-                if (depth == 0) {
+                if (depth == DEPTH_ZERO) {
                     start = i;
                 }
                 depth++;
             } else if (character == '}') {
-                if (depth > 0) {
+                if (depth > DEPTH_ZERO) {
                     depth--;
-                    if (depth == 0 && start != INDEX_NOT_FOUND) {
+                    if (depth == DEPTH_ZERO && start != INDEX_NOT_FOUND) {
                         String candidate = text.substring(start, i + 1);
                         if (this.isValidJson(candidate)) {
                             lastValid = candidate;
@@ -286,48 +273,47 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
                 }
             }
         }
-
         return lastValid;
     }
 
+    /**
+     * Extracts the last valid JSON array found in the provided text.
+     *
+     * @param text text that may contain one or more JSON arrays
+     * @return last valid JSON array, or an empty string if none is found
+     */
     private String extractLastValidJsonArray(String text) {
-        int depth = 0;
+        int depth = DEPTH_ZERO;
         int start = INDEX_NOT_FOUND;
         boolean inString = false;
         boolean escaped = false;
         String lastValid = "";
-
         for (int i = 0; i < text.length(); i++) {
             char character = text.charAt(i);
-
             if (escaped) {
                 escaped = false;
                 continue;
             }
-
             if (character == '\\') {
                 escaped = inString;
                 continue;
             }
-
             if (character == '"') {
                 inString = !inString;
                 continue;
             }
-
             if (inString) {
                 continue;
             }
-
             if (character == '[') {
-                if (depth == 0) {
+                if (depth == DEPTH_ZERO) {
                     start = i;
                 }
                 depth++;
             } else if (character == ']') {
-                if (depth > 0) {
+                if (depth > DEPTH_ZERO) {
                     depth--;
-                    if (depth == 0 && start != INDEX_NOT_FOUND) {
+                    if (depth == DEPTH_ZERO && start != INDEX_NOT_FOUND) {
                         String candidate = text.substring(start, i + 1);
                         if (this.isValidJson(candidate)) {
                             lastValid = candidate;
@@ -337,10 +323,15 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
                 }
             }
         }
-
         return lastValid;
     }
 
+    /**
+     * Checks whether the provided text is valid JSON.
+     *
+     * @param text text to validate
+     * @return true if the text can be parsed as JSON, false otherwise
+     */
     private boolean isValidJson(String text) {
         try {
             OBJECT_MAPPER.readTree(text);

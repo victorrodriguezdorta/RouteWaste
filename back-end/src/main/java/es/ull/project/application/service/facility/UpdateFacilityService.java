@@ -1,8 +1,8 @@
 package es.ull.project.application.service.facility;
 
 import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.application.service.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditService;
 import es.ull.project.application.usecase.facility.UpdateFacilityUseCase;
+import es.ull.project.application.usecase.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditUseCase;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
@@ -22,17 +22,17 @@ import java.util.UUID;
 public class UpdateFacilityService implements UpdateFacilityUseCase {
 
     private final FacilityRepository repository;
-    private final InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation;
+    private final InvalidateInfrastructurePlansOnEntityEditUseCase infrastructurePlanInvalidation;
 
     /**
      * Constructs a new UpdateFacilityService with the specified repository.
      * 
      * @param repository the facility repository for persistence operations
-     * @param infrastructurePlanInvalidation service that marks affected infrastructure plans obsolete
+     * @param infrastructurePlanInvalidation use case that marks affected infrastructure plans obsolete
      */
     public UpdateFacilityService(
             FacilityRepository repository,
-            InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation) {
+            InvalidateInfrastructurePlansOnEntityEditUseCase infrastructurePlanInvalidation) {
         this.repository = repository;
         this.infrastructurePlanInvalidation = infrastructurePlanInvalidation;
     }
@@ -41,6 +41,7 @@ public class UpdateFacilityService implements UpdateFacilityUseCase {
      * Updates an existing facility with new values.
      * 
      * @param id                       the unique identifier of the facility to update
+     * @param newName                  the new facility name, or null to keep the existing value
      * @param newFacilityType          the new facility type, or null to keep the existing value
      * @param newLocation              the new location, or null to keep the existing value
      * @param newStorageCapacity       the new storage capacity in kilograms, or null to keep the existing value

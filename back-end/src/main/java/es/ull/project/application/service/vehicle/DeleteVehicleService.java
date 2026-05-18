@@ -1,10 +1,9 @@
 package es.ull.project.application.service.vehicle;
 
 import es.ull.project.application.repository.VehicleRepository;
-import es.ull.project.application.service.infrastructureplan.DeleteInfrastructurePlansReferencingEntityService;
+import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlansReferencingEntityUseCase;
 import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
-
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -16,19 +15,19 @@ import java.util.UUID;
 public class DeleteVehicleService implements DeleteVehicleUseCase {
 
     private final VehicleRepository repository;
-    private final DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService;
+    private final DeleteInfrastructurePlansReferencingEntityUseCase deleteInfrastructurePlansReferencingEntityUseCase;
 
     /**
      * Constructs a new DeleteVehicleService with the specified repository.
      *
      * @param repository the vehicle repository used for persistence operations
-     * @param deleteInfrastructurePlansReferencingEntityService removes plans that referenced this vehicle in their execution snapshot
+     * @param deleteInfrastructurePlansReferencingEntityUseCase removes plans that referenced this vehicle in their execution snapshot
      */
     public DeleteVehicleService(
             VehicleRepository repository,
-            DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService) {
+            DeleteInfrastructurePlansReferencingEntityUseCase deleteInfrastructurePlansReferencingEntityUseCase) {
         this.repository = repository;
-        this.deleteInfrastructurePlansReferencingEntityService = deleteInfrastructurePlansReferencingEntityService;
+        this.deleteInfrastructurePlansReferencingEntityUseCase = deleteInfrastructurePlansReferencingEntityUseCase;
     }
 
     /**
@@ -41,7 +40,7 @@ public class DeleteVehicleService implements DeleteVehicleUseCase {
     @Override
     public Vehicle delete(UUID id) {
         Vehicle existing = this.repository.findById(id).orElseThrow(() -> new NoSuchElementException("Vehicle not found"));
-        this.deleteInfrastructurePlansReferencingEntityService.deletePlansWhoseExecutionRequestReferencesEntity(id);
+        this.deleteInfrastructurePlansReferencingEntityUseCase.deletePlansWhoseExecutionRequestReferencesEntity(id);
         this.repository.delete(existing);
         return existing;
     }

@@ -18,12 +18,14 @@ import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
+import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanListResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
 import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
 import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
 import es.ull.project.adapter.rest.serialization.container.ContainerResponseBodySerializer;
+import es.ull.project.adapter.rest.serialization.dailyplan.DailyPlanResponseBodySerializer;
 import es.ull.project.adapter.rest.serialization.facility.FacilityResponseBodySerializer;
 import es.ull.project.adapter.rest.serialization.infrastructureplan.InfrastructurePlanListResponseBodySerializer;
 import es.ull.project.adapter.rest.serialization.infrastructureplan.InfrastructurePlanResponseBodySerializer;
@@ -100,6 +102,9 @@ public class RestConfiguration {
         module.addSerializer(
                 InfrastructurePlanListResponseBody.class,
                 new InfrastructurePlanListResponseBodySerializer());
+        module.addSerializer(
+                DailyPlanResponseBody.class,
+                new DailyPlanResponseBodySerializer());
         module.addSerializer(
                 ServiceAssignmentResponseBody.class,
                 new ServiceAssignmentResponseBodySerializer());

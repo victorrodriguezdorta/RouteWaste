@@ -1,12 +1,11 @@
 package com.ull.domain;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.ull.domain.entity.Container;
 import com.ull.domain.entity.FacilityWithVehicles;
 import com.ull.domain.valueobject.cost.MaximumBudget;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents the algorithm input problem.
@@ -21,6 +20,8 @@ public class DeliveryPlanningProblem {
   public static final String CONTAINERS_NOT_DEFINED = "Selected containers list is not defined";
   public static final String AVERAGE_PICKUP_TIME_NOT_VALID = "Average pickup time in minutes must be >= 0";
   public static final String NUMBER_OF_DAYS_NOT_VALID = "Number of days must be >= 1";
+  private static final int MIN_AVERAGE_PICKUP_TIME_MINUTES = 0;
+  private static final int MIN_NUMBER_OF_DAYS = 1;
 
   private final int averagePickupTimeMinutes;
   private final int numberOfDays;
@@ -70,38 +71,73 @@ public class DeliveryPlanningProblem {
     this.containers = new ArrayList<>(containers);
   }
 
+  /**
+   * Validates that average pickup time is not negative.
+   *
+   * @param averagePickupTimeMinutes average pickup time to validate
+   */
   private void validateAveragePickupTime(int averagePickupTimeMinutes) {
-    if (averagePickupTimeMinutes < 0) {
+    if (averagePickupTimeMinutes < MIN_AVERAGE_PICKUP_TIME_MINUTES) {
       throw new IllegalArgumentException(AVERAGE_PICKUP_TIME_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that number of planning days is positive.
+   *
+   * @param numberOfDays number of days to validate
+   */
   private void validateNumberOfDays(int numberOfDays) {
-    if (numberOfDays < 1) {
+    if (numberOfDays < MIN_NUMBER_OF_DAYS) {
       throw new IllegalArgumentException(NUMBER_OF_DAYS_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that the facility assignments list exists.
+   *
+   * @param facilitiesWithVehicles facility assignments to validate
+   */
   private void validateFacilities(List<FacilityWithVehicles> facilitiesWithVehicles) {
     if (facilitiesWithVehicles == null) {
       throw new IllegalArgumentException(FACILITIES_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that the selected containers list exists.
+   *
+   * @param containers containers list to validate
+   */
   private void validateContainers(List<Container> containers) {
     if (containers == null) {
       throw new IllegalArgumentException(CONTAINERS_NOT_DEFINED);
     }
   }
 
+  /**
+   * Returns the average pickup time in minutes.
+   *
+   * @return average pickup time in minutes
+   */
   public int getAveragePickupTimeMinutes() {
     return this.averagePickupTimeMinutes;
   }
 
+  /**
+   * Returns the planning horizon length.
+   *
+   * @return number of planning days
+   */
   public int getNumberOfDays() {
     return this.numberOfDays;
   }
 
+  /**
+   * Returns the maximum budget configured for the problem.
+   *
+   * @return maximum budget, or null when not provided
+   */
   public MaximumBudget getMaxBudget() {
     return this.maxBudget;
   }
@@ -124,16 +160,29 @@ public class DeliveryPlanningProblem {
     return Collections.unmodifiableList(this.containers);
   }
 
-  /** Returns the total number of facilities in the problem. */
+  /**
+   * Returns the total number of facilities in the problem.
+   *
+   * @return number of facility assignments
+   */
   public int getNumberOfFacilities() {
     return this.facilitiesWithVehicles.size();
   }
 
-  /** Returns the total number of containers in the problem. */
+  /**
+   * Returns the total number of containers in the problem.
+   *
+   * @return number of selected containers
+   */
   public int getNumberOfContainers() {
     return this.containers.size();
   }
 
+  /**
+   * Returns a readable representation of this planning problem.
+   *
+   * @return text containing planning parameters and collection sizes
+   */
   @Override
   public String toString() {
     return String.format(

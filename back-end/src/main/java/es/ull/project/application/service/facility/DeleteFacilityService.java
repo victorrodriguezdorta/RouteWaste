@@ -1,8 +1,8 @@
 package es.ull.project.application.service.facility;
 
 import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.application.service.infrastructureplan.DeleteInfrastructurePlansReferencingEntityService;
 import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
+import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlansReferencingEntityUseCase;
 import es.ull.project.domain.entity.Facility;
 
 import java.util.NoSuchElementException;
@@ -15,18 +15,18 @@ import java.util.UUID;
 public class DeleteFacilityService implements DeleteFacilityUseCase {
 
     private final FacilityRepository repository;
-    private final DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService;
+    private final DeleteInfrastructurePlansReferencingEntityUseCase deleteInfrastructurePlansReferencingEntityUseCase;
 
     /**
      * Constructs a new DeleteFacilityService with the specified repository.
      * @param repository the facility repository for persistence operations
-     * @param deleteInfrastructurePlansReferencingEntityService removes plans that referenced this facility in their execution snapshot
+     * @param deleteInfrastructurePlansReferencingEntityUseCase removes plans that referenced this facility in their execution snapshot
      */
     public DeleteFacilityService(
             FacilityRepository repository,
-            DeleteInfrastructurePlansReferencingEntityService deleteInfrastructurePlansReferencingEntityService) {
+            DeleteInfrastructurePlansReferencingEntityUseCase deleteInfrastructurePlansReferencingEntityUseCase) {
         this.repository = repository;
-        this.deleteInfrastructurePlansReferencingEntityService = deleteInfrastructurePlansReferencingEntityService;
+        this.deleteInfrastructurePlansReferencingEntityUseCase = deleteInfrastructurePlansReferencingEntityUseCase;
     }
 
     /**
@@ -38,7 +38,7 @@ public class DeleteFacilityService implements DeleteFacilityUseCase {
     @Override
     public Facility delete(UUID id) {
         Facility existing = this.repository.findById(id).orElseThrow(() -> new NoSuchElementException("Facility not found"));
-        this.deleteInfrastructurePlansReferencingEntityService.deletePlansWhoseExecutionRequestReferencesEntity(id);
+        this.deleteInfrastructurePlansReferencingEntityUseCase.deletePlansWhoseExecutionRequestReferencesEntity(id);
         this.repository.delete(existing);
         return existing;
     }

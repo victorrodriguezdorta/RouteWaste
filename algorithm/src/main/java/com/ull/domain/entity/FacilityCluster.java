@@ -31,18 +31,33 @@ public class FacilityCluster {
     this.assignedContainers = new ArrayList<>();
   }
 
+  /**
+   * Validates that the facility assigned to the cluster exists.
+   *
+   * @param facility the facility to validate
+   */
   private void validateFacility(Facility facility) {
     if (facility == null) {
       throw new IllegalArgumentException(FACILITY_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that a container can be assigned to this cluster.
+   *
+   * @param container the container to validate
+   */
   private void validateContainer(Container container) {
     if (container == null) {
       throw new IllegalArgumentException(CONTAINERS_NOT_DEFINED);
     }
   }
 
+  /**
+   * Returns the facility that owns this cluster.
+   *
+   * @return the facility associated with the assigned containers
+   */
   public Facility getFacility() {
     return this.facility;
   }
@@ -66,11 +81,21 @@ public class FacilityCluster {
     this.assignedContainers.add(container);
   }
 
-  /** Returns the number of containers currently assigned to this cluster. */
+  /**
+   * Returns the number of containers currently assigned to this cluster.
+   *
+   * @return the assigned container count
+   */
   public int getSize() {
     return this.assignedContainers.size();
   }
 
+  /**
+   * Compares this cluster with another object by facility.
+   *
+   * @param otherObject object to compare
+   * @return true when both clusters belong to the same facility
+   */
   @Override
   public boolean equals(Object otherObject) {
     if (this == otherObject) {
@@ -83,11 +108,21 @@ public class FacilityCluster {
     return Objects.equals(this.facility, other.facility);
   }
 
+  /**
+   * Returns a hash code based on the cluster facility.
+   *
+   * @return hash code for this cluster
+   */
   @Override
   public int hashCode() {
     return Objects.hash(this.facility);
   }
 
+  /**
+   * Returns a readable representation of this cluster.
+   *
+   * @return text containing the facility id and number of containers
+   */
   @Override
   public String toString() {
     return String.format(

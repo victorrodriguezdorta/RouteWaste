@@ -8,7 +8,14 @@ import java.util.UUID;
  */
 public final class InfrastructurePlanExecutionRequestReferences {
 
+    private static final String UTILITY_CLASS_EXCEPTION_MESSAGE =
+            "This is a utility class and cannot be instantiated.";
+
+    /**
+     * Prevents instantiation of this utility class.
+     */
     private InfrastructurePlanExecutionRequestReferences() {
+        throw new UnsupportedOperationException(UTILITY_CLASS_EXCEPTION_MESSAGE);
     }
 
     /**

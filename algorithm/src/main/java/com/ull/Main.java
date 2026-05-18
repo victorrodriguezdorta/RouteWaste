@@ -1,16 +1,14 @@
 package com.ull;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-
-import org.json.JSONObject;
-
 import com.ull.algorithm.Algorithm;
 import com.ull.domain.DeliveryPlanningProblem;
 import com.ull.domain.DeliveryPlanningSolution;
 import com.ull.io.DeliveryPlanningProblemJsonFileSupplier;
 import com.ull.io.DeliveryPlanningSolutionToJson;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import org.json.JSONObject;
 
 /**
  * Entry point of the algorithm module.
@@ -26,41 +24,58 @@ import com.ull.io.DeliveryPlanningSolutionToJson;
  */
 public class Main {
 
+  private static final int FIRST_ARGUMENT_INDEX = 0;
+  private static final int JSON_PREVIEW_MAX_LENGTH = 2000;
+  private static final String ALGORITHM_EXECUTION_FAILED = "Algorithm execution failed";
+  private static final String ERROR_READING_STDIN = "Error reading from stdin: ";
+  private static final String ERROR_RUNNING_ALGORITHM = "Error while parsing/running algorithm: ";
+  private static final String INPUT_JSON_PREVIEW = "Input JSON preview (truncated):\n";
+  private static final String NO_JSON_PROBLEM_PROVIDED =
+      "No JSON problem provided. Supply either as command-line argument or via stdin";
+  private static final String PARSE_PROBLEM_FAILED = "Could not parse the planning problem";
+  private static final String TRUNCATED_SUFFIX = "... [truncated]";
+  private static final String UTILITY_CLASS_INSTANTIATION =
+      "This is a utility class and cannot be instantiated.";
+
+  /**
+   * Prevents instantiation of the application entry point.
+   */
+  private Main() {
+    throw new UnsupportedOperationException(UTILITY_CLASS_INSTANTIATION);
+  }
+
+  /**
+   * Runs the algorithm from a JSON payload supplied as an argument or stdin.
+   *
+   * @param args command-line arguments
+   */
   public static void main(String[] args) {
     String problemString = readProblemJson(args);
     JSONObject jsonInstance = new JSONObject(problemString);
-
     try {
       DeliveryPlanningProblem problem =
           new DeliveryPlanningProblemJsonFileSupplier()
               .get(jsonInstance)
               .findFirst()
-              .orElseThrow(() -> new IllegalStateException("Could not parse the planning problem"));
-
+              .orElseThrow(() -> new IllegalStateException(PARSE_PROBLEM_FAILED));
       Algorithm solver = new Algorithm(problem);
       DeliveryPlanningSolution solution = solver.run();
-
       JSONObject output = new DeliveryPlanningSolutionToJson().apply(solution);
       System.out.println(output.toString(4));
     } catch (Exception e) {
-      // Print diagnostic info to stderr to help debugging when large JSON fails
       try {
-        System.err.println("Error while parsing/running algorithm: " + e.toString());
+        System.err.println(ERROR_RUNNING_ALGORITHM + e.toString());
         e.printStackTrace(System.err);
-        // Also print a truncated preview of the input JSON to help identify format issues
         if (jsonInstance != null) {
           String jsonPreview = jsonInstance.toString();
-          if (jsonPreview.length() > 2000) {
-            jsonPreview = jsonPreview.substring(0, 2000) + "... [truncated]";
+          if (jsonPreview.length() > JSON_PREVIEW_MAX_LENGTH) {
+            jsonPreview = jsonPreview.substring(FIRST_ARGUMENT_INDEX, JSON_PREVIEW_MAX_LENGTH) + TRUNCATED_SUFFIX;
           }
-          System.err.println("Input JSON preview (truncated):\n" + jsonPreview);
+          System.err.println(INPUT_JSON_PREVIEW + jsonPreview);
         }
       } catch (Exception ex) {
-        // Ignore secondary errors when trying to log diagnostics
       }
-
-      // Propagate failure to caller instead of returning an empty successful-like payload.
-      throw new RuntimeException("Algorithm execution failed", e);
+      throw new RuntimeException(ALGORITHM_EXECUTION_FAILED, e);
     }
   }
 
@@ -75,12 +90,12 @@ public class Main {
    * @return JSON string representing the delivery planning problem
    */
   private static String readProblemJson(String[] args) {
-    // If JSON provided as command-line argument, use it (backward compatibility)
-    if (args != null && args.length > 0 && args[0] != null && !args[0].isBlank()) {
-      return args[0];
+    if (args != null
+        && args.length > FIRST_ARGUMENT_INDEX
+        && args[FIRST_ARGUMENT_INDEX] != null
+        && !args[FIRST_ARGUMENT_INDEX].isBlank()) {
+      return args[FIRST_ARGUMENT_INDEX];
     }
-
-    // Otherwise, read from stdin (for large payloads)
     try {
       BufferedReader reader = new BufferedReader(
           new InputStreamReader(System.in, StandardCharsets.UTF_8));
@@ -94,10 +109,8 @@ public class Main {
         return jsonFromStdin;
       }
     } catch (Exception e) {
-      System.err.println("Error reading from stdin: " + e.getMessage());
+      System.err.println(ERROR_READING_STDIN + e.getMessage());
     }
-
-    throw new IllegalArgumentException(
-        "No JSON problem provided. Supply either as command-line argument or via stdin");
+    throw new IllegalArgumentException(NO_JSON_PROBLEM_PROVIDED);
   }
 }

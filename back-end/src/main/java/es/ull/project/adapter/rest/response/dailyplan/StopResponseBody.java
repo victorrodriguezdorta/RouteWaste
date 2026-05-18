@@ -1,14 +1,14 @@
 package es.ull.project.adapter.rest.response.dailyplan;
 
-import java.util.List;
-import java.util.UUID;
-
 import es.ull.project.domain.entity.StopAlert;
 import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.location.Distance;
+import es.ull.project.domain.valueobject.name.Name;
 import es.ull.project.domain.valueobject.route.RouteSequence;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * StopResponseBody
@@ -30,7 +30,7 @@ public class StopResponseBody {
     /**
      * Container display name when {@link #type} is a container stop.
      */
-    public String containerName;
+    public Name containerName;
 
     /**
      * Kind of stop (container visit or facility unload).
@@ -61,7 +61,7 @@ public class StopResponseBody {
      * The actual liters in the container before collection at this stop.
      * Useful for displaying the container's state to the user.
      */
-    public Double containerActualLiters;
+    public CollectedVolumeLiters containerActualLiters;
 
     /**
      * List of alerts generated at this stop.

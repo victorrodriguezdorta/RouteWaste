@@ -1,6 +1,7 @@
 package es.ull.project.adapter.rest.response.overview;
 
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanListResponseBody;
+import es.ull.project.domain.readmodel.ApplicationEntityCounts;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ public class ApplicationOverviewResponseBody {
     /**
      * Totals per aggregate type.
      */
-    public ApplicationEntityCountsResponseBody entityCounts;
+    public ApplicationEntityCounts entityCounts;
 
     /**
      * Up to three infrastructure plans with the latest {@code executedAt} (descending); may be empty.

@@ -60,6 +60,37 @@ public enum StopType {
         return false;
     }
 
+    /**
+     * Returns the index of the stop type with the given name.
+     *
+     * @param stringToCheck string representation of the stop type
+     * @return zero-based enum index
+     */
+    public static int indexOf(String stringToCheck) {
+        StopType parsed = fromString(stringToCheck);
+        StopType[] stopTypes = values();
+        for (int index = 0; index < stopTypes.length; index++) {
+            if (stopTypes[index] == parsed) {
+                return index;
+            }
+        }
+        throw new IllegalArgumentException(ERROR_STOP_TYPE_INVALID + allowedValues());
+    }
+
+    /**
+     * Returns a deterministic sample stop type for tests and seed data.
+     *
+     * @return stop type sample
+     */
+    public static StopType random() {
+        return CONTAINER;
+    }
+
+    /**
+     * Returns the allowed stop type names separated by commas.
+     *
+     * @return allowed stop type names
+     */
     private static String allowedValues() {
         StringBuilder result = new StringBuilder();
         for (StopType stopType : values()) {

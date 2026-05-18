@@ -2,7 +2,6 @@ package es.ull.project.adapter.memory;
 
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.domain.entity.ServiceAssignment;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,6 +75,12 @@ public class InMemoryServiceAssignmentRepository implements ServiceAssignmentRep
         return Optional.ofNullable(store.get(id));
     }
 
+    /**
+     * Finds service assignments linked to an infrastructure plan.
+     *
+     * @param infrastructurePlanId parent infrastructure plan id
+     * @return matching service assignments, or an empty list if the id is null
+     */
     @Override
     public List<ServiceAssignment> findByInfrastructurePlanId(UUID infrastructurePlanId) {
         if (infrastructurePlanId == null) {

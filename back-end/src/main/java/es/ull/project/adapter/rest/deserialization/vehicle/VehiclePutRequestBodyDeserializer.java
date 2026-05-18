@@ -74,6 +74,13 @@ public class VehiclePutRequestBodyDeserializer extends JsonDeserializer<VehicleP
         }
     }
 
+    /**
+     * Parses the vehicle name field from JSON.
+     *
+     * @param rootNode the root JSON node
+     * @return the parsed Name value object
+     * @throws IllegalArgumentException if the field is missing or invalid
+     */
     private Name parseName(JsonNode rootNode) {
         if (!rootNode.has(JsonFields.NAME)) {
             throw new IllegalArgumentException("Required field '" + JsonFields.NAME + "' is missing");

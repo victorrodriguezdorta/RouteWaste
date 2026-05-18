@@ -1,25 +1,27 @@
 package es.ull.project.application.service.infrastructureplan;
 
+import es.ull.project.application.repository.InfrastructurePlanRepository;
+import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
+import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlansReferencingEntityUseCase;
+import es.ull.project.domain.entity.InfrastructurePlan;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import es.ull.project.application.repository.InfrastructurePlanRepository;
-import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
-import es.ull.project.domain.entity.InfrastructurePlan;
-
 /**
  * Removes infrastructure plans whose persisted snapshot (execution request JSON, selected facilities,
  * service assignments, or daily plans) references a deleted master entity.
  */
-public class DeleteInfrastructurePlansReferencingEntityService {
+public class DeleteInfrastructurePlansReferencingEntityService implements DeleteInfrastructurePlansReferencingEntityUseCase {
 
     private final InfrastructurePlanRepository infrastructurePlanRepository;
     private final DeleteInfrastructurePlanUseCase deleteInfrastructurePlanUseCase;
 
     /**
+     * Creates the service that removes plans referencing deleted entities.
+     *
      * @param infrastructurePlanRepository repository to find affected plans
      * @param deleteInfrastructurePlanUseCase use case that cascades daily plans, service assignments, and container daily states
      */
@@ -36,6 +38,7 @@ public class DeleteInfrastructurePlansReferencingEntityService {
      *
      * @param deletedEntityId id of the entity about to be removed
      */
+    @Override
     public void deletePlansWhoseExecutionRequestReferencesEntity(UUID deletedEntityId) {
         if (deletedEntityId == null) {
             return;

@@ -1,5 +1,7 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import es.ull.project.application.repository.DailyPlanRepository;
+import es.ull.project.domain.entity.DailyPlan;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,9 +12,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-
-import es.ull.project.application.repository.DailyPlanRepository;
-import es.ull.project.domain.entity.DailyPlan;
 
 /**
  * MongoDB implementation of the DailyPlanRepository interface.

@@ -1,14 +1,13 @@
 package com.ull.domain;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.ull.domain.entity.ContainerDailyState;
 import com.ull.domain.entity.DailyPlan;
 import com.ull.domain.entity.FacilityCluster;
 import com.ull.domain.valueobject.cost.MaximumBudget;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents the output of the algorithm execution.
@@ -25,21 +24,11 @@ import com.ull.domain.valueobject.cost.MaximumBudget;
 public class DeliveryPlanningSolution {
 
   public static final String CLUSTERS_NOT_DEFINED = "Clusters list is not defined";
+  public static final String CONTAINER_DAILY_STATE_NOT_DEFINED = "Container daily state is not defined";
   public static final String DAILY_PLANS_NOT_DEFINED = "Daily plans list is not defined";
+  public static final String STATUS_NOT_DEFINED = "Status is not defined";
 
-  /**
-   * Possible statuses for the algorithm execution.
-   */
-  public enum Status {
-    /** The solver found a provably optimal solution. */
-    OPTIMAL,
-    /** The solver found a feasible but not provably optimal solution. */
-    SUBOPTIMAL,
-    /** The problem has no feasible solution with the given constraints. */
-    INFEASIBLE
-  }
-
-  private Status status;
+  private DeliveryPlanningStatus status;
   private final Instant executedAt;
   private MaximumBudget maxBudget;
   private final List<FacilityCluster> clusters;
@@ -48,50 +37,63 @@ public class DeliveryPlanningSolution {
 
   /**
    * Creates an empty solution stamped with the current instant.
-   * Status defaults to {@link Status#INFEASIBLE} until the algorithm updates it.
+   * Status defaults to {@link DeliveryPlanningStatus#INFEASIBLE} until the algorithm updates it.
    */
   public DeliveryPlanningSolution() {
-    this.status = Status.INFEASIBLE;
+    this.status = DeliveryPlanningStatus.INFEASIBLE;
     this.executedAt = Instant.now();
     this.clusters = new ArrayList<>();
     this.dailyPlans = new ArrayList<>();
     this.containerStateMonitoring = new ArrayList<>();
   }
 
-  // -------------------------------------------------------------------------
-  // Status
-  // -------------------------------------------------------------------------
-
-  public Status getStatus() {
+  /**
+   * Returns the current execution status.
+   *
+   * @return current planning status
+   */
+  public DeliveryPlanningStatus getStatus() {
     return this.status;
   }
 
-  public void updateStatus(Status status) {
+  /**
+   * Updates the execution status.
+   *
+   * @param status the new planning status
+   */
+  public void updateStatus(DeliveryPlanningStatus status) {
     if (status == null) {
-      throw new IllegalArgumentException("Status is not defined");
+      throw new IllegalArgumentException(STATUS_NOT_DEFINED);
     }
     this.status = status;
   }
 
-  // -------------------------------------------------------------------------
-  // Execution timestamp
-  // -------------------------------------------------------------------------
-
+  /**
+   * Returns the instant when this solution was created.
+   *
+   * @return execution timestamp
+   */
   public Instant getExecutedAt() {
     return this.executedAt;
   }
 
+  /**
+   * Returns the maximum budget used by the algorithm.
+   *
+   * @return maximum budget, or null when not provided
+   */
   public MaximumBudget getMaxBudget() {
     return this.maxBudget;
   }
 
+  /**
+   * Updates the maximum budget associated with this solution.
+   *
+   * @param maxBudget the maximum budget to store
+   */
   public void updateMaxBudget(MaximumBudget maxBudget) {
     this.maxBudget = maxBudget;
   }
-
-  // -------------------------------------------------------------------------
-  // Clusters
-  // -------------------------------------------------------------------------
 
   /**
    * Returns an unmodifiable view of the facility clusters.
@@ -114,10 +116,6 @@ public class DeliveryPlanningSolution {
     this.clusters.add(cluster);
   }
 
-  // -------------------------------------------------------------------------
-  // Daily plans (routes)
-  // -------------------------------------------------------------------------
-
   /**
    * Returns an unmodifiable view of the daily plans.
    *
@@ -139,10 +137,6 @@ public class DeliveryPlanningSolution {
     this.dailyPlans.add(dailyPlan);
   }
 
-  // -------------------------------------------------------------------------
-  // Container state monitoring
-  // -------------------------------------------------------------------------
-
   /**
    * Returns an unmodifiable view of the container daily states.
    *
@@ -159,14 +153,10 @@ public class DeliveryPlanningSolution {
    */
   public void addContainerDailyState(ContainerDailyState containerDailyState) {
     if (containerDailyState == null) {
-      throw new IllegalArgumentException("Container daily state is not defined");
+      throw new IllegalArgumentException(CONTAINER_DAILY_STATE_NOT_DEFINED);
     }
     this.containerStateMonitoring.add(containerDailyState);
   }
-
-  // -------------------------------------------------------------------------
-  // Derived metrics
-  // -------------------------------------------------------------------------
 
   /**
    * Returns the total route distance across all daily plans, in meters.
@@ -201,6 +191,11 @@ public class DeliveryPlanningSolution {
         .sum();
   }
 
+  /**
+   * Returns a readable representation of this solution.
+   *
+   * @return text containing status, timestamp, counts, and total distance
+   */
   @Override
   public String toString() {
     return String.format(

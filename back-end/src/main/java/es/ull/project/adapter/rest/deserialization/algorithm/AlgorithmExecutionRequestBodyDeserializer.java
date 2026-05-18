@@ -42,18 +42,15 @@ public class AlgorithmExecutionRequestBodyDeserializer extends JsonDeserializer<
             throws IOException {
         JsonNode rootNode = parser.getCodec().readTree(parser);
         List<FieldError> errors = new ArrayList<>();
-
         List<FacilityVehiclesSelectionRequestBody> facilitiesWithVehicles =
                 parseFacilitySelections(rootNode, parser, errors);
         List<UUID> selectedContainerIds = parseSelectedContainerIds(rootNode, errors);
         NumberOfDays numberOfDays = parseNumberOfDays(rootNode, errors);
         AveragePickupTimeMinutes averagePickupTimeMinutes = parseAveragePickupTimeMinutes(rootNode, errors);
         MaximumBudget maxBudget = parseMaximumBudget(rootNode, errors);
-
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-
         AlgorithmExecutionRequestBody requestBody = new AlgorithmExecutionRequestBody();
         requestBody.facilitiesWithVehicles = facilitiesWithVehicles;
         requestBody.selectedContainerIds = selectedContainerIds;
@@ -63,6 +60,15 @@ public class AlgorithmExecutionRequestBodyDeserializer extends JsonDeserializer<
         return requestBody;
     }
 
+    /**
+     * Parses facility and vehicle selections from the request.
+     *
+     * @param rootNode the root JSON node
+     * @param parser the JSON parser used for nested conversion
+     * @param errors validation errors collected during parsing
+     * @return parsed facility selections, or null when absent or invalid
+     * @throws IOException if nested deserialization fails
+     */
     private List<FacilityVehiclesSelectionRequestBody> parseFacilitySelections(
             JsonNode rootNode,
             JsonParser parser,
@@ -82,6 +88,13 @@ public class AlgorithmExecutionRequestBodyDeserializer extends JsonDeserializer<
         return selections;
     }
 
+    /**
+     * Parses selected container identifiers from the request.
+     *
+     * @param rootNode the root JSON node
+     * @param errors validation errors collected during parsing
+     * @return parsed container ids, or null when absent or invalid
+     */
     private List<UUID> parseSelectedContainerIds(JsonNode rootNode, List<FieldError> errors) {
         if (!rootNode.has(FIELD_SELECTED_CONTAINER_IDS) || rootNode.get(FIELD_SELECTED_CONTAINER_IDS).isNull()) {
             return null;
@@ -102,6 +115,13 @@ public class AlgorithmExecutionRequestBodyDeserializer extends JsonDeserializer<
         return containerIds;
     }
 
+    /**
+     * Parses the optional number of days.
+     *
+     * @param rootNode the root JSON node
+     * @param errors validation errors collected during parsing
+     * @return parsed number of days, or null when absent or invalid
+     */
     private NumberOfDays parseNumberOfDays(JsonNode rootNode, List<FieldError> errors) {
         if (!rootNode.has(FIELD_NUMBER_OF_DAYS) || rootNode.get(FIELD_NUMBER_OF_DAYS).isNull()) {
             return null;
@@ -114,6 +134,13 @@ public class AlgorithmExecutionRequestBodyDeserializer extends JsonDeserializer<
         }
     }
 
+    /**
+     * Parses the optional average pickup time in minutes.
+     *
+     * @param rootNode the root JSON node
+     * @param errors validation errors collected during parsing
+     * @return parsed average pickup time, or null when absent or invalid
+     */
     private AveragePickupTimeMinutes parseAveragePickupTimeMinutes(JsonNode rootNode, List<FieldError> errors) {
         if (!rootNode.has(FIELD_AVERAGE_PICKUP_TIME_MINUTES)
                 || rootNode.get(FIELD_AVERAGE_PICKUP_TIME_MINUTES).isNull()) {
@@ -127,6 +154,13 @@ public class AlgorithmExecutionRequestBodyDeserializer extends JsonDeserializer<
         }
     }
 
+    /**
+     * Parses the optional maximum budget.
+     *
+     * @param rootNode the root JSON node
+     * @param errors validation errors collected during parsing
+     * @return parsed maximum budget, or null when absent or invalid
+     */
     private MaximumBudget parseMaximumBudget(JsonNode rootNode, List<FieldError> errors) {
         if (!rootNode.has(JsonFields.MAX_BUDGET) || rootNode.get(JsonFields.MAX_BUDGET).isNull()) {
             return null;

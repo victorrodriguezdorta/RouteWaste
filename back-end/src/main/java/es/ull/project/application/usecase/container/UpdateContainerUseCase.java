@@ -17,6 +17,7 @@ public interface UpdateContainerUseCase {
      * Updates an existing container with the specified attributes.
      *
      * @param id             the unique identifier of the container
+     * @param newName        the new container name
      * @param newLocation    the new location
      * @param newWasteType   the new waste type
      * @param newCapacityLiters the new container capacity in liters

@@ -24,6 +24,9 @@ public class Facility {
   public static final String CURRENT_FILLING_LEVEL_NOT_DEFINED = "Current filling level is not defined";
   public static final String CURRENT_STORED_KILOGRAMS_NOT_VALID = "Current stored kilograms is not valid";
   public static final String CURRENT_STORED_KILOGRAMS_EXCEEDED = "Current stored kilograms exceeds facility storage capacity";
+  public static final String OTHER_FACILITY_NOT_DEFINED = "Other facility cannot be null";
+  public static final String CONTAINER_NOT_DEFINED = "Container cannot be null";
+  private static final double ZERO_AMOUNT = 0.0;
 
   private final String id;
   private String facilityType;
@@ -64,7 +67,7 @@ public class Facility {
         unloadingTimeMinutes,
         openingFixedCost,
         status,
-        0.0);
+        ZERO_AMOUNT);
   }
 
   /**
@@ -126,65 +129,115 @@ public class Facility {
     this.openingFixedCost = openingFixedCost;
     this.status = status;
     this.currentFillingLevel = currentFillingLevel;
-    this.currentStoredKilograms = 0.0;
+    this.currentStoredKilograms = ZERO_AMOUNT;
   }
 
+  /**
+   * Validates that a facility identifier is present.
+   *
+   * @param id the identifier to validate
+   */
   private void validateId(String id) {
     if (id == null || id.isBlank()) {
       throw new IllegalArgumentException(ID_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that a facility type is present.
+   *
+   * @param facilityType the facility type to validate
+   */
   private void validateFacilityType(String facilityType) {
     if (facilityType == null || facilityType.isBlank()) {
       throw new IllegalArgumentException(TYPE_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that a facility location is present.
+   *
+   * @param location the location to validate
+   */
   private void validateLocation(Location location) {
     if (location == null) {
       throw new IllegalArgumentException(LOCATION_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that storage capacity is not negative.
+   *
+   * @param storageCapacityKilograms the storage capacity to validate
+   */
   private void validateStorageCapacity(double storageCapacityKilograms) {
-    if (storageCapacityKilograms < 0) {
+    if (storageCapacityKilograms < ZERO_AMOUNT) {
       throw new IllegalArgumentException(STORAGE_CAPACITY_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that processing capacity is not negative.
+   *
+   * @param processingCapacityKilogramsPerDay the processing capacity to validate
+   */
   private void validateProcessingCapacity(double processingCapacityKilogramsPerDay) {
-    if (processingCapacityKilogramsPerDay < 0) {
+    if (processingCapacityKilogramsPerDay < ZERO_AMOUNT) {
       throw new IllegalArgumentException(PROCESSING_CAPACITY_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that unloading time is not negative.
+   *
+   * @param unloadingTimeMinutes the unloading time to validate
+   */
   private void validateUnloadingTime(double unloadingTimeMinutes) {
-    if (unloadingTimeMinutes < 0) {
+    if (unloadingTimeMinutes < ZERO_AMOUNT) {
       throw new IllegalArgumentException(UNLOADING_TIME_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that opening fixed cost is not negative.
+   *
+   * @param openingFixedCost the opening fixed cost to validate
+   */
   private void validateOpeningFixedCost(double openingFixedCost) {
-    if (openingFixedCost < 0) {
+    if (openingFixedCost < ZERO_AMOUNT) {
       throw new IllegalArgumentException(OPENING_COST_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that a facility status is present.
+   *
+   * @param status the status to validate
+   */
   private void validateStatus(String status) {
     if (status == null || status.isBlank()) {
       throw new IllegalArgumentException(STATUS_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that current filling level is not negative.
+   *
+   * @param currentFillingLevel the filling level to validate
+   */
   private void validateCurrentFillingLevel(double currentFillingLevel) {
-    if (currentFillingLevel < 0) {
+    if (currentFillingLevel < ZERO_AMOUNT) {
       throw new IllegalArgumentException(CURRENT_FILLING_LEVEL_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that stored kilograms are within the facility capacity.
+   *
+   * @param currentStoredKilograms the stored kilograms to validate
+   */
   private void validateCurrentStoredKilograms(double currentStoredKilograms) {
-    if (currentStoredKilograms < 0) {
+    if (currentStoredKilograms < ZERO_AMOUNT) {
       throw new IllegalArgumentException(CURRENT_STORED_KILOGRAMS_NOT_VALID);
     }
     if (currentStoredKilograms > this.storageCapacityKilograms) {
@@ -192,32 +245,67 @@ public class Facility {
     }
   }
 
+  /**
+   * Returns the facility identifier.
+   *
+   * @return the facility id
+   */
   public String getId() {
     return this.id;
   }
 
+  /**
+   * Returns the facility type.
+   *
+   * @return the facility type
+   */
   public String getFacilityType() {
     return this.facilityType;
   }
 
+  /**
+   * Updates the facility type.
+   *
+   * @param facilityType the new facility type
+   */
   public void updateFacilityType(String facilityType) {
     validateFacilityType(facilityType);
     this.facilityType = facilityType;
   }
 
+  /**
+   * Returns the facility location.
+   *
+   * @return the location value object
+   */
   public Location getLocation() {
     return this.location;
   }
 
+  /**
+   * Updates the facility location.
+   *
+   * @param location the new location
+   */
   public void updateLocation(Location location) {
     validateLocation(location);
     this.location = location;
   }
 
+  /**
+   * Returns the storage capacity in kilograms.
+   *
+   * @return storage capacity in kilograms
+   */
   public double getStorageCapacityKilograms() {
     return this.storageCapacityKilograms;
   }
 
+  /**
+   * Updates the storage capacity in kilograms.
+   *
+   * @param storageCapacityKilograms the new storage capacity
+   */
   public void updateStorageCapacityKilograms(double storageCapacityKilograms) {
     validateStorageCapacity(storageCapacityKilograms);
     if (this.currentStoredKilograms > storageCapacityKilograms) {
@@ -226,70 +314,143 @@ public class Facility {
     this.storageCapacityKilograms = storageCapacityKilograms;
   }
 
+  /**
+   * Returns the processing capacity in kilograms per day.
+   *
+   * @return processing capacity in kilograms per day
+   */
   public double getProcessingCapacityKilogramsPerDay() {
     return this.processingCapacityKilogramsPerDay;
   }
 
+  /**
+   * Updates the processing capacity in kilograms per day.
+   *
+   * @param processingCapacityKilogramsPerDay the new processing capacity
+   */
   public void updateProcessingCapacityKilogramsPerDay(double processingCapacityKilogramsPerDay) {
     validateProcessingCapacity(processingCapacityKilogramsPerDay);
     this.processingCapacityKilogramsPerDay = processingCapacityKilogramsPerDay;
   }
 
+  /**
+   * Returns the unloading time in minutes.
+   *
+   * @return unloading time in minutes
+   */
   public double getUnloadingTimeMinutes() {
     return this.unloadingTimeMinutes;
   }
 
+  /**
+   * Updates the unloading time in minutes.
+   *
+   * @param unloadingTimeMinutes the new unloading time
+   */
   public void updateUnloadingTimeMinutes(int unloadingTimeMinutes) {
     validateUnloadingTime(unloadingTimeMinutes);
     this.unloadingTimeMinutes = unloadingTimeMinutes;
   }
 
+  /**
+   * Returns the opening fixed cost.
+   *
+   * @return opening fixed cost
+   */
   public double getOpeningFixedCost() {
     return this.openingFixedCost;
   }
 
+  /**
+   * Updates the opening fixed cost.
+   *
+   * @param openingFixedCost the new opening fixed cost
+   */
   public void updateOpeningFixedCost(double openingFixedCost) {
     validateOpeningFixedCost(openingFixedCost);
     this.openingFixedCost = openingFixedCost;
   }
 
+  /**
+   * Returns the facility status.
+   *
+   * @return facility status
+   */
   public String getStatus() {
     return this.status;
   }
 
+  /**
+   * Updates the facility status.
+   *
+   * @param status the new status
+   */
   public void updateStatus(String status) {
     validateStatus(status);
     this.status = status;
   }
 
+  /**
+   * Returns the current filling level used by the algorithm.
+   *
+   * @return current filling level
+   */
   public double getCurrentFillingLevel() {
     return this.currentFillingLevel;
   }
 
+  /**
+   * Updates the current filling level used by the algorithm.
+   *
+   * @param currentFillingLevel the new current filling level
+   */
   public void updateCurrentFillingLevel(double currentFillingLevel) {
     validateCurrentFillingLevel(currentFillingLevel);
     this.currentFillingLevel = currentFillingLevel;
   }
 
+  /**
+   * Returns the kilograms currently stored at the facility.
+   *
+   * @return current stored kilograms
+   */
   public double getCurrentStoredKilograms() {
     return this.currentStoredKilograms;
   }
 
+  /**
+   * Updates the kilograms currently stored at the facility.
+   *
+   * @param currentStoredKilograms the new stored kilograms amount
+   */
   public void updateCurrentStoredKilograms(double currentStoredKilograms) {
     validateCurrentStoredKilograms(currentStoredKilograms);
     this.currentStoredKilograms = currentStoredKilograms;
   }
 
+  /**
+   * Adds kilograms to the currently stored amount.
+   *
+   * @param kilogramsToAdd kilograms to add
+   */
   public void addStoredKilograms(double kilogramsToAdd) {
     updateCurrentStoredKilograms(this.currentStoredKilograms + kilogramsToAdd);
   }
 
+  /**
+   * Removes kilograms from the currently stored amount.
+   *
+   * @param kilogramsToRemove kilograms to remove
+   */
   public void removeStoredKilograms(double kilogramsToRemove) {
     updateCurrentStoredKilograms(this.currentStoredKilograms - kilogramsToRemove);
   }
 
+  /**
+   * Empties the facility stored kilograms counter.
+   */
   public void emptyStoredKilograms() {
-    this.currentStoredKilograms = 0.0;
+    this.currentStoredKilograms = ZERO_AMOUNT;
   }
 
   /**
@@ -300,7 +461,7 @@ public class Facility {
    * @return the distance in meters
    */
   public double calculateDistanceTo(Facility otherFacility) {
-    Objects.requireNonNull(otherFacility, "Other facility cannot be null");
+    Objects.requireNonNull(otherFacility, OTHER_FACILITY_NOT_DEFINED);
     return this.location.calculateDistanceTo(otherFacility.location);
   }
 
@@ -312,10 +473,16 @@ public class Facility {
    * @return the distance in meters
    */
   public double calculateDistanceTo(Container container) {
-    Objects.requireNonNull(container, "Container cannot be null");
+    Objects.requireNonNull(container, CONTAINER_NOT_DEFINED);
     return this.location.calculateDistanceTo(container.getLocation());
   }
 
+  /**
+   * Compares this facility with another object by identifier.
+   *
+   * @param otherObject object to compare
+   * @return true when both facilities have the same identifier
+   */
   @Override
   public boolean equals(Object otherObject) {
     if (this == otherObject) {
@@ -328,11 +495,21 @@ public class Facility {
     return Objects.equals(this.id, otherFacility.id);
   }
 
+  /**
+   * Returns a hash code based on the facility identifier.
+   *
+   * @return hash code for this facility
+   */
   @Override
   public int hashCode() {
     return Objects.hash(this.id);
   }
 
+  /**
+   * Returns a readable representation of this facility.
+   *
+   * @return text containing the main facility attributes
+   */
   @Override
   public String toString() {
     return String.format(

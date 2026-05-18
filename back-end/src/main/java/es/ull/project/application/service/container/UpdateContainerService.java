@@ -1,8 +1,8 @@
 package es.ull.project.application.service.container;
 
 import es.ull.project.application.repository.ContainerRepository;
-import es.ull.project.application.service.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditService;
 import es.ull.project.application.usecase.container.UpdateContainerUseCase;
+import es.ull.project.application.usecase.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditUseCase;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
@@ -20,16 +20,16 @@ import java.util.UUID;
 public class UpdateContainerService implements UpdateContainerUseCase {
 
     private final ContainerRepository repository;
-    private final InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation;
+    private final InvalidateInfrastructurePlansOnEntityEditUseCase infrastructurePlanInvalidation;
 
     /**
      * Constructs a new UpdateContainerService with the specified repository.
      * @param repository the container repository for persistence operations
-     * @param infrastructurePlanInvalidation service that marks affected infrastructure plans obsolete
+     * @param infrastructurePlanInvalidation use case that marks affected infrastructure plans obsolete
      */
     public UpdateContainerService(
             ContainerRepository repository,
-            InvalidateInfrastructurePlansOnEntityEditService infrastructurePlanInvalidation) {
+            InvalidateInfrastructurePlansOnEntityEditUseCase infrastructurePlanInvalidation) {
         this.repository = repository;
         this.infrastructurePlanInvalidation = infrastructurePlanInvalidation;
     }
@@ -37,6 +37,7 @@ public class UpdateContainerService implements UpdateContainerUseCase {
     /**
      * Updates an existing container with new values.
      * @param id the unique identifier of the container to update
+     * @param newName the new container name, or null to keep the existing value
      * @param newLocation the new location, or null to keep the existing value
      * @param newWasteType the new waste type, or null to keep the existing value
      * @param newCapacityLiters the new container capacity in liters, or null to keep the existing value

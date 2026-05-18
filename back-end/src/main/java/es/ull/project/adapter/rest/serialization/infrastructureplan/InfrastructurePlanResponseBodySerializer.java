@@ -1,12 +1,10 @@
 package es.ull.project.adapter.rest.serialization.infrastructureplan;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
+import java.io.IOException;
 
 /**
  * Custom JSON serializer for InfrastructurePlanResponseBody
@@ -15,7 +13,46 @@ import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePla
  */
 public class InfrastructurePlanResponseBodySerializer extends StdSerializer<InfrastructurePlanResponseBody> {
 
-
+    private static final String FIELD_ID = "id";
+    private static final String FIELD_VALIDITY_STATE = "validityState";
+    private static final String FIELD_EXECUTION_REQUEST_JSON = "executionRequestJson";
+    private static final String FIELD_EXECUTED_AT = "executedAt";
+    private static final String FIELD_PERIOD = "period";
+    private static final String FIELD_NUMBER_OF_DAYS = "numberOfDays";
+    private static final String FIELD_METRICS = "metrics";
+    private static final String FIELD_TOTAL_COLLECTED_KILOGRAMS = "totalCollectedKilograms";
+    private static final String FIELD_TOTAL_COLLECTED_LITERS = "totalCollectedLiters";
+    private static final String FIELD_TOTAL_DISTANCE_METERS = "totalDistanceMeters";
+    private static final String FIELD_AVERAGE_PICKUP_TIME_MINUTES = "averagePickupTimeMinutes";
+    private static final String FIELD_ESTIMATED_TOTAL_COST = "estimatedTotalCost";
+    private static final String FIELD_AMOUNT = "amount";
+    private static final String FIELD_CURRENCY = "currency";
+    private static final String FIELD_MAX_BUDGET = "maxBudget";
+    private static final String FIELD_SERVICE_POLICIES = "servicePolicies";
+    private static final String FIELD_MAX_SERVICE_DISTANCE_METERS = "maxServiceDistanceMeters";
+    private static final String FIELD_MAX_SERVICE_TIME_MINUTES = "maxServiceTimeMinutes";
+    private static final String FIELD_MAX_INFRASTRUCTURE_COUNT = "maxInfrastructureCount";
+    private static final String FIELD_MAX_EMISSIONS = "maxEmissions";
+    private static final String FIELD_FACILITIES = "facilities";
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_FACILITY_TYPE = "facilityType";
+    private static final String FIELD_STATUS = "status";
+    private static final String FIELD_LOCATION = "location";
+    private static final String FIELD_LATITUDE = "latitude";
+    private static final String FIELD_LONGITUDE = "longitude";
+    private static final String FIELD_POSTAL_ADDRESS = "postalAddress";
+    private static final String FIELD_CAPACITIES = "capacities";
+    private static final String FIELD_STORAGE_CAPACITY_KG = "storageCapacityKg";
+    private static final String FIELD_PROCESSING_CAPACITY_KG_PER_DAY = "processingCapacityKgPerDay";
+    private static final String FIELD_ASSIGNED_CONTAINERS = "assignedContainers";
+    private static final String FIELD_DAILY_PLANS = "dailyPlans";
+    private static final String FIELD_CONTAINER_STATE_MONITORING = "containerStateMonitoring";
+    private static final String FIELD_CONTAINER_ID = "containerId";
+    private static final String FIELD_CONTAINER_NAME = "containerName";
+    private static final String FIELD_PLAN_DAY = "planDay";
+    private static final String FIELD_DAILY_FILLING_LITERS = "dailyFillingLiters";
+    private static final String FIELD_CONTAINER_CAPACITY_LITERS = "containerCapacityLiters";
+    private static final String FIELD_DAILY_DEMAND_LITERS_PER_DAY = "dailyDemandLitersPerDay";
 
     /**
      * Default constructor for the serializer
@@ -37,100 +74,94 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
     @Override
     public void serialize(InfrastructurePlanResponseBody value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
-        gen.writeStringField("id", value.id.toString());
+        gen.writeStringField(FIELD_ID, value.id.toString());
         if (value.validityState != null) {
-            gen.writeStringField("validityState", value.validityState);
+            gen.writeStringField(FIELD_VALIDITY_STATE, value.validityState.name());
         }
         if (value.executionRequestJson != null) {
-            gen.writeStringField("executionRequestJson", value.executionRequestJson);
+            gen.writeStringField(FIELD_EXECUTION_REQUEST_JSON, value.executionRequestJson.getJson());
         }
         if (value.executedAt != null) {
-            gen.writeStringField("executedAt", value.executedAt);
+            gen.writeStringField(FIELD_EXECUTED_AT, value.executedAt.getTimestamp());
         }
         if (value.period != null) {
-            gen.writeNumberField("period", Integer.parseInt(value.period.getValue()));
+            gen.writeNumberField(FIELD_PERIOD, Integer.parseInt(value.period.getValue()));
         }
         if (value.numberOfDays != null) {
-            gen.writeNumberField("numberOfDays", value.numberOfDays);
+            gen.writeNumberField(FIELD_NUMBER_OF_DAYS, value.numberOfDays.getValue());
         }
-        
-        // Metrics
-        gen.writeObjectFieldStart("metrics");
-        gen.writeNumberField("totalCollectedKilograms", value.totalCollectedKilograms);
-        gen.writeNumberField("totalCollectedLiters", value.totalCollectedLiters);
-        gen.writeNumberField("totalDistanceMeters", value.totalDistanceMeters);
+        gen.writeObjectFieldStart(FIELD_METRICS);
+        gen.writeNumberField(FIELD_TOTAL_COLLECTED_KILOGRAMS, value.totalCollectedKilograms.getValue());
+        gen.writeNumberField(FIELD_TOTAL_COLLECTED_LITERS, value.totalCollectedLiters.getValue());
+        gen.writeNumberField(FIELD_TOTAL_DISTANCE_METERS, value.totalDistanceMeters.getValue());
         if (value.averagePickupTimeMinutes != null) {
-            gen.writeNumberField("averagePickupTimeMinutes", value.averagePickupTimeMinutes);
+            gen.writeNumberField(FIELD_AVERAGE_PICKUP_TIME_MINUTES, value.averagePickupTimeMinutes.getValue());
         }
         if (value.estimatedTotalCost != null) {
-            gen.writeObjectFieldStart("estimatedTotalCost");
-            gen.writeNumberField("amount", value.estimatedTotalCost.getAmount());
+            gen.writeObjectFieldStart(FIELD_ESTIMATED_TOTAL_COST);
+            gen.writeNumberField(FIELD_AMOUNT, value.estimatedTotalCost.getAmount());
             if (value.estimatedTotalCost.getCurrency().isPresent()) {
-                gen.writeStringField("currency", value.estimatedTotalCost.getCurrency().get().getCode());
+                gen.writeStringField(FIELD_CURRENCY, value.estimatedTotalCost.getCurrency().get().getCode());
             }
             gen.writeEndObject();
         }
         if (value.maxBudget != null) {
-            gen.writeObjectFieldStart("maxBudget");
-            gen.writeNumberField("amount", value.maxBudget.getAmount());
+            gen.writeObjectFieldStart(FIELD_MAX_BUDGET);
+            gen.writeNumberField(FIELD_AMOUNT, value.maxBudget.getAmount());
             if (value.maxBudget.getCurrency().isPresent()) {
-                gen.writeStringField("currency", value.maxBudget.getCurrency().get().getCode());
+                gen.writeStringField(FIELD_CURRENCY, value.maxBudget.getCurrency().get().getCode());
             }
             gen.writeEndObject();
         }
         gen.writeEndObject();
-
         if (value.servicePolicies != null) {
-            gen.writeObjectFieldStart("servicePolicies");
+            gen.writeObjectFieldStart(FIELD_SERVICE_POLICIES);
             if (value.servicePolicies.getMaxServiceDistance().isPresent()) {
-                gen.writeNumberField("maxServiceDistanceMeters", value.servicePolicies.getMaxServiceDistance().get());
+                gen.writeNumberField(FIELD_MAX_SERVICE_DISTANCE_METERS, value.servicePolicies.getMaxServiceDistance().get());
             }
             if (value.servicePolicies.getMaxServiceTime().isPresent()) {
-                gen.writeNumberField("maxServiceTimeMinutes", value.servicePolicies.getMaxServiceTime().get());
+                gen.writeNumberField(FIELD_MAX_SERVICE_TIME_MINUTES, value.servicePolicies.getMaxServiceTime().get());
             }
             if (value.servicePolicies.getMaxInfrastructureCount().isPresent()) {
-                gen.writeNumberField("maxInfrastructureCount", value.servicePolicies.getMaxInfrastructureCount().get());
+                gen.writeNumberField(FIELD_MAX_INFRASTRUCTURE_COUNT, value.servicePolicies.getMaxInfrastructureCount().get());
             }
             if (value.servicePolicies.getMaxEmissions().isPresent()) {
-                gen.writeNumberField("maxEmissions", value.servicePolicies.getMaxEmissions().get());
+                gen.writeNumberField(FIELD_MAX_EMISSIONS, value.servicePolicies.getMaxEmissions().get());
             }
             gen.writeEndObject();
         }
-
-        // Facilities
-        gen.writeArrayFieldStart("facilities");
+        gen.writeArrayFieldStart(FIELD_FACILITIES);
         if (value.selectedFacilities != null) {
             for (var facility : value.selectedFacilities) {
                 gen.writeStartObject();
-                gen.writeStringField("id", facility.id.toString());
+                gen.writeStringField(FIELD_ID, facility.id.toString());
                 if (facility.name != null) {
-                    gen.writeStringField("name", facility.name.getValue());
+                    gen.writeStringField(FIELD_NAME, facility.name.getValue());
                 }
                 if (facility.facilityType != null) {
-                    gen.writeStringField("facilityType", facility.facilityType.name());
+                    gen.writeStringField(FIELD_FACILITY_TYPE, facility.facilityType.name());
                 }
                 if (facility.status != null) {
-                    gen.writeStringField("status", facility.status.name());
+                    gen.writeStringField(FIELD_STATUS, facility.status.name());
                 }
                 if (facility.location != null) {
-                    gen.writeObjectFieldStart("location");
-                    gen.writeNumberField("latitude", facility.location.getLatitude());
-                    gen.writeNumberField("longitude", facility.location.getLongitude());
+                    gen.writeObjectFieldStart(FIELD_LOCATION);
+                    gen.writeNumberField(FIELD_LATITUDE, facility.location.getLatitude());
+                    gen.writeNumberField(FIELD_LONGITUDE, facility.location.getLongitude());
                     if (facility.location.getPostalAddress() != null) {
-                        gen.writeStringField("postalAddress", facility.location.getPostalAddress());
+                        gen.writeStringField(FIELD_POSTAL_ADDRESS, facility.location.getPostalAddress());
                     }
                     gen.writeEndObject();
                 }
-                gen.writeObjectFieldStart("capacities");
+                gen.writeObjectFieldStart(FIELD_CAPACITIES);
                 if (facility.storageCapacity != null) {
-                    gen.writeNumberField("storageCapacityKg", facility.storageCapacity.getKilograms());
+                    gen.writeNumberField(FIELD_STORAGE_CAPACITY_KG, facility.storageCapacity.getKilograms());
                 }
                 if (facility.processingCapacity != null) {
-                    gen.writeNumberField("processingCapacityKgPerDay", facility.processingCapacity.getKilogramsPerDay());
+                    gen.writeNumberField(FIELD_PROCESSING_CAPACITY_KG_PER_DAY, facility.processingCapacity.getKilogramsPerDay());
                 }
                 gen.writeEndObject();
-
-                gen.writeArrayFieldStart("assignedContainers");
+                gen.writeArrayFieldStart(FIELD_ASSIGNED_CONTAINERS);
                 if (value.serviceAssignments != null) {
                     var assignment = value.serviceAssignments.stream().filter(a -> a.facilityId.equals(facility.id)).findFirst().orElse(null);
                     if (assignment != null && assignment.assignedContainers != null) {
@@ -140,8 +171,7 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
                     }
                 }
                 gen.writeEndArray();
-
-                gen.writeArrayFieldStart("dailyPlans");
+                gen.writeArrayFieldStart(FIELD_DAILY_PLANS);
                 if (value.dailyPlans != null) {
                     var plans = value.dailyPlans.stream().filter(dp -> dp.facilityId.equals(facility.id)).toList();
                     for (var dp : plans) {
@@ -149,45 +179,42 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
                     }
                 }
                 gen.writeEndArray();
-
                 gen.writeEndObject();
             }
         }
         gen.writeEndArray();
-
-        gen.writeArrayFieldStart("containerStateMonitoring");
+        gen.writeArrayFieldStart(FIELD_CONTAINER_STATE_MONITORING);
         if (value.containerStateMonitoring != null) {
             for (var state : value.containerStateMonitoring) {
                 gen.writeStartObject();
                 if (state.id != null) {
-                    gen.writeStringField("id", state.id.toString());
+                    gen.writeStringField(FIELD_ID, state.id.toString());
                 }
                 if (state.containerId != null) {
-                    gen.writeStringField("containerId", state.containerId);
+                    gen.writeStringField(FIELD_CONTAINER_ID, state.containerId.toString());
                 }
                 if (state.containerName != null) {
-                    gen.writeStringField("containerName", state.containerName);
+                    gen.writeStringField(FIELD_CONTAINER_NAME, state.containerName.getValue());
                 }
                 if (state.planDay != null) {
-                    gen.writeNumberField("planDay", state.planDay);
+                    gen.writeNumberField(FIELD_PLAN_DAY, state.planDay.getDay());
                 }
                 if (state.dailyFillingLiters != null) {
-                    gen.writeNumberField("dailyFillingLiters", state.dailyFillingLiters);
+                    gen.writeNumberField(FIELD_DAILY_FILLING_LITERS, state.dailyFillingLiters.getValue());
                 }
                 if (state.containerCapacityLiters != null) {
-                    gen.writeNumberField("containerCapacityLiters", state.containerCapacityLiters);
+                    gen.writeNumberField(FIELD_CONTAINER_CAPACITY_LITERS, state.containerCapacityLiters.getLiters());
                 }
                 if (state.dailyDemandLitersPerDay != null) {
-                    gen.writeNumberField("dailyDemandLitersPerDay", state.dailyDemandLitersPerDay);
+                    gen.writeNumberField(FIELD_DAILY_DEMAND_LITERS_PER_DAY, state.dailyDemandLitersPerDay.getLitersPerDay());
                 }
                 if (state.status != null) {
-                    gen.writeStringField("status", state.status);
+                    gen.writeStringField(FIELD_STATUS, state.status.name());
                 }
                 gen.writeEndObject();
             }
         }
         gen.writeEndArray();
-
         gen.writeEndObject();
     }
 }

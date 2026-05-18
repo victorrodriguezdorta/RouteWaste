@@ -14,6 +14,7 @@ public interface CreateVehicleUseCase {
     /**
      * Creates a new vehicle with the specified attributes.
      *
+     * @param name               the vehicle name
      * @param vehicleType        the type of vehicle
      * @param capacityKilograms the transport capacity in kilograms
      * @param capacityLiters    the transport capacity in liters

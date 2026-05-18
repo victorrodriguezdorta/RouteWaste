@@ -55,7 +55,7 @@ public class InfrastructurePlanListResponseBodySerializer extends StdSerializer<
             gen.writeNumberField(FIELD_AVERAGE_PICKUP_TIME_MINUTES, value.averagePickupTimeMinutes.getValue());
         }
         if (value.validityState != null) {
-            gen.writeStringField(FIELD_VALIDITY_STATE, value.validityState);
+            gen.writeStringField(FIELD_VALIDITY_STATE, value.validityState.name());
         }
         gen.writeEndObject();
     }

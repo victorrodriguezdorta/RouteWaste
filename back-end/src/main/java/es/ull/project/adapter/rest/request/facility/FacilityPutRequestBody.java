@@ -9,7 +9,6 @@ import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.location.Location;
 import es.ull.project.domain.valueobject.name.Name;
 
-
 /**
  * FacilityPutRequestBody
  * 

@@ -1,22 +1,5 @@
 package es.ull.project.application.service.algorithm;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import es.ull.project.application.repository.ContainerDailyStateRepository;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.DailyPlanRepository;
@@ -34,18 +17,39 @@ import es.ull.project.domain.entity.ServiceAssignment;
 import es.ull.project.domain.entity.Stop;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.ContainerStatus;
+import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
+import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.identifier.ContainerId;
+import es.ull.project.domain.valueobject.identifier.InfrastructurePlanId;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.route.RouteSequence;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanDay;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service that transforms the raw algorithm response into the infrastructure
@@ -107,6 +111,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @param infrastructurePlanRepository repository for persisting infrastructure plans
 	 * @param serviceAssignmentRepository  repository for persisting service assignments
 	 * @param dailyPlanRepository          repository for persisting daily plans
+	 * @param containerDailyStateRepository repository for persisting container daily states
 	 * @param facilityRepository           repository for accessing facilities
 	 * @param containerRepository          repository for accessing containers
 	 * @param vehicleRepository            repository for accessing vehicles
@@ -135,10 +140,11 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @param numberOfDays               the number of days in the planning period
 	 * @param averagePickupTimeMinutes   average pickup time per stop in minutes
 	 * @param providedMaxBudget          optional maximum budget override
+	 * @param executionRequestJson       client request JSON snapshot (optional)
 	 * @return the persisted InfrastructurePlan
 	 */
 	@Override
-	public InfrastructurePlan persist(AlgorithmJsonPayload algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget, String executionRequestJson) {
+	public InfrastructurePlan persist(AlgorithmJsonPayload algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget, AlgorithmJsonPayload executionRequestJson) {
 		logger.info("=== PERSIST START ===");
 		if (algorithmResponse == null) {
 			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE);
@@ -167,7 +173,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @param executionRequestJson       client request JSON snapshot (optional)
 	 * @return the persisted InfrastructurePlan
 	 */
-	private InfrastructurePlan persistFromNode(JSONObject algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget, String executionRequestJson) {
+	private InfrastructurePlan persistFromNode(JSONObject algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget, AlgorithmJsonPayload executionRequestJson) {
 		if (algorithmResponse == null) {
 			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE);
 		}
@@ -194,7 +200,8 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 				null,
 				numberOfDays,
 				averagePickupTimeMinutes,
-				executedAt != null ? new ExecutedAt(executedAt) : null);
+				executedAt != null ? new ExecutedAt(executedAt) : null,
+				InfrastructurePlanValidityState.VALID);
 		Map<UUID, Facility> facilitiesById = new LinkedHashMap<>();
 		Map<UUID, Container> containersById = new LinkedHashMap<>();
 		List<ServiceAssignment> serviceAssignments = new ArrayList<>();
@@ -248,11 +255,11 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 						facility,
 						serviceDate,
 						planDay,
-						vehicle,
-						totalCollectedKilograms,
-						totalCollectedLiters,
-						totalDistanceMeters,
-						stops);
+						vehicle);
+				dailyPlan.updateRouteMetrics(totalCollectedKilograms, totalCollectedLiters, totalDistanceMeters);
+				for (Stop stop : stops) {
+					dailyPlan.addStop(stop);
+				}
 				plan.addDailyPlan(dailyPlan);
 				dailyPlans.add(dailyPlan);
 			}
@@ -272,8 +279,8 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 				CollectedWeightKilograms.fromKilograms(algorithmResponse.optDouble(FIELD_TOTAL_COLLECTED_KILOGRAMS, 0.0)),
 				CollectedVolumeLiters.fromLiters(algorithmResponse.optDouble(FIELD_TOTAL_COLLECTED_LITERS, 0.0)),
 				Distance.fromMeters(algorithmResponse.optDouble(FIELD_TOTAL_DISTANCE_METERS, 0.0)));
-		if (executionRequestJson != null && !executionRequestJson.isBlank()) {
-			plan.assignExecutionRequestSnapshot(executionRequestJson);
+		if (executionRequestJson != null) {
+			plan.assignExecutionRequestSnapshot(executionRequestJson.getJson());
 		}
 		for (ServiceAssignment serviceAssignment : serviceAssignments) {
 			logger.debug("Saving ServiceAssignment for facility: {}", serviceAssignment.getFacility().getId());
@@ -444,13 +451,12 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			ContainerStatus status = ContainerStatus.fromString(statusRaw);
 			try {
 				ContainerDailyState containerDailyState = new ContainerDailyState(
-						UUID.randomUUID(),
-						infrastructurePlanId,
-						containerId,
-						planDay,
-						dailyFillingLiters,
-						containerCapacityLiters,
-						dailyDemandLitersPerDay,
+						new InfrastructurePlanId(infrastructurePlanId),
+						new ContainerId(UUID.fromString(containerId)),
+						new PlanDay(planDay),
+						CollectedVolumeLiters.fromLiters(dailyFillingLiters),
+						new ContainerCapacityLiters(containerCapacityLiters),
+						new DailyWasteDemandLitersPerDay(dailyDemandLitersPerDay),
 						status);
 				containerDailyStates.add(containerDailyState);
 			} catch (IllegalArgumentException ex) {

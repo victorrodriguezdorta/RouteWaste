@@ -47,10 +47,8 @@ public class AlgorithmExecutionResponseMapper {
     private static AlgorithmFacilityVehiclesResponseBody toFacilityVehiclesResponseBody(
             ResolvedFacilityVehiclesSelection selection) {
         AlgorithmFacilityVehiclesResponseBody responseBody = new AlgorithmFacilityVehiclesResponseBody();
-        responseBody.facility = FacilityResponseMapper.toResponseBody(selection.getFacility());
-        responseBody.selectedVehicles = selection.getSelectedVehicles().stream()
-                .map(VehicleResponseMapper::toResponseBody)
-                .toList();
+        responseBody.facility = selection.getFacility();
+        responseBody.selectedVehicles = selection.getSelectedVehicles();
         return responseBody;
     }
 }

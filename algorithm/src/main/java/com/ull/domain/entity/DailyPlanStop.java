@@ -10,8 +10,8 @@ import java.util.Objects;
  * Represents a stop inside a daily collection plan.
  */
 public class DailyPlanStop {
-
-
+  public static final int MIN_SEQUENCE = 1;
+  public static final double ZERO_AMOUNT = 0.0;
   public static final String CONTAINER_NOT_DEFINED = "Container is not defined";
   public static final String SEQUENCE_NOT_VALID = "Stop sequence is not valid";
   public static final String DISTANCE_NOT_VALID = "Distance from previous stop is not valid";
@@ -34,6 +34,7 @@ public class DailyPlanStop {
    * Creates a stop with its route and collection metrics.
    *
    * @param sequence stop sequence inside the plan
+   * @param type kind of stop represented in the daily plan
    * @param container visited container
    * @param distanceFromPreviousMeters distance from the previous point in meters
    * @param cumulativeDistanceMeters cumulative route distance in meters
@@ -97,12 +98,18 @@ public class DailyPlanStop {
         cumulativeDistanceMeters,
         collectedKilograms,
         collectedLiters,
-        0.0,
+        ZERO_AMOUNT,
         new ArrayList<>());
   }
 
   /**
    * Factory to create a facility stop (no container).
+   *
+   * @param sequence stop sequence inside the plan
+   * @param distanceFromPreviousMeters distance from the previous point in meters
+   * @param cumulativeDistanceMeters cumulative route distance in meters
+   * @param alerts list of alerts generated at the facility stop
+   * @return a daily plan stop representing a visit to the facility
    */
   public static DailyPlanStop forFacility(
       int sequence,
@@ -115,90 +122,176 @@ public class DailyPlanStop {
         null,
         distanceFromPreviousMeters,
         cumulativeDistanceMeters,
-        0.0,
-        0.0,
-        0.0,
+        ZERO_AMOUNT,
+        ZERO_AMOUNT,
+        ZERO_AMOUNT,
         alerts != null ? alerts : new ArrayList<>());
   }
 
+  /**
+   * Validates that the stop sequence is inside the accepted route range.
+   *
+   * @param sequence stop sequence to validate
+   */
   private void validateSequence(int sequence) {
-    if (sequence < 1) {
+    if (sequence < MIN_SEQUENCE) {
       throw new IllegalArgumentException(SEQUENCE_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that a container stop has an associated container.
+   *
+   * @param container container to validate
+   */
   private void validateContainer(Container container) {
     if (container == null) {
       throw new IllegalArgumentException(CONTAINER_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that the distance from the previous stop is non-negative.
+   *
+   * @param distanceFromPreviousMeters distance from the previous stop in meters
+   */
   private void validateDistance(double distanceFromPreviousMeters) {
-    if (distanceFromPreviousMeters < 0) {
+    if (distanceFromPreviousMeters < ZERO_AMOUNT) {
       throw new IllegalArgumentException(DISTANCE_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that the accumulated route distance is non-negative.
+   *
+   * @param cumulativeDistanceMeters accumulated route distance in meters
+   */
   private void validateCumulativeDistance(double cumulativeDistanceMeters) {
-    if (cumulativeDistanceMeters < 0) {
+    if (cumulativeDistanceMeters < ZERO_AMOUNT) {
       throw new IllegalArgumentException(CUMULATIVE_DISTANCE_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that collected kilograms is non-negative.
+   *
+   * @param collectedKilograms collected kilograms to validate
+   */
   private void validateCollectedKilograms(double collectedKilograms) {
-    if (collectedKilograms < 0) {
+    if (collectedKilograms < ZERO_AMOUNT) {
       throw new IllegalArgumentException(COLLECTED_KILOGRAMS_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that collected liters is non-negative.
+   *
+   * @param collectedLiters collected liters to validate
+   */
   private void validateCollectedLiters(double collectedLiters) {
-    if (collectedLiters < 0) {
+    if (collectedLiters < ZERO_AMOUNT) {
       throw new IllegalArgumentException(COLLECTED_LITERS_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that the container actual liters value is non-negative.
+   *
+   * @param containerActualLiters actual liters to validate
+   */
   private void validateContainerActualLiters(double containerActualLiters) {
-    if (containerActualLiters < 0) {
+    if (containerActualLiters < ZERO_AMOUNT) {
       throw new IllegalArgumentException(CONTAINER_ACTUAL_LITERS_NOT_VALID);
     }
   }
 
+  /**
+   * Gets the route sequence of the stop.
+   *
+   * @return route sequence of the stop
+   */
   public int getSequence() {
     return this.sequence;
   }
 
+  /**
+   * Gets the visited container.
+   *
+   * @return visited container, or {@code null} for facility stops
+   */
   public Container getContainer() {
     return this.container;
   }
 
+  /**
+   * Gets the type of stop.
+   *
+   * @return stop type
+   */
   public StopType getType() {
     return this.type;
   }
 
+  /**
+   * Gets the distance from the previous route point.
+   *
+   * @return distance from the previous route point in meters
+   */
   public double getDistanceFromPreviousMeters() {
     return this.distanceFromPreviousMeters;
   }
 
+  /**
+   * Gets the accumulated distance at this stop.
+   *
+   * @return accumulated distance in meters
+   */
   public double getCumulativeDistanceMeters() {
     return this.cumulativeDistanceMeters;
   }
 
+  /**
+   * Gets the kilograms collected at this stop.
+   *
+   * @return kilograms collected at this stop
+   */
   public double getCollectedKilograms() {
     return this.collectedKilograms;
   }
 
+  /**
+   * Gets the liters collected at this stop.
+   *
+   * @return liters collected at this stop
+   */
   public double getCollectedLiters() {
     return this.collectedLiters;
   }
 
+  /**
+   * Gets the actual liters in the container before collection.
+   *
+   * @return actual liters in the container before collection
+   */
   public double getContainerActualLiters() {
     return this.containerActualLiters;
   }
 
+  /**
+   * Gets the alerts generated at this stop.
+   *
+   * @return unmodifiable list of alerts generated at this stop
+   */
   public List<Alert> getAlerts() {
     return Collections.unmodifiableList(this.alerts);
   }
 
+  /**
+   * Compares this stop with another object by sequence, type, and container.
+   *
+   * @param otherObject object to compare with this stop
+   * @return true when both objects represent the same daily plan stop
+   */
   @Override
   public boolean equals(Object otherObject) {
     if (this == otherObject) {
@@ -213,11 +306,21 @@ public class DailyPlanStop {
       && Objects.equals(this.container, otherStop.container);
   }
 
+  /**
+   * Calculates the hash code from the identifying stop fields.
+   *
+   * @return hash code for this stop
+   */
   @Override
   public int hashCode() {
     return Objects.hash(this.sequence, this.type, this.container);
   }
 
+  /**
+   * Gets a text representation of the daily plan stop.
+   *
+   * @return text representation of the daily plan stop
+   */
   @Override
   public String toString() {
     return String.format(

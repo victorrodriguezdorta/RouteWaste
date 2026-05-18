@@ -12,6 +12,14 @@ import java.io.IOException;
  */
 public class AlgorithmExecutionResponseBodySerializer extends StdSerializer<AlgorithmExecutionResponseBody> {
 
+    private static final String FIELD_FACILITIES_WITH_VEHICLES = "facilitiesWithVehicles";
+    private static final String FIELD_SELECTED_CONTAINERS = "selectedContainers";
+    private static final String FIELD_NUMBER_OF_DAYS = "numberOfDays";
+    private static final String FIELD_AVERAGE_PICKUP_TIME_MINUTES = "averagePickupTimeMinutes";
+    private static final String FIELD_MAX_BUDGET = "maxBudget";
+    private static final String FIELD_AMOUNT = "amount";
+    private static final String FIELD_CURRENCY = "currency";
+
     /**
      * Creates the serializer for AlgorithmExecutionResponseBody.
      */
@@ -31,19 +39,19 @@ public class AlgorithmExecutionResponseBodySerializer extends StdSerializer<Algo
     public void serialize(AlgorithmExecutionResponseBody value, JsonGenerator gen, SerializerProvider provider)
             throws IOException {
         gen.writeStartObject();
-        gen.writeObjectField("facilitiesWithVehicles", value.facilitiesWithVehicles);
-        gen.writeObjectField("selectedContainers", value.selectedContainers);
+        gen.writeObjectField(FIELD_FACILITIES_WITH_VEHICLES, value.facilitiesWithVehicles);
+        gen.writeObjectField(FIELD_SELECTED_CONTAINERS, value.selectedContainers);
         if (value.numberOfDays != null) {
-            gen.writeNumberField("numberOfDays", value.numberOfDays.getValue());
+            gen.writeNumberField(FIELD_NUMBER_OF_DAYS, value.numberOfDays.getValue());
         }
         if (value.averagePickupTimeMinutes != null) {
-            gen.writeNumberField("averagePickupTimeMinutes", value.averagePickupTimeMinutes.getValue());
+            gen.writeNumberField(FIELD_AVERAGE_PICKUP_TIME_MINUTES, value.averagePickupTimeMinutes.getValue());
         }
         if (value.maxBudget != null) {
-            gen.writeObjectFieldStart("maxBudget");
-            gen.writeNumberField("amount", value.maxBudget.getAmount());
+            gen.writeObjectFieldStart(FIELD_MAX_BUDGET);
+            gen.writeNumberField(FIELD_AMOUNT, value.maxBudget.getAmount());
             if (value.maxBudget.getCurrency().isPresent()) {
-                gen.writeStringField("currency", value.maxBudget.getCurrency().get().getCode());
+                gen.writeStringField(FIELD_CURRENCY, value.maxBudget.getCurrency().get().getCode());
             }
             gen.writeEndObject();
         }

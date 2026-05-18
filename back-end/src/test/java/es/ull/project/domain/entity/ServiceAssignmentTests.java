@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
@@ -86,7 +87,14 @@ class ServiceAssignmentTests {
     }
     
     private static InfrastructurePlan randomInfrastructurePlan() {
-        return new InfrastructurePlan(new PlanningPeriod("2026"), new MaximumBudget(1_000_000.0), new ServicePolicies(5000.0, 60, 100, 1000.0), null, null, null);
+        return new InfrastructurePlan(
+                new PlanningPeriod("2026"),
+                new MaximumBudget(1_000_000.0),
+                new ServicePolicies(5000.0, 60, 100, 1000.0),
+                null,
+                null,
+                null,
+                InfrastructurePlanValidityState.VALID);
     }
 
     // ========== Constructors ==========

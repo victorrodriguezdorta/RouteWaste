@@ -1,8 +1,7 @@
 package com.ull.domain.entity;
 
-import java.util.Objects;
-
 import com.ull.domain.enumerate.ContainerStatus;
+import java.util.Objects;
 
 /**
  * Represents the monitoring state of a container for a specific day.
@@ -17,6 +16,8 @@ public class ContainerDailyState {
   public static final String DAILY_FILLING_NOT_VALID = "Daily filling must be >= 0";
   public static final String CONTAINER_CAPACITY_NOT_VALID = "Container capacity must be > 0";
   public static final String DAILY_DEMAND_NOT_VALID = "Daily demand must be >= 0";
+  private static final int MIN_PLAN_DAY = 1;
+  private static final double ZERO_LITERS = 0.0;
 
   private final String containerId;
   private final int planDay;
@@ -47,7 +48,6 @@ public class ContainerDailyState {
     validateDailyFilling(dailyFillingLiters);
     validateContainerCapacity(containerCapacityLiters);
     validateDailyDemand(dailyDemandLitersPerDay);
-
     this.containerId = containerId;
     this.planDay = planDay;
     this.dailyFillingLiters = dailyFillingLiters;
@@ -69,7 +69,7 @@ public class ContainerDailyState {
       int planDay,
       double dailyFillingLiters,
       double containerCapacityLiters) {
-    this(containerId, planDay, dailyFillingLiters, containerCapacityLiters, 0.0, ContainerStatus.CORRECT);
+    this(containerId, planDay, dailyFillingLiters, containerCapacityLiters, ZERO_LITERS, ContainerStatus.CORRECT);
   }
 
   /**
@@ -90,56 +90,111 @@ public class ContainerDailyState {
     this(containerId, planDay, dailyFillingLiters, containerCapacityLiters, dailyDemandLitersPerDay, ContainerStatus.CORRECT);
   }
 
+  /**
+   * Validates that the container identifier is present.
+   *
+   * @param containerId the container identifier to validate
+   */
   private void validateContainerId(String containerId) {
     if (containerId == null || containerId.isBlank()) {
       throw new IllegalArgumentException(CONTAINER_ID_NOT_DEFINED);
     }
   }
 
+  /**
+   * Validates that the plan day is inside the planning horizon.
+   *
+   * @param planDay the plan day to validate
+   */
   private void validatePlanDay(int planDay) {
-    if (planDay < 1) {
+    if (planDay < MIN_PLAN_DAY) {
       throw new IllegalArgumentException(PLAN_DAY_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that the daily filling value is not negative.
+   *
+   * @param dailyFillingLiters the daily filling value to validate
+   */
   private void validateDailyFilling(double dailyFillingLiters) {
-    if (dailyFillingLiters < 0) {
+    if (dailyFillingLiters < ZERO_LITERS) {
       throw new IllegalArgumentException(DAILY_FILLING_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that the container capacity is positive.
+   *
+   * @param containerCapacityLiters the capacity value to validate
+   */
   private void validateContainerCapacity(double containerCapacityLiters) {
-    if (containerCapacityLiters <= 0) {
+    if (containerCapacityLiters <= ZERO_LITERS) {
       throw new IllegalArgumentException(CONTAINER_CAPACITY_NOT_VALID);
     }
   }
 
+  /**
+   * Validates that the daily demand value is not negative.
+   *
+   * @param dailyDemandLitersPerDay the daily demand value to validate
+   */
   private void validateDailyDemand(double dailyDemandLitersPerDay) {
-    if (dailyDemandLitersPerDay < 0) {
+    if (dailyDemandLitersPerDay < ZERO_LITERS) {
       throw new IllegalArgumentException(DAILY_DEMAND_NOT_VALID);
     }
   }
 
+  /**
+   * Returns the monitored container identifier.
+   *
+   * @return container identifier
+   */
   public String getContainerId() {
     return this.containerId;
   }
 
+  /**
+   * Returns the planning day for this state.
+   *
+   * @return one-based planning day
+   */
   public int getPlanDay() {
     return this.planDay;
   }
 
+  /**
+   * Returns the daily filling in liters.
+   *
+   * @return daily filling liters
+   */
   public double getDailyFillingLiters() {
     return this.dailyFillingLiters;
   }
 
+  /**
+   * Returns the container capacity in liters.
+   *
+   * @return container capacity liters
+   */
   public double getContainerCapacityLiters() {
     return this.containerCapacityLiters;
   }
 
+  /**
+   * Returns the daily demand in liters per day.
+   *
+   * @return daily demand liters per day
+   */
   public double getDailyDemandLitersPerDay() {
     return this.dailyDemandLitersPerDay;
   }
 
+  /**
+   * Returns the computed container status.
+   *
+   * @return container status for the day
+   */
   public ContainerStatus getStatus() {
     return this.status;
   }
@@ -153,6 +208,12 @@ public class ContainerDailyState {
     return (this.dailyFillingLiters / this.containerCapacityLiters) * 100.0;
   }
 
+  /**
+   * Compares this daily state with another object by container and day.
+   *
+   * @param otherObject object to compare
+   * @return true when both states belong to the same container and day
+   */
   @Override
   public boolean equals(Object otherObject) {
     if (this == otherObject) {
@@ -165,11 +226,21 @@ public class ContainerDailyState {
     return this.planDay == other.planDay && Objects.equals(this.containerId, other.containerId);
   }
 
+  /**
+   * Returns a hash code based on container identifier and day.
+   *
+   * @return hash code for this daily state
+   */
   @Override
   public int hashCode() {
     return Objects.hash(this.containerId, this.planDay);
   }
 
+  /**
+   * Returns a readable representation of this container daily state.
+   *
+   * @return text containing container, day, filling, capacity, demand, and status
+   */
   @Override
   public String toString() {
     return String.format(

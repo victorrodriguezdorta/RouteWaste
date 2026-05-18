@@ -1,5 +1,11 @@
 package es.ull.project.adapter.mongodb.reader;
 
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.entity.ServiceAssignment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,13 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.lang.NonNull;
-
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.configuration.MongoConfiguration;
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.entity.InfrastructurePlan;
-import es.ull.project.domain.entity.ServiceAssignment;
 
 /**
  * ServiceAssignmentReadingConverter
@@ -78,6 +77,4 @@ public class ServiceAssignmentReadingConverter implements Converter<Document, Se
                 facility,
                 assignedContainers);
     }
-
-
 }
