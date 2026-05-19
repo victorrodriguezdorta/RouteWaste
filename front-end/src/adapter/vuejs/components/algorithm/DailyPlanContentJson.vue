@@ -482,37 +482,13 @@ function facilityTooltip(facility: InfrastructurePlanFacilityDetail): string {
   return facilityType && facilityType !== '-' ? `${name} · ${facilityType}` : name;
 }
 
-function formatVehicleTypeLabel(value: unknown): string {
-  if (value == null || value === '') {
-    return '';
-  }
-
-  return String(value)
-    .replace(/_/g, ' ')
-    .toLowerCase()
-    .replace(/\b\w/g, (character) => character.toUpperCase());
-}
-
 function vehicleButtonLabel(route: VehicleRouteOption): string {
   const name = route.dailyPlan.vehicle?.name?.getValue()?.trim();
-  if (name) {
-    return name;
-  }
-  const typeStr = formatVehicleTypeLabel(route.dailyPlan.vehicle?.vehicleType);
-  return typeStr.length > 0 ? typeStr : unnamedEntityLabel();
+  return name && name.length > 0 ? name : unnamedEntityLabel();
 }
 
 function vehicleRouteTooltip(route: VehicleRouteOption): string {
-  const snapshot = route.dailyPlan.vehicle;
-  const name = snapshot?.name?.getValue()?.trim() ?? '';
-  const typeStr = formatVehicleTypeLabel(snapshot?.vehicleType);
-  if (name && typeStr) {
-    return `${name} · ${typeStr}`;
-  }
-  if (name) {
-    return name;
-  }
-  return typeStr.length > 0 ? typeStr : unnamedEntityLabel();
+  return vehicleButtonLabel(route);
 }
 
 function formatFacilityType(value?: FacilityType | string): string {

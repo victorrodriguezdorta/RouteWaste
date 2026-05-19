@@ -1,4 +1,5 @@
 import type { InfrastructurePlanDailyPlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
+import type { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
 
 export type RouteLinePlotDatum = Record<string, number> & {
   product: number;
@@ -64,14 +65,48 @@ export function buildRouteDistanceLineSeries(
   }));
 }
 
+/**
+ * Total route distance in meters: cumulative distance at the last stop when stops exist,
+ * otherwise the plan-level total from the backend.
+ */
+export function resolveRouteTotalDistanceMeters(
+  dailyPlan: InfrastructurePlanDailyPlanDetail,
+): number {
+  const stops = dailyPlan.stops;
+  if (stops.length > 0) {
+    const sorted = [...stops].sort(
+      (left, right) => left.sequence.getValue() - right.sequence.getValue(),
+    );
+    return sorted[sorted.length - 1].cumulativeDistanceMeters.getValue();
+  }
+
+  return dailyPlan.totalDistanceMeters.getValue();
+}
+
+/**
+ * Estimated route cost: (total km) × (vehicle cost per km).
+ */
+export function calculateEstimatedRouteCost(
+  totalDistanceMeters: number,
+  costPerKilometer: TransportationVariableCost | null,
+): number | null {
+  if (costPerKilometer == null) {
+    return null;
+  }
+
+  const kilometers = totalDistanceMeters / 1000;
+  return kilometers * costPerKilometer.getAmount();
+}
+
 export function buildRouteSummaryMetrics(
   dailyPlan: InfrastructurePlanDailyPlanDetail,
 ): RouteSummaryMetrics {
-  const totalDistanceMeters = dailyPlan.totalDistanceMeters.getValue();
+  const totalDistanceMeters = resolveRouteTotalDistanceMeters(dailyPlan);
   const costPerKilometer = dailyPlan.vehicle?.costPerKilometer ?? null;
-  const estimatedRouteCostAmount = costPerKilometer
-    ? (totalDistanceMeters / 1000) * costPerKilometer.getAmount()
-    : null;
+  const estimatedRouteCostAmount = calculateEstimatedRouteCost(
+    totalDistanceMeters,
+    costPerKilometer,
+  );
 
   return {
     totalDistanceMeters,

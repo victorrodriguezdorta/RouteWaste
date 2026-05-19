@@ -228,17 +228,6 @@ function unnamedEntityLabel(): string {
   return translated === key ? '—' : translated;
 }
 
-function formatVehicleTypeLabel(value: unknown): string {
-  if (value == null || value === '') {
-    return '';
-  }
-
-  return String(value)
-    .replace(/_/g, ' ')
-    .toLowerCase()
-    .replace(/\b\w/g, (character) => character.toUpperCase());
-}
-
 const viewTooltip = computed(() => {
   const translated = t('algorithm.list.table.tooltips.view');
   return translated === 'algorithm.list.table.tooltips.view' ? 'View details' : translated;
@@ -247,7 +236,6 @@ const viewTooltip = computed(() => {
 const normalizedRoutes = computed<NormalizedRoute[]>(() =>
   props.routes.map((route, routeIndex) => {
     const vehicleName = route.dailyPlan.vehicle?.name?.getValue()?.trim();
-    const vehicleTypeStr = formatVehicleTypeLabel(route.dailyPlan.vehicle?.vehicleType);
     const facilityName = route.dailyPlan.facilityName?.trim();
     const stops = normalizeStops(route.dailyPlan.stops);
     const summary = buildRouteSummaryMetrics(route.dailyPlan);
@@ -256,11 +244,7 @@ const normalizedRoutes = computed<NormalizedRoute[]>(() =>
       key: route.key,
       vehicleId: route.vehicleId,
       vehicleLabel:
-        vehicleName && vehicleName.length > 0
-          ? vehicleName
-          : vehicleTypeStr.length > 0
-            ? vehicleTypeStr
-            : unnamedEntityLabel(),
+        vehicleName && vehicleName.length > 0 ? vehicleName : unnamedEntityLabel(),
       facilityId: route.facilityId,
       facilityLabel:
         facilityName && facilityName.length > 0 ? facilityName : unnamedEntityLabel(),

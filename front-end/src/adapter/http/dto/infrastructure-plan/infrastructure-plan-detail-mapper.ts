@@ -256,20 +256,11 @@ export class InfrastructurePlanDetailMapper {
         'Kilograms',
       );
       const capacityLiters = this.extractNamedNumber(dailyPlan.vehicle.capacityLiters, 'liters');
-      const costPerKilometer = dailyPlan.vehicle.costPerKilometer
-        ? new TransportationVariableCost(
-            typeof dailyPlan.vehicle.costPerKilometer.amount === 'number'
-              ? dailyPlan.vehicle.costPerKilometer.amount
-              : 0,
-            dailyPlan.vehicle.costPerKilometer.currency ?? 'EUR',
-          )
-        : null;
+      const costPerKilometer = this.mapTransportationVariableCost(dailyPlan.vehicle.costPerKilometer);
 
       return new InfrastructurePlanVehicleDetail(
         new UllUUID(dailyPlan.vehicle.id),
-        typeof dailyPlan.vehicle.name === 'string' && dailyPlan.vehicle.name.trim().length > 0
-          ? new Name(dailyPlan.vehicle.name.trim())
-          : null,
+        this.parseOptionalName(dailyPlan.vehicle.name),
         dailyPlan.vehicle.vehicleType ? vehicleTypeFromString(dailyPlan.vehicle.vehicleType) : null,
         capacityKilograms != null ? new VehicleCapacityKilograms(capacityKilograms) : null,
         capacityLiters != null ? new VehicleCapacityLiters(capacityLiters) : null,
@@ -468,13 +459,71 @@ export class InfrastructurePlanDetailMapper {
     return 0;
   }
 
+  private static parseOptionalName(value: unknown): Name | null {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? new Name(trimmed) : null;
+    }
+
+    if (value && typeof value === 'object') {
+      const nested = (value as Record<string, unknown>).value;
+      if (typeof nested === 'string') {
+        const trimmed = nested.trim();
+        return trimmed.length > 0 ? new Name(trimmed) : null;
+      }
+    }
+
+    return null;
+  }
+
   private static extractNamedNumber(value: unknown, key: string): number | null {
+    if (typeof value === 'number') {
+      return value;
+    }
+
     if (!value || typeof value !== 'object') {
       return null;
     }
 
-    const candidate = (value as Record<string, unknown>)[key];
-    return typeof candidate === 'number' ? candidate : null;
+    const record = value as Record<string, unknown>;
+    const candidate = record[key];
+    if (typeof candidate === 'number') {
+      return candidate;
+    }
+
+    return this.extractOptionalNumber(value);
+  }
+
+  private static mapTransportationVariableCost(
+    value: unknown,
+    defaultCurrency = 'EUR',
+  ): TransportationVariableCost | null {
+    if (typeof value === 'number') {
+      return new TransportationVariableCost(value, defaultCurrency);
+    }
+
+    if (!value || typeof value !== 'object') {
+      return null;
+    }
+
+    const record = value as Record<string, unknown>;
+    const amount =
+      typeof record.amount === 'number' ? record.amount : this.extractOptionalNumber(value);
+    if (amount == null) {
+      return null;
+    }
+
+    let currency = defaultCurrency;
+    if (typeof record.currency === 'string' && record.currency.length > 0) {
+      currency = record.currency;
+    } else if (record.currency && typeof record.currency === 'object') {
+      const code = (record.currency as Record<string, unknown>).code;
+      if (typeof code === 'string' && code.length > 0) {
+        currency = code;
+      }
+    }
+
+    return new TransportationVariableCost(amount, currency);
   }
 
   private static extractNumber(value: unknown): number {
