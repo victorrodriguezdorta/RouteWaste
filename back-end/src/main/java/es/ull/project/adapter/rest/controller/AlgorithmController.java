@@ -21,9 +21,11 @@ import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
  * At this stage, the endpoint resolves all received identifiers and returns the
  * complete data loaded from the database.
  */
+@Tag(name = "Algorithms")
 @RestController
 @RequestMapping(ApiRoutes.ALGORITHMS)
 public class AlgorithmController {
@@ -118,7 +121,11 @@ public class AlgorithmController {
     })
     @PostMapping("/execute")
     public ResponseEntity<JsonNode> executeAlgorithm(
-            @Parameter(description = "Algorithm execution request data") @RequestBody AlgorithmExecutionRequestBody requestBody) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Selected facilities, vehicles, containers, planning horizon, and optional budget",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = AlgorithmExecutionRequestBody.class)))
+            @RequestBody AlgorithmExecutionRequestBody requestBody) {
         List<AlgorithmExecutionSelection> facilitiesWithVehicles = this.mapFacilitySelections(
                 requestBody.facilitiesWithVehicles);
         List<UUID> selectedContainerIds = requestBody.selectedContainerIds != null

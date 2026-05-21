@@ -21,8 +21,11 @@ import es.ull.project.domain.valueobject.page.TotalElements;
 import es.ull.project.domain.valueobject.page.TotalPages;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -47,6 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * REST controller for InfrastructurePlan resources.
  */
+@Tag(name = "Infrastructure Plans")
 @RestController
 @RequestMapping(ApiRoutes.INFRASTRUCTURE_PLANS)
 public class InfrastructurePlanController {
@@ -74,7 +78,8 @@ public class InfrastructurePlanController {
      */
     @Operation(summary = "Get all infrastructure plans", description = "Retrieves a paginated lightweight list of all infrastructure plans")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Infrastructure plans retrieved successfully"),
+            @ApiResponse(responseCode = "200", description = "Infrastructure plans retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = InfrastructurePlanPageResponseBody.class))),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -150,7 +155,8 @@ public class InfrastructurePlanController {
      */
     @Operation(summary = "Get infrastructure plan by ID", description = "Retrieves a specific infrastructure plan by its unique identifier")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Infrastructure plan found"),
+            @ApiResponse(responseCode = "200", description = "Infrastructure plan found",
+                    content = @Content(schema = @Schema(implementation = InfrastructurePlanResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Infrastructure plan not found"),
             @ApiResponse(responseCode = "400", description = "Invalid ID format")
     })
@@ -181,7 +187,8 @@ public class InfrastructurePlanController {
      */
     @Operation(summary = "Delete an infrastructure plan", description = "Deletes an infrastructure plan by its unique identifier")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Infrastructure plan deleted successfully"),
+            @ApiResponse(responseCode = "200", description = "Infrastructure plan deleted successfully",
+                    content = @Content(schema = @Schema(implementation = InfrastructurePlanResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Infrastructure plan not found"),
             @ApiResponse(responseCode = "400", description = "Invalid ID format")
     })

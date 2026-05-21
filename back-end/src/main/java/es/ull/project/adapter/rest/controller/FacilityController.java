@@ -25,8 +25,11 @@ import es.ull.project.domain.valueobject.page.TotalPages;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -61,6 +64,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 
  * Base path: defined in ApiRoutes.FACILITIES
  */
+@Tag(name = "Facilities")
 @RestController
 @RequestMapping(ApiRoutes.FACILITIES)
 public class FacilityController {
@@ -112,7 +116,8 @@ public class FacilityController {
      */
     @Operation(summary = "Get all facilities", description = "Retrieves a paginated list of facilities with optional sorting and advanced filtering")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Facilities retrieved successfully"),
+            @ApiResponse(responseCode = "200", description = "Facilities retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = FacilityPageResponseBody.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
     @GetMapping("/")
@@ -215,7 +220,8 @@ public class FacilityController {
      */
     @Operation(summary = "Get facility by ID", description = "Retrieves a specific facility by its unique identifier")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Facility found"),
+            @ApiResponse(responseCode = "200", description = "Facility found",
+                    content = @Content(schema = @Schema(implementation = FacilityResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Facility not found"),
             @ApiResponse(responseCode = "400", description = "Invalid ID format")
     })
@@ -249,12 +255,17 @@ public class FacilityController {
      */
     @Operation(summary = "Create a facility", description = "Creates a new facility with the provided data")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Facility created successfully"),
+            @ApiResponse(responseCode = "201", description = "Facility created successfully",
+                    content = @Content(schema = @Schema(implementation = FacilityResponseBody.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request data")
     })
     @PostMapping("/")
     public ResponseEntity<FacilityResponseBody> createFacility(
-            @Parameter(description = "Facility data") @RequestBody FacilityPostRequestBody requestBody) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Facility attributes required to create a new record",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = FacilityPostRequestBody.class)))
+            @RequestBody FacilityPostRequestBody requestBody) {
         try {
             Facility createdFacility = this.createFacilityUseCase.create(
                     requestBody.name,
@@ -290,14 +301,19 @@ public class FacilityController {
      */
     @Operation(summary = "Update a facility", description = "Updates an existing facility with the provided data")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Facility updated successfully"),
+            @ApiResponse(responseCode = "200", description = "Facility updated successfully",
+                    content = @Content(schema = @Schema(implementation = FacilityResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Facility not found"),
             @ApiResponse(responseCode = "400", description = "Invalid request data")
     })
     @PutMapping("/{id}")
     public ResponseEntity<FacilityResponseBody> updateFacility(
             @Parameter(description = "Facility UUID") @PathVariable String id,
-            @Parameter(description = "Updated facility data") @RequestBody FacilityPutRequestBody requestBody) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Full facility payload used to replace the existing record",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = FacilityPutRequestBody.class)))
+            @RequestBody FacilityPutRequestBody requestBody) {
         try {
             UUID facilityId = UUID.fromString(id);
             Facility updatedFacility = this.updateFacilityUseCase.update(
@@ -335,7 +351,8 @@ public class FacilityController {
      */
     @Operation(summary = "Delete a facility", description = "Deletes a facility by its unique identifier")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Facility deleted successfully"),
+            @ApiResponse(responseCode = "200", description = "Facility deleted successfully",
+                    content = @Content(schema = @Schema(implementation = FacilityResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Facility not found"),
             @ApiResponse(responseCode = "400", description = "Invalid ID format")
     })

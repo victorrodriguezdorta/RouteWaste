@@ -21,8 +21,11 @@ import es.ull.project.domain.valueobject.page.TotalElements;
 import es.ull.project.domain.valueobject.page.TotalPages;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -57,6 +60,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 
  * Base path: defined in ApiRoutes.VEHICLES
  */
+@Tag(name = "Vehicles")
 @RestController
 @RequestMapping(ApiRoutes.VEHICLES)
 public class VehicleController {
@@ -105,7 +109,8 @@ public class VehicleController {
      */
     @Operation(summary = "Get all vehicles", description = "Retrieves a paginated list of vehicles with optional sorting and filtering")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Vehicles retrieved successfully"),
+            @ApiResponse(responseCode = "200", description = "Vehicles retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = VehiclePageResponseBody.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
     @GetMapping("/")
@@ -192,7 +197,8 @@ public class VehicleController {
      */
     @Operation(summary = "Get vehicle by ID", description = "Retrieves a specific vehicle by its unique identifier")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Vehicle found"),
+            @ApiResponse(responseCode = "200", description = "Vehicle found",
+                    content = @Content(schema = @Schema(implementation = VehicleResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Vehicle not found"),
             @ApiResponse(responseCode = "400", description = "Invalid ID format")
     })
@@ -226,12 +232,17 @@ public class VehicleController {
      */
     @Operation(summary = "Create a vehicle", description = "Creates a new vehicle with the provided data")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Vehicle created successfully"),
+            @ApiResponse(responseCode = "201", description = "Vehicle created successfully",
+                    content = @Content(schema = @Schema(implementation = VehicleResponseBody.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request data")
     })
     @PostMapping("/")
     public ResponseEntity<VehicleResponseBody> createVehicle(
-            @Parameter(description = "Vehicle data") @RequestBody VehiclePostRequestBody requestBody) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Vehicle attributes required to create a new record",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = VehiclePostRequestBody.class)))
+            @RequestBody VehiclePostRequestBody requestBody) {
         Vehicle createdVehicle = this.createVehicleUseCase.create(
                 requestBody.name,
                 requestBody.vehicleType,
@@ -260,14 +271,19 @@ public class VehicleController {
      */
     @Operation(summary = "Update a vehicle", description = "Updates an existing vehicle with the provided data")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Vehicle updated successfully"),
+            @ApiResponse(responseCode = "200", description = "Vehicle updated successfully",
+                    content = @Content(schema = @Schema(implementation = VehicleResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Vehicle not found"),
             @ApiResponse(responseCode = "400", description = "Invalid request data")
     })
     @PutMapping("/{id}")
     public ResponseEntity<VehicleResponseBody> updateVehicle(
             @Parameter(description = "Vehicle UUID") @PathVariable String id,
-            @Parameter(description = "Updated vehicle data") @RequestBody VehiclePutRequestBody requestBody) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Full vehicle payload used to replace the existing record",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = VehiclePutRequestBody.class)))
+            @RequestBody VehiclePutRequestBody requestBody) {
         try {
             UUID vehicleId = UUID.fromString(id);
             Vehicle updatedVehicle = this.updateVehicleUseCase.update(
@@ -300,7 +316,8 @@ public class VehicleController {
      */
     @Operation(summary = "Delete a vehicle", description = "Deletes a vehicle by its unique identifier")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Vehicle deleted successfully"),
+            @ApiResponse(responseCode = "200", description = "Vehicle deleted successfully",
+                    content = @Content(schema = @Schema(implementation = VehicleResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Vehicle not found"),
             @ApiResponse(responseCode = "400", description = "Invalid ID format")
     })

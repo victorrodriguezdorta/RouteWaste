@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * GlobalExceptionHandler
@@ -53,6 +54,7 @@ public class GlobalExceptionHandler {
      * @param ex the HttpMessageNotReadableException thrown by Jackson
      * @return ResponseEntity with error message and HTTP 400 (BAD_REQUEST)
      */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleDeserializationError(HttpMessageNotReadableException ex) {
         String message = extractRootCauseMessage(ex);
@@ -69,6 +71,7 @@ public class GlobalExceptionHandler {
      * @param ex the ValidationException containing multiple field errors
      * @return ResponseEntity with structured error response and HTTP 400 (BAD_REQUEST)
      */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -88,6 +91,7 @@ public class GlobalExceptionHandler {
      * @param ex the IllegalArgumentException thrown by services or domain entities
      * @return ResponseEntity with error message and HTTP 400 (BAD_REQUEST)
      */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleValidationError(IllegalArgumentException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -111,6 +115,7 @@ public class GlobalExceptionHandler {
      * @param ex the IllegalStateException thrown by domain entities
      * @return ResponseEntity with error message and HTTP 400 (BAD_REQUEST)
      */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, String>> handleIllegalStateError(IllegalStateException ex) {
         Map<String, String> errorResponse = new HashMap<>();
@@ -124,6 +129,7 @@ public class GlobalExceptionHandler {
      * @param ex the algorithm execution exception
      * @return ResponseEntity with error message and HTTP 500 (INTERNAL_SERVER_ERROR)
      */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(AlgorithmExecutionException.class)
     public ResponseEntity<Map<String, String>> handleAlgorithmExecutionError(AlgorithmExecutionException ex) {
         Map<String, String> errorResponse = new HashMap<>();
@@ -141,6 +147,7 @@ public class GlobalExceptionHandler {
      * @param ex the NoSuchElementException thrown by services
      * @return ResponseEntity with error message and HTTP 404 (NOT_FOUND)
      */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Map<String, String>> handleNotFoundError(NoSuchElementException ex) {
         Map<String, String> errorResponse = new HashMap<>();
@@ -156,6 +163,7 @@ public class GlobalExceptionHandler {
      * @param ex the generic Exception
      * @return ResponseEntity with generic error message and HTTP 500 (INTERNAL_SERVER_ERROR)
      */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericError(Exception ex) {
         Map<String, String> errorResponse = new HashMap<>();

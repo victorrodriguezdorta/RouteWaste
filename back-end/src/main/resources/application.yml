@@ -1,3 +1,17 @@
+server:
+  error:
+    include-message: always
+    include-stacktrace: never
+    include-binding-errors: never
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
 spring:
   application:
     name: back-end
@@ -17,17 +31,6 @@ logging:
   level:
     org.springframework.web: DEBUG
     es.ull.project: DEBUG
-
-# Error handling configuration
-# - include-message: always show error messages
-# - include-stacktrace: never show stack traces in responses (security and cleanliness)
-# - include-binding-errors: never show binding errors details
-# The GlobalExceptionHandler will provide clean, user-friendly error messages
-server:
-  error:
-    include-message: always
-    include-stacktrace: never
-    include-binding-errors: never
 
 algorithm:
   docker:

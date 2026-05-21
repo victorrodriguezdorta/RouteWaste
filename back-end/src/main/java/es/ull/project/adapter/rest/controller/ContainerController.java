@@ -24,8 +24,11 @@ import es.ull.project.domain.valueobject.page.TotalPages;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -60,6 +63,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 
  * Base path: defined in ApiRoutes.CONTAINERS
  */
+@Tag(name = "Containers")
 @RestController
 @RequestMapping(ApiRoutes.CONTAINERS)
 public class ContainerController {
@@ -115,7 +119,8 @@ public class ContainerController {
      */
     @Operation(summary = "Get all containers", description = "Retrieves a paginated list of containers with optional sorting and advanced filtering")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Containers retrieved successfully"),
+            @ApiResponse(responseCode = "200", description = "Containers retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = ContainerPageResponseBody.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
     @GetMapping("/")
@@ -218,7 +223,8 @@ public class ContainerController {
      */
     @Operation(summary = "Get container by ID", description = "Retrieves a specific container by its unique identifier")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Container found"),
+            @ApiResponse(responseCode = "200", description = "Container found",
+                    content = @Content(schema = @Schema(implementation = ContainerResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Container not found"),
             @ApiResponse(responseCode = "400", description = "Invalid ID format")
     })
@@ -252,12 +258,17 @@ public class ContainerController {
      */
     @Operation(summary = "Create a container", description = "Creates a new container with the provided data")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Container created successfully"),
+            @ApiResponse(responseCode = "201", description = "Container created successfully",
+                    content = @Content(schema = @Schema(implementation = ContainerResponseBody.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request data")
     })
     @PostMapping("/")
     public ResponseEntity<ContainerResponseBody> createContainer(
-            @Parameter(description = "Container data") @RequestBody ContainerPostRequestBody requestBody) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Container attributes required to create a new record",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = ContainerPostRequestBody.class)))
+            @RequestBody ContainerPostRequestBody requestBody) {
         try {
             Container createdContainer = this.createContainerUseCase.create(
                     requestBody.name,
@@ -291,14 +302,19 @@ public class ContainerController {
      */
     @Operation(summary = "Update a container", description = "Updates an existing container with the provided data")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Container updated successfully"),
+            @ApiResponse(responseCode = "200", description = "Container updated successfully",
+                    content = @Content(schema = @Schema(implementation = ContainerResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Container not found"),
             @ApiResponse(responseCode = "400", description = "Invalid request data")
     })
     @PutMapping("/{id}")
     public ResponseEntity<ContainerResponseBody> updateContainer(
             @Parameter(description = "Container UUID") @PathVariable String id,
-            @Parameter(description = "Updated container data") @RequestBody ContainerPutRequestBody requestBody) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Full container payload used to replace the existing record",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = ContainerPutRequestBody.class)))
+            @RequestBody ContainerPutRequestBody requestBody) {
         try {
             UUID containerId = UUID.fromString(id);
             Container updatedContainer = this.updateContainerUseCase.update(
@@ -334,7 +350,8 @@ public class ContainerController {
      */
     @Operation(summary = "Delete a container", description = "Deletes a container by its unique identifier")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Container deleted successfully"),
+            @ApiResponse(responseCode = "200", description = "Container deleted successfully",
+                    content = @Content(schema = @Schema(implementation = ContainerResponseBody.class))),
             @ApiResponse(responseCode = "404", description = "Container not found"),
             @ApiResponse(responseCode = "400", description = "Invalid ID format")
     })
