@@ -175,6 +175,63 @@ class AlgorithmTest {
   }
 
   @Test
+  void shouldRecordCollectedKilogramsFromWasteTypeDensity() {
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK", 1000.0, 1000.0);
+    Container container = container("container-1", 28.465, -16.263, 500.0, 80.0);
+
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+        15,
+        1,
+        List.of(facilityWithVehicles),
+        List.of(container),
+        new MaximumBudget(5000.0, "EUR"));
+
+    DeliveryPlanningSolution solution = new Algorithm(problem).run();
+
+    DailyPlan dailyPlan = solution.getDailyPlans().get(0);
+    DailyPlanStop containerStop = dailyPlan.getStops().stream()
+        .filter(stop -> stop.getType() == StopType.CONTAINER)
+        .findFirst()
+        .orElseThrow();
+
+    assertEquals(80.0, containerStop.getCollectedLiters(), DELTA);
+    assertEquals(40.0, containerStop.getCollectedKilograms(), DELTA);
+    assertEquals(40.0, dailyPlan.getTotalCollectedKilograms(), DELTA);
+  }
+
+  @Test
+  void shouldUnloadWhenKilogramCapacityIsReachedBeforeLiterCapacity() {
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK", 30.0, 1000.0);
+    Container container = container("container-1", 28.465, -16.263, 500.0, 100.0);
+
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+        15,
+        1,
+        List.of(facilityWithVehicles),
+        List.of(container),
+        new MaximumBudget(5000.0, "EUR"));
+
+    DeliveryPlanningSolution solution = new Algorithm(problem).run();
+
+    DailyPlan dailyPlan = solution.getDailyPlans().get(0);
+    List<DailyPlanStop> containerStops = dailyPlan.getStops().stream()
+        .filter(stop -> stop.getType() == StopType.CONTAINER)
+        .toList();
+
+    assertEquals(2, containerStops.size());
+    assertEquals(60.0, containerStops.get(0).getCollectedLiters(), DELTA);
+    assertEquals(30.0, containerStops.get(0).getCollectedKilograms(), DELTA);
+    assertEquals(40.0, containerStops.get(1).getCollectedLiters(), DELTA);
+    assertEquals(20.0, containerStops.get(1).getCollectedKilograms(), DELTA);
+    assertEquals(100.0, dailyPlan.getTotalCollectedLiters(), DELTA);
+    assertEquals(50.0, dailyPlan.getTotalCollectedKilograms(), DELTA);
+  }
+
+  @Test
   void shouldRevisitContainerAfterUnloadUntilItIsEmpty() {
     Facility facility = facility("facility-1");
     Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK", 60.0, 60.0);
@@ -253,8 +310,8 @@ class AlgorithmTest {
         .filter(s -> s.getType() == StopType.FACILITY)
         .count();
 
-    assertEquals(1, facilityStopCount);
-    assertTrue(solution.getTotalCollectedLiters() <= 100.0 + DELTA);
+    assertEquals(2, facilityStopCount);
+    assertTrue(solution.getTotalCollectedLiters() <= 120.0 + DELTA);
   }
 
   @Test
@@ -368,5 +425,6 @@ class AlgorithmTest {
     new Algorithm(problem).run();
 
     assertEquals(0.0, vehicle.getCurrentLoadLiters(), DELTA);
+    assertEquals(0.0, vehicle.getCurrentLoadKilograms(), DELTA);
   }
 }

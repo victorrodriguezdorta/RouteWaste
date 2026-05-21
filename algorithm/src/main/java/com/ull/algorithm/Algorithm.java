@@ -12,6 +12,9 @@ import com.ull.domain.entity.FacilityCluster;
 import com.ull.domain.entity.FacilityWithVehicles;
 import com.ull.domain.entity.Vehicle;
 import com.ull.domain.enumerate.ContainerStatus;
+import com.ull.domain.enumerate.WasteType;
+import com.ull.domain.valueobject.converter.WasteVolumeToMassConverter;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -199,26 +202,27 @@ public class Algorithm {
     if (facility == null || facility.getLocation() == null || vehicle == null) {
       return;
     }
-    double vehicleCapacity = vehicle.getCapacityLiters();
-    if (vehicleCapacity <= EPSILON) {
+    if (!hasRouteCapacityConfigured(vehicle)) {
       return;
     }
-    double vehicleCurrentLoad = 0.0;
+    double vehicleCurrentLoadLiters = 0.0;
+    double vehicleCurrentLoadKilograms = 0.0;
     Object currentLocation = facility;
     int facilityVisits = MIN_NUMBER_OF_DAYS;
     while (hasPendingLiters(availableContainers)) {
-      double remainingCapacity = vehicleCapacity - vehicleCurrentLoad;
-      if (remainingCapacity <= EPSILON) {
+      if (isVehicleLoadFull(vehicle, vehicleCurrentLoadLiters, vehicleCurrentLoadKilograms)) {
         if (facilityVisits >= MAX_FACILITY_VISITS) {
           break;
         }
         returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
-        vehicleCurrentLoad = 0.0;
+        vehicleCurrentLoadLiters = 0.0;
+        vehicleCurrentLoadKilograms = 0.0;
         currentLocation = facility;
         facilityVisits++;
         continue;
       }
-      if (facilityVisits >= MAX_FACILITY_VISITS && vehicleCurrentLoad > EPSILON) {
+      if (facilityVisits >= MAX_FACILITY_VISITS
+          && (vehicleCurrentLoadLiters > EPSILON || vehicleCurrentLoadKilograms > EPSILON)) {
         break;
       }
       Container nearest = findNearestCollectableContainer(currentLocation, availableContainers);
@@ -230,33 +234,143 @@ public class Algorithm {
         updatePendingLiters(nearest, 0.0);
         continue;
       }
-      double collectedLiters = Math.min(pendingLiters, remainingCapacity);
+      double remainingLiters = remainingLiterCapacity(vehicle, vehicleCurrentLoadLiters);
+      double remainingKilograms = remainingKilogramCapacity(vehicle, vehicleCurrentLoadKilograms);
+      double collectedLiters = computeCollectableLiters(
+          nearest,
+          pendingLiters,
+          remainingLiters,
+          remainingKilograms);
+      if (collectedLiters <= EPSILON) {
+        if (facilityVisits >= MAX_FACILITY_VISITS) {
+          break;
+        }
+        returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
+        vehicleCurrentLoadLiters = 0.0;
+        vehicleCurrentLoadKilograms = 0.0;
+        currentLocation = facility;
+        facilityVisits++;
+        continue;
+      }
+      double collectedKilograms = WasteVolumeToMassConverter.litersToKilograms(
+          collectedLiters,
+          nearest.getWasteType());
       double distanceFromCurrentLocation = calculateDistanceToContainer(currentLocation, nearest);
       dailyPlan.addStop(
           nearest,
-          0.0,
+          collectedKilograms,
           collectedLiters,
           pendingLiters,
           distanceFromCurrentLocation,
           createStopAlerts(nearest, pendingLiters, collectedLiters));
       updatePendingLiters(nearest, pendingLiters - collectedLiters);
-      vehicleCurrentLoad += collectedLiters;
-      vehicle.updateCurrentLoadLiters(vehicleCurrentLoad);
+      vehicleCurrentLoadLiters += collectedLiters;
+      vehicleCurrentLoadKilograms += collectedKilograms;
+      vehicle.updateCurrentLoadLiters(vehicleCurrentLoadLiters);
+      vehicle.updateCurrentLoadKilograms(vehicleCurrentLoadKilograms);
       currentLocation = nearest;
-      if (vehicleCurrentLoad >= vehicleCapacity - EPSILON) {
+      if (isVehicleLoadFull(vehicle, vehicleCurrentLoadLiters, vehicleCurrentLoadKilograms)) {
         if (facilityVisits >= MAX_FACILITY_VISITS) {
           break;
         }
         returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
-        vehicleCurrentLoad = 0.0;
+        vehicleCurrentLoadLiters = 0.0;
+        vehicleCurrentLoadKilograms = 0.0;
         currentLocation = facility;
         facilityVisits++;
       }
     }
-    if (vehicleCurrentLoad > EPSILON && facilityVisits < MAX_FACILITY_VISITS) {
+    if ((vehicleCurrentLoadLiters > EPSILON || vehicleCurrentLoadKilograms > EPSILON)
+        && facilityVisits < MAX_FACILITY_VISITS) {
       returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
       facilityVisits++;
     }
+  }
+
+  /**
+   * Returns whether the vehicle has at least one positive routing capacity configured.
+   *
+   * @param vehicle assigned vehicle
+   * @return true when liter or kilogram capacity is positive
+   */
+  private boolean hasRouteCapacityConfigured(Vehicle vehicle) {
+    return vehicle.getCapacityLiters() > EPSILON || vehicle.getCapacityKilograms() > EPSILON;
+  }
+
+  /**
+   * Returns remaining liter capacity on the vehicle.
+   *
+   * @param vehicle assigned vehicle
+   * @param currentLoadLiters current liter load
+   * @return remaining liters, or unbounded when liter capacity is not configured
+   */
+  private double remainingLiterCapacity(Vehicle vehicle, double currentLoadLiters) {
+    if (vehicle.getCapacityLiters() <= EPSILON) {
+      return Double.MAX_VALUE;
+    }
+    return Math.max(0.0, vehicle.getCapacityLiters() - currentLoadLiters);
+  }
+
+  /**
+   * Returns remaining kilogram capacity on the vehicle.
+   *
+   * @param vehicle assigned vehicle
+   * @param currentLoadKilograms current kilogram load
+   * @return remaining kilograms, or unbounded when kg capacity is not configured
+   */
+  private double remainingKilogramCapacity(Vehicle vehicle, double currentLoadKilograms) {
+    if (vehicle.getCapacityKilograms() <= EPSILON) {
+      return Double.MAX_VALUE;
+    }
+    return Math.max(0.0, vehicle.getCapacityKilograms() - currentLoadKilograms);
+  }
+
+  /**
+   * Determines whether the vehicle has reached a binding capacity limit.
+   *
+   * @param vehicle assigned vehicle
+   * @param currentLoadLiters current liter load
+   * @param currentLoadKilograms current kilogram load
+   * @return true when liter or kilogram capacity is exhausted
+   */
+  private boolean isVehicleLoadFull(
+      Vehicle vehicle,
+      double currentLoadLiters,
+      double currentLoadKilograms) {
+    boolean litersFull = vehicle.getCapacityLiters() > EPSILON
+        && currentLoadLiters >= vehicle.getCapacityLiters() - EPSILON;
+    boolean kilogramsFull = vehicle.getCapacityKilograms() > EPSILON
+        && currentLoadKilograms >= vehicle.getCapacityKilograms() - EPSILON;
+    return litersFull || kilogramsFull;
+  }
+
+  /**
+   * Computes how many liters can be collected respecting pending waste, liter capacity,
+   * and kilogram capacity (via waste-type density).
+   *
+   * @param container target container
+   * @param pendingLiters liters pending before collection
+   * @param remainingLiters remaining liter capacity on the vehicle
+   * @param remainingKilograms remaining kilogram capacity on the vehicle
+   * @return collectable liters (zero when no capacity remains)
+   */
+  private double computeCollectableLiters(
+      Container container,
+      double pendingLiters,
+      double remainingLiters,
+      double remainingKilograms) {
+    if (pendingLiters <= EPSILON) {
+      return 0.0;
+    }
+    double collectedLiters = Math.min(pendingLiters, remainingLiters);
+    WasteType wasteType = container.getWasteType();
+    if (remainingKilograms < Double.MAX_VALUE) {
+      double litersLimitedByKilograms = WasteVolumeToMassConverter.litersFromRemainingKilograms(
+          remainingKilograms,
+          wasteType);
+      collectedLiters = Math.min(collectedLiters, litersLimitedByKilograms);
+    }
+    return collectedLiters <= EPSILON ? 0.0 : collectedLiters;
   }
 
   /**
