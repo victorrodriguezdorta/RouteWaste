@@ -7,6 +7,7 @@ import {
     UpdateVehicleService
 } from '@/application/service/vehicle';
 import type { Vehicle } from '@/domain/entity/vehicle';
+import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 
@@ -35,6 +36,9 @@ export const useVehicleStore = defineStore('Vehicle', {
 
     /** Total amount of vehicles available in backend */
     totalVehicles: 0,
+
+    /** Global statistics from last list response (unfiltered totals by type) */
+    vehicleStatistics: undefined as EntityTypeStatistics | undefined,
 
     /** Current zero-based page index loaded from backend */
     currentPage: 0,
@@ -127,6 +131,7 @@ export const useVehicleStore = defineStore('Vehicle', {
           this.totalVehicles = data.totalElements;
           this.currentPage = data.page;
           this.rowsPerPage = data.size;
+          this.vehicleStatistics = data.statistics;
           this.loading = false;
         }
       );

@@ -2,6 +2,7 @@ package es.ull.project.application.usecase.vehicle;
 
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.readmodel.EntityTypeBreakdown;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -46,4 +47,11 @@ public interface ReadVehicleUseCase {
      * @return a page of vehicles
      */
     Page<Vehicle> fetchAll(@NonNull Pageable pageable, VehicleType vehicleType);
+
+    /**
+     * Returns global vehicle statistics: total count and count per {@link VehicleType}.
+     *
+     * @return unfiltered type breakdown
+     */
+    EntityTypeBreakdown fetchStatistics();
 }

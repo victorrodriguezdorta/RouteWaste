@@ -240,4 +240,27 @@ public class InMemoryFacilityRepository implements FacilityRepository {
         }
         return new PageImpl<>(pageContent, pageable, allFacilities.size());
     }
+
+    /**
+     * Counts all facilities in the store.
+     *
+     * @return total facility count
+     */
+    @Override
+    public long count() {
+        return store.size();
+    }
+
+    /**
+     * Counts facilities grouped by {@link FacilityType}.
+     *
+     * @return map with every facility type and its count
+     */
+    @Override
+    public Map<FacilityType, Long> countByFacilityType() {
+        return InMemoryEnumTypeCounts.countByEnum(
+                store.values().stream(),
+                FacilityType.class,
+                Facility::getFacilityType);
+    }
 }

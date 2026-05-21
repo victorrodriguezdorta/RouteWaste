@@ -1,11 +1,13 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import es.ull.project.adapter.mongodb.support.MongoEnumTypeCounts;
 import es.ull.project.application.query.ContainerSearchCriteria;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.WasteType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,5 +197,30 @@ public class ContainerMongoRepository implements ContainerRepository {
                     .lte(criteria.getMaxDailyDemand()));
         }
         return criterias;
+    }
+
+    /**
+     * Counts all containers in the collection.
+     *
+     * @return total container count
+     */
+    @Override
+    public long count() {
+        return MongoEnumTypeCounts.countAll(this.mongoTemplate, Container.class, COLLECTION_NAME);
+    }
+
+    /**
+     * Counts containers grouped by {@link WasteType}.
+     *
+     * @return map with every waste type and its count
+     */
+    @Override
+    public Map<WasteType, Long> countByWasteType() {
+        return MongoEnumTypeCounts.countByEnumField(
+                this.mongoTemplate,
+                Container.class,
+                COLLECTION_NAME,
+                FIELD_WASTE_TYPE,
+                WasteType.class);
     }
 }

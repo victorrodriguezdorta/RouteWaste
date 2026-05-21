@@ -1,4 +1,5 @@
 import { ContainerJsonResponse } from '@/adapter/http/dto/container/container-json-response';
+import { toEntityTypeStatistics } from '@/adapter/http/mapper/entity-statistics-json-mapper';
 import type { ContainerPageJsonResponse } from '@/adapter/http/dto/container/container-page-json-response';
 import { ContainerPostJsonRequest } from '@/adapter/http/dto/container/container-post-json-request';
 import { ContainerPutJsonRequest } from '@/adapter/http/dto/container/container-put-json-request';
@@ -104,6 +105,7 @@ export class ContainerHttpRepository implements ContainerRepository {
                   totalPages: data.totalPages,
                   page: data.page,
                   size: data.size,
+                  statistics: toEntityTypeStatistics(data.statistics),
                 };
               }
 

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import es.ull.project.adapter.memory.InMemoryEnumTypeCounts;
 import es.ull.project.application.query.ContainerSearchCriteria;
 import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.application.repository.ContainerDailyStateRepository;
@@ -608,6 +609,17 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
         public Page<Facility> findAll(Pageable pageable, FacilitySearchCriteria criteria) {
           return new PageImpl<>(fetchAll(), pageable, saved.size());
         }
+
+        @Override
+        public long count() {
+          return saved.size();
+        }
+
+        @Override
+        public Map<FacilityType, Long> countByFacilityType() {
+          return InMemoryEnumTypeCounts.countByEnum(
+              saved.values().stream(), FacilityType.class, Facility::getFacilityType);
+        }
       }
 
       private static final class InMemoryContainerRepository implements ContainerRepository {
@@ -655,6 +667,17 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
         public Page<Container> findAll(Pageable pageable, ContainerSearchCriteria criteria) {
           return new PageImpl<>(fetchAll(), pageable, saved.size());
         }
+
+        @Override
+        public long count() {
+          return saved.size();
+        }
+
+        @Override
+        public Map<WasteType, Long> countByWasteType() {
+          return InMemoryEnumTypeCounts.countByEnum(
+              saved.values().stream(), WasteType.class, Container::getWasteType);
+        }
       }
 
       private static final class InMemoryVehicleRepository implements VehicleRepository {
@@ -696,6 +719,17 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
         @Override
         public Optional<Vehicle> findById(UUID id) {
           return Optional.ofNullable(saved.get(id));
+        }
+
+        @Override
+        public long count() {
+          return saved.size();
+        }
+
+        @Override
+        public Map<VehicleType, Long> countByVehicleType() {
+          return InMemoryEnumTypeCounts.countByEnum(
+              saved.values().stream(), VehicleType.class, Vehicle::getVehicleType);
         }
       }
 }

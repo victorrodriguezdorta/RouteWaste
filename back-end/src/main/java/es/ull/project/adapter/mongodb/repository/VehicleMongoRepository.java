@@ -1,9 +1,11 @@
 package es.ull.project.adapter.mongodb.repository;
 
+import es.ull.project.adapter.mongodb.support.MongoEnumTypeCounts;
 import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,5 +131,30 @@ public class VehicleMongoRepository implements VehicleRepository {
         Query query = new Query(Criteria.where(FIELD_ID).is(id));
         Vehicle vehicle = this.mongoTemplate.findOne(query, Vehicle.class, COLLECTION_NAME);
         return Optional.ofNullable(vehicle);
+    }
+
+    /**
+     * Counts all vehicles in the collection.
+     *
+     * @return total vehicle count
+     */
+    @Override
+    public long count() {
+        return MongoEnumTypeCounts.countAll(this.mongoTemplate, Vehicle.class, COLLECTION_NAME);
+    }
+
+    /**
+     * Counts vehicles grouped by {@link VehicleType}.
+     *
+     * @return map with every vehicle type and its count
+     */
+    @Override
+    public Map<VehicleType, Long> countByVehicleType() {
+        return MongoEnumTypeCounts.countByEnumField(
+                this.mongoTemplate,
+                Vehicle.class,
+                COLLECTION_NAME,
+                FIELD_VEHICLE_TYPE,
+                VehicleType.class);
     }
 }

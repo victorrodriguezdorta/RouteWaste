@@ -12,7 +12,7 @@
     </v-snackbar>
 
     <CrudLayout
-      :title="t('container.list.title')"
+      :title="listTitleWithTotal"
       icon="mdi-delete"
     >
       <template #title-actions>
@@ -130,6 +130,16 @@
             :locations="containerMapPins"
             detail-route-name="ShowContainer"
           />
+          <EntityTypeStatisticsChart
+            class="list-with-map-layout__chart"
+            :statistics="containerStatistics"
+            :chart-id="11"
+            :chart-title="t('container.list.statistics.byType')"
+            :empty-message="t('container.list.statistics.noData')"
+            :translate-type="translateWasteTypeKey"
+            :chart-width="280"
+            :chart-height="240"
+          />
         </div>
       </div>
 
@@ -204,6 +214,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { serviceZoneColor, serviceZoneToOptions } from '../../../../domain/enumerate/service-zone';
 import { wasteTypeColor, wasteTypeToOptions } from '../../../../domain/enumerate/waste-type';
+import EntityTypeStatisticsChart from '../../components/common/EntityTypeStatisticsChart.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
 import LocationsListMap from '../../components/common/LocationsListMap.vue';
 import router from '../../router/router';
@@ -212,7 +223,19 @@ import { useContainerStore } from '../../stores/container-store';
 const { t } = useI18n();
 
 const containerStore = useContainerStore();
-const { containers, containerNotification, loading, totalContainers, currentPage, rowsPerPage } = storeToRefs(containerStore);
+const { containers, containerNotification, loading, totalContainers, containerStatistics, currentPage, rowsPerPage } = storeToRefs(containerStore);
+
+const listTitleWithTotal = computed(() => {
+  const total = containerStatistics.value?.total;
+  const base = t('container.list.title');
+  return total != null ? `${base} (${total})` : base;
+});
+
+const translateWasteTypeKey = (typeKey: string): string => {
+  const key = `container.add.wasteTypes.${typeKey}`;
+  const translated = t(key);
+  return translated === key ? typeKey : translated;
+};
 
 const dialogDelete = ref(false);
 const selectedContainerId = ref('');
@@ -297,9 +320,9 @@ const containerItems = computed(() => {
       rawWasteType: container.getWasteType(),
       rawServiceZone: serviceZone,
       wasteType: t(`container.add.wasteTypes.${container.getWasteType()}`),
-      location: `${location.postalAddress} (${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)})`,
-      capacityLiters: `${capacity.getLiters()} L`,
-      demand: `${dailyDemand.getLitersPerDay()} L/day`,
+      location: location.postalAddress,
+      capacityLiters: capacity.getLiters(),
+      demand: dailyDemand.getLitersPerDay(),
       serviceZone: serviceZone
         ? t(`container.add.serviceZones.${serviceZone}`)
         : t('container.list.notAssigned'),
@@ -415,6 +438,13 @@ const confirmDelete = async () => {
   min-width: 0;
   position: sticky;
   top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.list-with-map-layout__chart {
+  margin-bottom: 0;
 }
 
 .list-with-map-layout__map :deep(.locations-list-map),

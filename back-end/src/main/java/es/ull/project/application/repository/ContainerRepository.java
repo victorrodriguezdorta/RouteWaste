@@ -4,6 +4,7 @@ import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.WasteType;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -83,4 +84,18 @@ public interface ContainerRepository {
      * @return page of matching containers
      */
     public abstract Page<Container> findAll(@NonNull Pageable pageable, @NonNull es.ull.project.application.query.ContainerSearchCriteria criteria);
+
+    /**
+     * Counts all containers in the repository.
+     *
+     * @return total container count
+     */
+    public abstract long count();
+
+    /**
+     * Counts containers grouped by {@link WasteType}.
+     *
+     * @return map with every waste type and its count (zero when none)
+     */
+    public abstract Map<WasteType, Long> countByWasteType();
 }

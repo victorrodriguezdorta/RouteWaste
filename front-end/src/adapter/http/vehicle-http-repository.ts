@@ -1,3 +1,4 @@
+import { toEntityTypeStatistics } from '@/adapter/http/mapper/entity-statistics-json-mapper';
 import { VehicleJsonResponse } from './dto/vehicle/vehicle-json-response';
 import type { VehiclePageJsonResponse } from './dto/vehicle/vehicle-page-json-response';
 import { VehiclePostJsonRequest } from './dto/vehicle/vehicle-post-json-request';
@@ -89,6 +90,7 @@ export class VehicleHttpRepository implements VehicleRepository {
                   totalPages: data.totalPages,
                   page: data.page,
                   size: data.size,
+                  statistics: toEntityTypeStatistics(data.statistics),
                 };
               }
 

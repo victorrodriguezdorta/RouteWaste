@@ -80,7 +80,6 @@
           hide-details="auto"
           :error="maxBudgetAmount < 0"
         />
-        <small class="text-caption">EUR</small>
         <small v-if="maxBudgetAmount < 0" class="text-error">
           {{ t('algorithm.execute.step3.maxBudgetError') }}
         </small>
@@ -125,13 +124,13 @@
           <v-card-text>
             <div class="text-caption">
               <p>
-                <strong>{{ t('algorithm.execute.step3.numberOfDays') }}:</strong> {{ numberOfDays }} {{ t('algorithm.execute.step3.days') }}
+                <strong>{{ t('algorithm.execute.step3.numberOfDays') }}:</strong> {{ numberOfDays }}
               </p>
               <p>
-                <strong>{{ t('algorithm.execute.step3.averagePickupTime') }}:</strong> {{ averagePickupTime }} {{ t('algorithm.execute.step3.minutes') }}
+                <strong>{{ t('algorithm.execute.step3.averagePickupTime') }}:</strong> {{ averagePickupTime }}
               </p>
               <p>
-                <strong>{{ t('algorithm.execute.step3.maxBudget') }}:</strong> {{ maxBudgetAmount }} EUR
+                <strong>{{ t('algorithm.execute.step3.maxBudget') }}:</strong> {{ maxBudgetAmount }}
               </p>
             </div>
           </v-card-text>

@@ -1,9 +1,11 @@
 package es.ull.project.application.service.vehicle;
 
 import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.application.service.common.EntityTypeBreakdownBuilder;
 import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
+import es.ull.project.domain.readmodel.EntityTypeBreakdown;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -72,5 +74,18 @@ public class ReadVehicleService implements ReadVehicleUseCase {
     @Override
     public Page<Vehicle> fetchAll(@NonNull Pageable pageable, VehicleType vehicleType) {
         return this.repository.findAll(pageable, vehicleType);
+    }
+
+    /**
+     * Returns global vehicle statistics (total and per {@link VehicleType}).
+     *
+     * @return unfiltered type breakdown
+     */
+    @Override
+    public EntityTypeBreakdown fetchStatistics() {
+        return EntityTypeBreakdownBuilder.fromCounts(
+                this.repository.count(),
+                this.repository.countByVehicleType(),
+                VehicleType.class);
     }
 }

@@ -3,6 +3,7 @@ package es.ull.project.adapter.rest.controller;
 import es.ull.project.adapter.mongodb.mapper.ContainerFieldMapper;
 import es.ull.project.adapter.mongodb.query.ContainerSearchCriteriaBuilder;
 import es.ull.project.adapter.rest.mapper.ContainerResponseMapper;
+import es.ull.project.adapter.rest.mapper.EntityStatisticsResponseMapper;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
 import es.ull.project.adapter.rest.response.container.ContainerPageResponseBody;
@@ -201,6 +202,7 @@ public class ContainerController {
         response.numberOfElements = new NumberOfElements(containerPage.getNumberOfElements());
         response.first = new PageFlag(containerPage.isFirst());
         response.last = new PageFlag(containerPage.isLast());
+        response.statistics = EntityStatisticsResponseMapper.toResponseBody(this.readContainerUseCase.fetchStatistics());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

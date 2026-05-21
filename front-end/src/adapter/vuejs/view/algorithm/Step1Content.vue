@@ -211,21 +211,6 @@
                   </v-chip>
                 </template>
 
-                <!-- Capacity Kg -->
-                <template v-slot:item.capacityKilograms="{ item }">
-                  {{ item.capacityKilograms }} kg
-                </template>
-
-                <!-- Capacity L -->
-                <template v-slot:item.capacityLiters="{ item }">
-                  {{ item.capacityLiters }} L
-                </template>
-
-                <!-- Cost -->
-                <template v-slot:item.cost="{ item }">
-                  {{ item.cost }}
-                </template>
-
                 <!-- No data -->
                 <template v-slot:no-data>
                   <v-alert type="info" variant="tonal" class="ma-4">

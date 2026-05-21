@@ -3,6 +3,7 @@ package es.ull.project.application.repository;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -70,4 +71,18 @@ public interface VehicleRepository {
      * @return optional containing the vehicle if found
      */
     public abstract Optional<Vehicle> findById(UUID id);
+
+    /**
+     * Counts all vehicles in the repository.
+     *
+     * @return total vehicle count
+     */
+    public abstract long count();
+
+    /**
+     * Counts vehicles grouped by {@link VehicleType}.
+     *
+     * @return map with every vehicle type and its count (zero when none)
+     */
+    public abstract Map<VehicleType, Long> countByVehicleType();
 }

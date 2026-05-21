@@ -1,3 +1,4 @@
+import type { EntityStatisticsJsonResponse } from '../common/entity-statistics-json-response';
 import type { VehicleJsonResponse } from './vehicle-json-response';
 
 /**
@@ -12,4 +13,5 @@ export interface VehiclePageJsonResponse {
   numberOfElements: number;
   first: boolean;
   last: boolean;
+  statistics?: EntityStatisticsJsonResponse;
 }

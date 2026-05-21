@@ -1,4 +1,5 @@
 import { FacilityJsonResponse } from '@/adapter/http/dto/facility/facility-json-response';
+import { toEntityTypeStatistics } from '@/adapter/http/mapper/entity-statistics-json-mapper';
 import type { FacilityPageJsonResponse } from '@/adapter/http/dto/facility/facility-page-json-response';
 import { FacilityPostJsonRequest } from '@/adapter/http/dto/facility/facility-post-json-request';
 import { FacilityPutJsonRequest } from '@/adapter/http/dto/facility/facility-put-json-request';
@@ -110,6 +111,7 @@ export class FacilityHttpRepository implements FacilityRepository {
                   totalPages: data.totalPages,
                   page: data.page,
                   size: data.size,
+                  statistics: toEntityTypeStatistics(data.statistics),
                 };
               }
 

@@ -3,6 +3,7 @@ package es.ull.project.application.usecase.facility;
 import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.readmodel.EntityTypeBreakdown;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -54,4 +55,11 @@ public interface ReadFacilityUseCase {
      * @return a page of facilities
      */
     Page<Facility> fetchAll(@NonNull Pageable pageable, @NonNull FacilitySearchCriteria criteria);
+
+    /**
+     * Returns global facility statistics: total count and count per {@link FacilityType}.
+     *
+     * @return unfiltered type breakdown
+     */
+    EntityTypeBreakdown fetchStatistics();
 }

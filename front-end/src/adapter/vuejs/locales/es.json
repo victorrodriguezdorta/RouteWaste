@@ -123,6 +123,10 @@
     },
     "list": {
       "title": "Vehículos",
+      "statistics": {
+        "byType": "Vehículos por tipo",
+        "noData": "No hay vehículos registrados"
+      },
       "addButton": "Agregar Vehículo",
       "filterByType": "Filtrar por tipo",
       "filterAll": "Todos los tipos",
@@ -132,7 +136,7 @@
           "type": "Tipo de Vehículo",
           "capacityKilograms": "Capacidad (kg)",
           "capacityLiters": "Capacidad (L)",
-          "cost": "Costo por Km",
+          "cost": "Costo por Km (EUR)",
           "actions": "Acciones"
         },
         "tooltips": {
@@ -221,6 +225,10 @@
     },
     "list": {
       "title": "Contenedores",
+      "statistics": {
+        "byType": "Contenedores por tipo de residuo",
+        "noData": "No hay contenedores registrados"
+      },
       "addButton": "Agregar Contenedor",
       "filterByWasteType": "Filtrar por tipo de residuo",
       "filterByServiceZone": "Filtrar por zona de servicio",
@@ -324,6 +332,10 @@
     },
     "list": {
       "title": "Instalaciones",
+      "statistics": {
+        "byType": "Instalaciones por tipo",
+        "noData": "No hay instalaciones registradas"
+      },
       "addButton": "Agregar Instalación",
       "filterByType": "Filtrar por tipo",
       "filterByStatus": "Filtrar por estado",
@@ -336,7 +348,7 @@
           "storageCapacity": "Almacenamiento (kg)",
           "processingCapacity": "Procesamiento (kg/día)",
           "unloadingTime": "Descarga (min)",
-          "openingCost": "Coste Apertura",
+          "openingCost": "Coste Apertura (EUR)",
           "status": "Estado",
           "actions": "Acciones"
         },
@@ -545,7 +557,7 @@
         "averagePickupTime": "Tiempo Promedio de Recogida (minutos)",
         "averagePickupTimePlaceholder": "Ej: 15",
         "averagePickupTimeError": "El tiempo de recogida debe ser mayor que 0",
-        "maxBudget": "Presupuesto Máximo",
+        "maxBudget": "Presupuesto Máximo (EUR)",
         "maxBudgetPlaceholder": "Ej: 1000",
         "maxBudgetError": "El presupuesto no puede ser negativo",
         "finalSummary": "Resumen Final",

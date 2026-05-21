@@ -18,7 +18,7 @@
     </v-snackbar>
 
     <CrudLayout
-      :title="t('vehicle.list.title')"
+      :title="listTitleWithTotal"
       icon="mdi-truck"
     >
       <template #title-actions>
@@ -34,7 +34,8 @@
         />
       </template>
 
-      <!-- Vehicles data table -->
+      <div class="list-with-map-layout">
+        <div class="list-with-map-layout__main">
       <v-data-table-server
         :headers="headers"
         :items="vehicleItems"
@@ -58,21 +59,6 @@
           <v-chip :color="vehicleTypeColor(item.rawType)" size="small">
             {{ item.type }}
           </v-chip>
-        </template>
-
-        <!-- Capacity (Kilograms) column -->
-        <template v-slot:item.capacityKilograms="{ item }">
-          {{ item.capacityKilograms }} kg
-        </template>
-
-        <!-- Capacity (Liters) column -->
-        <template v-slot:item.capacityLiters="{ item }">
-          {{ item.capacityLiters }} L
-        </template>
-
-        <!-- Cost column -->
-        <template v-slot:item.cost="{ item }">
-          {{ item.cost }}
         </template>
 
         <!-- Actions column (View, Edit, Delete buttons) -->
@@ -122,6 +108,21 @@
           </v-alert>
         </template>
       </v-data-table-server>
+        </div>
+
+        <div class="list-with-map-layout__map">
+          <EntityTypeStatisticsChart
+            class="list-with-map-layout__chart"
+            :statistics="vehicleStatistics"
+            :chart-id="10"
+            :chart-title="t('vehicle.list.statistics.byType')"
+            :empty-message="t('vehicle.list.statistics.noData')"
+            :translate-type="translateVehicleTypeKey"
+            :chart-width="280"
+            :chart-height="240"
+          />
+        </div>
+      </div>
 
       <template #toolbar-append>
         <div style="width: 250px;">
@@ -170,6 +171,7 @@ import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { VehicleType, vehicleTypeColor, vehicleTypeToOptions } from '../../../../domain/enumerate/vehicle-type';
+import EntityTypeStatisticsChart from '../../components/common/EntityTypeStatisticsChart.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
 import router from '../../router/router';
 import { useVehicleStore } from '../../stores/vehicle-store';
@@ -179,7 +181,13 @@ const { t } = useI18n();
 
 // Store instance and reactive references
 const vehicleStore = useVehicleStore();
-const { vehicles, vehicleNotification, loading, totalVehicles, currentPage, rowsPerPage } = storeToRefs(vehicleStore);
+const { vehicles, vehicleNotification, loading, totalVehicles, vehicleStatistics, currentPage, rowsPerPage } = storeToRefs(vehicleStore);
+
+const listTitleWithTotal = computed(() => {
+  const total = vehicleStatistics.value?.total;
+  const base = t('vehicle.list.title');
+  return total != null ? `${base} (${total})` : base;
+});
 
 // Local component state
 const dialogDelete = ref(false);
@@ -248,7 +256,7 @@ const vehicleItems = computed(() => {
     type: formatVehicleType(vehicle.getVehicleType()),
     capacityKilograms: vehicle.getCapacityKilograms().getKilograms(),
     capacityLiters: vehicle.getCapacityLiters().getLiters(),
-    cost: `${vehicle.getCostPerKilometer().getAmount().toFixed(2)} ${vehicle.getCostPerKilometer().getCurrency().getCode()}`,
+    cost: vehicle.getCostPerKilometer().getAmount().toFixed(2),
   }));
 });
 
@@ -310,6 +318,12 @@ const formatVehicleType = (type: VehicleType): string => {
   return t(`vehicle.add.vehicleTypes.${type}`);
 };
 
+const translateVehicleTypeKey = (typeKey: string): string => {
+  const key = `vehicle.add.vehicleTypes.${typeKey}`;
+  const translated = t(key);
+  return translated === key ? typeKey : translated;
+};
+
 /**
  * Navigate to add vehicle view
  */
@@ -367,5 +381,45 @@ const confirmDelete = async () => {
 
 .v-data-table {
   border-radius: 8px;
+}
+
+.list-with-map-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.list-with-map-layout__main {
+  flex: 2 1 0;
+  min-width: 0;
+}
+
+.list-with-map-layout__map {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 360px;
+  position: sticky;
+  top: 12px;
+}
+
+.list-with-map-layout__chart {
+  margin-bottom: 0;
+}
+
+@media (max-width: 960px) {
+  .list-with-map-layout {
+    flex-direction: column;
+  }
+
+  .list-with-map-layout__main {
+    width: 100%;
+  }
+
+  .list-with-map-layout__map {
+    width: 100%;
+    max-width: none;
+    position: static;
+  }
 }
 </style>

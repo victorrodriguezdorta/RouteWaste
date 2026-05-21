@@ -151,4 +151,27 @@ public class InMemoryVehicleRepository implements VehicleRepository {
     public Optional<Vehicle> findById(UUID id) {
         return Optional.ofNullable(store.get(id));
     }
+
+    /**
+     * Counts all vehicles in the store.
+     *
+     * @return total vehicle count
+     */
+    @Override
+    public long count() {
+        return store.size();
+    }
+
+    /**
+     * Counts vehicles grouped by {@link VehicleType}.
+     *
+     * @return map with every vehicle type and its count
+     */
+    @Override
+    public Map<VehicleType, Long> countByVehicleType() {
+        return InMemoryEnumTypeCounts.countByEnum(
+                store.values().stream(),
+                VehicleType.class,
+                Vehicle::getVehicleType);
+    }
 }

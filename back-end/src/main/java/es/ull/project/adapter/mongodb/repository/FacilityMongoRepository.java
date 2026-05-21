@@ -2,6 +2,7 @@ package es.ull.project.adapter.mongodb.repository;
 
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.adapter.mongodb.query.FacilitySearchCriteriaBuilder;
+import es.ull.project.adapter.mongodb.support.MongoEnumTypeCounts;
 import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.domain.entity.Facility;
@@ -9,6 +10,7 @@ import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,5 +174,30 @@ public class FacilityMongoRepository implements FacilityRepository {
                     .regex(criteria.getLocationPostalAddress(), CASE_INSENSITIVE_REGEX_FLAG));
         }
         return criterias;
+    }
+
+    /**
+     * Counts all facilities in the collection.
+     *
+     * @return total facility count
+     */
+    @Override
+    public long count() {
+        return MongoEnumTypeCounts.countAll(this.mongoTemplate, Facility.class, COLLECTION_NAME);
+    }
+
+    /**
+     * Counts facilities grouped by {@link FacilityType}.
+     *
+     * @return map with every facility type and its count
+     */
+    @Override
+    public Map<FacilityType, Long> countByFacilityType() {
+        return MongoEnumTypeCounts.countByEnumField(
+                this.mongoTemplate,
+                Facility.class,
+                COLLECTION_NAME,
+                MongoFields.FACILITY_TYPE,
+                FacilityType.class);
     }
 }

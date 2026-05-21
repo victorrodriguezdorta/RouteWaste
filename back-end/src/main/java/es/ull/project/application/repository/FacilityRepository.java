@@ -5,6 +5,7 @@ import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -84,4 +85,18 @@ public interface FacilityRepository {
      * @return page of matching facilities
      */
     public abstract Page<Facility> findAll(@NonNull Pageable pageable, @NonNull FacilitySearchCriteria criteria);
+
+    /**
+     * Counts all facilities in the repository.
+     *
+     * @return total facility count
+     */
+    public abstract long count();
+
+    /**
+     * Counts facilities grouped by {@link FacilityType}.
+     *
+     * @return map with every facility type and its count (zero when none)
+     */
+    public abstract Map<FacilityType, Long> countByFacilityType();
 }

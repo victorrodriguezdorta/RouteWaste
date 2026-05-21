@@ -123,6 +123,10 @@
     },
     "list": {
       "title": "Vehicles",
+      "statistics": {
+        "byType": "Vehicles by type",
+        "noData": "No vehicles registered"
+      },
       "addButton": "Add Vehicle",
       "filterByType": "Filter by type",
       "filterAll": "All types",
@@ -132,7 +136,7 @@
           "type": "Vehicle Type",
           "capacityKilograms": "Capacity (kg)",
           "capacityLiters": "Capacity (L)",
-          "cost": "Cost per Km",
+          "cost": "Cost per Km (EUR)",
           "actions": "Actions"
         },
         "tooltips": {
@@ -221,6 +225,10 @@
     },
     "list": {
       "title": "Containers",
+      "statistics": {
+        "byType": "Containers by waste type",
+        "noData": "No containers registered"
+      },
       "addButton": "Add Container",
       "filterByWasteType": "Filter by waste type",
       "filterByServiceZone": "Filter by service zone",
@@ -324,6 +332,10 @@
     },
     "list": {
       "title": "Facilities",
+      "statistics": {
+        "byType": "Facilities by type",
+        "noData": "No facilities registered"
+      },
       "addButton": "Add Facility",
       "filterByType": "Filter by type",
       "filterByStatus": "Filter by status",
@@ -336,7 +348,7 @@
           "storageCapacity": "Storage (kg)",
           "processingCapacity": "Processing (kg/day)",
           "unloadingTime": "Unloading (min)",
-          "openingCost": "Opening Cost",
+          "openingCost": "Opening Cost (EUR)",
           "status": "Status",
           "actions": "Actions"
         },
@@ -545,7 +557,7 @@
         "averagePickupTime": "Average Pickup Time (minutes)",
         "averagePickupTimePlaceholder": "E.g.: 15",
         "averagePickupTimeError": "Pickup time must be greater than 0",
-        "maxBudget": "Maximum Budget",
+        "maxBudget": "Maximum Budget (EUR)",
         "maxBudgetPlaceholder": "E.g.: 1000",
         "maxBudgetError": "Budget cannot be negative",
         "finalSummary": "Final Summary",

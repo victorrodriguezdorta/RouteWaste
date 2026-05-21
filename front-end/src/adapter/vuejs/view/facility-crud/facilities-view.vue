@@ -12,7 +12,7 @@
     </v-snackbar>
 
     <CrudLayout
-      :title="t('facility.list.title')"
+      :title="listTitleWithTotal"
       icon="mdi-factory"
     >
       <template #title-actions>
@@ -136,6 +136,16 @@
             :locations="facilityMapPins"
             detail-route-name="EditFacility"
           />
+          <EntityTypeStatisticsChart
+            class="list-with-map-layout__chart"
+            :statistics="facilityStatistics"
+            :chart-id="12"
+            :chart-title="t('facility.list.statistics.byType')"
+            :empty-message="t('facility.list.statistics.noData')"
+            :translate-type="translateFacilityTypeKey"
+            :chart-width="280"
+            :chart-height="240"
+          />
         </div>
       </div>
 
@@ -210,6 +220,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { facilityStatusColor, facilityStatusToOptions } from '../../../../domain/enumerate/facility-status';
 import { facilityTypeColor, facilityTypeToOptions } from '../../../../domain/enumerate/facility-type';
+import EntityTypeStatisticsChart from '../../components/common/EntityTypeStatisticsChart.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
 import LocationsListMap from '../../components/common/LocationsListMap.vue';
 import router from '../../router/router';
@@ -218,7 +229,19 @@ import { useFacilityStore } from '../../stores/facility-store';
 const { t } = useI18n();
 
 const facilityStore = useFacilityStore();
-const { facilities, facilityNotification, loading, totalFacilities, currentPage, rowsPerPage } = storeToRefs(facilityStore);
+const { facilities, facilityNotification, loading, totalFacilities, facilityStatistics, currentPage, rowsPerPage } = storeToRefs(facilityStore);
+
+const listTitleWithTotal = computed(() => {
+  const total = facilityStatistics.value?.total;
+  const base = t('facility.list.title');
+  return total != null ? `${base} (${total})` : base;
+});
+
+const translateFacilityTypeKey = (typeKey: string): string => {
+  const key = `facility.add.facilityTypes.${typeKey}`;
+  const translated = t(key);
+  return translated === key ? typeKey : translated;
+};
 
 const dialogDelete = ref(false);
 const selectedFacilityId = ref('');
@@ -317,11 +340,11 @@ const facilityItems = computed(() => {
       rawFacilityType: facility.getFacilityType(),
       rawStatus: facility.getStatus(),
       type: t(`facility.add.facilityTypes.${facility.getFacilityType()}`),
-      location: `${location.postalAddress} (${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)})`,
-      storageCapacity: `${storageCapacity.toFixed(2)} kg`,
-      processingCapacity: `${processingCapacity.toFixed(2)} kg/día`,
-      unloadingTime: `${unloadingTime} min`,
-      openingCost: `${openingCost.getAmount().toFixed(2)} ${openingCost.getCurrency().getCode()}`,
+      location: location.postalAddress,
+      storageCapacity: storageCapacity.toFixed(2),
+      processingCapacity: processingCapacity.toFixed(2),
+      unloadingTime,
+      openingCost: openingCost.getAmount().toFixed(2),
       status: t(`facility.add.statuses.${facility.getStatus()}`),
     };
   });
@@ -435,6 +458,13 @@ const confirmDelete = async () => {
   min-width: 0;
   position: sticky;
   top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.list-with-map-layout__chart {
+  margin-bottom: 0;
 }
 
 .list-with-map-layout__map :deep(.locations-list-map),

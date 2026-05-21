@@ -171,11 +171,11 @@ export function useAlgorithmExecution() {
         rawFacilityType: facility.getFacilityType(),
         rawStatus: facility.getStatus(),
         type: t(`facility.add.facilityTypes.${facility.getFacilityType()}`),
-        location: `${location.postalAddress} (${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)})`,
-        storageCapacity: `${storageCapacity.toFixed(2)} kg`,
-        processingCapacity: `${processingCapacity.toFixed(2)} kg/día`,
-        unloadingTime: `${unloadingTime} min`,
-        openingCost: `${openingCost.getAmount().toFixed(2)} ${openingCost.getCurrency().getCode()}`,
+        location: location.postalAddress,
+        storageCapacity: storageCapacity.toFixed(2),
+        processingCapacity: processingCapacity.toFixed(2),
+        unloadingTime,
+        openingCost: openingCost.getAmount().toFixed(2),
         status: t(`facility.add.statuses.${facility.getStatus()}`),
       };
     });
@@ -206,7 +206,7 @@ export function useAlgorithmExecution() {
       type: t(`vehicle.add.vehicleTypes.${vehicle.getVehicleType()}`),
       capacityKilograms: vehicle.getCapacityKilograms().getKilograms(),
       capacityLiters: vehicle.getCapacityLiters().getLiters(),
-      cost: `${vehicle.getCostPerKilometer().getAmount().toFixed(2)} ${vehicle.getCostPerKilometer().getCurrency().getCode()}`,
+      cost: vehicle.getCostPerKilometer().getAmount().toFixed(2),
     }));
   });
 
@@ -645,9 +645,9 @@ export function useAlgorithmExecution() {
         rawWasteType: container.getWasteType(),
         rawServiceZone: serviceZone,
         wasteType: t(`container.add.wasteTypes.${container.getWasteType()}`),
-        location: `${location.postalAddress} (${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)})`,
-        capacityLiters: `${capacity.getLiters()} L`,
-        demand: `${dailyDemand.getLitersPerDay()} L/day`,
+        location: location.postalAddress,
+        capacityLiters: capacity.getLiters(),
+        demand: dailyDemand.getLitersPerDay(),
         serviceZone: serviceZone
           ? t(`container.add.serviceZones.${serviceZone}`)
           : t('container.list.notAssigned'),

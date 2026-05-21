@@ -1,5 +1,6 @@
 package es.ull.project.adapter.rest.response.facility;
 
+import es.ull.project.adapter.rest.response.common.EntityStatisticsResponseBody;
 import es.ull.project.domain.valueobject.page.NumberOfElements;
 import es.ull.project.domain.valueobject.page.PageFlag;
 import es.ull.project.domain.valueobject.page.PageNumber;
@@ -52,4 +53,9 @@ public class FacilityPageResponseBody {
      * True when current page is the last one.
      */
     public PageFlag last;
+
+    /**
+     * Global statistics: total facilities and count per {@link es.ull.project.domain.enumerate.FacilityType}.
+     */
+    public EntityStatisticsResponseBody statistics;
 }

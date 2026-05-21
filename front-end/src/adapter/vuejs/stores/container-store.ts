@@ -7,6 +7,7 @@ import {
     UpdateContainerService
 } from '@/application/service/container';
 import type { Container } from '@/domain/entity/container';
+import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 
@@ -35,6 +36,9 @@ export const useContainerStore = defineStore('Container', {
 
     /** Total amount of containers available in backend */
     totalContainers: 0,
+
+    /** Global statistics from last list response (unfiltered totals by type) */
+    containerStatistics: undefined as EntityTypeStatistics | undefined,
 
     /** Current zero-based page index loaded from backend */
     currentPage: 0,
@@ -142,6 +146,7 @@ export const useContainerStore = defineStore('Container', {
           this.totalContainers = data.totalElements;
           this.currentPage = data.page;
           this.rowsPerPage = data.size;
+          this.containerStatistics = data.statistics;
           this.loading = false;
         }
       );

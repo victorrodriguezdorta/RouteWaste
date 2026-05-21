@@ -2,9 +2,11 @@ package es.ull.project.application.service.facility;
 
 import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.application.service.common.EntityTypeBreakdownBuilder;
 import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.readmodel.EntityTypeBreakdown;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -82,5 +84,18 @@ public class ReadFacilityService implements ReadFacilityUseCase {
     @Override
     public Page<Facility> fetchAll(@NonNull Pageable pageable, @NonNull FacilitySearchCriteria criteria) {
         return this.repository.findAll(pageable, criteria);
+    }
+
+    /**
+     * Returns global facility statistics (total and per {@link FacilityType}).
+     *
+     * @return unfiltered type breakdown
+     */
+    @Override
+    public EntityTypeBreakdown fetchStatistics() {
+        return EntityTypeBreakdownBuilder.fromCounts(
+                this.repository.count(),
+                this.repository.countByFacilityType(),
+                FacilityType.class);
     }
 }

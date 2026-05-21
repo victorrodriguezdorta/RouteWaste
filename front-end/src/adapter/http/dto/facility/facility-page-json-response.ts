@@ -1,3 +1,4 @@
+import type { EntityStatisticsJsonResponse } from '../common/entity-statistics-json-response';
 import type { FacilityJsonResponse } from './facility-json-response';
 
 /**
@@ -12,4 +13,5 @@ export interface FacilityPageJsonResponse {
   numberOfElements: number;
   first: boolean;
   last: boolean;
+  statistics?: EntityStatisticsJsonResponse;
 }

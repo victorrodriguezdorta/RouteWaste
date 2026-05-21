@@ -2,6 +2,7 @@ package es.ull.project.adapter.rest.controller;
 
 import es.ull.project.adapter.mongodb.mapper.FacilityFieldMapper;
 import es.ull.project.adapter.mongodb.query.FacilitySearchCriteriaBuilder;
+import es.ull.project.adapter.rest.mapper.EntityStatisticsResponseMapper;
 import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
 import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
@@ -198,6 +199,7 @@ public class FacilityController {
         response.numberOfElements = new NumberOfElements(facilityPage.getNumberOfElements());
         response.first = new PageFlag(facilityPage.isFirst());
         response.last = new PageFlag(facilityPage.isLast());
+        response.statistics = EntityStatisticsResponseMapper.toResponseBody(this.readFacilityUseCase.fetchStatistics());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -8,6 +8,7 @@ import {
     UpdateFacilityService
 } from '@/application/service/facility';
 import type { Facility } from '@/domain/entity/facility';
+import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 
@@ -36,6 +37,9 @@ export const useFacilityStore = defineStore('Facility', {
     
     /** Total amount of facilities available in backend */
     totalFacilities: 0,
+
+    /** Global statistics from last list response (unfiltered totals by type) */
+    facilityStatistics: undefined as EntityTypeStatistics | undefined,
 
     /** Current zero-based page index loaded from backend */
     currentPage: 0,
@@ -137,6 +141,7 @@ export const useFacilityStore = defineStore('Facility', {
           console.log('[FacilityStore.getFacilities] Success, received facilities:', data);
           this.facilities = data.items;
           this.totalFacilities = data.totalElements;
+          this.facilityStatistics = data.statistics;
           this.currentPage = data.page;
           this.rowsPerPage = data.size;
           this.loading = false;

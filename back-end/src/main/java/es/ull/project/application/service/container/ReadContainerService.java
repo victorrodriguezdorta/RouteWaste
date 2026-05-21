@@ -2,9 +2,11 @@ package es.ull.project.application.service.container;
 
 import es.ull.project.application.query.ContainerSearchCriteria;
 import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.application.service.common.EntityTypeBreakdownBuilder;
 import es.ull.project.application.usecase.container.ReadContainerUseCase;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.WasteType;
+import es.ull.project.domain.readmodel.EntityTypeBreakdown;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -83,5 +85,18 @@ public class ReadContainerService implements ReadContainerUseCase {
     @Override
     public Page<Container> fetchAll(@NonNull Pageable pageable, @NonNull ContainerSearchCriteria criteria) {
         return this.repository.findAll(pageable, criteria);
+    }
+
+    /**
+     * Returns global container statistics (total and per {@link WasteType}).
+     *
+     * @return unfiltered type breakdown
+     */
+    @Override
+    public EntityTypeBreakdown fetchStatistics() {
+        return EntityTypeBreakdownBuilder.fromCounts(
+                this.repository.count(),
+                this.repository.countByWasteType(),
+                WasteType.class);
     }
 }

@@ -155,4 +155,27 @@ public class InMemoryContainerRepository implements ContainerRepository {
         List<Container> pageContent = start >= filtered.size() ? List.of() : filtered.subList(start, end);
         return new PageImpl<>(pageContent, pageable, filtered.size());
     }
+
+    /**
+     * Counts all containers in the store.
+     *
+     * @return total container count
+     */
+    @Override
+    public long count() {
+        return store.size();
+    }
+
+    /**
+     * Counts containers grouped by {@link WasteType}.
+     *
+     * @return map with every waste type and its count
+     */
+    @Override
+    public Map<WasteType, Long> countByWasteType() {
+        return InMemoryEnumTypeCounts.countByEnum(
+                store.values().stream(),
+                WasteType.class,
+                Container::getWasteType);
+    }
 }
