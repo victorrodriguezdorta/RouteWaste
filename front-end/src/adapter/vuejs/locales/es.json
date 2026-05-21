@@ -496,7 +496,7 @@
   },
   "algorithm": {
     "list": {
-      "title": "Algoritmos",
+      "title": "Algoritmo de Recogida",
       "runButton": "Ejecutar algoritmo",
       "table": {
         "headers": {
@@ -600,7 +600,7 @@
         "description": "Configura las instalaciones de procesamiento, almacenes y puntos de transferencia."
       },
       "algorithm": {
-        "title": "Algoritmo de Ruta",
+        "title": "Algoritmo de Recogida",
         "description": "Visualiza y gestiona el algoritmo de optimización de rutas de recolección.",
         "buttonText": "Calcular Ruta"
       }

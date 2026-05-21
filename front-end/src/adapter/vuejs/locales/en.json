@@ -496,7 +496,7 @@
   },
   "algorithm": {
     "list": {
-      "title": "Algorithms",
+      "title": "Collection Algorithm",
       "runButton": "Run algorithm",
       "table": {
         "headers": {
@@ -600,7 +600,7 @@
         "description": "Configure processing facilities, warehouses and transfer points."
       },
       "algorithm": {
-        "title": "Route Algorithm",
+        "title": "Collection Algorithm",
         "description": "View and manage the collection route optimization algorithm.",
         "buttonText": "Calculate Route"
       }
