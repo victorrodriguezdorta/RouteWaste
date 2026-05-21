@@ -1,0 +1,13 @@
+{
+  "name": "sensor-app",
+  "private": true,
+  "description": "Root tooling for sensor-app (REST API Newman tests)",
+  "scripts": {
+    "postman:generate": "node scripts/generate-rest-api-postman.mjs",
+    "test:api": "newman run rest-api_tests.json -e rest-api_environment.json",
+    "test:api:generate": "npm run postman:generate && npm run test:api"
+  },
+  "devDependencies": {
+    "newman": "^6.2.1"
+  }
+}

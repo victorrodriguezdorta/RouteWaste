@@ -1,0 +1,39 @@
+{
+  "id": "711c2f4b-7f6d-4579-bb9e-b2bfbd993fb9",
+  "name": "Sensor App Local",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "vehicleId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "containerId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "facilityId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "infrastructurePlanId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2026-05-21T15:26:33.994Z",
+  "_postman_exported_using": "generate-rest-api-postman.mjs"
+}
