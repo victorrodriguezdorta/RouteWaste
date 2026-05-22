@@ -31,6 +31,12 @@ coverage
 /cypress/videos/
 /cypress/screenshots/
 
+# Playwright
+front-end/test-results/
+front-end/playwright-report/
+front-end/blob-report/
+front-end/playwright/.cache/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

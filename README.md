@@ -332,3 +332,52 @@ Los tests de CRUD crean entidades de prueba con nombre `Newman Test … {{$times
 1. Edita `scripts/generate-rest-api-postman.mjs` si cambian rutas o contratos JSON.
 2. Regenera los JSON: `npm run postman:generate`
 3. Vuelve a ejecutar: `npm run test:api`
+
+## Front-end E2E tests (Playwright)
+
+UI tests live in `front-end/e2e/` and run from the **terminal** (the Playwright UI is optional).
+
+### Requirements
+
+- Node.js in `front-end/`
+- Chromium browser (one-time install):
+
+```bash
+cd front-end
+npm install
+npx playwright install chromium
+```
+
+- For API-dependent tests: back-end and MongoDB running (`docker compose --profile back-end up -d`).
+
+### Run
+
+```bash
+cd front-end
+npm run test:e2e
+```
+
+Useful commands:
+
+| Command | Description |
+|---------|-------------|
+| `npm run test:e2e` | Full suite (starts Vite on `:5173` automatically) |
+| `npm run test:e2e:headed` | Same, with a visible browser |
+| `npm run test:e2e:ui` | Interactive mode (explore and debug tests) |
+| `npm run test:e2e:report` | Open the HTML report from the last run |
+
+The API URL is set in `front-end/.env.development` (`VITE_APP_API_URL=http://localhost:8080/api/v1/`).
+
+Test source code (names, comments, messages) is in **English**. UI assertions use **Spanish** labels because the app defaults to `es`.
+
+### Suite coverage
+
+| File | Coverage |
+|------|----------|
+| `e2e/navigation.spec.ts` | Home screen and navigation to vehicles |
+| `e2e/vehicles.spec.ts` | List, create form, validation, delete (API + UI) |
+| `e2e/containers.spec.ts` | List, create form, validation, delete (API + UI) |
+| `e2e/facilities.spec.ts` | List, create form, validation, delete (API + UI) |
+| `e2e/algorithm.spec.ts` | Plans list and execution screen |
+
+Delete tests (create via API, remove in UI) are skipped when the back-end is not available at `localhost:8080`. The rest does not require the API.

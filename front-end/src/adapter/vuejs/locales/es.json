@@ -1,4 +1,10 @@
 {
+  "notFound": {
+    "code": "404",
+    "title": "Página no encontrada",
+    "description": "La ruta que buscas no existe o ha sido movida.",
+    "goHome": "Ir al inicio"
+  },
   "nav": {
     "navigation": "Navegación",
     "openMenu": "Abrir menú de navegación",
@@ -78,6 +84,8 @@
       "fields": {
         "name": "Nombre",
         "vehicleType": "Tipo de Vehículo",
+        "capacityKilograms": "Capacidad (kg)",
+        "capacityLiters": "Capacidad (L)",
         "capacityValue": "Valor de Capacidad",
         "capacityUnit": "Unidad (ej: tons, kg)",
         "timeUnit": "Unidad de Tiempo",
@@ -98,6 +106,8 @@
       "fields": {
         "name": "Nombre",
         "vehicleType": "Tipo de Vehículo",
+        "capacityKilograms": "Capacidad (kg)",
+        "capacityLiters": "Capacidad (L)",
         "capacityValue": "Valor de Capacidad",
         "capacityUnit": "Unidad (ej: tons, kg)",
         "timeUnit": "Unidad de Tiempo",
@@ -113,6 +123,8 @@
       "fields": {
         "name": "Nombre",
         "vehicleType": "Tipo de Vehículo",
+        "capacityKilograms": "Capacidad (kg)",
+        "capacityLiters": "Capacidad (L)",
         "capacityValue": "Valor de Capacidad",
         "capacityUnit": "Unidad",
         "timeUnit": "Unidad de Tiempo",

@@ -100,6 +100,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('../view/algorithm/show-infrastructure-plan.vue'),
         props: true,
     },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: () => import('../view/not-found/not-found.vue'),
+    },
 ];
 
 const router: Router = createRouter({

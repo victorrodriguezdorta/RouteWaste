@@ -1,4 +1,10 @@
 {
+  "notFound": {
+    "code": "404",
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "goHome": "Go to home"
+  },
   "nav": {
     "navigation": "Navigation",
     "openMenu": "Open navigation menu",
@@ -78,6 +84,8 @@
       "fields": {
         "name": "Name",
         "vehicleType": "Vehicle Type",
+        "capacityKilograms": "Capacity (kg)",
+        "capacityLiters": "Capacity (L)",
         "capacityValue": "Capacity Value",
         "capacityUnit": "Unit (e.g., tons, kg)",
         "timeUnit": "Time Unit",
