@@ -21,6 +21,7 @@ import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -121,6 +122,7 @@ public class AlgorithmController {
     })
     @PostMapping("/execute")
     public ResponseEntity<JsonNode> executeAlgorithm(
+            @Parameter(description = "Selected facilities, vehicles, containers, planning horizon, and optional budget")
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Selected facilities, vehicles, containers, planning horizon, and optional budget",
                     required = true,

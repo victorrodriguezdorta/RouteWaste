@@ -10,7 +10,13 @@ import java.util.stream.Stream;
  */
 public final class InMemoryEnumTypeCounts {
 
+    private static final String UTILITY_CLASS_MESSAGE = "This is a utility class and cannot be instantiated.";
+
+    /**
+     * Prevents instantiation of this utility class.
+     */
     private InMemoryEnumTypeCounts() {
+        throw new UnsupportedOperationException(UTILITY_CLASS_MESSAGE);
     }
 
     /**

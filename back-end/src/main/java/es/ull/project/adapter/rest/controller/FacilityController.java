@@ -2,7 +2,6 @@ package es.ull.project.adapter.rest.controller;
 
 import es.ull.project.adapter.mongodb.mapper.FacilityFieldMapper;
 import es.ull.project.adapter.mongodb.query.FacilitySearchCriteriaBuilder;
-import es.ull.project.adapter.rest.mapper.EntityStatisticsResponseMapper;
 import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
 import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
@@ -204,7 +203,7 @@ public class FacilityController {
         response.numberOfElements = new NumberOfElements(facilityPage.getNumberOfElements());
         response.first = new PageFlag(facilityPage.isFirst());
         response.last = new PageFlag(facilityPage.isLast());
-        response.statistics = EntityStatisticsResponseMapper.toResponseBody(this.readFacilityUseCase.fetchStatistics());
+        response.statistics = this.readFacilityUseCase.fetchStatistics();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -261,6 +260,7 @@ public class FacilityController {
     })
     @PostMapping("/")
     public ResponseEntity<FacilityResponseBody> createFacility(
+            @Parameter(description = "Facility attributes required to create a new record")
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Facility attributes required to create a new record",
                     required = true,
@@ -309,6 +309,7 @@ public class FacilityController {
     @PutMapping("/{id}")
     public ResponseEntity<FacilityResponseBody> updateFacility(
             @Parameter(description = "Facility UUID") @PathVariable String id,
+            @Parameter(description = "Full facility payload used to replace the existing record")
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Full facility payload used to replace the existing record",
                     required = true,

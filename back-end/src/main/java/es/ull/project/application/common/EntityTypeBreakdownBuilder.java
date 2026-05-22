@@ -1,7 +1,9 @@
-package es.ull.project.application.service.common;
+package es.ull.project.application.common;
 
 import es.ull.project.domain.readmodel.EntityTypeBreakdown;
+import es.ull.project.domain.readmodel.EntityTypeCount;
 import es.ull.project.domain.valueobject.page.TotalElements;
+import es.ull.project.domain.valueobject.statistics.EntityTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +15,13 @@ import java.util.function.Function;
  */
 public final class EntityTypeBreakdownBuilder {
 
+    private static final String UTILITY_CLASS_MESSAGE = "This is a utility class and cannot be instantiated.";
+
+    /**
+     * Prevents instantiation of this utility class.
+     */
     private EntityTypeBreakdownBuilder() {
+        throw new UnsupportedOperationException(UTILITY_CLASS_MESSAGE);
     }
 
     /**
@@ -31,11 +39,11 @@ public final class EntityTypeBreakdownBuilder {
             Map<E, Long> counts,
             E[] enumValues,
             Function<E, String> typeName) {
-        List<EntityTypeBreakdown.TypeCount> byType = new ArrayList<>(enumValues.length);
+        List<EntityTypeCount> byType = new ArrayList<>(enumValues.length);
         for (E enumValue : enumValues) {
             long count = counts.getOrDefault(enumValue, 0L);
-            byType.add(new EntityTypeBreakdown.TypeCount(
-                    typeName.apply(enumValue),
+            byType.add(new EntityTypeCount(
+                    new EntityTypeName(typeName.apply(enumValue)),
                     new TotalElements(count)));
         }
         return new EntityTypeBreakdown(new TotalElements(total), byType);

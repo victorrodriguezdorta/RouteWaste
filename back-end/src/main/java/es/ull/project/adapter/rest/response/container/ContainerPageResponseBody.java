@@ -1,6 +1,6 @@
 package es.ull.project.adapter.rest.response.container;
 
-import es.ull.project.adapter.rest.response.common.EntityStatisticsResponseBody;
+import es.ull.project.domain.readmodel.EntityTypeBreakdown;
 import es.ull.project.domain.valueobject.page.NumberOfElements;
 import es.ull.project.domain.valueobject.page.PageFlag;
 import es.ull.project.domain.valueobject.page.PageNumber;
@@ -57,5 +57,5 @@ public class ContainerPageResponseBody {
     /**
      * Global statistics: total containers and count per {@link es.ull.project.domain.enumerate.WasteType}.
      */
-    public EntityStatisticsResponseBody statistics;
+    public EntityTypeBreakdown statistics;
 }

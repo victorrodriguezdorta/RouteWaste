@@ -5,18 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import es.ull.project.adapter.memory.InMemoryEnumTypeCounts;
 import es.ull.project.application.query.ContainerSearchCriteria;
 import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.application.repository.ContainerDailyStateRepository;
@@ -617,8 +619,7 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
 
         @Override
         public Map<FacilityType, Long> countByFacilityType() {
-          return InMemoryEnumTypeCounts.countByEnum(
-              saved.values().stream(), FacilityType.class, Facility::getFacilityType);
+          return countByEnum(saved.values().stream(), FacilityType.class, Facility::getFacilityType);
         }
       }
 
@@ -675,8 +676,7 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
 
         @Override
         public Map<WasteType, Long> countByWasteType() {
-          return InMemoryEnumTypeCounts.countByEnum(
-              saved.values().stream(), WasteType.class, Container::getWasteType);
+          return countByEnum(saved.values().stream(), WasteType.class, Container::getWasteType);
         }
       }
 
@@ -728,8 +728,24 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
 
         @Override
         public Map<VehicleType, Long> countByVehicleType() {
-          return InMemoryEnumTypeCounts.countByEnum(
-              saved.values().stream(), VehicleType.class, Vehicle::getVehicleType);
+          return countByEnum(saved.values().stream(), VehicleType.class, Vehicle::getVehicleType);
         }
       }
+
+    private static <T, E extends Enum<E>> Map<E, Long> countByEnum(
+            Stream<T> entities,
+            Class<E> enumClass,
+            Function<T, E> classifier) {
+        Map<E, Long> counts = new EnumMap<>(enumClass);
+        for (E enumValue : enumClass.getEnumConstants()) {
+            counts.put(enumValue, 0L);
+        }
+        entities.forEach(entity -> {
+            E key = classifier.apply(entity);
+            if (key != null) {
+                counts.merge(key, 1L, Long::sum);
+            }
+        });
+        return counts;
+    }
 }

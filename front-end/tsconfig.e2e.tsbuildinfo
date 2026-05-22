@@ -1,0 +1,1 @@
+{"root":["./playwright.config.ts","./e2e/algorithm.spec.ts","./e2e/containers.spec.ts","./e2e/facilities.spec.ts","./e2e/navigation.spec.ts","./e2e/not-found.spec.ts","./e2e/vehicles.spec.ts","./e2e/helpers/api.ts","./e2e/helpers/backend.ts","./e2e/helpers/entity-api.ts","./e2e/helpers/navigation.ts","./e2e/helpers/paginated-list.ts","./e2e/helpers/table.ts"],"version":"6.0.3"}

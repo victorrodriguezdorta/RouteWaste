@@ -1,7 +1,7 @@
 package es.ull.project.application.service.vehicle;
 
 import es.ull.project.application.repository.VehicleRepository;
-import es.ull.project.application.service.common.EntityTypeBreakdownBuilder;
+import es.ull.project.application.common.EntityTypeBreakdownBuilder;
 import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;

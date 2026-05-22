@@ -3,7 +3,6 @@ package es.ull.project.adapter.rest.controller;
 import es.ull.project.adapter.mongodb.mapper.ContainerFieldMapper;
 import es.ull.project.adapter.mongodb.query.ContainerSearchCriteriaBuilder;
 import es.ull.project.adapter.rest.mapper.ContainerResponseMapper;
-import es.ull.project.adapter.rest.mapper.EntityStatisticsResponseMapper;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
 import es.ull.project.adapter.rest.response.container.ContainerPageResponseBody;
@@ -207,7 +206,7 @@ public class ContainerController {
         response.numberOfElements = new NumberOfElements(containerPage.getNumberOfElements());
         response.first = new PageFlag(containerPage.isFirst());
         response.last = new PageFlag(containerPage.isLast());
-        response.statistics = EntityStatisticsResponseMapper.toResponseBody(this.readContainerUseCase.fetchStatistics());
+        response.statistics = this.readContainerUseCase.fetchStatistics();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -264,6 +263,7 @@ public class ContainerController {
     })
     @PostMapping("/")
     public ResponseEntity<ContainerResponseBody> createContainer(
+            @Parameter(description = "Container attributes required to create a new record")
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Container attributes required to create a new record",
                     required = true,
@@ -310,6 +310,7 @@ public class ContainerController {
     @PutMapping("/{id}")
     public ResponseEntity<ContainerResponseBody> updateContainer(
             @Parameter(description = "Container UUID") @PathVariable String id,
+            @Parameter(description = "Full container payload used to replace the existing record")
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Full container payload used to replace the existing record",
                     required = true,

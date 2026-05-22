@@ -8,13 +8,7 @@ import java.util.List;
  */
 public record EntityTypeBreakdown(
         TotalElements total,
-        List<TypeCount> byType) {
-
-    /**
-     * Count for a single enumerated type (e.g. vehicle or waste type).
-     */
-    public record TypeCount(String type, TotalElements count) {
-    }
+        List<EntityTypeCount> byType) {
 
     /**
      * Canonical constructor ensuring a non-null, immutable list of type counts.

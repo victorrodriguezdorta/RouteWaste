@@ -11,7 +11,13 @@ import org.springframework.data.mongodb.core.query.Query;
  */
 public final class MongoEnumTypeCounts {
 
+    private static final String UTILITY_CLASS_MESSAGE = "This is a utility class and cannot be instantiated.";
+
+    /**
+     * Prevents instantiation of this utility class.
+     */
     private MongoEnumTypeCounts() {
+        throw new UnsupportedOperationException(UTILITY_CLASS_MESSAGE);
     }
 
     /**

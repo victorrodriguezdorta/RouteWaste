@@ -1,7 +1,6 @@
 package es.ull.project.adapter.rest.controller;
 
 import es.ull.project.adapter.mongodb.mapper.VehicleFieldMapper;
-import es.ull.project.adapter.rest.mapper.EntityStatisticsResponseMapper;
 import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
@@ -181,7 +180,7 @@ public class VehicleController {
         response.numberOfElements = new NumberOfElements(vehiclePage.getNumberOfElements());
         response.first = new PageFlag(vehiclePage.isFirst());
         response.last = new PageFlag(vehiclePage.isLast());
-        response.statistics = EntityStatisticsResponseMapper.toResponseBody(this.readVehicleUseCase.fetchStatistics());
+        response.statistics = this.readVehicleUseCase.fetchStatistics();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -238,6 +237,7 @@ public class VehicleController {
     })
     @PostMapping("/")
     public ResponseEntity<VehicleResponseBody> createVehicle(
+            @Parameter(description = "Vehicle attributes required to create a new record")
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Vehicle attributes required to create a new record",
                     required = true,
@@ -279,6 +279,7 @@ public class VehicleController {
     @PutMapping("/{id}")
     public ResponseEntity<VehicleResponseBody> updateVehicle(
             @Parameter(description = "Vehicle UUID") @PathVariable String id,
+            @Parameter(description = "Full vehicle payload used to replace the existing record")
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Full vehicle payload used to replace the existing record",
                     required = true,
