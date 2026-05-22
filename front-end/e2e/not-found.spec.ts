@@ -1,0 +1,17 @@
+import { expect, test } from '@playwright/test';
+
+test.describe('Not found', () => {
+  test('shows the 404 page for unknown routes', async ({ page }) => {
+    await page.goto('/this-route-does-not-exist');
+    await expect(page.getByText('404')).toBeVisible();
+    await expect(page.getByText('Página no encontrada')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Ir al inicio' })).toBeVisible();
+  });
+
+  test('returns to home from the 404 page', async ({ page }) => {
+    await page.goto('/unknown-playwright-route');
+    await page.getByRole('button', { name: 'Ir al inicio' }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByText('Bienvenido a Route Waste')).toBeVisible();
+  });
+});

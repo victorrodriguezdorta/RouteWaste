@@ -370,14 +370,15 @@ The API URL is set in `front-end/.env.development` (`VITE_APP_API_URL=http://loc
 
 Test source code (names, comments, messages) is in **English**. UI assertions use **Spanish** labels because the app defaults to `es`.
 
-### Suite coverage
+### Suite coverage (40 tests)
 
 | File | Coverage |
 |------|----------|
-| `e2e/navigation.spec.ts` | Home screen and navigation to vehicles |
-| `e2e/vehicles.spec.ts` | List, create form, validation, delete (API + UI) |
-| `e2e/containers.spec.ts` | List, create form, validation, delete (API + UI) |
-| `e2e/facilities.spec.ts` | List, create form, validation, delete (API + UI) |
-| `e2e/algorithm.spec.ts` | Plans list and execution screen |
+| `e2e/navigation.spec.ts` | Home cards, side menu links |
+| `e2e/not-found.spec.ts` | 404 page and return home |
+| `e2e/vehicles.spec.ts` | List, headers, create, cancel, validation, view, edit, delete |
+| `e2e/containers.spec.ts` | Same flows as vehicles |
+| `e2e/facilities.spec.ts` | Same flows as vehicles |
+| `e2e/algorithm.spec.ts` | Plans list, headers, execution wizard, API table load |
 
-Delete tests (create via API, remove in UI) are skipped when the back-end is not available at `localhost:8080`. The rest does not require the API.
+Tests that create data via API (view, edit, delete, algorithm table) are skipped when the back-end is not available at `localhost:8080`. Smoke tests (navigation, forms, validation) do not require the API.
