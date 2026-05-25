@@ -1,21 +1,9 @@
-import type { CreateContainerCommand } from './create-container-command';
-import type { CreateContainerResult } from './create-container-result';
+import type { CreateContainerCommand } from '@/application/model/container-management/create-container/create-container-command';
+import type { CreateContainerResult } from '@/application/model/container-management/create-container/create-container-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-
-export type { CreateContainerCommand } from './create-container-command';
-export type { CreateContainerResult } from './create-container-result';
-
-// CreateContainerUseCase.ts
-// Use case contract for creating a new container
 
 /**
  * Use case for registering a new container in the system.
- * Input: location, waste type, waste demand, service zone
- * Output: Container (entity)
- */
-
-/**
- * use case contract for creating a container
  */
 export interface CreateContainerUseCase {
     /**
@@ -25,3 +13,6 @@ export interface CreateContainerUseCase {
      */
     execute(command: CreateContainerCommand): Promise<Either<DataError, CreateContainerResult>>;
 }
+
+export type { CreateContainerCommand } from '@/application/model/container-management/create-container/create-container-command';
+export type { CreateContainerResult } from '@/application/model/container-management/create-container/create-container-result';

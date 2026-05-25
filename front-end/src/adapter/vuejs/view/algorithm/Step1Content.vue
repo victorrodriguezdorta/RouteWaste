@@ -266,7 +266,7 @@ import { useI18n } from 'vue-i18n';
 import { facilityTypeColor } from '../../../../domain/enumerate/facility-type';
 import { vehicleTypeColor } from '../../../../domain/enumerate/vehicle-type';
 import LocationsListMap from '../../components/common/LocationsListMap.vue';
-import { useAlgorithmExecution } from '../../composables/useAlgorithmExecution';
+import { useAlgorithmExecution } from '@/adapter/vuejs/composables/use-algorithm-execution';
 
 const { t } = useI18n();
 

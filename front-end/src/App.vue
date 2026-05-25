@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import type { Link } from '@ull-tfg/ull-tfg-typescript';
 import { Footer } from '@ull-tfg/ull-tfg-vue';
 import AppHeader from './adapter/vuejs/components/common/AppHeader.vue';
-import NavigationDrawer from './adapter/vuejs/components/common/navigation-drawer.vue';
+import NavigationDrawer from './adapter/vuejs/components/common/NavigationDrawer.vue';
 
 const drawerOpen = ref(false);
 

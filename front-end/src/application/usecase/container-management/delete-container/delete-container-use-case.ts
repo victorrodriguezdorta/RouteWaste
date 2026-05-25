@@ -1,18 +1,6 @@
-// DeleteContainerUseCase.ts
-// Use case contract for deleting a container
-
-import type { DeleteContainerCommand } from './delete-container-command';
-import type { DeleteContainerResult } from './delete-container-result';
+import type { DeleteContainerCommand } from '@/application/model/container-management/delete-container/delete-container-command';
+import type { DeleteContainerResult } from '@/application/model/container-management/delete-container/delete-container-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-
-export type { DeleteContainerCommand } from './delete-container-command';
-export type { DeleteContainerResult } from './delete-container-result';
-
-/**
- * Use case for deleting a container from the system.
- * Input: containerId
- * Output: success confirmation (boolean)
- */
 
 /**
  * Use case contract for deleting a container
@@ -26,4 +14,5 @@ export interface DeleteContainerUseCase {
     execute(command: DeleteContainerCommand): Promise<Either<DataError, DeleteContainerResult>>;
 }
 
-
+export type { DeleteContainerCommand } from '@/application/model/container-management/delete-container/delete-container-command';
+export type { DeleteContainerResult } from '@/application/model/container-management/delete-container/delete-container-result';

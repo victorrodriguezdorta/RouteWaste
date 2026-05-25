@@ -1,8 +1,14 @@
+import { postBulkImportFile } from '@/adapter/http/bulk-import-http';
+import type { BulkImportJsonResponse } from '@/adapter/http/dto/common/bulk-import-json-response';
+import {
+  type BulkImportResult,
+  toBulkImportResult,
+} from '@/adapter/http/dto/common/bulk-import-result';
 import { ContainerJsonResponse } from '@/adapter/http/dto/container/container-json-response';
-import { toEntityTypeStatistics } from '@/adapter/http/mapper/entity-statistics-json-mapper';
 import type { ContainerPageJsonResponse } from '@/adapter/http/dto/container/container-page-json-response';
 import { ContainerPostJsonRequest } from '@/adapter/http/dto/container/container-post-json-request';
 import { ContainerPutJsonRequest } from '@/adapter/http/dto/container/container-put-json-request';
+import { toEntityTypeStatistics } from '@/adapter/http/mapper/entity-statistics-json-mapper';
 import type { ContainerRepository } from '@/application/repository/container-repository';
 import type { CreateContainerCommand, CreateContainerResult } from '@/application/usecase/container-management/create-container/create-container-use-case';
 import type { DeleteContainerCommand, DeleteContainerResult } from '@/application/usecase/container-management/delete-container/delete-container-use-case';
@@ -10,13 +16,11 @@ import type { FilterContainersCommand, FilterContainersResult } from '@/applicat
 import type { GetContainerCommand, GetContainerResult } from '@/application/usecase/container-management/get-container/get-container-use-case';
 import type { ListContainersCommand, ListContainersResult } from '@/application/usecase/container-management/list-containers/list-containers-use-case';
 import type { UpdateContainerCommand, UpdateContainerResult } from '@/application/usecase/container-management/update-container/update-container-use-case';
-import type {
-    ApiError,
-    DataError,
-} from '@ull-tfg/ull-tfg-typescript';
 import {
-    Either,
-    http,
+  type ApiError,
+  type DataError,
+  Either,
+  http,
 } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -234,7 +238,7 @@ export class ContainerHttpRepository implements ContainerRepository {
         .delete(url, this.headers)
         .then(response => {
           if (response.ok) {
-            resolve(Either.right(true));
+            resolve(Either.right({ success: true }));
           } else {
             response.json().then((data: ApiError) => {
               data.kind = 'ApiError';
@@ -282,20 +286,48 @@ export class ContainerHttpRepository implements ContainerRepository {
         .then(response => {
           if (response.ok) {
             response.json().then((data: ContainerJsonResponse[]) => {
-              const convertedData: FilterContainersResult = [];
-              
-              // Transform each JSON response to domain entity
+              const items: FilterContainersResult['items'] = [];
+
               data.forEach(container => {
-                convertedData.push(ContainerJsonResponse.toContainer(container));
+                items.push(ContainerJsonResponse.toContainer(container));
               });
-              
-              resolve(Either.right(convertedData));
+
+              resolve(Either.right({ items }));
             });
           } else {
             response.json().then((data: ApiError) => {
               reject(Either.left(data));
             });
           }
+        })
+        .catch((error: any) => {
+          resolve(Either.left({ kind: 'UnexpectedError', message: error }));
+        });
+    });
+  }
+
+  /**
+   * Import containers from a JSON file uploaded as multipart form data.
+   *
+   * @param file JSON file with an array of containers or {@code { containers: [...] }}
+   * @returns Either a DataError or bulk import statistics
+   */
+  public async importFromFile(
+    file: File
+  ): Promise<Either<DataError, BulkImportResult>> {
+    const url = `${this.API_URL}bulk/import`;
+
+    return new Promise((resolve) => {
+      postBulkImportFile(url, file)
+        .then(async (response) => {
+          const body = await response.json();
+          if (response.ok) {
+            resolve(Either.right(toBulkImportResult(body as BulkImportJsonResponse)));
+            return;
+          }
+          const apiError = body as ApiError;
+          apiError.kind = 'ApiError';
+          resolve(Either.left(apiError));
         })
         .catch((error: any) => {
           resolve(Either.left({ kind: 'UnexpectedError', message: error }));

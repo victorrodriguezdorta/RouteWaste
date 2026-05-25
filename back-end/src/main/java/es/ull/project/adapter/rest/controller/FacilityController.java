@@ -2,12 +2,18 @@ package es.ull.project.adapter.rest.controller;
 
 import es.ull.project.adapter.mongodb.mapper.FacilityFieldMapper;
 import es.ull.project.adapter.mongodb.query.FacilitySearchCriteriaBuilder;
+import es.ull.project.adapter.rest.mapper.BulkImportResponseMapper;
 import es.ull.project.adapter.rest.mapper.FacilityResponseMapper;
+import es.ull.project.adapter.rest.request.facility.FacilityBulkPostRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
+import es.ull.project.adapter.rest.response.bulk.BulkImportResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityPageResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
+import es.ull.project.adapter.rest.support.BulkImportMultipartSupport;
+import es.ull.project.application.model.BulkCreateOutcome;
 import es.ull.project.application.query.FacilitySearchCriteria;
+import es.ull.project.application.usecase.facility.BulkCreateFacilitiesUseCase;
 import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
 import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
 import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
@@ -40,6 +46,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,7 +56,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * FacilityController
@@ -83,6 +92,12 @@ public class FacilityController {
      */
     @Autowired
     private CreateFacilityUseCase createFacilityUseCase;
+
+    @Autowired
+    private BulkCreateFacilitiesUseCase bulkCreateFacilitiesUseCase;
+
+    @Autowired
+    private BulkImportMultipartSupport bulkImportMultipartSupport;
 
     /**
      * Use case for updating existing facilities.
@@ -282,6 +297,77 @@ public class FacilityController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    /**
+     * POST /facilities/bulk
+     *
+     * Creates multiple facilities from a JSON array in the request body.
+     *
+     * @param requestBody bulk payload with one or more facility records
+     * @return ResponseEntity with import summary and HTTP 201 if all succeed,
+     *         or HTTP 400 when one or more items fail validation or persistence
+     */
+    @Operation(summary = "Bulk create facilities", description = "Creates multiple facilities from a JSON array in the request body")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "All facilities created successfully",
+                    content = @Content(schema = @Schema(implementation = BulkImportResponseBody.class))),
+            @ApiResponse(responseCode = "400", description = "Validation failed or one or more items could not be created")
+    })
+    @PostMapping(ApiRoutes.BULK)
+    public ResponseEntity<BulkImportResponseBody> bulkCreateFacilities(
+            @Parameter(description = "JSON array of facilities or object {\"facilities\": [...]}")
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "JSON array of facilities or object {\"facilities\": [...]}",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = FacilityBulkPostRequestBody.class)))
+            @RequestBody FacilityBulkPostRequestBody requestBody) {
+        return executeBulkCreate(requestBody);
+    }
+
+    /**
+     * POST /facilities/bulk/import
+     *
+     * Uploads a JSON file containing many facilities to create in a single operation.
+     *
+     * @param file multipart JSON file (array or object with a facilities property)
+     * @return ResponseEntity with import summary and HTTP 201 if all succeed,
+     *         or HTTP 400 when the file is invalid or one or more items fail
+     */
+    @Operation(summary = "Import facilities from JSON file", description = "Uploads a JSON file containing many facilities to create")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "All facilities created successfully",
+                    content = @Content(schema = @Schema(implementation = BulkImportResponseBody.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid file or one or more items could not be created")
+    })
+    @PostMapping(value = ApiRoutes.BULK_IMPORT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BulkImportResponseBody> importFacilitiesFromFile(
+            @Parameter(description = "JSON file with facilities (array or {\"facilities\": [...]})")
+            @RequestPart("file") MultipartFile file) {
+        FacilityBulkPostRequestBody requestBody = this.bulkImportMultipartSupport.parseJsonFile(
+                file, FacilityBulkPostRequestBody.class);
+        return executeBulkCreate(requestBody);
+    }
+
+    /**
+     * Runs the bulk create use case and maps the outcome to an HTTP response.
+     *
+     * @param requestBody bulk payload with facility records to create
+     * @return ResponseEntity with import summary and appropriate HTTP status
+     */
+    private ResponseEntity<BulkImportResponseBody> executeBulkCreate(FacilityBulkPostRequestBody requestBody) {
+        List<FacilityPostRequestBody> items = requestBody.facilities;
+        BulkCreateOutcome outcome = this.bulkCreateFacilitiesUseCase.createAll(
+                items.stream().map(item -> item.name).toList(),
+                items.stream().map(item -> item.facilityType).toList(),
+                items.stream().map(item -> item.location).toList(),
+                items.stream().map(item -> item.storageCapacity).toList(),
+                items.stream().map(item -> item.processingCapacity).toList(),
+                items.stream().map(item -> item.unloadingTime).toList(),
+                items.stream().map(item -> item.openingFixedCost).toList(),
+                items.stream().map(item -> item.status).toList());
+        HttpStatus status = outcome.isSuccess() ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+        return new ResponseEntity<>(BulkImportResponseMapper.toResponseBody(outcome), status);
     }
 
     /**

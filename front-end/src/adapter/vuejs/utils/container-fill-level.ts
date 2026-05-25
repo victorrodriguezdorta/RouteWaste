@@ -1,10 +1,13 @@
+import type { ContainerFillMarkerTone } from './container-fill-marker-tone';
+import type { ContainerFillThemePalette } from './container-fill-theme-palette';
 import type {
   InfrastructurePlanContainerDailyStateDetail,
   InfrastructurePlanContainerDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
 import { professionalLightColors } from '@/theme/professional-light-colors';
 
-export type ContainerFillMarkerTone = 'unknown' | 'normal' | 'medium' | 'overflow';
+export type { ContainerFillMarkerTone } from './container-fill-marker-tone';
+export type { ContainerFillThemePalette } from './container-fill-theme-palette';
 
 export function normalizePlanDay(value: number | string | null | undefined): number {
   if (typeof value === 'number' && Number.isFinite(value)) {
@@ -64,8 +67,6 @@ export function containerFillToneForEntry(entry: {
 }): ContainerFillMarkerTone {
   return resolveContainerFillMarkerTone(computeContainerFillPercent(entry));
 }
-
-export type ContainerFillThemePalette = Record<ContainerFillMarkerTone, string>;
 
 /** Misma fuente que `main.ts` → `professionalLightColors`. */
 export function buildContainerFillThemePalette(): ContainerFillThemePalette {

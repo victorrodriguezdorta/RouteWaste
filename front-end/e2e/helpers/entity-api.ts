@@ -1,5 +1,5 @@
-import type { APIRequestContext } from '@playwright/test';
 import { apiBaseUrl } from './api';
+import type { APIRequestContext } from '@playwright/test';
 
 export async function createVehicle(
   request: APIRequestContext,

@@ -15,6 +15,11 @@ springdoc:
 spring:
   application:
     name: back-end
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   
   # Allow bean definition overriding (required for Spring Boot 3.4.11 compatibility)
   main:

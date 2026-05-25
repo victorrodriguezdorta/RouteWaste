@@ -11,11 +11,13 @@ import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.application.service.algorithm.ExecuteAlgorithmService;
 import es.ull.project.application.service.algorithm.PersistAlgorithmExecutionResultService;
 import es.ull.project.application.service.algorithm.RunAlgorithmService;
+import es.ull.project.application.service.container.BulkCreateContainersService;
 import es.ull.project.application.service.container.CreateContainerService;
 import es.ull.project.application.service.container.DeleteContainerService;
 import es.ull.project.application.service.container.ReadContainerService;
 import es.ull.project.application.service.container.UpdateContainerService;
 import es.ull.project.application.service.dailyplan.ReadDailyPlanService;
+import es.ull.project.application.service.facility.BulkCreateFacilitiesService;
 import es.ull.project.application.service.facility.CreateFacilityService;
 import es.ull.project.application.service.facility.DeleteFacilityService;
 import es.ull.project.application.service.facility.ReadFacilityService;
@@ -25,6 +27,7 @@ import es.ull.project.application.service.infrastructureplan.DeleteInfrastructur
 import es.ull.project.application.service.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditService;
 import es.ull.project.application.service.infrastructureplan.ReadInfrastructurePlanService;
 import es.ull.project.application.service.overview.GetApplicationOverviewService;
+import es.ull.project.application.service.vehicle.BulkCreateVehiclesService;
 import es.ull.project.application.service.vehicle.CreateVehicleService;
 import es.ull.project.application.service.vehicle.DeleteVehicleService;
 import es.ull.project.application.service.vehicle.ReadVehicleService;
@@ -32,11 +35,13 @@ import es.ull.project.application.service.vehicle.UpdateVehicleService;
 import es.ull.project.application.usecase.algorithm.ExecuteAlgorithmUseCase;
 import es.ull.project.application.usecase.algorithm.PersistAlgorithmExecutionResultUseCase;
 import es.ull.project.application.usecase.algorithm.RunAlgorithmUseCase;
+import es.ull.project.application.usecase.container.BulkCreateContainersUseCase;
 import es.ull.project.application.usecase.container.CreateContainerUseCase;
 import es.ull.project.application.usecase.container.DeleteContainerUseCase;
 import es.ull.project.application.usecase.container.ReadContainerUseCase;
 import es.ull.project.application.usecase.container.UpdateContainerUseCase;
 import es.ull.project.application.usecase.dailyplan.ReadDailyPlanUseCase;
+import es.ull.project.application.usecase.facility.BulkCreateFacilitiesUseCase;
 import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
 import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
 import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
@@ -46,6 +51,7 @@ import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructur
 import es.ull.project.application.usecase.infrastructureplan.InvalidateInfrastructurePlansOnEntityEditUseCase;
 import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
 import es.ull.project.application.usecase.overview.GetApplicationOverviewUseCase;
+import es.ull.project.application.usecase.vehicle.BulkCreateVehiclesUseCase;
 import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
@@ -143,6 +149,17 @@ public class ServiceConfiguration {
     }
 
     /**
+     * Creates the service bean responsible for bulk container creation.
+     *
+     * @param createContainerUseCase single-entity create use case
+     * @return configured {@link BulkCreateContainersService} instance
+     */
+    @Bean
+    public BulkCreateContainersUseCase bulkCreateContainersService(CreateContainerUseCase createContainerUseCase) {
+        return new BulkCreateContainersService(createContainerUseCase);
+    }
+
+    /**
      * Creates the service bean responsible for reading containers.
      *
      * @param repository the container repository
@@ -193,6 +210,17 @@ public class ServiceConfiguration {
     }
 
     /**
+     * Creates the service bean responsible for bulk facility creation.
+     *
+     * @param createFacilityUseCase single-entity create use case
+     * @return configured {@link BulkCreateFacilitiesService} instance
+     */
+    @Bean
+    public BulkCreateFacilitiesUseCase bulkCreateFacilitiesService(CreateFacilityUseCase createFacilityUseCase) {
+        return new BulkCreateFacilitiesService(createFacilityUseCase);
+    }
+
+    /**
      * Creates the service bean responsible for reading facilities.
      *
      * @param repository the facility repository
@@ -240,6 +268,17 @@ public class ServiceConfiguration {
     @Bean
     public CreateVehicleUseCase createVehicleService(VehicleRepository repository) {
         return new CreateVehicleService(repository);
+    }
+
+    /**
+     * Creates the service bean responsible for bulk vehicle creation.
+     *
+     * @param createVehicleUseCase single-entity create use case
+     * @return configured {@link BulkCreateVehiclesService} instance
+     */
+    @Bean
+    public BulkCreateVehiclesUseCase bulkCreateVehiclesService(CreateVehicleUseCase createVehicleUseCase) {
+        return new BulkCreateVehiclesService(createVehicleUseCase);
     }
 
     /**

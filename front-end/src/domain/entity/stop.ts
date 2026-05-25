@@ -1,17 +1,11 @@
 import { Container } from '@/domain/entity/container';
+import type { StopAlert } from '@/domain/entity/stop-alert';
 import { CollectedVolumeLiters } from '@/domain/valueobject/capacity/collected-volume-liters';
 import { CollectedWeightKilograms } from '@/domain/valueobject/capacity/collected-weight-kilograms';
 import { Distance } from '@/domain/valueobject/location/distance';
 import { RouteSequence } from '@/domain/valueobject/location/route-sequence';
 
-/**
- * Stop alert containing information about events during collection.
- */
-export interface StopAlert {
-  type: string;
-  message: string;
-  value?: number;
-}
+export type { StopAlert } from '@/domain/entity/stop-alert';
 
 /**
  * Stop
@@ -98,6 +92,13 @@ export class Stop {
 
   /**
    * Validate that all required parameters are not null.
+   *
+   * @param sequence Route sequence for this stop
+   * @param container Container visited at this stop
+   * @param collectedKilograms Weight collected at this stop
+   * @param collectedLiters Volume collected at this stop
+   * @param distanceFromPreviousMeters Distance from the previous stop
+   * @param cumulativeDistanceMeters Cumulative distance traveled so far
    * @throws Error if any required parameter is null or undefined
    */
   private validate(

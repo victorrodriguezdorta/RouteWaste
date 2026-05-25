@@ -1,13 +1,12 @@
-import { ContainerHttpRepository } from '@/adapter/http/container-http-repository';
-import {
-    CreateContainerService,
-    DeleteContainerService,
-    GetContainerService,
-    ListContainersService,
-    UpdateContainerService
-} from '@/application/service/container';
+import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
 import type { Container } from '@/domain/entity/container';
 import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
+import { ContainerHttpRepository } from '@/adapter/http/container-http-repository';
+import { CreateContainerService } from '@/application/service/container/create-container-service';
+import { DeleteContainerService } from '@/application/service/container/delete-container-service';
+import { GetContainerService } from '@/application/service/container/get-container-service';
+import { ListContainersService } from '@/application/service/container/list-containers-service';
+import { UpdateContainerService } from '@/application/service/container/update-container-service';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 
@@ -272,6 +271,28 @@ export const useContainerStore = defineStore('Container', {
      * 
      * @param id UUID string of the container to delete
      */
+    /**
+     * Import containers from a JSON file via the bulk import API.
+     *
+     * @param file JSON file selected by the user
+     * @returns import statistics when the request completes, or null on transport/API error
+     */
+    async importContainersFromFile(file: File): Promise<BulkImportResult | null> {
+      this.loading = true;
+      try {
+        const result = await this.containerRepository.importFromFile(file);
+        return result.fold(
+          (error) => {
+            this.handleError(error);
+            return null;
+          },
+          (data) => data,
+        );
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async deleteContainer(id: string) {
       // Create service instance with repository
       const deleteService = new DeleteContainerService(this.containerRepository);
@@ -338,8 +359,15 @@ export const useContainerStore = defineStore('Container', {
       // Determine error message based on error kind
       let errorMessage = 'An unexpected error occurred';
       
-      if (error.kind === 'ValidationError') {
-        errorMessage = error.message || 'Invalid container data';
+      if (error.kind === 'ApiError' || error.error === 'ValidationError' || error.kind === 'ValidationError') {
+        if (error.details && error.details.length > 0) {
+          errorMessage = error.details
+            .map((detail: { field: string; issue?: string; message?: string }) =>
+              `${detail.field}: ${detail.issue ?? detail.message ?? ''}`)
+            .join('; ');
+        } else {
+          errorMessage = error.message || 'Invalid container data';
+        }
       } else if (error.kind === 'NotFoundError') {
         errorMessage = 'Container not found';
       } else if (error.kind === 'ConflictError') {

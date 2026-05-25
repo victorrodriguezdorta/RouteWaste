@@ -1,4 +1,4 @@
-import type { UpdateVehicleCommand } from '@/application/usecase/vehicle-management/update-vehicle/update-vehicle-command';
+import type { UpdateVehicleCommand } from '@/application/model/vehicle-management/update-vehicle/update-vehicle-command';
 
 /**
  * VehiclePutJsonRequest DTO

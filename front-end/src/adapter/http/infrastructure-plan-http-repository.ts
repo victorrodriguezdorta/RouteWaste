@@ -1,3 +1,6 @@
+import { InfrastructurePlanDetailMapper } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
+import type { InfrastructurePlanJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-json-response';
+import type { InfrastructurePlansResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plans-response';
 import type { InfrastructurePlanRepository } from '@/application/repository/infrastructure-plan-repository';
 import type { DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/delete-infrastructure-plan/delete-infrastructure-plan-use-case';
 import type { GetInfrastructurePlanCommand, GetInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-use-case';
@@ -8,9 +11,6 @@ import {
   Either,
   http,
 } from '@ull-tfg/ull-tfg-typescript';
-import { InfrastructurePlanDetailMapper } from './dto/infrastructure-plan/infrastructure-plan-detail-mapper';
-import type { InfrastructurePlanJsonResponse } from './dto/infrastructure-plan/infrastructure-plan-json-response';
-import type { InfrastructurePlansResponse } from './dto/infrastructure-plan/infrastructure-plans-response';
 
 /**
  * HTTP repository implementation for InfrastructurePlan entity.
@@ -131,7 +131,7 @@ export class InfrastructurePlanHttpRepository implements InfrastructurePlanRepos
         .delete(url, this.headers)
         .then(response => {
           if (response.ok) {
-            resolve(Either.right(true));
+            resolve(Either.right({ success: true }));
           } else {
             response.json().then((data: ApiError) => {
               data.kind = 'ApiError';

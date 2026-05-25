@@ -312,14 +312,14 @@ function formatLiters(value: number | null | undefined): string {
 
 function monitoringStatusLabel(status: string | null | undefined): string {
   if (!status) {
-    return t('infrastructurePlan.show.daily.monitoring.statuses.NO_DATA');
+    return t('infrastructurePlan.show.daily.monitoring.statuses.noData');
   }
 
   if (status === 'OVERFLOWED') {
-    return t('infrastructurePlan.show.daily.monitoring.statuses.OVERFLOWED');
+    return t('infrastructurePlan.show.daily.monitoring.statuses.overflowed');
   }
 
-  return t('infrastructurePlan.show.daily.monitoring.statuses.OK');
+  return t('infrastructurePlan.show.daily.monitoring.statuses.ok');
 }
 
 function fillPercent(entry: { container: InfrastructurePlanContainerDetail; state?: InfrastructurePlanContainerDailyStateDetail }): number | null {

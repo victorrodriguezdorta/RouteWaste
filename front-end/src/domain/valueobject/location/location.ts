@@ -17,7 +17,8 @@ export class Location {
   /**
    * Regular expression used to validate the postal address.
    */
-  private static readonly POSTAL_REGEX = /^[A-Za-z0-9\s,.-]+$/;
+  /** Letters (including accents), digits, spaces and common address punctuation. */
+  private static readonly POSTAL_REGEX = /^[\p{L}\p{N}\s,.-]+$/u;
 
   /**
    * Validated postal address.

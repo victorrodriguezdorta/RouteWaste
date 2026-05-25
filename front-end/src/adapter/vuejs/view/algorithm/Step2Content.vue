@@ -182,7 +182,7 @@ import { useI18n } from 'vue-i18n';
 import { serviceZoneColor } from '../../../../domain/enumerate/service-zone';
 import { wasteTypeColor } from '../../../../domain/enumerate/waste-type';
 import LocationsListMap from '../../components/common/LocationsListMap.vue';
-import { useAlgorithmExecution } from '../../composables/useAlgorithmExecution';
+import { useAlgorithmExecution } from '@/adapter/vuejs/composables/use-algorithm-execution';
 
 const { t } = useI18n();
 

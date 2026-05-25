@@ -1,14 +1,13 @@
-import { FacilityHttpRepository } from '@/adapter/http/facility-http-repository';
-import {
-    CreateFacilityService,
-    DeleteFacilityService,
-    FilterFacilitiesService,
-    GetFacilityService,
-    ListFacilitiesService,
-    UpdateFacilityService
-} from '@/application/service/facility';
+import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
 import type { Facility } from '@/domain/entity/facility';
 import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
+import { FacilityHttpRepository } from '@/adapter/http/facility-http-repository';
+import { CreateFacilityService } from '@/application/service/facility/create-facility-service';
+import { DeleteFacilityService } from '@/application/service/facility/delete-facility-service';
+import { FilterFacilitiesService } from '@/application/service/facility/filter-facilities-service';
+import { GetFacilityService } from '@/application/service/facility/get-facility-service';
+import { ListFacilitiesService } from '@/application/service/facility/list-facilities-service';
+import { UpdateFacilityService } from '@/application/service/facility/update-facility-service';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 
@@ -107,8 +106,6 @@ export const useFacilityStore = defineStore('Facility', {
      * @param location Optional location filter (postal address)
      */
     async getFacilities(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', facilityType?: string, status?: string, location?: string) {
-      console.log('[FacilityStore.getFacilities] Starting fetch with params:', { page, rowsPerPage, sortBy, sortOrder, facilityType, status, location });
-      
       this.loading = true;
       this.facilities = [];
       const requestedPage = page ?? this.currentPage;
@@ -138,7 +135,6 @@ export const useFacilityStore = defineStore('Facility', {
         },
         data => {
           // Success case: update state with facilities
-          console.log('[FacilityStore.getFacilities] Success, received facilities:', data);
           this.facilities = data.items;
           this.totalFacilities = data.totalElements;
           this.facilityStatistics = data.statistics;
@@ -273,6 +269,22 @@ export const useFacilityStore = defineStore('Facility', {
      * 
      * @param id UUID string of the facility to delete
      */
+    async importFacilitiesFromFile(file: File): Promise<BulkImportResult | null> {
+      this.loading = true;
+      try {
+        const result = await this.facilityRepository.importFromFile(file);
+        return result.fold(
+          (error) => {
+            this.handleError(error);
+            return null;
+          },
+          (data) => data,
+        );
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async deleteFacility(id: string) {
       // Create service instance with repository
       const deleteService = new DeleteFacilityService(this.facilityRepository);
@@ -330,7 +342,7 @@ export const useFacilityStore = defineStore('Facility', {
         },
         data => {
           // Success case: update state with filtered facilities
-          this.facilities = data;
+          this.facilities = data.items;
           this.loading = false;
         }
       );
@@ -369,8 +381,15 @@ export const useFacilityStore = defineStore('Facility', {
       // Determine error message based on error kind
       let errorMessage = 'An unexpected error occurred';
       
-      if (error.kind === 'ValidationError') {
-        errorMessage = error.message || 'Invalid facility data';
+      if (error.kind === 'ApiError' || error.error === 'ValidationError' || error.kind === 'ValidationError') {
+        if (error.details && error.details.length > 0) {
+          errorMessage = error.details
+            .map((detail: { field: string; issue?: string; message?: string }) =>
+              `${detail.field}: ${detail.issue ?? detail.message ?? ''}`)
+            .join('; ');
+        } else {
+          errorMessage = error.message || 'Invalid facility data';
+        }
       } else if (error.kind === 'NotFoundError') {
         errorMessage = 'Facility not found';
       } else if (error.kind === 'ConflictError') {

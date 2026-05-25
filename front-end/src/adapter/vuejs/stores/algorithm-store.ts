@@ -1,5 +1,5 @@
 import { AlgorithmHttpRepository } from '@/adapter/http/algorithm-http-repository';
-import { CreateAlgorithmService } from '@/application/service/algorithm';
+import { CreateAlgorithmService } from '@/application/service/algorithm/create-algorithm-service';
 import type { CreateAlgorithmCommand, CreateAlgorithmResult } from '@/application/usecase/algorithm-management/create-algorithm/create-algorithm-use-case';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';

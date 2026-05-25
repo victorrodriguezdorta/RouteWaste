@@ -8,7 +8,7 @@
             <v-icon v-if="icon" size="48" class="mr-4" color="primary">{{ icon }}</v-icon>
             <h1 class="text-h4 font-weight-bold text-primary">{{ title }}</h1>
             
-            <div class="ml-6">
+            <div class="ml-6 list-title-actions">
               <slot name="title-actions" />
             </div>
           </v-col>
@@ -60,5 +60,14 @@ withDefaults(defineProps<{
 </script>
 
 <style scoped>
-.rounded-lg { border-radius: 8px !important; }
+.rounded-lg {
+  border-radius: 8px !important;
+}
+
+.list-title-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
 </style>

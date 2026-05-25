@@ -1,3 +1,10 @@
+import en from './adapter/vuejs/locales/en.json';
+import es from './adapter/vuejs/locales/es.json';
+import router from './adapter/vuejs/router/router';
+import App from './App.vue';
+import './style.css';
+/** Colores del tema: edítalos en `src/theme/professional-light-colors.ts` */
+import { professionalLightColors } from './theme/professional-light-colors';
 import '@mdi/font/css/materialdesignicons.css';
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
@@ -46,18 +53,11 @@ import {
   VToolbarTitle,
   VTooltip,
   VWindow,
-  VWindowItem,
+  VWindowItem
 } from 'vuetify/components';
 import { Ripple } from 'vuetify/directives';
 import { en as vuetifyEn, es as vuetifyEs } from 'vuetify/locale';
 import 'vuetify/styles';
-import en from './adapter/vuejs/locales/en.json';
-import es from './adapter/vuejs/locales/es.json';
-import router from './adapter/vuejs/router/router';
-import App from './App.vue';
-/** Colores del tema: edítalos en `src/theme/professional-light-colors.ts` */
-import { professionalLightColors } from './theme/professional-light-colors';
-import './style.css';
 
 const vuetify = createVuetify({
   components: {
@@ -95,13 +95,13 @@ const vuetify = createVuetify({
     VStepperItem,
     VStepperWindow,
     VStepperWindowItem,
+    VTab,
+    VTabs,
     VTextField,
     VTextarea,
     VToolbar,
     VToolbarTitle,
     VTooltip,
-    VTabs,
-    VTab,
     VWindow,
     VWindowItem,
   },

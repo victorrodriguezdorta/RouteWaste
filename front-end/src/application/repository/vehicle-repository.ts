@@ -1,3 +1,4 @@
+import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
 import type { CreateVehicleCommand, CreateVehicleResult } from '@/application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
 import type { DeleteVehicleCommand, DeleteVehicleResult } from '@/application/usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';
 import type { GetVehicleCommand, GetVehicleResult } from '@/application/usecase/vehicle-management/get-vehicle/get-vehicle-use-case';
@@ -44,4 +45,11 @@ export interface VehicleRepository {
    * @return Either a DataError or a boolean indicating success.
    */
   delete(command: DeleteVehicleCommand): Promise<Either<DataError, DeleteVehicleResult>>;
+
+  /**
+   * @brief Import vehicles from a JSON file.
+   * @param file JSON file selected by the user.
+   * @return Either a DataError or bulk import statistics.
+   */
+  importFromFile(file: File): Promise<Either<DataError, BulkImportResult>>;
 }

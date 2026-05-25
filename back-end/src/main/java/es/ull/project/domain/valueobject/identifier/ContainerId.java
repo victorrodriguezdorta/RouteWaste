@@ -14,7 +14,7 @@ public final class ContainerId {
      * Container UUID value.
      * It is a required attribute.
      */
-    private final String value;
+    private final UUID value;
 
     /**
      * Creates a container identifier.
@@ -25,7 +25,7 @@ public final class ContainerId {
         if (value == null) {
             throw new IllegalArgumentException(ERROR_ID_NOT_DEFINED);
         }
-        this.value = value.toString();
+        this.value = value;
     }
 
     /**
@@ -34,7 +34,7 @@ public final class ContainerId {
      * @return container UUID
      */
     public UUID getValue() {
-        return UUID.fromString(this.value);
+        return this.value;
     }
 
     /**
@@ -72,6 +72,6 @@ public final class ContainerId {
      */
     @Override
     public String toString() {
-        return this.value;
+        return this.value.toString();
     }
 }

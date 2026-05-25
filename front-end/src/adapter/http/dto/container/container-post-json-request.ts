@@ -1,4 +1,4 @@
-import type { CreateContainerCommand } from '@/application/usecase/container-management/create-container/create-container-command';
+import type { CreateContainerCommand } from '@/application/model/container-management/create-container/create-container-command';
 
 /**
  * ContainerPostJsonRequest DTO

@@ -1,4 +1,4 @@
-import type { UpdateContainerCommand } from '@/application/usecase/container-management/update-container/update-container-command';
+import type { UpdateContainerCommand } from '@/application/model/container-management/update-container/update-container-command';
 
 /**
  * ContainerPutJsonRequest DTO

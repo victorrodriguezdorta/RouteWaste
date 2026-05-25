@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
 import { isBackendAvailable } from './api';
+import { test } from '@playwright/test';
 
 export async function skipWithoutBackend(): Promise<void> {
   const backendUp = await isBackendAvailable();

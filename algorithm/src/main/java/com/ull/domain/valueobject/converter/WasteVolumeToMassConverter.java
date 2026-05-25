@@ -9,6 +9,10 @@ import com.ull.domain.enumerate.WasteType;
  */
 public final class WasteVolumeToMassConverter {
 
+  private static final double ZERO_AMOUNT = 0.0;
+  private static final double ZERO_LITERS = 0.0;
+  private static final String UTILITY_CLASS_INSTANTIATION =
+      "This is a utility class and cannot be instantiated.";
   private static final double ORGANIC_KG_PER_LITER = 0.50;
   private static final double PACKAGING_KG_PER_LITER = 0.08;
   private static final double PAPER_CARDBOARD_KG_PER_LITER = 0.15;
@@ -16,8 +20,11 @@ public final class WasteVolumeToMassConverter {
   private static final double RESIDUAL_KG_PER_LITER = 0.40;
   private static final double DEFAULT_KG_PER_LITER = RESIDUAL_KG_PER_LITER;
 
+  /**
+   * Prevents instantiation of this utility class.
+   */
   private WasteVolumeToMassConverter() {
-    throw new UnsupportedOperationException("Utility class");
+    throw new UnsupportedOperationException(UTILITY_CLASS_INSTANTIATION);
   }
 
   /**
@@ -47,8 +54,8 @@ public final class WasteVolumeToMassConverter {
    * @return mass in kilograms
    */
   public static double litersToKilograms(double liters, WasteType wasteType) {
-    if (liters <= 0.0) {
-      return 0.0;
+    if (liters <= ZERO_LITERS) {
+      return ZERO_LITERS;
     }
     return liters * kilogramsPerLiter(wasteType);
   }
@@ -61,11 +68,11 @@ public final class WasteVolumeToMassConverter {
    * @return liters limit implied by kg capacity
    */
   public static double litersFromRemainingKilograms(double remainingKilograms, WasteType wasteType) {
-    if (remainingKilograms <= 0.0) {
-      return 0.0;
+    if (remainingKilograms <= ZERO_AMOUNT) {
+      return ZERO_LITERS;
     }
     double density = kilogramsPerLiter(wasteType);
-    if (density <= 0.0) {
+    if (density <= ZERO_AMOUNT) {
       return Double.MAX_VALUE;
     }
     return remainingKilograms / density;

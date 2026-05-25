@@ -1,10 +1,8 @@
+import type { FacilityAssignmentBarDatum } from './facility-assignment-bar-datum';
+import type { PlanOverviewAnalytics } from './plan-overview-analytics';
+import type { TypeCountDatum } from './type-count-datum';
 import type { InfrastructurePlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import type { InfrastructurePlanFacilityDetail } from '@/domain/read-model/infrastructure-plan-detail/details/infrastructure-plan-facility-detail';
-import type {
-  FacilityAssignmentBarDatum,
-  PlanOverviewAnalytics,
-  TypeCountDatum,
-} from './types';
 
 function countUniqueVehiclesForFacility(facility: InfrastructurePlanFacilityDetail): number {
   const vehicleIds = new Set(

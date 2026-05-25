@@ -1,4 +1,4 @@
-import type { CreateFacilityCommand } from '@/application/usecase/facility-management/create-facility/create-facility-command';
+import type { CreateFacilityCommand } from '@/application/model/facility-management/create-facility/create-facility-command';
 
 /**
  * FacilityPostJsonRequest DTO
@@ -77,9 +77,7 @@ export class FacilityPostJsonRequest {
    * @returns A new FacilityPostJsonRequest instance with VO structures.
    */
   public static toRequest(data: CreateFacilityCommand): FacilityPostJsonRequest {
-    console.log('[FacilityPostJsonRequest.toRequest] Converting command to request:', data);
-    
-    const request = new FacilityPostJsonRequest(
+    return new FacilityPostJsonRequest(
       data.name.getValue(),
       data.facilityType,
       {
@@ -100,8 +98,5 @@ export class FacilityPostJsonRequest {
       },
       data.status
     );
-    
-    console.log('[FacilityPostJsonRequest.toRequest] Converted request:', request);
-    return request;
   }
 }

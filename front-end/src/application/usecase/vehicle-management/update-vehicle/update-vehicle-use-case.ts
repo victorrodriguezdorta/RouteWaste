@@ -1,13 +1,10 @@
-import type { UpdateVehicleCommand } from './update-vehicle-command';
-import type { UpdateVehicleResult } from './update-vehicle-result';
+import type { UpdateVehicleCommand } from '@/application/model/vehicle-management/update-vehicle/update-vehicle-command';
+import type { UpdateVehicleResult } from '@/application/model/vehicle-management/update-vehicle/update-vehicle-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 
-export type { UpdateVehicleCommand } from './update-vehicle-command';
-export type { UpdateVehicleResult } from './update-vehicle-result';
-
-// UpdateVehicleUseCase.ts
-// Use case contract for updating a vehicle
-// Use case contract
+/**
+ * Use case contract for updating a vehicle
+ */
 export interface UpdateVehicleUseCase {
     /**
      * Handles the update of an existing vehicle
@@ -17,3 +14,6 @@ export interface UpdateVehicleUseCase {
      */
     execute(command: UpdateVehicleCommand): Promise<Either<DataError, UpdateVehicleResult>>;
 }
+
+export type { UpdateVehicleCommand } from '@/application/model/vehicle-management/update-vehicle/update-vehicle-command';
+export type { UpdateVehicleResult } from '@/application/model/vehicle-management/update-vehicle/update-vehicle-result';

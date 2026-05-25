@@ -1,3 +1,11 @@
+import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
+
+/** Returns the locale key segment for a facility status enum value. */
+export function facilityStatusLocaleKey(status: FacilityStatus | string): string {
+  const value = typeof status === 'string' ? facilityStatusFromString(status) : status;
+  return enumToLocaleKey(value);
+}
+
 /**
  * FacilityStatus
  *
@@ -81,7 +89,7 @@ export function facilityStatusRandom(): FacilityStatus {
  */
 export function facilityStatusToOptions(t: (key: string) => string): { title: string; value: FacilityStatus }[] {
   return facilityStatusValues().map((status) => ({
-    title: t(`facility.add.statuses.${status}`),
+    title: t(`facility.add.statuses.${facilityStatusLocaleKey(status)}`),
     value: status,
   }));
 }

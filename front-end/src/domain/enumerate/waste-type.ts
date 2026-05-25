@@ -1,3 +1,13 @@
+import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
+
+/**
+ * Returns the locale key segment for a waste type enum value.
+ */
+export function wasteTypeLocaleKey(type: WasteType | string): string {
+  const value = typeof type === 'string' ? wasteTypeFromString(type) : type;
+  return enumToLocaleKey(value);
+}
+
 /**
  * WasteType
  *
@@ -110,7 +120,7 @@ export function wasteTypeColor(type: WasteType | string): string {
  */
 export function wasteTypeToOptions(t: (key: string) => string): { title: string; value: WasteType }[] {
   return wasteTypeValues().map((type) => ({
-    title: t(`container.add.wasteTypes.${type}`),
+    title: t(`container.add.wasteTypes.${wasteTypeLocaleKey(type)}`),
     value: type,
   }));
 }

@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { PieChartDatum } from '@/adapter/vuejs/analytics/infrastructure-plan/types';
+import type { PieChartDatum } from '@/adapter/vuejs/analytics/infrastructure-plan/pie-chart-datum';
 import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { PieChart } from '@ull-tfg/ull-tfg-vue';
 import { computed, onMounted, ref, watch } from 'vue';

@@ -1,31 +1,9 @@
+import type { RouteChartIds } from './route-chart-ids';
+import type { RouteLinePlotDatum } from './route-line-plot-datum';
+import type { RouteProgressStop } from './route-progress-stop';
+import type { RouteSummaryMetrics } from './route-summary-metrics';
 import type { InfrastructurePlanDailyPlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import type { TransportationVariableCost } from '@/domain/valueobject/cost/transportation-variable-cost';
-
-export type RouteLinePlotDatum = Record<string, number> & {
-  product: number;
-};
-
-export interface RouteProgressStop {
-  sequence: number;
-  collectedKilograms?: number;
-  collectedLiters?: number;
-  cumulativeKilograms?: number;
-  cumulativeLiters?: number;
-  cumulativeDistanceMeters?: number;
-}
-
-export interface RouteSummaryMetrics {
-  totalDistanceMeters: number | null;
-  estimatedRouteCostAmount: number | null;
-  estimatedRouteCostCurrency: string;
-  capacityKilograms: number | null;
-  capacityLiters: number | null;
-}
-
-export interface RouteChartIds {
-  collection: number;
-  distance: number;
-}
 
 export function buildRouteChartIds(routeIndex: number): RouteChartIds {
   const baseId = 10_000 + routeIndex * 10;

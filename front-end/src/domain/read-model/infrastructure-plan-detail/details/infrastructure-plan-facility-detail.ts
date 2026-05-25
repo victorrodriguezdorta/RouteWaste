@@ -1,3 +1,5 @@
+import type { InfrastructurePlanContainerDetail } from './infrastructure-plan-container-detail';
+import type { InfrastructurePlanDailyPlanDetail } from './infrastructure-plan-daily-plan-detail';
 import { FacilityStatus } from '@/domain/enumerate/facility-status';
 import { FacilityType } from '@/domain/enumerate/facility-type';
 import { ProcessingCapacityKilogramsPerDay } from '@/domain/valueobject/capacity/processing-capacity-kilograms-per-day';
@@ -5,8 +7,6 @@ import { StorageCapacityKilograms } from '@/domain/valueobject/capacity/storage-
 import { Location } from '@/domain/valueobject/location/location';
 import { Name } from '@/domain/valueobject/name/name';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import type { InfrastructurePlanContainerDetail } from './infrastructure-plan-container-detail';
-import type { InfrastructurePlanDailyPlanDetail } from './infrastructure-plan-daily-plan-detail';
 
 /**
  * Read-only facility node used by the infrastructure plan detail views.

@@ -1,4 +1,4 @@
-import type { CreateVehicleCommand } from '@/application/usecase/vehicle-management/create-vehicle/create-vehicle-command';
+import type { CreateVehicleCommand } from '@/application/model/vehicle-management/create-vehicle/create-vehicle-command';
 
 /**
  * VehiclePostJsonRequest DTO

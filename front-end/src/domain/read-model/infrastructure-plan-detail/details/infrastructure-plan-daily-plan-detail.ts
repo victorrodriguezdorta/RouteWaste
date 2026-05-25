@@ -1,9 +1,9 @@
+import type { InfrastructurePlanStopDetail } from './infrastructure-plan-stop-detail';
+import type { InfrastructurePlanVehicleDetail } from './infrastructure-plan-vehicle-detail';
 import { CollectedVolumeLiters } from '@/domain/valueobject/capacity/collected-volume-liters';
 import { CollectedWeightKilograms } from '@/domain/valueobject/capacity/collected-weight-kilograms';
 import { Distance } from '@/domain/valueobject/location/distance';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-import type { InfrastructurePlanStopDetail } from './infrastructure-plan-stop-detail';
-import type { InfrastructurePlanVehicleDetail } from './infrastructure-plan-vehicle-detail';
 
 /**
  * Read-only daily plan used by the infrastructure plan detail views.

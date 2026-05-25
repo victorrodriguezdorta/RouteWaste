@@ -1,16 +1,9 @@
-// Use case contract for listing all infrastructure plans
-
-import type { ListInfrastructurePlansCommand } from './list-infrastructure-plans-command';
-import type { ListInfrastructurePlansResult } from './list-infrastructure-plans-result';
+import type { ListInfrastructurePlansCommand } from '@/application/model/infrastructure-plan-management/list-infrastructure-plans/list-infrastructure-plans-command';
+import type { ListInfrastructurePlansResult } from '@/application/model/infrastructure-plan-management/list-infrastructure-plans/list-infrastructure-plans-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-
-export type { ListInfrastructurePlansCommand } from './list-infrastructure-plans-command';
-export type { ListInfrastructurePlansResult } from './list-infrastructure-plans-result';
 
 /**
  * Use case for listing all infrastructure plans in the system.
- * Input: none (optionally pagination params)
- * Output: InfrastructurePlan[] (entity array)
  */
 export interface ListInfrastructurePlansUseCase {
     /**
@@ -21,3 +14,5 @@ export interface ListInfrastructurePlansUseCase {
     execute(command?: ListInfrastructurePlansCommand): Promise<Either<DataError, ListInfrastructurePlansResult>>;
 }
 
+export type { ListInfrastructurePlansCommand } from '@/application/model/infrastructure-plan-management/list-infrastructure-plans/list-infrastructure-plans-command';
+export type { ListInfrastructurePlansResult } from '@/application/model/infrastructure-plan-management/list-infrastructure-plans/list-infrastructure-plans-result';

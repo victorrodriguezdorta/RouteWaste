@@ -1,8 +1,14 @@
+import { postBulkImportFile } from '@/adapter/http/bulk-import-http';
+import type { BulkImportJsonResponse } from '@/adapter/http/dto/common/bulk-import-json-response';
+import {
+  type BulkImportResult,
+  toBulkImportResult,
+} from '@/adapter/http/dto/common/bulk-import-result';
 import { FacilityJsonResponse } from '@/adapter/http/dto/facility/facility-json-response';
-import { toEntityTypeStatistics } from '@/adapter/http/mapper/entity-statistics-json-mapper';
 import type { FacilityPageJsonResponse } from '@/adapter/http/dto/facility/facility-page-json-response';
 import { FacilityPostJsonRequest } from '@/adapter/http/dto/facility/facility-post-json-request';
 import { FacilityPutJsonRequest } from '@/adapter/http/dto/facility/facility-put-json-request';
+import { toEntityTypeStatistics } from '@/adapter/http/mapper/entity-statistics-json-mapper';
 import type { FacilityRepository } from '@/application/repository/facility-repository';
 import type { CreateFacilityCommand, CreateFacilityResult } from '@/application/usecase/facility-management/create-facility/create-facility-use-case';
 import type { DeleteFacilityCommand, DeleteFacilityResult } from '@/application/usecase/facility-management/delete-facility/delete-facility-use-case';
@@ -11,10 +17,10 @@ import type { GetFacilityCommand, GetFacilityResult } from '@/application/usecas
 import type { ListFacilitiesCommand, ListFacilitiesResult } from '@/application/usecase/facility-management/list-facilities/list-facilities-use-case';
 import type { UpdateFacilityCommand, UpdateFacilityResult } from '@/application/usecase/facility-management/update-facility/update-facility-use-case';
 import {
-    type ApiError,
-    type DataError,
-    Either,
-    http,
+  type ApiError,
+  type DataError,
+  Either,
+  http,
 } from '@ull-tfg/ull-tfg-typescript';
 
 /**
@@ -78,22 +84,15 @@ export class FacilityHttpRepository implements FacilityRepository {
       url += `&location=${encodeURIComponent(command.location)}`;
     }
 
-    console.log('[FacilityHttpRepository.list] Fetching from:', url);
-
     return new Promise((resolve, reject) => {
       http
         .get(url, this.headers)
         .then(response => {
-          console.log('[FacilityHttpRepository.list] Response status:', response.status, 'OK:', response.ok);
-          
           if (response.ok) {
             response.json().then((data: FacilityPageJsonResponse | FacilityJsonResponse[]) => {
-              console.log('[FacilityHttpRepository.list] Raw response data:', data);
-              
               let convertedData: ListFacilitiesResult;
 
               if (Array.isArray(data)) {
-                console.log('[FacilityHttpRepository.list] Response is array, converting...');
                 const items = data.map((facility: FacilityJsonResponse) => FacilityJsonResponse.toFacility(facility));
                 convertedData = {
                   items,
@@ -103,7 +102,6 @@ export class FacilityHttpRepository implements FacilityRepository {
                   size: requestedSize,
                 };
               } else {
-                console.log('[FacilityHttpRepository.list] Response is paginated, converting...');
                 const items = data.content.map((facility: FacilityJsonResponse) => FacilityJsonResponse.toFacility(facility));
                 convertedData = {
                   items,
@@ -115,11 +113,9 @@ export class FacilityHttpRepository implements FacilityRepository {
                 };
               }
 
-              console.log('[FacilityHttpRepository.list] Converted data:', convertedData);
               resolve(Either.right(convertedData));
             });
           } else {
-            console.log('[FacilityHttpRepository.list] Response not OK');
             response.json().then((data: ApiError) => {
               reject(Either.left(data));
             });
@@ -173,18 +169,13 @@ export class FacilityHttpRepository implements FacilityRepository {
     command: CreateFacilityCommand
   ): Promise<Either<DataError, CreateFacilityResult>> {
     const body = FacilityPostJsonRequest.toRequest(command);
-    console.log('[FacilityHttpRepository.create] Creating facility with body:', body);
-    console.log('[FacilityHttpRepository.create] JSON stringified:', JSON.stringify(body));
 
     return new Promise((resolve, reject) => {
       http
         .post(this.API_URL, body, this.headers)
         .then(response => {
-          console.log('[FacilityHttpRepository.create] Response status:', response.status, 'OK:', response.ok);
-          
           if (response.ok) {
             response.json().then((data: FacilityJsonResponse) => {
-              console.log('[FacilityHttpRepository.create] Success, received:', data);
               resolve(Either.right(FacilityJsonResponse.toFacility(data)));
             });
           } else {
@@ -212,18 +203,13 @@ export class FacilityHttpRepository implements FacilityRepository {
   ): Promise<Either<DataError, UpdateFacilityResult>> {
     const url = `${this.API_URL}${command.facilityId.toString()}`;
     const body = FacilityPutJsonRequest.toRequest(command);
-    console.log('[FacilityHttpRepository.update] Updating facility with URL:', url, 'body:', body);
-    console.log('[FacilityHttpRepository.update] JSON stringified:', JSON.stringify(body));
 
     return new Promise((resolve) => {
       http
         .put(url, body, this.headers)
         .then(response => {
-          console.log('[FacilityHttpRepository.update] Response status:', response.status, 'OK:', response.ok);
-          
           if (response.ok) {
             response.json().then((data: FacilityJsonResponse) => {
-              console.log('[FacilityHttpRepository.update] Success, received:', data);
               resolve(Either.right(FacilityJsonResponse.toFacility(data)));
             });
           } else {
@@ -257,7 +243,7 @@ export class FacilityHttpRepository implements FacilityRepository {
         .delete(url, this.headers)
         .then(response => {
           if (response.ok) {
-            resolve(Either.right(true));
+            resolve(Either.right({ success: true }));
           } else {
             response.json().then((data: ApiError) => {
               data.kind = 'ApiError';
@@ -305,20 +291,48 @@ export class FacilityHttpRepository implements FacilityRepository {
         .then(response => {
           if (response.ok) {
             response.json().then((data: FacilityJsonResponse[]) => {
-              const convertedData: FilterFacilitiesResult = [];
-              
-              // Transform each JSON response to domain entity
+              const items: FilterFacilitiesResult['items'] = [];
+
               data.forEach(facility => {
-                convertedData.push(FacilityJsonResponse.toFacility(facility));
+                items.push(FacilityJsonResponse.toFacility(facility));
               });
-              
-              resolve(Either.right(convertedData));
+
+              resolve(Either.right({ items }));
             });
           } else {
             response.json().then((data: ApiError) => {
               reject(Either.left(data));
             });
           }
+        })
+        .catch((error: any) => {
+          resolve(Either.left({ kind: 'UnexpectedError', message: error }));
+        });
+    });
+  }
+
+  /**
+   * Import facilities from a JSON file uploaded as multipart form data.
+   *
+   * @param file JSON file with an array of facilities or {@code { facilities: [...] }}
+   * @returns Either a DataError or bulk import statistics
+   */
+  public async importFromFile(
+    file: File
+  ): Promise<Either<DataError, BulkImportResult>> {
+    const url = `${this.API_URL}bulk/import`;
+
+    return new Promise((resolve) => {
+      postBulkImportFile(url, file)
+        .then(async (response) => {
+          const body = await response.json();
+          if (response.ok) {
+            resolve(Either.right(toBulkImportResult(body as BulkImportJsonResponse)));
+            return;
+          }
+          const apiError = body as ApiError;
+          apiError.kind = 'ApiError';
+          resolve(Either.left(apiError));
         })
         .catch((error: any) => {
           resolve(Either.left({ kind: 'UnexpectedError', message: error }));

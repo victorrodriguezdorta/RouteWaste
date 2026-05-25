@@ -72,4 +72,16 @@ public final class ApiRoutes {
      * Full path: /api/v1/application-overview
      */
     public static final String APPLICATION_OVERVIEW = API_BASE + "/application-overview";
+
+    /**
+     * Bulk create/import suffix for master entities.
+     * Example: /api/v1/containers/bulk
+     */
+    public static final String BULK = "/bulk";
+
+    /**
+     * Bulk import from uploaded JSON file.
+     * Example: /api/v1/containers/bulk/import
+     */
+    public static final String BULK_IMPORT = BULK + "/import";
 }

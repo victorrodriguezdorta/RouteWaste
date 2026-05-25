@@ -1,3 +1,11 @@
+import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
+
+/** Returns the locale key segment for a vehicle type enum value. */
+export function vehicleTypeLocaleKey(type: VehicleType | string): string {
+  const value = typeof type === 'string' ? vehicleTypeFromString(type) : type;
+  return enumToLocaleKey(value);
+}
+
 /**
  * VehicleType
  *
@@ -79,7 +87,7 @@ export function vehicleTypeRandom(): VehicleType {
  */
 export function vehicleTypeToOptions(t: (key: string) => string): { title: string; value: VehicleType }[] {
   return vehicleTypeValues().map((type) => ({
-    title: t(`vehicle.add.vehicleTypes.${type}`),
+    title: t(`vehicle.add.vehicleTypes.${vehicleTypeLocaleKey(type)}`),
     value: type,
   }));
 }

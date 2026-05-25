@@ -1,17 +1,9 @@
-import type { ListVehiclesCommand } from './list-vehicles-command';
-import type { ListVehiclesResult } from './list-vehicles-result';
+import type { ListVehiclesCommand } from '@/application/model/vehicle-management/list-vehicles/list-vehicles-command';
+import type { ListVehiclesResult } from '@/application/model/vehicle-management/list-vehicles/list-vehicles-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-
-export type { ListVehiclesCommand } from './list-vehicles-command';
-export type { ListVehiclesResult } from './list-vehicles-result';
-
-// ListVehiclesUseCase.ts
-// Use case contract for listing all vehicles
 
 /**
  * Use case for listing all vehicles in the system.
- * Input: none (optionally pagination params)
- * Output: Vehicle[] (entity array)
  */
 export interface ListVehiclesUseCase {
     /**
@@ -22,3 +14,6 @@ export interface ListVehiclesUseCase {
      */
     execute(command?: ListVehiclesCommand): Promise<Either<DataError, ListVehiclesResult>>;
 }
+
+export type { ListVehiclesCommand } from '@/application/model/vehicle-management/list-vehicles/list-vehicles-command';
+export type { ListVehiclesResult } from '@/application/model/vehicle-management/list-vehicles/list-vehicles-result';

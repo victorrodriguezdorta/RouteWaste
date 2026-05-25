@@ -63,10 +63,18 @@ export class Vehicle {
    */
   getId(): UllUUID { return this.id; }
 
-  /** Return the vehicle display name. */
+  /**
+   * Return the vehicle display name.
+   *
+   * @returns The vehicle display name
+   */
   getName(): Name { return this.name; }
 
-  /** Update the vehicle name. */
+  /**
+   * Update the vehicle name.
+   *
+   * @param name New vehicle display name
+   */
   updateName(name: Name): void { if (!name) throw new Error('Vehicle name is not defined'); this.name = name; }
 
   /**

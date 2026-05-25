@@ -1,5 +1,5 @@
-import type { EntityStatisticsJsonResponse } from '../common/entity-statistics-json-response';
 import type { VehicleJsonResponse } from './vehicle-json-response';
+import type { EntityStatisticsJsonResponse } from '@/adapter/http/dto/common/entity-statistics-json-response';
 
 /**
  * Paginated response DTO for vehicles endpoint.

@@ -1,3 +1,4 @@
+import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
 import type { CreateFacilityCommand, CreateFacilityResult } from '@/application/usecase/facility-management/create-facility/create-facility-use-case';
 import type { DeleteFacilityCommand, DeleteFacilityResult } from '@/application/usecase/facility-management/delete-facility/delete-facility-use-case';
 import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '@/application/usecase/facility-management/filter-facilities/filter-facilities-use-case';
@@ -52,4 +53,11 @@ export interface FacilityRepository {
    * @return Either a DataError or a list of matching Facility entities.
    */
   filter(command: FilterFacilitiesCommand): Promise<Either<DataError, FilterFacilitiesResult>>;
+
+  /**
+   * @brief Import facilities from a JSON file.
+   * @param file JSON file selected by the user.
+   * @return Either a DataError or bulk import statistics.
+   */
+  importFromFile(file: File): Promise<Either<DataError, BulkImportResult>>;
 }

@@ -100,6 +100,9 @@ export class FacilityJsonResponse {
 
   /**
    * Extract numeric value from storage capacity (handles both formats).
+   *
+   * @param value Storage capacity as number or nested value object
+   * @returns Capacity in kilograms
    * @private
    */
   private static extractStorageCapacity(value: number | { value: number }): number {
@@ -108,6 +111,9 @@ export class FacilityJsonResponse {
 
   /**
    * Extract numeric value from processing capacity (handles both formats).
+   *
+   * @param value Processing capacity as number or nested value object
+   * @returns Capacity in kilograms per day
    * @private
    */
   private static extractProcessingCapacity(value: number | { value: number }): number {
@@ -116,6 +122,9 @@ export class FacilityJsonResponse {
 
   /**
    * Extract numeric value from unloading time (handles both formats).
+   *
+   * @param value Unloading time as number or nested time value object
+   * @returns Unloading time in minutes
    * @private
    */
   private static extractUnloadingTime(value: number | { timeValue: number }): number {
@@ -125,6 +134,9 @@ export class FacilityJsonResponse {
   /**
    * Extract numeric value from filling level (handles both formats).
    * Backend returns {value: number} for currentFillingLevel
+   *
+   * @param value Filling level as number or nested value object
+   * @returns Filling level in liters per day
    * @private
    */
   private static extractFillingLevel(value?: number | { value: number } | { wasteDemandValue: number }): number {
@@ -146,8 +158,6 @@ export class FacilityJsonResponse {
    */
   public static toFacility(data: FacilityJsonResponse): Facility {
     try {
-      console.log('[FacilityJsonResponse.toFacility] Starting deserialization:', data);
-      
       const id = new UllUUID(data.id);
       const name = new Name(data.name);
       const loc = new Location(
@@ -162,14 +172,7 @@ export class FacilityJsonResponse {
       const processingCapacityValue = this.extractProcessingCapacity(data.processingCapacity);
       const unloadingTimeValue = this.extractUnloadingTime(data.unloadingTime);
       const fillingLevelValue = this.extractFillingLevel(data.currentFillingLevel);
-      
-      console.log('[FacilityJsonResponse.toFacility] Extracted values:', { 
-        storageCapacityValue, 
-        processingCapacityValue, 
-        unloadingTimeValue, 
-        fillingLevelValue 
-      });
-      
+
       const storageCapacity = new StorageCapacityKilograms(storageCapacityValue);
       const processingCapacity = new ProcessingCapacityKilogramsPerDay(processingCapacityValue);
       const unloadingTime = new UnloadingTime(unloadingTimeValue);
@@ -177,8 +180,6 @@ export class FacilityJsonResponse {
       const facilityType = facilityTypeFromString(data.facilityType);
       const status = facilityStatusFromString(data.status);
       const currentFillingLevel = new DailyWasteDemandLitersPerDay(fillingLevelValue);
-
-      console.log('[FacilityJsonResponse.toFacility] Created VOs, constructing Facility');
 
       const facility = new Facility(
         name,
@@ -192,8 +193,7 @@ export class FacilityJsonResponse {
         id,
         currentFillingLevel
       );
-      
-      console.log('[FacilityJsonResponse.toFacility] Successfully created Facility:', facility);
+
       return facility;
     } catch (error) {
       console.error('[FacilityJsonResponse.toFacility] Error during deserialization:', error, 'Data:', data);

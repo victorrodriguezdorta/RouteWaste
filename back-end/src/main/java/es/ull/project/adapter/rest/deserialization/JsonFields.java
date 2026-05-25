@@ -32,6 +32,13 @@ public final class JsonFields {
     public static final String NAME = "name";
 
     /**
+     * Bulk import wrapper fields
+     */
+    public static final String CONTAINERS = "containers";
+    public static final String FACILITIES = "facilities";
+    public static final String VEHICLES = "vehicles";
+
+    /**
      * Vehicle fields
      */
     public static final String VEHICLE_TYPE = "vehicleType";

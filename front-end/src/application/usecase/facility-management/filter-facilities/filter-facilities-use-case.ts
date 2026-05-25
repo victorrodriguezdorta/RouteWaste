@@ -1,16 +1,9 @@
-import type { FilterFacilitiesCommand } from './filter-facilities-command';
-import type { FilterFacilitiesResult } from './filter-facilities-result';
+import type { FilterFacilitiesCommand } from '@/application/model/facility-management/filter-facilities/filter-facilities-command';
+import type { FilterFacilitiesResult } from '@/application/model/facility-management/filter-facilities/filter-facilities-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 
-export type { FilterFacilitiesCommand } from './filter-facilities-command';
-export type { FilterFacilitiesResult } from './filter-facilities-result';
-
-// FilterFacilitiesUseCase.ts
-// Use case contract for filtering facilities
 /**
  * Use case for filtering facilities based on criteria.
- * Input: filter parameters (facilityType, status, etc.)
- * Output: Facility[] (entity array)
  */
 export interface FilterFacilitiesUseCase {
     /**
@@ -21,3 +14,6 @@ export interface FilterFacilitiesUseCase {
      */
     execute(command: FilterFacilitiesCommand): Promise<Either<DataError, FilterFacilitiesResult>>;
 }
+
+export type { FilterFacilitiesCommand } from '@/application/model/facility-management/filter-facilities/filter-facilities-command';
+export type { FilterFacilitiesResult } from '@/application/model/facility-management/filter-facilities/filter-facilities-result';

@@ -1,18 +1,6 @@
-import type { FilterContainersCommand } from './filter-containers-command';
-import type { FilterContainersResult } from './filter-containers-result';
+import type { FilterContainersCommand } from '@/application/model/container-management/filter-containers/filter-containers-command';
+import type { FilterContainersResult } from '@/application/model/container-management/filter-containers/filter-containers-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-
-export type { FilterContainersCommand } from './filter-containers-command';
-export type { FilterContainersResult } from './filter-containers-result';
-
-// FilterContainersUseCase.ts
-// Use case contract for filtering containers
-
-/**
- * Use case for filtering containers based on criteria.
- * Input: filter parameters (wasteType, serviceZone, etc.)
- * Output: Container[] (entity array)
- */
 
 /**
  * Use case contract for filtering containers
@@ -26,5 +14,5 @@ export interface FilterContainersUseCase {
     execute(command: FilterContainersCommand): Promise<Either<DataError, FilterContainersResult>>;
 }
 
-
-
+export type { FilterContainersCommand } from '@/application/model/container-management/filter-containers/filter-containers-command';
+export type { FilterContainersResult } from '@/application/model/container-management/filter-containers/filter-containers-result';

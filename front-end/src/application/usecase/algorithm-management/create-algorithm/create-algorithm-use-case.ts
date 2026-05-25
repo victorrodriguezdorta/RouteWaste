@@ -1,16 +1,8 @@
+import type { CreateAlgorithmCommand } from '@/application/model/algorithm-management/create-algorithm/create-algorithm-command';
+import type { CreateAlgorithmResult } from '@/application/model/algorithm-management/create-algorithm/create-algorithm-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-import type { CreateAlgorithmCommand } from './create-algorithm-command';
-import type { CreateAlgorithmResult } from './create-algorithm-result';
-
-export type { CreateAlgorithmCommand } from './create-algorithm-command';
-export type { CreateAlgorithmResult } from './create-algorithm-result';
-
 /**
- * CreateAlgorithmUseCase
- *
  * Use case for executing the delivery planning algorithm.
- * Input: facilities with vehicles, containers, number of days, pickup time
- * Output: Algorithm execution result with ID and status
  */
 export interface CreateAlgorithmUseCase {
   /**
@@ -20,3 +12,7 @@ export interface CreateAlgorithmUseCase {
    */
   execute(command: CreateAlgorithmCommand): Promise<Either<DataError, CreateAlgorithmResult>>;
 }
+
+export type { CreateAlgorithmCommand } from '@/application/model/algorithm-management/create-algorithm/create-algorithm-command';
+export type { FacilityVehicleCommand } from '@/adapter/http/dto/algorithm/facility-vehicle-command';
+export type { CreateAlgorithmResult } from '@/application/model/algorithm-management/create-algorithm/create-algorithm-result';

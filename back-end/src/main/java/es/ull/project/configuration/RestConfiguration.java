@@ -4,17 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import es.ull.project.adapter.rest.deserialization.algorithm.AlgorithmExecutionRequestBodyDeserializer;
+import es.ull.project.adapter.rest.deserialization.container.ContainerBulkPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.container.ContainerPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.container.ContainerPutRequestBodyDeserializer;
+import es.ull.project.adapter.rest.deserialization.facility.FacilityBulkPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.facility.FacilityPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.facility.FacilityPutRequestBodyDeserializer;
+import es.ull.project.adapter.rest.deserialization.vehicle.VehicleBulkPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.vehicle.VehiclePostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.vehicle.VehiclePutRequestBodyDeserializer;
 import es.ull.project.adapter.rest.request.algorithm.AlgorithmExecutionRequestBody;
+import es.ull.project.adapter.rest.request.container.ContainerBulkPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
+import es.ull.project.adapter.rest.request.facility.FacilityBulkPostRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPostRequestBody;
 import es.ull.project.adapter.rest.request.facility.FacilityPutRequestBody;
+import es.ull.project.adapter.rest.request.vehicle.VehicleBulkPostRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
@@ -73,17 +79,26 @@ public class RestConfiguration {
                 VehiclePostRequestBody.class,
                 new VehiclePostRequestBodyDeserializer());
         module.addDeserializer(
+                VehicleBulkPostRequestBody.class,
+                new VehicleBulkPostRequestBodyDeserializer());
+        module.addDeserializer(
                 VehiclePutRequestBody.class,
                 new VehiclePutRequestBodyDeserializer());
         module.addDeserializer(
                 ContainerPostRequestBody.class,
                 new ContainerPostRequestBodyDeserializer());
         module.addDeserializer(
+                ContainerBulkPostRequestBody.class,
+                new ContainerBulkPostRequestBodyDeserializer());
+        module.addDeserializer(
                 ContainerPutRequestBody.class,
                 new ContainerPutRequestBodyDeserializer());
         module.addDeserializer(
                 FacilityPostRequestBody.class,
                 new FacilityPostRequestBodyDeserializer());
+        module.addDeserializer(
+                FacilityBulkPostRequestBody.class,
+                new FacilityBulkPostRequestBodyDeserializer());
         module.addDeserializer(
                 FacilityPutRequestBody.class,
                 new FacilityPutRequestBodyDeserializer());

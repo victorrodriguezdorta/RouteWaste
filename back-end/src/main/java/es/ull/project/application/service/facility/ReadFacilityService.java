@@ -1,8 +1,8 @@
 package es.ull.project.application.service.facility;
 
+import es.ull.project.application.common.EntityTypeBreakdownBuilder;
 import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.application.common.EntityTypeBreakdownBuilder;
 import es.ull.project.application.usecase.facility.ReadFacilityUseCase;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityType;

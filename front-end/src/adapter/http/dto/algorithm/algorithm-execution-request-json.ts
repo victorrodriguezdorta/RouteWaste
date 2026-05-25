@@ -1,14 +1,6 @@
-import type { CreateAlgorithmCommand, FacilityVehicleCommand } from '@/application/usecase/algorithm-management/create-algorithm/create-algorithm-command';
-
-/**
- * FacilityVehicleJson
- *
- * JSON representation of a facility with its selected vehicles for HTTP communication.
- */
-export interface FacilityVehicleJson {
-  facilityId: string;
-  selectedVehicleIds: string[];
-}
+import type { FacilityVehicleJson } from './facility-vehicle-json';
+import type { FacilityVehicleCommand } from '@/adapter/http/dto/algorithm/facility-vehicle-command';
+import type { CreateAlgorithmCommand } from '@/application/model/algorithm-management/create-algorithm/create-algorithm-command';
 
 /**
  * AlgorithmExecutionRequestJson

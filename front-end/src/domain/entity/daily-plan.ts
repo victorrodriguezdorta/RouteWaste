@@ -108,6 +108,14 @@ export class DailyPlan {
 
   /**
    * Validate that all required parameters are not null.
+   *
+   * @param infrastructurePlan Parent infrastructure plan
+   * @param facility Facility where the route starts and ends
+   * @param serviceDate Date when the service is executed
+   * @param vehicle Vehicle assigned to the route
+   * @param totalCollectedKilograms Total weight collected on the route
+   * @param totalCollectedLiters Total volume collected on the route
+   * @param totalDistanceMeters Total distance traveled on the route
    * @throws Error if any required parameter is null or undefined
    */
   private validate(

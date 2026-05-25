@@ -1,11 +1,17 @@
 package es.ull.project.adapter.rest.controller;
 
 import es.ull.project.adapter.mongodb.mapper.VehicleFieldMapper;
+import es.ull.project.adapter.rest.mapper.BulkImportResponseMapper;
 import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
+import es.ull.project.adapter.rest.request.vehicle.VehicleBulkPostRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePutRequestBody;
+import es.ull.project.adapter.rest.response.bulk.BulkImportResponseBody;
 import es.ull.project.adapter.rest.response.vehicle.VehiclePageResponseBody;
 import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
+import es.ull.project.adapter.rest.support.BulkImportMultipartSupport;
+import es.ull.project.application.model.BulkCreateOutcome;
+import es.ull.project.application.usecase.vehicle.BulkCreateVehiclesUseCase;
 import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
@@ -36,6 +42,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +52,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * VehicleController
@@ -79,6 +88,12 @@ public class VehicleController {
      */
     @Autowired
     private CreateVehicleUseCase createVehicleUseCase;
+
+    @Autowired
+    private BulkCreateVehiclesUseCase bulkCreateVehiclesUseCase;
+
+    @Autowired
+    private BulkImportMultipartSupport bulkImportMultipartSupport;
 
     /**
      * Use case for updating existing vehicles.
@@ -252,6 +267,74 @@ public class VehicleController {
         );
         VehicleResponseBody responseBody = VehicleResponseMapper.toResponseBody(createdVehicle);
         return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
+    }
+
+    /**
+     * POST /vehicles/bulk
+     *
+     * Creates multiple vehicles from a JSON array in the request body.
+     *
+     * @param requestBody bulk payload with one or more vehicle records
+     * @return ResponseEntity with import summary and HTTP 201 if all succeed,
+     *         or HTTP 400 when one or more items fail validation or persistence
+     */
+    @Operation(summary = "Bulk create vehicles", description = "Creates multiple vehicles from a JSON array in the request body")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "All vehicles created successfully",
+                    content = @Content(schema = @Schema(implementation = BulkImportResponseBody.class))),
+            @ApiResponse(responseCode = "400", description = "Validation failed or one or more items could not be created")
+    })
+    @PostMapping(ApiRoutes.BULK)
+    public ResponseEntity<BulkImportResponseBody> bulkCreateVehicles(
+            @Parameter(description = "JSON array of vehicles or object {\"vehicles\": [...]}")
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "JSON array of vehicles or object {\"vehicles\": [...]}",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = VehicleBulkPostRequestBody.class)))
+            @RequestBody VehicleBulkPostRequestBody requestBody) {
+        return executeBulkCreate(requestBody);
+    }
+
+    /**
+     * POST /vehicles/bulk/import
+     *
+     * Uploads a JSON file containing many vehicles to create in a single operation.
+     *
+     * @param file multipart JSON file (array or object with a vehicles property)
+     * @return ResponseEntity with import summary and HTTP 201 if all succeed,
+     *         or HTTP 400 when the file is invalid or one or more items fail
+     */
+    @Operation(summary = "Import vehicles from JSON file", description = "Uploads a JSON file containing many vehicles to create")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "All vehicles created successfully",
+                    content = @Content(schema = @Schema(implementation = BulkImportResponseBody.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid file or one or more items could not be created")
+    })
+    @PostMapping(value = ApiRoutes.BULK_IMPORT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BulkImportResponseBody> importVehiclesFromFile(
+            @Parameter(description = "JSON file with vehicles (array or {\"vehicles\": [...]})")
+            @RequestPart("file") MultipartFile file) {
+        VehicleBulkPostRequestBody requestBody = this.bulkImportMultipartSupport.parseJsonFile(
+                file, VehicleBulkPostRequestBody.class);
+        return executeBulkCreate(requestBody);
+    }
+
+    /**
+     * Runs the bulk create use case and maps the outcome to an HTTP response.
+     *
+     * @param requestBody bulk payload with vehicle records to create
+     * @return ResponseEntity with import summary and appropriate HTTP status
+     */
+    private ResponseEntity<BulkImportResponseBody> executeBulkCreate(VehicleBulkPostRequestBody requestBody) {
+        List<VehiclePostRequestBody> items = requestBody.vehicles;
+        BulkCreateOutcome outcome = this.bulkCreateVehiclesUseCase.createAll(
+                items.stream().map(item -> item.name).toList(),
+                items.stream().map(item -> item.vehicleType).toList(),
+                items.stream().map(item -> item.capacityKilograms).toList(),
+                items.stream().map(item -> item.capacityLiters).toList(),
+                items.stream().map(item -> item.costPerKilometer).toList());
+        HttpStatus status = outcome.isSuccess() ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+        return new ResponseEntity<>(BulkImportResponseMapper.toResponseBody(outcome), status);
     }
 
     /**

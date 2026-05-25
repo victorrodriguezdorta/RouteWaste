@@ -2,18 +2,29 @@ package es.ull.project.adapter.rest.controller;
 
 import es.ull.project.adapter.mongodb.mapper.ContainerFieldMapper;
 import es.ull.project.adapter.mongodb.query.ContainerSearchCriteriaBuilder;
+import es.ull.project.adapter.rest.mapper.BulkImportResponseMapper;
 import es.ull.project.adapter.rest.mapper.ContainerResponseMapper;
+import es.ull.project.adapter.rest.request.container.ContainerBulkPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPutRequestBody;
+import es.ull.project.adapter.rest.response.bulk.BulkImportResponseBody;
 import es.ull.project.adapter.rest.response.container.ContainerPageResponseBody;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
+import es.ull.project.adapter.rest.support.BulkImportMultipartSupport;
+import es.ull.project.application.model.BulkCreateOutcome;
 import es.ull.project.application.query.ContainerSearchCriteria;
+import es.ull.project.application.usecase.container.BulkCreateContainersUseCase;
 import es.ull.project.application.usecase.container.CreateContainerUseCase;
 import es.ull.project.application.usecase.container.DeleteContainerUseCase;
 import es.ull.project.application.usecase.container.ReadContainerUseCase;
 import es.ull.project.application.usecase.container.UpdateContainerUseCase;
 import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
+import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
+import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.location.Location;
+import es.ull.project.domain.valueobject.name.Name;
 import es.ull.project.domain.valueobject.page.NumberOfElements;
 import es.ull.project.domain.valueobject.page.PageFlag;
 import es.ull.project.domain.valueobject.page.PageNumber;
@@ -39,6 +50,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +60,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * ContainerController
@@ -82,6 +96,18 @@ public class ContainerController {
      */
     @Autowired
     private CreateContainerUseCase createContainerUseCase;
+
+    /**
+     * Use case for bulk container creation.
+     */
+    @Autowired
+    private BulkCreateContainersUseCase bulkCreateContainersUseCase;
+
+    /**
+     * Parses uploaded JSON files for bulk import.
+     */
+    @Autowired
+    private BulkImportMultipartSupport bulkImportMultipartSupport;
 
     /**
      * Use case for updating existing containers.
@@ -283,6 +309,76 @@ public class ContainerController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    /**
+     * POST /containers/bulk
+     *
+     * Creates multiple containers from a JSON array in the request body.
+     *
+     * @param requestBody bulk payload with one or more container records
+     * @return ResponseEntity with import summary and HTTP 201 if all succeed,
+     *         or HTTP 400 when one or more items fail validation or persistence
+     */
+    @Operation(summary = "Bulk create containers", description = "Creates multiple containers from a JSON array in the request body")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "All containers created successfully",
+                    content = @Content(schema = @Schema(implementation = BulkImportResponseBody.class))),
+            @ApiResponse(responseCode = "400", description = "Validation failed or one or more items could not be created")
+    })
+    @PostMapping(ApiRoutes.BULK)
+    public ResponseEntity<BulkImportResponseBody> bulkCreateContainers(
+            @Parameter(description = "JSON array of containers or object {\"containers\": [...]}")
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "JSON array of containers or object {\"containers\": [...]}",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = ContainerBulkPostRequestBody.class)))
+            @RequestBody ContainerBulkPostRequestBody requestBody) {
+        return executeBulkCreate(requestBody);
+    }
+
+    /**
+     * POST /containers/bulk/import
+     *
+     * Uploads a JSON file containing many containers to create in a single operation.
+     *
+     * @param file multipart JSON file (array or object with a containers property)
+     * @return ResponseEntity with import summary and HTTP 201 if all succeed,
+     *         or HTTP 400 when the file is invalid or one or more items fail
+     */
+    @Operation(summary = "Import containers from JSON file", description = "Uploads a JSON file containing many containers to create")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "All containers created successfully",
+                    content = @Content(schema = @Schema(implementation = BulkImportResponseBody.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid file or one or more items could not be created")
+    })
+    @PostMapping(value = ApiRoutes.BULK_IMPORT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BulkImportResponseBody> importContainersFromFile(
+            @Parameter(description = "JSON file with containers (array or {\"containers\": [...]})")
+            @RequestPart("file") MultipartFile file) {
+        ContainerBulkPostRequestBody requestBody = this.bulkImportMultipartSupport.parseJsonFile(
+                file, ContainerBulkPostRequestBody.class);
+        return executeBulkCreate(requestBody);
+    }
+
+    /**
+     * Runs the bulk create use case and maps the outcome to an HTTP response.
+     *
+     * @param requestBody bulk payload with container records to create
+     * @return ResponseEntity with import summary and appropriate HTTP status
+     */
+    private ResponseEntity<BulkImportResponseBody> executeBulkCreate(ContainerBulkPostRequestBody requestBody) {
+        List<ContainerPostRequestBody> items = requestBody.containers;
+        List<Name> names = items.stream().map(item -> item.name).toList();
+        List<Location> locations = items.stream().map(item -> item.location).toList();
+        List<WasteType> wasteTypes = items.stream().map(item -> item.wasteType).toList();
+        List<ContainerCapacityLiters> capacities = items.stream().map(item -> item.capacityLiters).toList();
+        List<DailyWasteDemandLitersPerDay> demands = items.stream().map(item -> item.dailyDemandLitersPerDay).toList();
+        List<ServiceZone> serviceZones = items.stream().map(item -> item.serviceZone).toList();
+        BulkCreateOutcome outcome = this.bulkCreateContainersUseCase.createAll(
+                names, locations, wasteTypes, capacities, demands, serviceZones);
+        HttpStatus status = outcome.isSuccess() ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+        return new ResponseEntity<>(BulkImportResponseMapper.toResponseBody(outcome), status);
     }
 
     /**

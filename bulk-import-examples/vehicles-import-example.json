@@ -1,0 +1,34 @@
+{
+  "vehicles": [
+    {
+      "name": "Vehículo importación Recolector Ligero A",
+      "vehicleType": "COLLECTION_TRUCK",
+      "capacityKilograms": 3500,
+      "CapacityLiters": 7000,
+      "costPerKilometer": {
+        "amount": 0.85,
+        "currency": "EUR"
+      }
+    },
+    {
+      "name": "Vehículo importación Recolector Medio B",
+      "vehicleType": "COLLECTION_TRUCK",
+      "capacityKilograms": 5200,
+      "CapacityLiters": 10500,
+      "costPerKilometer": {
+        "amount": 1.1,
+        "currency": "EUR"
+      }
+    },
+    {
+      "name": "Vehículo importación Transferencia C",
+      "vehicleType": "TRANSFER_TRUCK",
+      "capacityKilograms": 12000,
+      "CapacityLiters": 22000,
+      "costPerKilometer": {
+        "amount": 1.8,
+        "currency": "EUR"
+      }
+    }
+  ]
+}

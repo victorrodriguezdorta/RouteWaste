@@ -1,13 +1,10 @@
-import type { CreateVehicleCommand } from './create-vehicle-command';
-import type { CreateVehicleResult } from './create-vehicle-result';
+import type { CreateVehicleCommand } from '@/application/model/vehicle-management/create-vehicle/create-vehicle-command';
+import type { CreateVehicleResult } from '@/application/model/vehicle-management/create-vehicle/create-vehicle-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
 
-export type { CreateVehicleCommand } from './create-vehicle-command';
-export type { CreateVehicleResult } from './create-vehicle-result';
-
-// CreateVehicleUseCase.ts
-// Use case contract for creating a new vehicle
-// Use case contract
+/**
+ * Use case contract for creating a new vehicle
+ */
 export interface CreateVehicleUseCase {
     /**
      * Handles the creation of a new vehicle
@@ -17,3 +14,6 @@ export interface CreateVehicleUseCase {
      */
     execute(command: CreateVehicleCommand): Promise<Either<DataError, CreateVehicleResult>>;
 }
+
+export type { CreateVehicleCommand } from '@/application/model/vehicle-management/create-vehicle/create-vehicle-command';
+export type { CreateVehicleResult } from '@/application/model/vehicle-management/create-vehicle/create-vehicle-result';

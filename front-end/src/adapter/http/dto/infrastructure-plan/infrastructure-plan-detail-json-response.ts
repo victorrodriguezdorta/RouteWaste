@@ -1,0 +1,32 @@
+import type { ContainerDailyStateJsonResponse } from './container-daily-state-json-response';
+import type { InfrastructurePlanClusterJsonResponse } from './infrastructure-plan-cluster-json-response';
+import type { InfrastructurePlanDailyPlanJsonResponse } from './infrastructure-plan-daily-plan-json-response';
+import type { InfrastructurePlanFacilityJsonResponse } from './infrastructure-plan-facility-json-response';
+import type { InfrastructurePlanMetricsJsonResponse } from './infrastructure-plan-metrics-json-response';
+import type { InfrastructurePlanMoneyJsonResponse } from './infrastructure-plan-money-json-response';
+
+/**
+ * Infrastructure plan detail payload returned by the backend.
+ */
+export interface InfrastructurePlanDetailJsonResponse {
+  id?: string;
+  executedAt: string;
+  period?: number;
+  numberOfDays?: number;
+  totalCollectedKilograms?: number;
+  totalCollectedLiters?: number;
+  maxBudget?: InfrastructurePlanMoneyJsonResponse;
+  totalDistanceMeters?: number;
+  averagePickupTimeMinutes?: number;
+  estimatedTotalCost?: InfrastructurePlanMoneyJsonResponse;
+  metrics?: InfrastructurePlanMetricsJsonResponse;
+  facilities?: InfrastructurePlanFacilityJsonResponse[];
+  clusters?: InfrastructurePlanClusterJsonResponse[];
+  status?: string;
+  dailyPlans?: InfrastructurePlanDailyPlanJsonResponse[];
+  containerStateMonitoring?: ContainerDailyStateJsonResponse[];
+  /** Backend: VALID | OBSOLETE */
+  validityState?: string;
+  /** JSON snapshot of the client execution request */
+  executionRequestJson?: string;
+}

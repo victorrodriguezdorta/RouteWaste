@@ -163,7 +163,7 @@ import {
   buildRouteDistanceLineSeries,
   buildRouteSummaryMetrics,
 } from '@/adapter/vuejs/analytics/infrastructure-plan/build-route-progress-charts';
-import type { RouteLinePlotDatum } from '@/adapter/vuejs/analytics/infrastructure-plan/build-route-progress-charts';
+import type { RouteLinePlotDatum } from '@/adapter/vuejs/analytics/infrastructure-plan/route-line-plot-datum';
 import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
 import SimpleLineChart from '@/adapter/vuejs/components/common/SimpleLineChart.vue';
 import { StopType } from '@/domain/enumerate/stop-type';

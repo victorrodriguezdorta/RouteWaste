@@ -14,7 +14,7 @@ public final class InfrastructurePlanId {
      * Infrastructure plan UUID value.
      * It is a required attribute.
      */
-    private final String value;
+    private final UUID value;
 
     /**
      * Creates an infrastructure plan identifier.
@@ -25,7 +25,7 @@ public final class InfrastructurePlanId {
         if (value == null) {
             throw new IllegalArgumentException(ERROR_ID_NOT_DEFINED);
         }
-        this.value = value.toString();
+        this.value = value;
     }
 
     /**
@@ -34,7 +34,7 @@ public final class InfrastructurePlanId {
      * @return infrastructure plan UUID
      */
     public UUID getValue() {
-        return UUID.fromString(this.value);
+        return this.value;
     }
 
     /**
@@ -72,6 +72,6 @@ public final class InfrastructurePlanId {
      */
     @Override
     public String toString() {
-        return this.value;
+        return this.value.toString();
     }
 }

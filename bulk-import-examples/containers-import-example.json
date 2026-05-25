@@ -1,0 +1,47 @@
+{
+  "containers": [
+    {
+      "name": "Contenedor importación Parque García Sanabria",
+      "location": {
+        "latitude": 28.4682,
+        "longitude": -16.2546,
+        "postalAddress": "Parque García Sanabria, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-1"
+      },
+      "wasteType": "ORGANIC",
+      "capacityLiters": 850,
+      "dailyDemandLitersPerDay": 275,
+      "serviceZone": "NEIGHBORHOOD"
+    },
+    {
+      "name": "Contenedor importación Mercado Nuestra Señora",
+      "location": {
+        "latitude": 28.4667,
+        "longitude": -16.2483,
+        "postalAddress": "Mercado de Nuestra Señora de África, Santa Cruz",
+        "gisReference": "IMPORT-CONTAINER-2"
+      },
+      "wasteType": "PACKAGING",
+      "capacityLiters": {
+        "liters": 1000
+      },
+      "dailyDemandLitersPerDay": {
+        "litersPerDay": 340
+      },
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor importación Rambla Pulido",
+      "location": {
+        "latitude": 28.4721,
+        "longitude": -16.2598,
+        "postalAddress": "Rambla de Pulido 45, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-3"
+      },
+      "wasteType": "PAPER_CARDBOARD",
+      "capacityLiters": 1100,
+      "dailyDemandLitersPerDay": 300,
+      "serviceZone": "GEOGRAPHICAL_AREA"
+    }
+  ]
+}

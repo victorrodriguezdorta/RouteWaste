@@ -213,7 +213,7 @@ export class FacilityAdd {
   static externalValidatePostalAddress(value: string): boolean | string {
     try {
       const POSTAL_MAX = 150;
-      const POSTAL_REGEX = /^[A-Za-z0-9\s,.-]+$/;
+      const POSTAL_REGEX = /^[\p{L}\p{N}\s,.-]+$/u;
       if (!value || value.length === 0) {
         throw new Error('Postal address cannot be empty');
       }
@@ -250,6 +250,12 @@ export class FacilityAdd {
     }
   }
 
+  /**
+   * Validate facility name for form fields.
+   *
+   * @param value Facility name string to validate
+   * @returns true if valid, error message string if invalid
+   */
   static externalValidateName(value: string): boolean | string {
     try {
       new Name(value);

@@ -1,3 +1,11 @@
+import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
+
+/** Returns the locale key segment for a facility type enum value. */
+export function facilityTypeLocaleKey(type: FacilityType | string): string {
+  const value = typeof type === 'string' ? facilityTypeFromString(type) : type;
+  return enumToLocaleKey(value);
+}
+
 /**
  * FacilityType
  *
@@ -93,7 +101,7 @@ export function facilityTypeColor(type: FacilityType | string): string {
  */
 export function facilityTypeToOptions(t: (key: string) => string): { title: string; value: FacilityType }[] {
   return facilityTypeValues().map((type) => ({
-    title: t(`facility.add.facilityTypes.${type}`),
+    title: t(`facility.add.facilityTypes.${facilityTypeLocaleKey(type)}`),
     value: type,
   }));
 }

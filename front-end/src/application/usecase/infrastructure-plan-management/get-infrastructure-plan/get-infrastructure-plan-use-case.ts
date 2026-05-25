@@ -1,19 +1,10 @@
-import type { GetInfrastructurePlanCommand } from './get-infrastructure-plan-command';
-import type { GetInfrastructurePlanResult } from './get-infrastructure-plan-result';
+import type { GetInfrastructurePlanCommand } from '@/application/model/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-command';
+import type { GetInfrastructurePlanResult } from '@/application/model/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-
-export type { GetInfrastructurePlanCommand } from './get-infrastructure-plan-command';
-export type { GetInfrastructurePlanResult } from './get-infrastructure-plan-result';
-
-// GetInfrastructurePlanUseCase.ts
-// Use case contract for getting an infrastructure plan by id
 
 /**
  * Use case for obtaining a single infrastructure plan by its identifier.
- * Input: planId
- * Output: InfrastructurePlan (entity)
  */
-
 export interface GetInfrastructurePlanUseCase {
     /**
      * Handles retrieving a single infrastructure plan by id
@@ -23,4 +14,5 @@ export interface GetInfrastructurePlanUseCase {
     execute(command: GetInfrastructurePlanCommand): Promise<Either<DataError, GetInfrastructurePlanResult>>;
 }
 
-
+export type { GetInfrastructurePlanCommand } from '@/application/model/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-command';
+export type { GetInfrastructurePlanResult } from '@/application/model/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-result';

@@ -83,6 +83,20 @@ public class LocationTests {
     }
 
     /**
+     * Constructor - postalAddress with Spanish accents (allowed)
+     */
+    @Test
+    void constructor_postalAddressWithAccents() {
+        Location loc = new Location(
+                28.4682,
+                -16.2546,
+                "Parque García Sanabria, Santa Cruz de Tenerife",
+                "GIS-001");
+
+        assertEquals("Parque García Sanabria, Santa Cruz de Tenerife", loc.getPostalAddress());
+    }
+
+    /**
      * Constructor - postalAddress wrong format
      */
     @Test

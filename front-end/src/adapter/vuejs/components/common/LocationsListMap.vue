@@ -347,23 +347,21 @@ onUnmounted(() => {
     height: 260px;
   }
 }
-</style>
 
-<style>
-.locations-list-map__map .leaflet-container {
+.locations-list-map__map :deep(.leaflet-container) {
   font-family: inherit;
   height: 100%;
   width: 100%;
 }
 
 /* DivIcon markers (algorithm selection map): neutralize Leaflet default frame */
-.locations-list-map__map .leaflet-div-icon.locations-list-map__tone-marker {
+.locations-list-map__map :deep(.leaflet-div-icon.locations-list-map__tone-marker) {
   background: transparent !important;
   border: none !important;
   cursor: pointer;
 }
 
-.locations-list-map__map .locations-list-map__tone-marker-pin {
+.locations-list-map__map :deep(.locations-list-map__tone-marker-pin) {
   display: flex;
   align-items: flex-start;
   justify-content: center;

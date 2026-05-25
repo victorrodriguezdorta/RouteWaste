@@ -1,3 +1,4 @@
+import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
 import type { CreateContainerCommand, CreateContainerResult } from '@/application/usecase/container-management/create-container/create-container-use-case';
 import type { DeleteContainerCommand, DeleteContainerResult } from '@/application/usecase/container-management/delete-container/delete-container-use-case';
 import type { FilterContainersCommand, FilterContainersResult } from '@/application/usecase/container-management/filter-containers/filter-containers-use-case';
@@ -52,4 +53,11 @@ export interface ContainerRepository {
    * @return Either a DataError or a list of matching Container entities.
    */
   filter(command: FilterContainersCommand): Promise<Either<DataError, FilterContainersResult>>;
+
+  /**
+   * @brief Import containers from a JSON file.
+   * @param file JSON file selected by the user.
+   * @return Either a DataError or bulk import statistics.
+   */
+  importFromFile(file: File): Promise<Either<DataError, BulkImportResult>>;
 }

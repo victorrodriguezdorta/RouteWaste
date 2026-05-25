@@ -1,3 +1,13 @@
+import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
+
+/**
+ * Returns the locale key segment for a time unit enum value.
+ */
+export function timeUnitLocaleKey(unit: TimeUnit | string): string {
+  const value = typeof unit === 'string' ? timeUnitFromString(unit) : unit;
+  return enumToLocaleKey(value);
+}
+
 /**
  * TimeUnit
  *
@@ -73,7 +83,7 @@ export function timeUnitRandom(): TimeUnit {
  */
 export function timeUnitToOptions(t: (key: string) => string): { title: string; value: TimeUnit }[] {
   return timeUnitValues().map((unit) => ({
-    title: t(`common.timeUnits.${unit}`),
+    title: t(`common.timeUnits.${timeUnitLocaleKey(unit)}`),
     value: unit,
   }));
 }

@@ -1,0 +1,76 @@
+{
+  "facilities": [
+    {
+      "name": "Instalación importación Base Operativa Norte",
+      "facilityType": "OPERATIONAL_BASE",
+      "location": {
+        "latitude": 28.4629,
+        "longitude": -16.2519,
+        "postalAddress": "Avenida Tres de Mayo 10, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-FACILITY-1"
+      },
+      "storageCapacity": {
+        "value": 25000
+      },
+      "processingCapacity": {
+        "value": 12000
+      },
+      "unloadingTime": {
+        "timeValue": 20
+      },
+      "openingFixedCost": {
+        "amount": 150000,
+        "currency": "EUR"
+      },
+      "status": "OPEN"
+    },
+    {
+      "name": "Instalación importación Estación Transferencia Anaga",
+      "facilityType": "TRANSFER_STATION",
+      "location": {
+        "latitude": 28.5262,
+        "longitude": -16.2464,
+        "postalAddress": "Carretera de Anaga 15, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-FACILITY-2"
+      },
+      "storageCapacity": {
+        "value": 38000
+      },
+      "processingCapacity": {
+        "value": 17000
+      },
+      "unloadingTime": {
+        "timeValue": 28
+      },
+      "openingFixedCost": {
+        "amount": 215000,
+        "currency": "EUR"
+      },
+      "status": "PLANNED"
+    },
+    {
+      "name": "Instalación importación Planta Tratamiento Sur",
+      "facilityType": "TREATMENT_PLANT",
+      "location": {
+        "latitude": 28.0961,
+        "longitude": -16.6806,
+        "postalAddress": "Polígono Industrial Sur, Tenerife",
+        "gisReference": "IMPORT-FACILITY-3"
+      },
+      "storageCapacity": {
+        "value": 80000
+      },
+      "processingCapacity": {
+        "value": 45000
+      },
+      "unloadingTime": {
+        "timeValue": 45
+      },
+      "openingFixedCost": {
+        "amount": 520000,
+        "currency": "EUR"
+      },
+      "status": "CANDIDATE"
+    }
+  ]
+}

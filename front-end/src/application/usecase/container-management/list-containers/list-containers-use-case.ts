@@ -1,18 +1,6 @@
-import type { ListContainersCommand } from './list-containers-command';
-import type { ListContainersResult } from './list-containers-result';
+import type { ListContainersCommand } from '@/application/model/container-management/list-containers/list-containers-command';
+import type { ListContainersResult } from '@/application/model/container-management/list-containers/list-containers-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-
-export type { ListContainersCommand } from './list-containers-command';
-export type { ListContainersResult } from './list-containers-result';
-
-// ListContainersUseCase.ts
-// Use case contract for listing all containers
-
-/**
- * Use case for listing all containers in the system.
- * Input: none (optionally pagination params)
- * Output: paginated container result
- */
 
 /**
  * Use case contract for listing all containers
@@ -26,5 +14,5 @@ export interface ListContainersUseCase {
     execute(command?: ListContainersCommand): Promise<Either<DataError, ListContainersResult>>;
 }
 
-
-
+export type { ListContainersCommand } from '@/application/model/container-management/list-containers/list-containers-command';
+export type { ListContainersResult } from '@/application/model/container-management/list-containers/list-containers-result';

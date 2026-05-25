@@ -142,11 +142,15 @@ export class Facility {
 
   /**
    * Devuelve el nombre de la instalación.
+   *
+   * @returns El nombre de la instalación
    */
   getName(): Name { return this.name; }
 
   /**
    * Actualiza el nombre de la instalación.
+   *
+   * @param name Nuevo nombre de la instalación
    */
   updateName(name: Name): void {
     if (!name) throw new Error('Facility name is not defined');

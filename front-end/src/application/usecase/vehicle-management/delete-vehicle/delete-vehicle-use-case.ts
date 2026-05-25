@@ -1,14 +1,9 @@
-import type { DeleteVehicleCommand } from './delete-vehicle-command';
-import type { DeleteVehicleResult } from './delete-vehicle-result';
+import type { DeleteVehicleCommand } from '@/application/model/vehicle-management/delete-vehicle/delete-vehicle-command';
+import type { DeleteVehicleResult } from '@/application/model/vehicle-management/delete-vehicle/delete-vehicle-result';
 import type { DataError, Either } from '@ull-tfg/ull-tfg-typescript';
-
-export type { DeleteVehicleCommand } from './delete-vehicle-command';
-export type { DeleteVehicleResult } from './delete-vehicle-result';
 
 /**
  * Use case for deleting a vehicle from the system.
- * Input: vehicleId
- * Output: success confirmation (boolean)
  */
 export interface DeleteVehicleUseCase {
     /**
@@ -19,3 +14,6 @@ export interface DeleteVehicleUseCase {
      */
     execute(command: DeleteVehicleCommand): Promise<Either<DataError, DeleteVehicleResult>>;
 }
+
+export type { DeleteVehicleCommand } from '@/application/model/vehicle-management/delete-vehicle/delete-vehicle-command';
+export type { DeleteVehicleResult } from '@/application/model/vehicle-management/delete-vehicle/delete-vehicle-result';

@@ -1,15 +1,9 @@
 import { AlgorithmExecutionRequestJson } from '@/adapter/http/dto/algorithm/algorithm-execution-request-json';
+import type { AlgorithmJsonResponse } from '@/adapter/http/dto/algorithm/algorithm-json-response';
 import type { AlgorithmRepository } from '@/application/repository/algorithm-repository';
 import type { CreateAlgorithmCommand, CreateAlgorithmResult } from '@/application/usecase/algorithm-management/create-algorithm/create-algorithm-use-case';
 import type { ApiError, DataError } from '@ull-tfg/ull-tfg-typescript';
 import { Either, http } from '@ull-tfg/ull-tfg-typescript';
-
-/**
- * AlgorithmJsonResponse
- *
- * JSON response from the backend after algorithm execution.
- */
-type AlgorithmJsonResponse = CreateAlgorithmResult;
 
 /**
  * AlgorithmHttpRepository

@@ -25,17 +25,23 @@
       "selectAll": "Select all",
       "deselectAll": "Deselect all"
     },
+    "bulkImport": {
+      "successTitle": "Import successful",
+      "successMessage": "Imported {created} of {total} records.",
+      "partialTitle": "Import incomplete",
+      "partialMessage": "Imported {created} of {total}. {failed} failed."
+    },
     "timeUnits": {
-      "DAY": "Day",
-      "WEEK": "Week",
-      "MONTH": "Month",
-      "YEAR": "Year"
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
     },
     "timeUnitsLowercase": {
-      "DAY": "day",
-      "WEEK": "week",
-      "MONTH": "month",
-      "YEAR": "year"
+      "day": "day",
+      "week": "week",
+      "month": "month",
+      "year": "year"
     },
     "loading": "Loading...",
     "map": {
@@ -93,9 +99,9 @@
         "currencyCode": "Currency Code (e.g., EUR, USD)"
       },
       "vehicleTypes": {
-        "COLLECTION_TRUCK": "Collection Truck",
-        "TRANSFER_TRUCK": "Transfer Truck",
-        "SUPPORT_VEHICLE": "Support Vehicle"
+        "collectionTruck": "Collection Truck",
+        "transferTruck": "Transfer Truck",
+        "supportVehicle": "Support Vehicle"
       }
     },
     "edit": {
@@ -106,6 +112,8 @@
       "fields": {
         "name": "Name",
         "vehicleType": "Vehicle Type",
+        "capacityKilograms": "Capacity (kg)",
+        "capacityLiters": "Capacity (L)",
         "capacityValue": "Capacity Value",
         "capacityUnit": "Unit (e.g., tons, kg)",
         "timeUnit": "Time Unit",
@@ -121,6 +129,8 @@
       "fields": {
         "name": "Name",
         "vehicleType": "Vehicle Type",
+        "capacityKilograms": "Capacity (kg)",
+        "capacityLiters": "Capacity (L)",
         "capacityValue": "Capacity Value",
         "capacityUnit": "Unit",
         "timeUnit": "Time Unit",
@@ -136,6 +146,7 @@
         "noData": "No vehicles registered"
       },
       "addButton": "Add Vehicle",
+      "importButton": "Import JSON",
       "filterByType": "Filter by type",
       "filterAll": "All types",
       "table": {
@@ -181,16 +192,16 @@
         "dailyDemandLitersPerDay": "Daily Demand (liters/day)"
       },
       "wasteTypes": {
-        "ORGANIC": "Organic",
-        "PACKAGING": "Packaging",
-        "PAPER_CARDBOARD": "Paper and Cardboard",
-        "GLASS": "Glass",
-        "RESIDUAL": "Residual"
+        "organic": "Organic",
+        "packaging": "Packaging",
+        "paperCardboard": "Paper and Cardboard",
+        "glass": "Glass",
+        "residual": "Residual"
       },
       "serviceZones": {
-        "NEIGHBORHOOD": "Neighborhood",
-        "DISTRICT": "District",
-        "GEOGRAPHICAL_AREA": "Geographical Area"
+        "neighborhood": "Neighborhood",
+        "district": "District",
+        "geographicalArea": "Geographical Area"
       }
     },
     "edit": {
@@ -238,6 +249,7 @@
         "noData": "No containers registered"
       },
       "addButton": "Add Container",
+      "importButton": "Import JSON",
       "filterByWasteType": "Filter by waste type",
       "filterByServiceZone": "Filter by service zone",
       "filterByLocation": "Search by location",
@@ -285,15 +297,15 @@
         "status": "Status"
       },
       "facilityTypes": {
-        "OPERATIONAL_BASE": "Operational Base",
-        "TRANSFER_STATION": "Transfer Station",
-        "TREATMENT_PLANT": "Treatment Plant"
+        "operationalBase": "Operational Base",
+        "transferStation": "Transfer Station",
+        "treatmentPlant": "Treatment Plant"
       },
       "statuses": {
-        "CANDIDATE": "Candidate",
-        "PLANNED": "Planned",
-        "OPEN": "Open",
-        "DISCARDED": "Discarded"
+        "candidate": "Candidate",
+        "planned": "Planned",
+        "open": "Open",
+        "discarded": "Discarded"
       }
     },
     "edit": {
@@ -345,6 +357,7 @@
         "noData": "No facilities registered"
       },
       "addButton": "Add Facility",
+      "importButton": "Import JSON",
       "filterByType": "Filter by type",
       "filterByStatus": "Filter by status",
       "filterByLocation": "Search by location",
@@ -385,8 +398,8 @@
           "validityState": "Plan status"
         },
         "validity": {
-          "VALID": "Valid",
-          "OBSOLETE": "Obsolete"
+          "valid": "Valid",
+          "obsolete": "Obsolete"
         },
         "tooltips": {
           "view": "View details",
@@ -506,9 +519,9 @@
           "fillEvolutionChartTitle": "Fill percentage evolution by container",
           "noData": "No data",
           "statuses": {
-            "OVERFLOWED": "Overflowed",
-            "OK": "OK",
-            "NO_DATA": "No data"
+            "overflowed": "Overflowed",
+            "ok": "OK",
+            "noData": "No data"
           }
         }
       }

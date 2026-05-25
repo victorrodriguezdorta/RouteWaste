@@ -103,6 +103,12 @@ export class VehicleAdd {
     }
   }
 
+  /**
+   * Validate vehicle name for form fields.
+   *
+   * @param value Vehicle name string to validate
+   * @returns true if valid, error message string if invalid
+   */
   static externalValidateName(value: string): boolean | string {
     try {
       new Name(value);

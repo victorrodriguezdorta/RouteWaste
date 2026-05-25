@@ -274,7 +274,7 @@ public class DeliveryPlanningProblemJsonFileSupplier {
    *
    * @param json source JSON object
    * @param fieldName direct or object field name
-   * @param nestedField nested numeric field name
+   * @param nestedFields candidate nested numeric field names inside the object
    * @return parsed double value
    */
   private double readDoubleFlexible(JSONObject json, String fieldName, String... nestedFields) {
@@ -298,7 +298,7 @@ public class DeliveryPlanningProblemJsonFileSupplier {
    *
    * @param json source JSON object
    * @param fieldName direct or object field name
-   * @param nestedField nested integer field name
+   * @param nestedFields candidate nested integer field names inside the object
    * @return parsed integer value
    */
   private int readIntFlexible(JSONObject json, String fieldName, String... nestedFields) {

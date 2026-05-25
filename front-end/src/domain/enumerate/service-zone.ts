@@ -1,3 +1,13 @@
+import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
+
+/**
+ * Returns the locale key segment for a service zone enum value.
+ */
+export function serviceZoneLocaleKey(zone: ServiceZone | string): string {
+  const value = typeof zone === 'string' ? serviceZoneFromString(zone) : zone;
+  return enumToLocaleKey(value);
+}
+
 /**
  * ServiceZone
  *
@@ -102,7 +112,7 @@ export function serviceZoneColor(zone: ServiceZone | string): string {
  */
 export function serviceZoneToOptions(t: (key: string) => string): { title: string; value: ServiceZone }[] {
   return serviceZoneValues().map((zone) => ({
-    title: t(`container.add.serviceZones.${zone}`),
+    title: t(`container.add.serviceZones.${serviceZoneLocaleKey(zone)}`),
     value: zone,
   }));
 }

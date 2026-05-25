@@ -1,13 +1,12 @@
-import { VehicleHttpRepository } from '@/adapter/http/vehicle-http-repository';
-import {
-    CreateVehicleService,
-    DeleteVehicleService,
-    GetVehicleService,
-    ListVehiclesService,
-    UpdateVehicleService
-} from '@/application/service/vehicle';
+import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
 import type { Vehicle } from '@/domain/entity/vehicle';
 import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
+import { VehicleHttpRepository } from '@/adapter/http/vehicle-http-repository';
+import { CreateVehicleService } from '@/application/service/vehicle/create-vehicle-service';
+import { DeleteVehicleService } from '@/application/service/vehicle/delete-vehicle-service';
+import { GetVehicleService } from '@/application/service/vehicle/get-vehicle-service';
+import { ListVehiclesService } from '@/application/service/vehicle/list-vehicles-service';
+import { UpdateVehicleService } from '@/application/service/vehicle/update-vehicle-service';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 
@@ -255,6 +254,22 @@ export const useVehicleStore = defineStore('Vehicle', {
      * 
      * @param id UUID string of the vehicle to delete
      */
+    async importVehiclesFromFile(file: File): Promise<BulkImportResult | null> {
+      this.loading = true;
+      try {
+        const result = await this.vehicleRepository.importFromFile(file);
+        return result.fold(
+          (error) => {
+            this.handleError(error);
+            return null;
+          },
+          (data) => data,
+        );
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async deleteVehicle(id: string) {
       // Create service instance with repository
       const deleteService = new DeleteVehicleService(this.vehicleRepository);

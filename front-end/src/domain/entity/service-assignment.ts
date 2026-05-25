@@ -55,6 +55,10 @@ export class ServiceAssignment {
 
   /**
    * Validates that all required parameters are not null.
+   *
+   * @param infrastructurePlan Parent infrastructure plan
+   * @param facility Facility providing the service
+   * @param assignedContainers Containers assigned to the facility
    * @throws Error if any parameter is null, undefined, or invalid
    */
   private validate(

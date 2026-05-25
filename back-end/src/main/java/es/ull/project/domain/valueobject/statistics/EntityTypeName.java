@@ -9,6 +9,10 @@ public final class EntityTypeName {
 
     private static final String ERROR_BLANK = "Entity type name must not be null or blank";
 
+    /**
+     * The serialized enum constant name.
+     * It is a required attribute.
+     */
     private final String value;
 
     /**
@@ -33,6 +37,12 @@ public final class EntityTypeName {
         return this.value;
     }
 
+    /**
+     * Checks equality based on the serialized type name.
+     *
+     * @param otherObject the object to compare with
+     * @return {@code true} if the other object has the same type name
+     */
     @Override
     public boolean equals(Object otherObject) {
         if (this == otherObject) {
@@ -45,11 +55,21 @@ public final class EntityTypeName {
         return Objects.equals(value, other.value);
     }
 
+    /**
+     * Returns a hash code based on the serialized type name.
+     *
+     * @return hash code
+     */
     @Override
     public int hashCode() {
         return Objects.hash(value);
     }
 
+    /**
+     * Returns a string representation.
+     *
+     * @return string representation
+     */
     @Override
     public String toString() {
         return "EntityTypeName={" + value + "}";

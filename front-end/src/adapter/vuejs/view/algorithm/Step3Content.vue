@@ -153,7 +153,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useAlgorithmExecution } from '../../composables/useAlgorithmExecution';
+import { useAlgorithmExecution } from '@/adapter/vuejs/composables/use-algorithm-execution';
 
 const { t } = useI18n();
 

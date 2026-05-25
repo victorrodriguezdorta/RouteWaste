@@ -79,11 +79,15 @@ export class Container {
 
   /**
    * Return the container display name.
+   *
+   * @returns The container display name
    */
   getName(): Name { return this.name; }
 
   /**
    * Update the container name.
+   *
+   * @param name New container display name
    */
   updateName(name: Name): void { if (!name) throw new Error('Container name is not defined'); this.name = name; }
 

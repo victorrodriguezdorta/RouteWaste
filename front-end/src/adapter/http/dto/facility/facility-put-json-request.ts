@@ -1,4 +1,4 @@
-import type { UpdateFacilityCommand } from '@/application/usecase/facility-management/update-facility/update-facility-command';
+import type { UpdateFacilityCommand } from '@/application/model/facility-management/update-facility/update-facility-command';
 
 /**
  * FacilityPutJsonRequest DTO
