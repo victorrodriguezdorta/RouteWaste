@@ -47,10 +47,10 @@ else
 fi
 
 # Algorithm
-docker run -v $(pwd):/data ${IMAGE_NAME} --test JAVA --uri file:/data --component algorithm
+docker run -v $(pwd):/data ${IMAGE_NAME} test --test JAVA --uri file:/data --component algorithm
 # Back-end
-docker run -v $(pwd):/data ${IMAGE_NAME} --test JAVA_HEXAGONAL --uri file:/data --component back-end
+docker run -v $(pwd):/data ${IMAGE_NAME} test --test JAVA_HEXAGONAL --uri file:/data --component back-end
 # Front-end (empty volume hides node_modules from analysis)
-docker run -v $(pwd):/data -v /data/front-end/node_modules ${IMAGE_NAME} --test TYPESCRIPT_HEXAGONAL --uri file:/data --component front-end
+docker run -v $(pwd):/data -v /data/front-end/node_modules ${IMAGE_NAME} test --test TYPESCRIPT_HEXAGONAL --uri file:/data --component front-end
 # Summary
-docker run -v $(pwd):/data ${IMAGE_NAME} --summary
+docker run -v $(pwd):/data ${IMAGE_NAME} summary
