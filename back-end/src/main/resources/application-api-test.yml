@@ -1,0 +1,15 @@
+# Profile for Newman / REST API integration tests only.
+# Use: SPRING_PROFILES_ACTIVE=api-test (see README, docker compose profile api-test).
+server:
+  port: 8081
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/db-application-api-test
+      database: db-application-api-test
+
+logging:
+  level:
+    org.springframework.web: INFO
+    es.ull.project: INFO

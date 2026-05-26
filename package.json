@@ -4,7 +4,12 @@
   "description": "Root tooling for sensor-app (REST API Newman tests)",
   "scripts": {
     "postman:generate": "node scripts/generate-rest-api-postman.mjs",
-    "test:api": "newman run rest-api_tests.json -e rest-api_environment.json",
+    "test:api:stack:up": "docker compose --profile api-test up -d",
+    "test:api:stack:down": "docker compose --profile api-test down",
+    "test:api:wait": "node scripts/wait-for-api-test.mjs",
+    "test:api": "npm run test:api:wait && newman run rest-api_tests.json -e rest-api_environment.json",
+    "test:api:jar": "mvn -f back-end/pom.xml package -DskipTests",
+    "test:api:full": "npm run test:api:jar && npm run test:api:stack:up && npm run test:api && npm run test:api:stack:down",
     "test:api:generate": "npm run postman:generate && npm run test:api"
   },
   "devDependencies": {

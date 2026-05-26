@@ -163,8 +163,8 @@ Snapshot del estado de un contenedor en un día concreto del plan (persistido co
 | Atributo | Tipo | Obligatorio | Descripción |
 |----------|------|-------------|-------------|
 | `id` | `UUID` | Sí (inmutable) | Identificador del snapshot |
-| `infrastructurePlanId` | `InfrastructurePlanId` | No | Plan padre (legacy sin enlace) |
-| `containerId` | `ContainerId` | Sí | Contenedor referenciado |
+| `infrastructurePlanId` | `UUID` | No | Plan padre (legacy sin enlace) |
+| `containerId` | `UUID` | Sí | Contenedor referenciado |
 | `planDay` | `PlanDay` | Sí | Día de planificación (≥ 1) |
 | `dailyFillingLiters` | `CollectedVolumeLiters` | Sí | Nivel de llenado del día (litros) |
 | `containerCapacityLiters` | `ContainerCapacityLiters` | Sí | Capacidad en el momento del plan |
@@ -187,7 +187,6 @@ Alerta generada durante el procesamiento de una parada (valor de dominio embebid
 
 ### 3.1. Identificadores y nombres
 
-- `ContainerId`, `InfrastructurePlanId` — wrappers de `UUID`.
 - `Name` — nombre legible de contenedor, instalación o vehículo.
 - Los identificadores de entidad principales (`Container`, `Facility`, `Vehicle`, etc.) son `UUID` inmutables generados en el constructor.
 
@@ -272,13 +271,26 @@ No son entidades ni VOs, pero forman parte del diseño DDD:
 La suite de tests de la API REST vive en la raíz del repositorio:
 
 - `rest-api_tests.json` — colección Postman (v2.1) con un caso por endpoint del back-end
-- `rest-api_environment.json` — entorno local (`baseUrl`, ids creados en runtime, etc.)
+- `rest-api_environment.json` — entorno de prueba (`baseUrl`, ids creados en runtime, etc.)
 
 Los ficheros se generan con:
 
 ```bash
 node scripts/generate-rest-api-postman.mjs
 ```
+
+### Base de datos aislada
+
+Los tests Newman **no deben** ejecutarse contra la base de datos de desarrollo (`db-application`). Usan un entorno dedicado:
+
+| Recurso | Desarrollo | Newman (API test) |
+|---------|------------|-------------------|
+| MongoDB database | `db-application` | `db-application-api-test` |
+| Back-end (host) | `http://localhost:8080` | `http://localhost:8081` |
+| Perfil Spring | (por defecto) | `api-test` |
+| Docker Compose | `--profile back-end` | `--profile api-test` |
+
+Así puedes tener el back-end de desarrollo en `:8080` y el de tests en `:8081` sin mezclar datos. En Docker, el MongoDB de Newman es un servicio interno (`mongo-api-test`) y no publica el puerto `27017`, por lo que no entra en conflicto con una MongoDB local o de desarrollo.
 
 ### Requisitos
 
@@ -292,19 +304,51 @@ npm install
 
 Si prefieres instalar Newman globalmente y te sale `EACCES` en Linux/WSL, **no uses `sudo`**: instala solo en el proyecto con el comando anterior, o ejecuta `npx newman` tras `npm install`.
 
-- Back-end y MongoDB en ejecución (por ejemplo con Docker):
+- Back-end con perfil **`api-test`** (puerto **8081**). Con Docker no necesitas tener libre el puerto `27017`, porque la MongoDB de test es interna al stack.
+
+**Opción A — Docker (recomendado):**
 
 ```bash
-docker compose --profile back-end up -d
+# 1. Compila el JAR (necesario para construir la imagen local)
+cd back-end && mvn package -DskipTests && cd ..
+# 2. Levanta MongoDB interna + back-end de test
+docker compose --profile api-test up -d
 ```
+
+Levanta `mongo-api-test` y `back-end-api-test` (imagen construida desde `./back-end/Dockerfile`) contra `db-application-api-test`. `mongo-api-test` no expone puertos al host.
+
+> La imagen pública `kaizten/sensor-app_back-end` es privada. El perfil `api-test` construye
+> la imagen localmente como `sensor-app_back-end:local`.
+
+**Opción B — Back-end local con Maven:**
+
+```bash
+cd back-end
+mvn spring-boot:run -Dspring-boot.run.profiles=api-test
+```
+
+(Requiere MongoDB en `localhost:27017`; usa `application-api-test.yml`.)
 
 ### Ejecutar la suite
 
 Desde la **raíz** del proyecto (`sensor-app/`, no `back-end/`):
 
 ```bash
+# Stack Docker + Newman + bajar stack
+npm run test:api:full
+
+# Solo Newman (con el stack api-test ya levantado)
 npm run test:api
 ```
+
+| Script | Descripción |
+|--------|-------------|
+| `npm run test:api:jar` | Compila el JAR del back-end (`mvn package -DskipTests`) |
+| `npm run test:api:stack:up` | `docker compose --profile api-test up -d` |
+| `npm run test:api:stack:down` | Para el stack de tests |
+| `npm run test:api:wait` | Espera a que responda `:8081` |
+| `npm run test:api` | Newman contra el entorno de test |
+| `npm run test:api:full` | Compila JAR + sube stack + Newman + baja stack |
 
 Equivalente manual:
 
@@ -312,7 +356,48 @@ Equivalente manual:
 npx newman run rest-api_tests.json -e rest-api_environment.json
 ```
 
-La variable `baseUrl` apunta por defecto a `http://localhost:8080`.
+La variable `baseUrl` apunta por defecto a `http://localhost:8081` (back-end con perfil `api-test`).
+
+### Inspeccionar la base de datos de Newman
+
+Cuando se usa Docker, Newman **sí usa MongoDB**, pero no usa la MongoDB local publicada en `localhost:27017`. Usa el contenedor interno `mongo-api-test`:
+
+- Servicio Docker: `mongo-api-test`
+- Base de datos: `db-application-api-test`
+- URI desde el back-end de test: `mongodb://mongo-api-test:27017/db-application-api-test`
+- Puerto en el host: ninguno (`mongo-api-test` no publica `27017`)
+
+Por eso `db-application-api-test` no aparece en MongoDB Compass si estás conectado a `localhost:27017`: Compass está mirando tu MongoDB local/de desarrollo, no el contenedor interno de Newman.
+
+Para inspeccionarla, deja el stack levantado y no uses `test:api:full`, porque ese script ejecuta `test:api:stack:down` al final:
+
+```bash
+npm run test:api:jar
+npm run test:api:stack:up
+npm run test:api
+```
+
+Después entra al contenedor de MongoDB de test:
+
+```bash
+docker exec -it mongo-api-test mongosh
+```
+
+Dentro de `mongosh`:
+
+```javascript
+show dbs
+use db-application-api-test
+show collections
+```
+
+Ten en cuenta que los tests CRUD crean datos de prueba y los eliminan al final de cada carpeta. Si la base queda sin documentos, MongoDB puede no mostrarla en `show dbs`, aunque el back-end sí haya usado `mongo-api-test` durante la ejecución.
+
+Cuando termines de inspeccionar:
+
+```bash
+npm run test:api:stack:down
+```
 
 ### Qué cubre la colección
 

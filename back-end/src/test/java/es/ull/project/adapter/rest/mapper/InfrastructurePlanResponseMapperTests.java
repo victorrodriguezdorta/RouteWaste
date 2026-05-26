@@ -17,8 +17,6 @@ import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
-import es.ull.project.domain.valueobject.identifier.ContainerId;
-import es.ull.project.domain.valueobject.identifier.InfrastructurePlanId;
 import es.ull.project.domain.valueobject.time.PlanDay;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
 
@@ -37,8 +35,8 @@ class InfrastructurePlanResponseMapperTests {
         );
 
         ContainerDailyState state = new ContainerDailyState(
-            new InfrastructurePlanId(plan.getId()),
-            new ContainerId(UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3")),
+            plan.getId(),
+            UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"),
             new PlanDay(2),
             CollectedVolumeLiters.fromLiters(850.0),
             new ContainerCapacityLiters(1000.0),
@@ -53,7 +51,7 @@ class InfrastructurePlanResponseMapperTests {
         assertNotNull(response.containerStateMonitoring);
         assertEquals(1, response.containerStateMonitoring.size());
         assertEquals(state.getId(), response.containerStateMonitoring.get(0).id);
-        assertEquals(UUID.fromString(state.getContainerId()), response.containerStateMonitoring.get(0).containerId);
+        assertEquals(state.getContainerId(), response.containerStateMonitoring.get(0).containerId);
         assertEquals(state.getPlanDay(), response.containerStateMonitoring.get(0).planDay.getDay());
         assertEquals(state.getDailyFillingLiters(), response.containerStateMonitoring.get(0).dailyFillingLiters.getValue());
         assertEquals(state.getContainerCapacityLiters(), response.containerStateMonitoring.get(0).containerCapacityLiters.getLiters());

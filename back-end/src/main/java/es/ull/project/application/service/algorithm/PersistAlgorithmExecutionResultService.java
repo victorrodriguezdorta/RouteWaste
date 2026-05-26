@@ -27,8 +27,6 @@ import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
-import es.ull.project.domain.valueobject.identifier.ContainerId;
-import es.ull.project.domain.valueobject.identifier.InfrastructurePlanId;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.route.RouteSequence;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
@@ -451,8 +449,8 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			ContainerStatus status = ContainerStatus.fromString(statusRaw);
 			try {
 				ContainerDailyState containerDailyState = new ContainerDailyState(
-						new InfrastructurePlanId(infrastructurePlanId),
-						new ContainerId(UUID.fromString(containerId)),
+						infrastructurePlanId,
+						UUID.fromString(containerId),
 						new PlanDay(planDay),
 						CollectedVolumeLiters.fromLiters(dailyFillingLiters),
 						new ContainerCapacityLiters(containerCapacityLiters),

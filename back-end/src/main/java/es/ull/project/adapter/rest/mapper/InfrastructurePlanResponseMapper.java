@@ -70,8 +70,8 @@ public class InfrastructurePlanResponseMapper {
         for (ContainerDailyState state : plan.getContainerDailyStates()) {
             ContainerDailyStateResponseBody stateResponse = new ContainerDailyStateResponseBody();
             stateResponse.id = state.getId();
-            stateResponse.containerId = java.util.UUID.fromString(state.getContainerId());
-            stateResponse.containerName = containerIdToName.get(state.getContainerId());
+            stateResponse.containerId = state.getContainerId();
+            stateResponse.containerName = containerIdToName.get(state.getContainerId().toString());
             stateResponse.planDay = new PlanDay(state.getPlanDay());
             stateResponse.dailyFillingLiters = CollectedVolumeLiters.fromLiters(state.getDailyFillingLiters());
             stateResponse.containerCapacityLiters = new ContainerCapacityLiters(state.getContainerCapacityLiters());

@@ -6,8 +6,6 @@ import es.ull.project.domain.enumerate.ContainerStatus;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
-import es.ull.project.domain.valueobject.identifier.ContainerId;
-import es.ull.project.domain.valueobject.identifier.InfrastructurePlanId;
 import es.ull.project.domain.valueobject.time.PlanDay;
 import java.util.UUID;
 
@@ -43,8 +41,8 @@ public class ContainerDailyStateReadingConverter implements Converter<Document, 
         ContainerStatus status = ContainerStatus.fromString(statusRaw);
         return new ContainerDailyState(
             id,
-            infrastructurePlanId != null ? new InfrastructurePlanId(infrastructurePlanId) : null,
-            new ContainerId(containerId),
+            infrastructurePlanId,
+            containerId,
             new PlanDay(planDay != null ? planDay : 1),
             CollectedVolumeLiters.fromLiters(dailyFilling != null ? dailyFilling : 0.0),
             new ContainerCapacityLiters(capacity != null ? capacity : 0.0),

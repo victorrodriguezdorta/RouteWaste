@@ -15,8 +15,6 @@ import es.ull.project.domain.enumerate.ContainerStatus;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
-import es.ull.project.domain.valueobject.identifier.ContainerId;
-import es.ull.project.domain.valueobject.identifier.InfrastructurePlanId;
 import es.ull.project.domain.valueobject.time.PlanDay;
 
 class ContainerDailyStateTests {
@@ -27,8 +25,8 @@ class ContainerDailyStateTests {
 
     private static ContainerDailyState randomState() {
         return new ContainerDailyState(
-            new InfrastructurePlanId(randomId()),
-            new ContainerId(randomId()),
+            randomId(),
+            randomId(),
             new PlanDay(1 + (int) (Math.random() * 30)),
             CollectedVolumeLiters.fromLiters(10.0 + Math.random() * 900.0),
             new ContainerCapacityLiters(100.0 + Math.random() * 900.0),
@@ -50,8 +48,8 @@ class ContainerDailyStateTests {
 
         ContainerDailyState state = new ContainerDailyState(
             id,
-            new InfrastructurePlanId(planId),
-            new ContainerId(containerId),
+            planId,
+            containerId,
             new PlanDay(planDay),
             CollectedVolumeLiters.fromLiters(dailyFillingLiters),
             new ContainerCapacityLiters(containerCapacityLiters),
@@ -61,7 +59,7 @@ class ContainerDailyStateTests {
 
         assertEquals(id, state.getId());
         assertEquals(planId, state.getInfrastructurePlanId().orElse(null));
-        assertEquals(containerId.toString(), state.getContainerId());
+        assertEquals(containerId, state.getContainerId());
         assertEquals(planDay, state.getPlanDay());
         assertEquals(dailyFillingLiters, state.getDailyFillingLiters());
         assertEquals(containerCapacityLiters, state.getContainerCapacityLiters());
@@ -73,8 +71,8 @@ class ContainerDailyStateTests {
     @Test
     void constructorDefaultsStatusWhenNull() {
         ContainerDailyState state = new ContainerDailyState(
-            new InfrastructurePlanId(randomId()),
-            new ContainerId(randomId()),
+            randomId(),
+            randomId(),
             new PlanDay(1),
             CollectedVolumeLiters.fromLiters(12.0),
             new ContainerCapacityLiters(100.0),
@@ -90,7 +88,7 @@ class ContainerDailyStateTests {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
             () -> new ContainerDailyState(
-                new InfrastructurePlanId(randomId()),
+                randomId(),
                 null,
                 new PlanDay(1),
                 CollectedVolumeLiters.fromLiters(12.0),
@@ -107,8 +105,8 @@ class ContainerDailyStateTests {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
             () -> new ContainerDailyState(
-                new InfrastructurePlanId(randomId()),
-                new ContainerId(randomId()),
+                randomId(),
+                randomId(),
                 null,
                 CollectedVolumeLiters.fromLiters(12.0),
                 new ContainerCapacityLiters(100.0),
@@ -124,8 +122,8 @@ class ContainerDailyStateTests {
         assertThrows(
             IllegalArgumentException.class,
             () -> new ContainerDailyState(
-                new InfrastructurePlanId(randomId()),
-                new ContainerId(randomId()),
+                randomId(),
+                randomId(),
                 new PlanDay(0),
                 CollectedVolumeLiters.fromLiters(12.0),
                 new ContainerCapacityLiters(100.0),
@@ -147,8 +145,8 @@ class ContainerDailyStateTests {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
             () -> new ContainerDailyState(
-                new InfrastructurePlanId(randomId()),
-                new ContainerId(randomId()),
+                randomId(),
+                randomId(),
                 new PlanDay(1),
                 CollectedVolumeLiters.fromLiters(1.0),
                 new ContainerCapacityLiters(0.0),
@@ -173,8 +171,8 @@ class ContainerDailyStateTests {
         UUID planId = randomId();
         ContainerDailyState state1 = new ContainerDailyState(
             id,
-            new InfrastructurePlanId(planId),
-            new ContainerId(randomId()),
+            planId,
+            randomId(),
             new PlanDay(1),
             CollectedVolumeLiters.fromLiters(12.0),
             new ContainerCapacityLiters(100.0),
@@ -182,8 +180,8 @@ class ContainerDailyStateTests {
             ContainerStatus.CORRECT);
         ContainerDailyState state2 = new ContainerDailyState(
             id,
-            new InfrastructurePlanId(planId),
-            new ContainerId(randomId()),
+            planId,
+            randomId(),
             new PlanDay(8),
             CollectedVolumeLiters.fromLiters(20.0),
             new ContainerCapacityLiters(150.0),
