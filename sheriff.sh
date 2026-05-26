@@ -17,7 +17,7 @@ if ! docker image inspect "$IMAGE_NAME" &>/dev/null; then
     exit 1
   fi
   echo -e "✅ Docker image '${IMAGE_NAME}' has been downloaded."
-  docker run -v $(pwd):/data ${IMAGE_NAME} --reset
+  docker run -v $(pwd):/data ${IMAGE_NAME} reset
 else
   echo -e "🔍 Checking for updates to Docker image '${IMAGE_NAME}'..."
   LOCAL_DIGEST=$(docker image inspect "$IMAGE_NAME" --format '{{index .RepoDigests 0}}' 2>/dev/null | cut -d@ -f2)
@@ -42,7 +42,7 @@ else
       exit 1
     fi
     echo -e "✅ Docker image '${IMAGE_NAME}' has been updated."
-    docker run -v $(pwd):/data ${IMAGE_NAME} --reset
+    docker run -v $(pwd):/data ${IMAGE_NAME} reset
   fi
 fi
 
