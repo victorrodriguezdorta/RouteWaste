@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { Facility } from '@/domain/entity/facility';
 import { FacilityStatus } from '@/domain/enumerate/facility-status';
 import { FacilityType } from '@/domain/enumerate/facility-type';
 import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
