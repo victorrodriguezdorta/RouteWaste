@@ -32,7 +32,7 @@ public class ContainerDailyStateReadingConverter implements Converter<Document, 
         logger.info("Reading ContainerDailyState from document");
         UUID id = (UUID) document.get(MongoFields.ID);
         UUID infrastructurePlanId = document.get(MongoFields.INFRASTRUCTURE_PLAN_ID, UUID.class);
-        UUID containerId = UUID.fromString(document.getString(MongoFields.CONTAINER_ID));
+        UUID containerId = document.get(MongoFields.CONTAINER_ID, UUID.class);
         Integer planDay = document.getInteger(MongoFields.PLAN_DAY);
         Double dailyFilling = document.getDouble(MongoFields.DAILY_FILLING_LITERS);
         Double capacity = document.getDouble(MongoFields.CAPACITY_LITERS);

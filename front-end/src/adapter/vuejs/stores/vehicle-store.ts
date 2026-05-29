@@ -9,6 +9,7 @@ import type { Vehicle } from '@/domain/entity/vehicle';
 import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
+import { resolveBackendError } from '../utils/translate-backend-error';
 
 /**
  * Vehicle Store
@@ -332,39 +333,8 @@ export const useVehicleStore = defineStore('Vehicle', {
      */
     handleError(error: any) {
       console.error('Vehicle store error:', error);
-      
-      // Determine error message based on error kind
-      let errorMessage = 'An unexpected error occurred';
-      
-      if (error.kind === 'ApiError' || error.error === 'ValidationError') {
-        // If the error has validation details, format them
-        if (error.details && error.details.length > 0) {
-          const detailMessages = error.details.map((detail: any) => 
-            `${detail.field}: ${detail.issue || detail.message}`
-          ).join('; ');
-          errorMessage = detailMessages;
-        } else if (error.message) {
-          errorMessage = error.message;
-        } else {
-          errorMessage = 'Invalid vehicle data';
-        }
-      } else if (error.kind === 'ValidationError') {
-        errorMessage = error.message || 'Invalid vehicle data';
-      } else if (error.kind === 'NotFoundError') {
-        errorMessage = 'Vehicle not found';
-      } else if (error.kind === 'ConflictError') {
-        errorMessage = 'Vehicle already exists or conflicts with existing data';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      // Display error notification to user
-      this.setNotification(
-        'Error', 
-        errorMessage, 
-        'mdi-alert', 
-        'error'
-      );
+      const { title, message } = resolveBackendError(error, 'vehicle');
+      this.setNotification(title, message, 'mdi-alert', 'error');
     },
   },
 });

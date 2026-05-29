@@ -6,6 +6,7 @@ import { ListInfrastructurePlansService } from '@/application/service/infrastruc
 import type { InfrastructurePlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
+import { resolveBackendError } from '../utils/translate-backend-error';
 
 /**
  * Infrastructure Plan Store
@@ -219,29 +220,8 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
      */
     handleError(error: any) {
       console.error('Infrastructure plan store error:', error);
-      
-      // Determine error message based on error kind
-      let errorMessage = 'An unexpected error occurred';
-      
-      if (error.kind === 'ValidationError') {
-        errorMessage = error.message || 'Invalid infrastructure plan data';
-      } else if (error.kind === 'NotFoundError') {
-        errorMessage = 'Infrastructure plan not found';
-      } else if (error.kind === 'ConflictError') {
-        errorMessage = 'Infrastructure plan already exists or conflicts with existing data';
-      } else if (error.kind === 'BudgetExceededError') {
-        errorMessage = 'Infrastructure plan exceeds maximum budget';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      // Display error notification to user
-      this.setNotification(
-        'Error', 
-        errorMessage, 
-        'mdi-alert', 
-        'error'
-      );
+      const { title, message } = resolveBackendError(error, 'infrastructurePlan');
+      this.setNotification(title, message, 'mdi-alert', 'error');
     },
   },
 });

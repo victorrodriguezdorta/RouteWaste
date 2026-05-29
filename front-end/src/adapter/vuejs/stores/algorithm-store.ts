@@ -3,6 +3,8 @@ import { CreateAlgorithmService } from '@/application/service/algorithm/create-a
 import type { CreateAlgorithmCommand, CreateAlgorithmResult } from '@/application/usecase/algorithm-management/create-algorithm/create-algorithm-use-case';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
+import { i18n } from '../i18n';
+import { resolveBackendError, translateBackendMessage } from '../utils/translate-backend-error';
 
 /**
  * FacilityVehicleSelection
@@ -244,8 +246,8 @@ export const useAlgorithmStore = defineStore('Algorithm', {
       // Validate that all required data is present
       if (!this.isFormValid) {
         this.setNotification(
-          'Validation Error',
-          'Please select at least one vehicle for every selected facility before executing the algorithm',
+          i18n.global.t('common.errors.titles.validation'),
+          i18n.global.t('common.errors.store.selectVehiclePerFacility'),
           'mdi-alert',
           'warning'
         );
@@ -289,18 +291,20 @@ export const useAlgorithmStore = defineStore('Algorithm', {
           this.loading = false;
           if (data.status === 'success') {
             this.setNotification(
-              'Success',
-              data.message,
+              i18n.global.t('common.errors.titles.success'),
+              translateBackendMessage(data.message),
               'mdi-check-circle',
               'success'
             );
           } else {
-            const message = data.details
-              ? `${data.message}. ${data.details}`
-              : data.message;
+            const translatedMessage = translateBackendMessage(data.message);
+            const translatedDetails = translateBackendMessage(data.details);
+            const message = translatedDetails
+              ? `${translatedMessage}. ${translatedDetails}`
+              : translatedMessage;
 
             this.setNotification(
-              'Error',
+              i18n.global.t('common.errors.titles.error'),
               message,
               'mdi-alert-circle',
               'error'
@@ -442,24 +446,8 @@ export const useAlgorithmStore = defineStore('Algorithm', {
      */
     handleError(error: any) {
       console.error('Algorithm store error:', error);
-
-      // Determine error message based on error kind
-      let errorMessage = 'An unexpected error occurred during algorithm execution';
-
-      if (error.kind === 'ValidationError') {
-        errorMessage = error.message || 'Invalid algorithm parameters';
-      } else if (error.kind === 'NotFoundError') {
-        errorMessage = 'One or more selected resources not found';
-      } else if (error.kind === 'ConflictError') {
-        errorMessage = 'Conflict in algorithm parameters or resources';
-      } else if (error.kind === 'UnexpectedError') {
-        errorMessage = error.message || 'Unexpected error from server';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-
-      // Display error notification to user
-      this.setNotification('Error', errorMessage, 'mdi-alert', 'error');
+      const { title, message } = resolveBackendError(error, 'algorithm');
+      this.setNotification(title, message, 'mdi-alert', 'error');
     },
   },
 });

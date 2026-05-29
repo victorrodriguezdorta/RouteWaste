@@ -1,5 +1,4 @@
-import en from './adapter/vuejs/locales/en.json';
-import es from './adapter/vuejs/locales/es.json';
+import { i18n } from './adapter/vuejs/i18n';
 import router from './adapter/vuejs/router/router';
 import App from './App.vue';
 import './style.css';
@@ -8,7 +7,6 @@ import { professionalLightColors } from './theme/professional-light-colors';
 import '@mdi/font/css/materialdesignicons.css';
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
-import { createI18n } from 'vue-i18n';
 import { createVuetify } from 'vuetify';
 import {
   VAlert,
@@ -125,17 +123,6 @@ const vuetify = createVuetify({
       }
     }
   }
-})
-
-// Configure vue-i18n
-const i18n = createI18n({
-  legacy: false, // Use Composition API
-  locale: 'es', // Default language
-  fallbackLocale: 'en', // Fallback language
-  messages: {
-    en,
-    es,
-  },
 })
 
 const pinia = createPinia()

@@ -9,6 +9,7 @@ import type { Container } from '@/domain/entity/container';
 import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
+import { resolveBackendError } from '../utils/translate-backend-error';
 
 /**
  * Container Store
@@ -355,34 +356,8 @@ export const useContainerStore = defineStore('Container', {
      */
     handleError(error: any) {
       console.error('Container store error:', error);
-      
-      // Determine error message based on error kind
-      let errorMessage = 'An unexpected error occurred';
-      
-      if (error.kind === 'ApiError' || error.error === 'ValidationError' || error.kind === 'ValidationError') {
-        if (error.details && error.details.length > 0) {
-          errorMessage = error.details
-            .map((detail: { field: string; issue?: string; message?: string }) =>
-              `${detail.field}: ${detail.issue ?? detail.message ?? ''}`)
-            .join('; ');
-        } else {
-          errorMessage = error.message || 'Invalid container data';
-        }
-      } else if (error.kind === 'NotFoundError') {
-        errorMessage = 'Container not found';
-      } else if (error.kind === 'ConflictError') {
-        errorMessage = 'Container already exists or conflicts with existing data';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      // Display error notification to user
-      this.setNotification(
-        'Error', 
-        errorMessage, 
-        'mdi-alert', 
-        'error'
-      );
+      const { title, message } = resolveBackendError(error, 'container');
+      this.setNotification(title, message, 'mdi-alert', 'error');
     },
   },
 });
