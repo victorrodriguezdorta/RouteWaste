@@ -9,7 +9,9 @@ test.describe('Algorithm / infrastructure plans', () => {
       page.getByRole('heading', { name: 'Algoritmo de Recogida' }),
     ).toBeVisible({ timeout: 15_000 });
     await expect(
-      page.getByRole('main').getByRole('button', { name: /Ejecutar algoritmo/i }),
+      page
+        .locator('.list-title-actions')
+        .getByRole('button', { name: /Ejecutar algoritmo/i }),
     ).toBeVisible({ timeout: 15_000 });
   });
 
@@ -29,7 +31,7 @@ test.describe('Algorithm / infrastructure plans', () => {
   test('opens the algorithm execution screen from the list action', async ({ page }) => {
     await page.goto('/algorithm');
     await page
-      .getByRole('main')
+      .locator('.list-title-actions')
       .getByRole('button', { name: /Ejecutar algoritmo/i })
       .click();
     await expect(page).toHaveURL(/\/algorithm\/execute$/);

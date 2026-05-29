@@ -1,12 +1,12 @@
 import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
-import type { Vehicle } from '@/domain/entity/vehicle';
-import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { VehicleHttpRepository } from '@/adapter/http/vehicle-http-repository';
 import { CreateVehicleService } from '@/application/service/vehicle/create-vehicle-service';
 import { DeleteVehicleService } from '@/application/service/vehicle/delete-vehicle-service';
 import { GetVehicleService } from '@/application/service/vehicle/get-vehicle-service';
 import { ListVehiclesService } from '@/application/service/vehicle/list-vehicles-service';
 import { UpdateVehicleService } from '@/application/service/vehicle/update-vehicle-service';
+import type { Vehicle } from '@/domain/entity/vehicle';
+import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 

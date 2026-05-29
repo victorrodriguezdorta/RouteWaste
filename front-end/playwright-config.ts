@@ -9,7 +9,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  // Many parallel tabs against one Vite dev server (e.g. WSL) can exceed 30s until `load`.
+  workers: process.env.CI ? 1 : 4,
+  // Default 30s is tight when navigation waits for full `load` under parallel load.
+  timeout: 60_000,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL,
@@ -17,6 +20,7 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     actionTimeout: 15_000,
+    navigationTimeout: 45_000,
   },
   expect: {
     timeout: 15_000,

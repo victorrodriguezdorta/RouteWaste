@@ -1,6 +1,4 @@
 import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
-import type { Facility } from '@/domain/entity/facility';
-import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { FacilityHttpRepository } from '@/adapter/http/facility-http-repository';
 import { CreateFacilityService } from '@/application/service/facility/create-facility-service';
 import { DeleteFacilityService } from '@/application/service/facility/delete-facility-service';
@@ -8,6 +6,8 @@ import { FilterFacilitiesService } from '@/application/service/facility/filter-f
 import { GetFacilityService } from '@/application/service/facility/get-facility-service';
 import { ListFacilitiesService } from '@/application/service/facility/list-facilities-service';
 import { UpdateFacilityService } from '@/application/service/facility/update-facility-service';
+import type { Facility } from '@/domain/entity/facility';
+import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
 
