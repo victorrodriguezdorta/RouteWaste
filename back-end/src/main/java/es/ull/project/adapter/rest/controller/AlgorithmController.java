@@ -139,7 +139,7 @@ public class AlgorithmController {
         MaximumBudget providedMaxBudget = null;
         if (requestBody.maxBudget != null) {
             providedMaxBudget = requestBody.maxBudget;
-        }
+        } 
         AlgorithmExecutionResult result = this.executeAlgorithmUseCase.execute(
                 facilitiesWithVehicles,
                 selectedContainerIds,

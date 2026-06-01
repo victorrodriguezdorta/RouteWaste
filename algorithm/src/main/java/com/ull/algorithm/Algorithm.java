@@ -574,7 +574,7 @@ public class Algorithm {
    * @param vehicle vehicle to unload
    * @param currentLocation current route location
    * @param facility facility to return to
-   */
+   */ 
   private void returnToFacilityAndUnload(
       DailyPlan dailyPlan,
       Vehicle vehicle,

@@ -4,4 +4,4 @@
 export interface AlgorithmMaxBudgetCommand {
   amount: number;
   currency: string;
-}
+} 
