@@ -4,11 +4,19 @@ services:
     build:
       context: ./algorithm
     image: sensor-app_algorithm:latest
-    profiles: ["algorithm", "full"]
+    profiles: ["algorithm"]
 
-  # Front-end
+  # Front-end (build locally — kaizten/sensor-app_front-end is private/unavailable)
+  # If npm fails with "checksum mismatch" on GitHub Packages, build on the host first:
+  #   cd front-end && npm install && npm run build && cd ..
+  #   FRONTEND_DOCKERFILE=Dockerfile.dist docker compose --profile full up -d --build
   front-end:
-    image: kaizten/sensor-app_front-end:latest
+    build:
+      context: ./front-end
+      dockerfile: ${FRONTEND_DOCKERFILE:-Dockerfile}
+      secrets:
+        - github_token
+    image: sensor-app_front-end:local
     container_name: front-end
     ports:
       - 80:80
@@ -16,17 +24,22 @@ services:
       - back-end
     profiles: ["full"]
   # Back-end (build locally — image kaizten/sensor-app_back-end is private)
+  # Profile "docker" + socket: runs algorithm via "docker run sensor-app_algorithm:latest"
   back-end:
     build:
       context: ./back-end
       dockerfile: Dockerfile
+      secrets:
+        - github_token
     image: sensor-app_back-end:local
     container_name: back-end
     ports:
       - 8080:8080    
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/db-application
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=dev,docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - mongodb
     profiles: ["back-end", "full"]
@@ -36,6 +49,8 @@ services:
     build:
       context: ./back-end
       dockerfile: Dockerfile
+      secrets:
+        - github_token
     image: sensor-app_back-end:local
     container_name: back-end-api-test
     ports:
@@ -81,6 +96,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 30
     profiles: ["watchtower"]
+
+secrets:
+  github_token:
+    environment: GITHUB_TOKEN
+
 volumes:
   mongodb_volume: {}
   mongodb_api_test_volume: {}

@@ -1,0 +1,9 @@
+# Active when the back-end runs inside Docker Compose (profile "docker").
+# Uses the host Docker socket to run the pre-built algorithm image.
+algorithm:
+  docker:
+    executable: /usr/local/bin/docker
+    project-directory: /tmp
+    compose-file: docker-compose.yml
+    service-name: algorithm
+    image: sensor-app_algorithm:latest

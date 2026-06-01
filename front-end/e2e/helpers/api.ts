@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE = 'http://localhost:8080/api/v1/';
+const DEFAULT_API_BASE = 'http://localhost:8081/api/v1/';
 
 export function apiBaseUrl(): string {
   return process.env.VITE_APP_API_URL ?? DEFAULT_API_BASE;

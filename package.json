@@ -10,7 +10,12 @@
     "test:api": "npm run test:api:wait && newman run rest-api_tests.json -e rest-api_environment.json",
     "test:api:jar": "mvn -f back-end/pom.xml package -DskipTests",
     "test:api:full": "npm run test:api:jar && npm run test:api:stack:up && npm run test:api && npm run test:api:stack:down",
-    "test:api:generate": "npm run postman:generate && npm run test:api"
+    "test:api:generate": "npm run postman:generate && npm run test:api",
+    "test:e2e": "npm run test:api:wait && npm --prefix front-end run test:e2e",
+    "test:e2e:full": "npm run test:api:jar && npm run test:api:stack:up && npm run test:e2e && npm run test:api:stack:down",
+    "docker:fe:build": "node scripts/build-front-end-for-docker.mjs",
+    "docker:full": "node scripts/docker-full-up.mjs",
+    "docker:full:down": "docker compose --profile full down"
   },
   "devDependencies": {
     "newman": "^6.2.1"

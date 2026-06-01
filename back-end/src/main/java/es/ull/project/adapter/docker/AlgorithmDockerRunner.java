@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,6 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
     private static final int PROCESS_SUCCESS_EXIT_CODE = 0;
     private static final int DEPTH_ZERO = 0;
     private static final int INDEX_NOT_FOUND = -1;
-    private static final String CMD_DOCKER = "docker";
     private static final String CMD_COMPOSE = "compose";
     private static final String CMD_FLAG_FILE = "-f";
     private static final String CMD_RUN = "run";
@@ -42,24 +42,44 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
     private static final String ERR_DOCKER_COMMAND_FAILED = "Failed to execute the docker command";
     private static final String ERR_DOCKER_INTERRUPTED = "The docker command execution was interrupted";
 
+    private final String dockerExecutable;
     private final String projectDirectory;
     private final String composeFile;
     private final String serviceName;
+    private final String dockerImage;
 
     /**
-     * Creates a new docker runner with the configured paths.
+     * Creates a runner for unit tests (compose mode, no pre-built image).
      *
      * @param projectDirectory base directory where docker compose is located
      * @param composeFile compose file name or relative path
      * @param serviceName compose service used to run the algorithm
      */
-    public AlgorithmDockerRunner(
-            @Value("${algorithm.docker.project-directory:..}") String projectDirectory,
-            @Value("${algorithm.docker.compose-file:docker-compose.yml}") String composeFile,
-            @Value("${algorithm.docker.service-name:algorithm}") String serviceName) {
+    AlgorithmDockerRunner(String projectDirectory, String composeFile, String serviceName) {
+        this.dockerExecutable = "docker";
         this.projectDirectory = projectDirectory;
         this.composeFile = composeFile;
         this.serviceName = serviceName;
+        this.dockerImage = "";
+    }
+
+    /**
+     * Creates a runner; when {@code dockerImage} is set (profile "docker"), uses {@code docker run -i}.
+     */
+    @Autowired
+    public AlgorithmDockerRunner(
+            @Value("${algorithm.docker.executable:docker}") String dockerExecutable,
+            @Value("${algorithm.docker.project-directory:..}") String projectDirectory,
+            @Value("${algorithm.docker.compose-file:docker-compose.yml}") String composeFile,
+            @Value("${algorithm.docker.service-name:algorithm}") String serviceName,
+            @Value("${algorithm.docker.image:}") String dockerImage) {
+        this.dockerExecutable = dockerExecutable == null || dockerExecutable.isBlank()
+                ? "docker"
+                : dockerExecutable.trim();
+        this.projectDirectory = projectDirectory;
+        this.composeFile = composeFile;
+        this.serviceName = serviceName;
+        this.dockerImage = dockerImage == null ? "" : dockerImage.trim();
     }
 
     /**
@@ -74,15 +94,9 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
         logger.info("=== ALGORITHM EXECUTION START ===");
         logger.info("JSON payload size: {} bytes", processedJson.length());
         logger.debug("JSON payload being sent to algorithm:\n{}", processedJson);
-        CommandResult commandResult = this.executeCommandWithStdin(List.of(
-                CMD_DOCKER,
-                CMD_COMPOSE,
-                CMD_FLAG_FILE,
-                this.composeFile,
-                CMD_RUN,
-                CMD_RM,
-                this.serviceName),
-                processedJson);
+        CommandResult commandResult = this.dockerImage.isBlank()
+                ? this.runWithCompose(processedJson)
+                : this.runWithDockerImage(processedJson);
         String jsonOutput = this.extractJsonPayload(commandResult.standardOutput());
         logger.info("Algorithm response size: {} bytes", jsonOutput.length());
         logger.debug("Algorithm response received:\n{}", jsonOutput);
@@ -94,11 +108,43 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
     }
 
     /**
+     * Runs the algorithm through docker compose.
+     */
+    private CommandResult runWithCompose(String processedJson) {
+        return this.executeCommandWithStdin(List.of(
+                this.dockerExecutable,
+                CMD_COMPOSE,
+                CMD_FLAG_FILE,
+                this.composeFile,
+                CMD_RUN,
+                CMD_RM,
+                this.serviceName),
+                processedJson);
+    }
+
+    /**
+     * Runs a pre-built algorithm image (docker profile / full stack in Docker).
+     */
+    private CommandResult runWithDockerImage(String processedJson) {
+        logger.info("Using pre-built algorithm image: {}", this.dockerImage);
+        return this.executeCommandWithStdin(List.of(
+                this.dockerExecutable,
+                "run",
+                CMD_RM,
+                "-i",
+                this.dockerImage),
+                processedJson);
+    }
+
+    /**
      * Builds the algorithm image before running the container.
      */
     private void buildAlgorithmImage() {
+        if (!this.dockerImage.isBlank()) {
+            return;
+        }
         this.executeCommand(List.of(
-                CMD_DOCKER,
+                this.dockerExecutable,
                 CMD_COMPOSE,
                 CMD_FLAG_FILE,
                 this.composeFile,
@@ -126,7 +172,8 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
             }
             return new CommandResult(standardOutput);
         } catch (IOException e) {
-            throw new AlgorithmExecutionException(ERR_DOCKER_COMMAND_FAILED, e);
+            logger.error("Docker command failed to start: {}", e.getMessage(), e);
+            throw new AlgorithmExecutionException(ERR_DOCKER_COMMAND_FAILED + ": " + e.getMessage(), e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new AlgorithmExecutionException(ERR_DOCKER_INTERRUPTED, e);
@@ -165,7 +212,8 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
             }
             return new CommandResult(standardOutput);
         } catch (IOException e) {
-            throw new AlgorithmExecutionException(ERR_DOCKER_COMMAND_FAILED, e);
+            logger.error("Docker command failed to start: {}", e.getMessage(), e);
+            throw new AlgorithmExecutionException(ERR_DOCKER_COMMAND_FAILED + ": " + e.getMessage(), e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new AlgorithmExecutionException(ERR_DOCKER_INTERRUPTED, e);

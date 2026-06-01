@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * 
  * Configuration class for Cross-Origin Resource Sharing (CORS).
  * This allows the front-end application running on a different origin
- * (e.g., http://localhost:5173) to make HTTP requests to this backend.
+ * (e.g., http://localhost:5173 or http://localhost via Docker nginx) to make HTTP requests to this backend.
  * 
  * Without this configuration, browsers will block requests from the front-end
  * due to CORS policy restrictions.
@@ -19,7 +19,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsConfiguration implements WebMvcConfigurer {
 
     private static final String ALL_PATHS = "/**";
-    private static final String[] ALLOWED_ORIGINS = { "http://localhost:5173", "http://localhost:5174", "http://localhost:3000" };
+    private static final String[] ALLOWED_ORIGINS = {
+            "http://localhost",
+            "http://localhost:80",
+            "http://127.0.0.1",
+            "http://127.0.0.1:80",
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:3000"
+    };
     private static final String[] ALLOWED_METHODS = { "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH" };
     private static final String ALL_HEADERS = "*";
 

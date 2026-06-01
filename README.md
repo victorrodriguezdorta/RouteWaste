@@ -266,6 +266,63 @@ No son entidades ni VOs, pero forman parte del diseño DDD:
 - **Servicio de Cálculo de Distancias**
   - Encapsula el acceso a GIS/road network para obtener `Distancia` y `TiempoServicio`.
 
+## Ejecución con Docker (stack completo)
+
+Levanta **MongoDB**, **back-end** y **front-end** en contenedores. El front-end se compila en el host (los paquetes `@ull-tfg` de GitHub Packages no instalan bien dentro del build de Docker); el back-end puede lanzar el **algoritmo** vía el socket de Docker del host.
+
+### Requisitos
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (o Docker Engine + Compose) en ejecución
+- [Node.js](https://nodejs.org/) v18+
+- Token de GitHub con permiso **`read:packages`** (paquetes `@ull-tfg` y Maven `ull-tfg-utils`)
+
+```bash
+# Desde la raíz del repositorio
+npm install
+cp .env.example .env
+# Edita .env y define GITHUB_TOKEN=ghp_...
+```
+
+### Arrancar y parar
+
+```bash
+# Construye front-end, imágenes Docker y levanta mongo + back-end + front-end
+npm run docker:full
+
+# Para todos los contenedores del perfil full (conserva volúmenes de MongoDB)
+npm run docker:full:down
+```
+
+| Script | Descripción |
+|--------|-------------|
+| `npm run docker:full` | Build del front-end en host + `docker compose build algorithm` + stack `full` |
+| `npm run docker:full:down` | `docker compose --profile full down` |
+
+La primera ejecución de `docker:full` puede tardar varios minutos (Maven en el back-end, descarga de imágenes).
+
+### URLs
+
+| Servicio | URL |
+|----------|-----|
+| Front-end | http://localhost |
+| Back-end (API) | http://localhost:8080/api/v1/ |
+| Swagger | http://localhost:8080/swagger-ui.html |
+| MongoDB (host) | `mongodb://localhost:27017/db-application` |
+
+### Notas
+
+- Si el puerto **27017** está ocupado (MongoDB local), para el stack `full` o detén ese servicio o cambia el mapeo de puertos en `docker-compose.yml`.
+- Tras cambiar código del **back-end** (p. ej. CORS o algoritmo), reconstruye: `docker compose build back-end && docker compose --profile full up -d back-end`.
+- Perfil Compose: `full` (servicios `mongodb`, `back-end`, `front-end`). Imagen del algoritmo: `sensor-app_algorithm:latest` (se construye antes de levantar el stack).
+
+Equivalente manual (sin los scripts npm):
+
+```bash
+node scripts/build-front-end-for-docker.mjs
+docker compose build algorithm
+FRONTEND_DOCKERFILE=Dockerfile.dist docker compose --profile full up -d --build
+```
+
 ## Tests REST (Postman / Newman)
 
 La suite de tests de la API REST vive en la raíz del repositorio:
@@ -433,9 +490,26 @@ npm install
 npx playwright install chromium
 ```
 
-- For API-dependent tests: back-end and MongoDB running (`docker compose --profile back-end up -d`).
+- For API-dependent tests: isolated api-test stack (`docker compose --profile api-test up -d`), same as Newman — **not** the dev back-end on `:8080`.
+
+E2E tests write to **`db-application-api-test`** (MongoDB inside `mongo-api-test`), not `db-application`.
 
 ### Run
+
+From the **repo root** (waits for `:8081`, then runs Playwright):
+
+```bash
+docker compose --profile api-test up -d
+npm run test:e2e
+```
+
+Or full cycle (build JAR, up stack, e2e, down stack):
+
+```bash
+npm run test:e2e:full
+```
+
+From `front-end/` only (stack must already be up on `:8081`):
 
 ```bash
 cd front-end
@@ -446,12 +520,14 @@ Useful commands:
 
 | Command | Description |
 |---------|-------------|
-| `npm run test:e2e` | Full suite (starts Vite on `:5173` automatically) |
+| `npm run test:e2e` (root) | Wait for `:8081` + full Playwright suite |
+| `npm run test:e2e:full` (root) | JAR + api-test stack + e2e + stack down |
+| `npm run test:e2e` (`front-end/`) | Full suite (starts Vite e2e on `:5174` → API `:8081`) |
 | `npm run test:e2e:headed` | Same, with a visible browser |
 | `npm run test:e2e:ui` | Interactive mode (explore and debug tests) |
 | `npm run test:e2e:report` | Open the HTML report from the last run |
 
-The API URL is set in `front-end/.env.development` (`VITE_APP_API_URL=http://localhost:8080/api/v1/`).
+The API URL for e2e is `http://localhost:8081/api/v1/` (`front-end/.env.e2e`, `playwright-config.ts`). Dev UI uses `front-end/.env.development` (`8080` / `db-application`).
 
 Test source code (names, comments, messages) is in **English**. UI assertions use **Spanish** labels because the app defaults to `es`.
 
@@ -459,11 +535,11 @@ Test source code (names, comments, messages) is in **English**. UI assertions us
 
 | File | Coverage |
 |------|----------|
-| `e2e/navigation.spec.ts` | Home cards, side menu links |
-| `e2e/not-found.spec.ts` | 404 page and return home |
-| `e2e/vehicles.spec.ts` | List, headers, create, cancel, validation, view, edit, delete |
-| `e2e/containers.spec.ts` | Same flows as vehicles |
-| `e2e/facilities.spec.ts` | Same flows as vehicles |
-| `e2e/algorithm.spec.ts` | Plans list, headers, execution wizard, API table load |
+| `e2e/home-navigation-end-to-end-spec.ts` | Home cards, side menu links |
+| `e2e/not-found-end-to-end-spec.ts` | 404 page and return home |
+| `e2e/vehicles-end-to-end-spec.ts` | List, headers, create, cancel, validation, view, edit, delete |
+| `e2e/containers-end-to-end-spec.ts` | Same flows as vehicles |
+| `e2e/facilities-end-to-end-spec.ts` | Same flows as vehicles |
+| `e2e/algorithm-end-to-end-spec.ts` | Plans list, headers, execution wizard, API table load |
 
-Tests that create data via API (view, edit, delete, algorithm table) are skipped when the back-end is not available at `localhost:8080`. Smoke tests (navigation, forms, validation) do not require the API.
+Tests that create data via API (view, edit, delete, algorithm table) are skipped when the api-test back-end is not available at `localhost:8081`. Smoke tests (navigation, forms, validation) do not require the API.
