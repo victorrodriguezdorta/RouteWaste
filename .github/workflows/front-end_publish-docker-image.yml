@@ -39,6 +39,8 @@ jobs:
       # Build and publish Docker image in DockerHub
       - name: Build and push Docker image
         uses: mr-smithers-excellent/docker-build-push@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.ULLSOFTWARE_PASSWORD }}
         with:
           image: ${{ env.DOCKER_IMAGE_NAME }}
           tags: latest
@@ -47,5 +49,6 @@ jobs:
           dockerfile: front-end/Dockerfile
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          buildArgs: |
-            GITHUB_TOKEN=${{ secrets.ULLSOFTWARE_PASSWORD }}
+          enableBuildKit: true
+          secrets: |
+            id=github_token,env=GITHUB_TOKEN
