@@ -217,8 +217,8 @@ import { ButtonTooltip, ErrorMessage } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { serviceZoneColor, serviceZoneLocaleKey, serviceZoneToOptions } from '../../../../domain/enumerate/service-zone';
-import { wasteTypeColor, wasteTypeLocaleKey, wasteTypeToOptions } from '../../../../domain/enumerate/waste-type';
+import { serviceZoneColor, serviceZoneLabel, serviceZoneToOptions } from '../../../../domain/enumerate/service-zone';
+import { wasteTypeColor, wasteTypeLabel, wasteTypeToOptions } from '../../../../domain/enumerate/waste-type';
 import BulkImportFileButton from '../../components/common/BulkImportFileButton.vue';
 import EntityTypeStatisticsChart from '../../components/common/EntityTypeStatisticsChart.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
@@ -237,11 +237,7 @@ const listTitleWithTotal = computed(() => {
   return total != null ? `${base} (${total})` : base;
 });
 
-const translateWasteTypeKey = (typeKey: string): string => {
-  const key = `container.add.wasteTypes.${wasteTypeLocaleKey(typeKey)}`;
-  const translated = t(key);
-  return translated === key ? typeKey : translated;
-};
+const translateWasteTypeKey = (typeKey: string): string => wasteTypeLabel(t, typeKey);
 
 const dialogDelete = ref(false);
 const selectedContainerId = ref('');
@@ -325,12 +321,12 @@ const containerItems = computed(() => {
       name: container.getName().getValue(),
       rawWasteType: container.getWasteType(),
       rawServiceZone: serviceZone,
-      wasteType: t(`container.add.wasteTypes.${wasteTypeLocaleKey(container.getWasteType())}`),
+      wasteType: wasteTypeLabel(t, container.getWasteType()),
       location: location.postalAddress,
       capacityLiters: capacity.getLiters(),
       demand: dailyDemand.getLitersPerDay(),
       serviceZone: serviceZone
-        ? t(`container.add.serviceZones.${serviceZoneLocaleKey(serviceZone)}`)
+        ? serviceZoneLabel(t, serviceZone)
         : t('container.list.notAssigned'),
     };
   });

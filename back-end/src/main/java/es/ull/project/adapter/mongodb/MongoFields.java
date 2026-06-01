@@ -108,6 +108,8 @@ public class MongoFields {
     public static final String EXECUTED_AT = "executedAt";
     public static final String EXECUTION_REQUEST_JSON = "executionRequestJson";
     public static final String VALIDITY_STATE = "validityState";
+    public static final String EXECUTION_STATE = "executionState";
+    public static final String FAILURE_REASON = "failureReason";
 
     /**
      * DailyPlan fields.

@@ -2,11 +2,11 @@ import { useAlgorithmStore } from '@/adapter/vuejs/stores/algorithm-store';
 import { useContainerStore } from '@/adapter/vuejs/stores/container-store';
 import { useFacilityStore } from '@/adapter/vuejs/stores/facility-store';
 import { useVehicleStore } from '@/adapter/vuejs/stores/vehicle-store';
-import { facilityStatusLocaleKey, facilityStatusToOptions } from '@/domain/enumerate/facility-status';
-import { facilityTypeLocaleKey, facilityTypeToOptions } from '@/domain/enumerate/facility-type';
-import { serviceZoneLocaleKey, serviceZoneToOptions } from '@/domain/enumerate/service-zone';
-import { vehicleTypeLocaleKey, vehicleTypeToOptions } from '@/domain/enumerate/vehicle-type';
-import { wasteTypeLocaleKey, wasteTypeToOptions } from '@/domain/enumerate/waste-type';
+import { facilityStatusLabel, facilityStatusToOptions } from '@/domain/enumerate/facility-status';
+import { facilityTypeLabel, facilityTypeToOptions } from '@/domain/enumerate/facility-type';
+import { serviceZoneLabel, serviceZoneToOptions } from '@/domain/enumerate/service-zone';
+import { vehicleTypeLabel, vehicleTypeToOptions } from '@/domain/enumerate/vehicle-type';
+import { wasteTypeLabel, wasteTypeToOptions } from '@/domain/enumerate/waste-type';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -170,13 +170,13 @@ export function useAlgorithmExecution() {
         name: facility.getName().getValue(),
         rawFacilityType: facility.getFacilityType(),
         rawStatus: facility.getStatus(),
-        type: t(`facility.add.facilityTypes.${facilityTypeLocaleKey(facility.getFacilityType())}`),
+        type: facilityTypeLabel(t, facility.getFacilityType()),
         location: location.postalAddress,
         storageCapacity: storageCapacity.toFixed(2),
         processingCapacity: processingCapacity.toFixed(2),
         unloadingTime,
         openingCost: openingCost.getAmount().toFixed(2),
-        status: t(`facility.add.statuses.${facilityStatusLocaleKey(facility.getStatus())}`),
+        status: facilityStatusLabel(t, facility.getStatus()),
       };
     });
   });
@@ -203,7 +203,7 @@ export function useAlgorithmExecution() {
       id: vehicle.getId().toString(),
       name: vehicle.getName().getValue(),
       rawType: vehicle.getVehicleType(),
-      type: t(`vehicle.add.vehicleTypes.${vehicleTypeLocaleKey(vehicle.getVehicleType())}`),
+      type: vehicleTypeLabel(t, vehicle.getVehicleType()),
       capacityKilograms: vehicle.getCapacityKilograms().getKilograms(),
       capacityLiters: vehicle.getCapacityLiters().getLiters(),
       cost: vehicle.getCostPerKilometer().getAmount().toFixed(2),
@@ -644,12 +644,12 @@ export function useAlgorithmExecution() {
         name: container.getName().getValue(),
         rawWasteType: container.getWasteType(),
         rawServiceZone: serviceZone,
-        wasteType: t(`container.add.wasteTypes.${wasteTypeLocaleKey(container.getWasteType())}`),
+        wasteType: wasteTypeLabel(t, container.getWasteType()),
         location: location.postalAddress,
         capacityLiters: capacity.getLiters(),
         demand: dailyDemand.getLitersPerDay(),
         serviceZone: serviceZone
-          ? t(`container.add.serviceZones.${serviceZoneLocaleKey(serviceZone)}`)
+          ? serviceZoneLabel(t, serviceZone)
           : t('container.list.notAssigned'),
       };
     });

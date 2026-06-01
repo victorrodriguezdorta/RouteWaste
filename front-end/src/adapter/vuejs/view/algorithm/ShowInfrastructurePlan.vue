@@ -1,13 +1,45 @@
 <template>
   <v-container fluid>
-    <LoaderDialog
+    <PrimaryLoadingOverlay
       v-if="loading"
-      :dialog="loading"
-      :title="label('common.loading', 'Cargando')"
       :message="label('infrastructurePlan.show.loading', 'Cargando plan de infraestructura...')"
-      color="primary"
-      persistent
     />
+
+    <v-alert
+      v-else-if="executionPending"
+      type="info"
+      variant="tonal"
+      class="ma-4"
+    >
+      {{ label('infrastructurePlan.show.execution.running', 'This plan is still executing. Refresh the list to see when it finishes.') }}
+      <ButtonTooltip
+        color="primary"
+        variant="text"
+        icon="mdi-arrow-left"
+        class="ml-2"
+        :text="label('common.buttons.back', 'Volver')"
+        :tooltip="label('common.buttons.back', 'Volver')"
+        :eventclick="goBack"
+      />
+    </v-alert>
+
+    <v-alert
+      v-else-if="executionFailed"
+      type="error"
+      variant="tonal"
+      class="ma-4"
+    >
+      {{ executionFailedMessage }}
+      <ButtonTooltip
+        color="primary"
+        variant="text"
+        icon="mdi-arrow-left"
+        class="ml-2"
+        :text="label('common.buttons.back', 'Volver')"
+        :tooltip="label('common.buttons.back', 'Volver')"
+        :eventclick="goBack"
+      />
+    </v-alert>
 
     <v-alert
       v-else-if="loadFailed"
@@ -55,7 +87,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ButtonTooltip, LoaderDialog } from '@ull-tfg/ull-tfg-vue';
+import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -63,8 +95,10 @@ import { useRoute } from 'vue-router';
 import DailyPlansNavigator from '../../components/algorithm/DailyPlansNavigator.vue';
 import InfrastructurePlanGeneralInfo from '../../components/algorithm/InfrastructurePlanGeneralInfo.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
+import PrimaryLoadingOverlay from '../../components/common/PrimaryLoadingOverlay.vue';
 import router from '../../router/router';
 import { useAlgorithmStore } from '../../stores/algorithm-store';
+import { InfrastructurePlanExecutionState } from '@/domain/enumerate/infrastructure-plan-execution-state';
 import { useInfrastructurePlanStore } from '../../stores/infrastructure-plan-store';
 
 const { t, locale } = useI18n();
@@ -81,6 +115,23 @@ const canOpenExecuteWithReplay = computed(
 const loading = ref(true);
 const loadFailed = ref(false);
 const title = ref(label('infrastructurePlan.show.title', 'Detalle del plan de infraestructura'));
+
+const executionPending = computed(
+  () => infrastructurePlan.value?.isExecutionRunning() ?? false,
+);
+
+const executionFailed = computed(
+  () => infrastructurePlan.value?.executionState === InfrastructurePlanExecutionState.FAILED,
+);
+
+const executionFailedMessage = computed(() => {
+  const reason = infrastructurePlan.value?.failureReason;
+  const base = label(
+    'infrastructurePlan.show.execution.failed',
+    'Algorithm execution failed for this plan.',
+  );
+  return reason ? `${base} ${reason}` : base;
+});
 
 const loadPlan = async (id: string) => {
   if (!id) {

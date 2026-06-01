@@ -115,7 +115,8 @@
 </template>
 
 <script lang="ts" setup>
-import { FacilityType } from '@/domain/enumerate/facility-type';
+import { FacilityType, facilityTypeLabel } from '@/domain/enumerate/facility-type';
+import { containerStatusLabel } from '@/domain/enumerate/container-status';
 import type {
     InfrastructurePlanContainerDailyStateDetail,
     InfrastructurePlanContainerDetail,
@@ -311,15 +312,7 @@ function formatLiters(value: number | null | undefined): string {
 }
 
 function monitoringStatusLabel(status: string | null | undefined): string {
-  if (!status) {
-    return t('infrastructurePlan.show.daily.monitoring.statuses.noData');
-  }
-
-  if (status === 'OVERFLOWED') {
-    return t('infrastructurePlan.show.daily.monitoring.statuses.overflowed');
-  }
-
-  return t('infrastructurePlan.show.daily.monitoring.statuses.ok');
+  return containerStatusLabel(t, status);
 }
 
 function fillPercent(entry: { container: InfrastructurePlanContainerDetail; state?: InfrastructurePlanContainerDailyStateDetail }): number | null {
@@ -340,10 +333,7 @@ function formatFacilityType(value?: FacilityType | string): string {
     return '-';
   }
 
-  return String(value)
-    .replace(/_/g, ' ')
-    .toLowerCase()
-    .replace(/\b\w/g, (character) => character.toUpperCase());
+  return facilityTypeLabel(t, value);
 }
 </script>
 

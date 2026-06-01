@@ -17,6 +17,7 @@ public class InfrastructurePlanFieldMapper {
     private static final String MONGO_FIELD_ESTIMATED_TOTAL_COST_AMOUNT = "estimatedTotalCost.amount";
     private static final String FIELD_NUMBER_OF_DAYS = "numberOfDays";
     private static final String FIELD_AVERAGE_PICKUP_TIME_MINUTES = "averagePickupTimeMinutes";
+    private static final String FIELD_EXECUTION_STATE = "executionState";
 
     private static final Map<String, String> FIELD_MAPPING = new HashMap<>();
 
@@ -27,6 +28,7 @@ public class InfrastructurePlanFieldMapper {
         FIELD_MAPPING.put(FIELD_ESTIMATED_TOTAL_COST_AMOUNT, MONGO_FIELD_ESTIMATED_TOTAL_COST_AMOUNT);
         FIELD_MAPPING.put(FIELD_NUMBER_OF_DAYS, FIELD_NUMBER_OF_DAYS);
         FIELD_MAPPING.put(FIELD_AVERAGE_PICKUP_TIME_MINUTES, FIELD_AVERAGE_PICKUP_TIME_MINUTES);
+        FIELD_MAPPING.put(FIELD_EXECUTION_STATE, FIELD_EXECUTION_STATE);
     }
 
     /**

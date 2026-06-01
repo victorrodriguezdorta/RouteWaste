@@ -1,10 +1,15 @@
 package es.ull.project.domain.enumerate;
 
 /**
- * Indicates whether an infrastructure plan still matches the master data that was used
- * when it was produced, or whether underlying entities have changed since execution.
+ * Overall status of an infrastructure plan: while the algorithm runs, when it is up to date,
+ * or when underlying master data has changed since it was produced.
  */
 public enum InfrastructurePlanValidityState {
+
+    /**
+     * Algorithm execution is in progress; plan data in persistence is still a placeholder.
+     */
+    RUNNING,
 
     /**
      * No conflicting edits detected for referenced entities (or not yet evaluated).

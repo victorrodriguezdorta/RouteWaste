@@ -17,6 +17,7 @@ import es.ull.project.domain.entity.ServiceAssignment;
 import es.ull.project.domain.entity.Stop;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.ContainerStatus;
+import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.enumerate.StopType;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
@@ -94,6 +95,8 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	private static final String ERR_FACILITY_INVALID_FORMAT = "Facility must be either a UUID string or an object with 'id' field";
 	private static final String ERR_VEHICLE_NODE_REQUIRED = "Vehicle node is required";
 	private static final String ERR_VEHICLE_INVALID_FORMAT = "Vehicle must be either a UUID string or an object with 'id' field";
+	private static final String ERR_PLAN_NOT_FOUND = "Infrastructure plan not found: ";
+	private static final String ERR_PLAN_NOT_RUNNING = "Infrastructure plan is not in RUNNING state: ";
 
 	private final InfrastructurePlanRepository infrastructurePlanRepository;
 	private final ServiceAssignmentRepository serviceAssignmentRepository;
@@ -158,7 +161,61 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE, e);
 		}
 		logger.info("Successfully parsed JSON. Starting persistence...");
-		return this.persistFromNode(root, numberOfDays, averagePickupTimeMinutes, providedMaxBudget, executionRequestJson);
+		return this.persistFromNode(root, numberOfDays, averagePickupTimeMinutes, providedMaxBudget, executionRequestJson, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public InfrastructurePlan complete(
+			UUID planId,
+			AlgorithmJsonPayload algorithmResponse,
+			NumberOfDays numberOfDays,
+			AveragePickupTimeMinutes averagePickupTimeMinutes,
+			MaximumBudget providedMaxBudget,
+			AlgorithmJsonPayload executionRequestJson) {
+		logger.info("=== COMPLETE START === planId={}", planId);
+		if (planId == null) {
+			throw new IllegalArgumentException(ERR_PLAN_NOT_FOUND);
+		}
+		if (algorithmResponse == null) {
+			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE);
+		}
+		InfrastructurePlan pendingPlan = this.infrastructurePlanRepository.findById(planId)
+				.orElseThrow(() -> new NoSuchElementException(ERR_PLAN_NOT_FOUND + planId));
+		if (!pendingPlan.isExecutionRunning()) {
+			throw new IllegalStateException(ERR_PLAN_NOT_RUNNING + planId);
+		}
+		String jsonStr = algorithmResponse.getJson();
+		JSONObject root;
+		try {
+			root = new JSONObject(jsonStr);
+		} catch (JSONException e) {
+			logger.error("Failed to parse algorithm JSON response", e);
+			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE, e);
+		}
+		InfrastructurePlan savedPlan = this.persistFromNode(
+				root, numberOfDays, averagePickupTimeMinutes, providedMaxBudget, executionRequestJson, pendingPlan);
+		logger.info("=== COMPLETE END === InfrastructurePlan updated with ID: {}", savedPlan.getId());
+		return savedPlan;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public InfrastructurePlan markExecutionFailed(UUID planId, String failureReason) {
+		if (planId == null) {
+			throw new IllegalArgumentException(ERR_PLAN_NOT_FOUND);
+		}
+		InfrastructurePlan plan = this.infrastructurePlanRepository.findById(planId)
+				.orElseThrow(() -> new NoSuchElementException(ERR_PLAN_NOT_FOUND + planId));
+		if (!plan.isExecutionRunning()) {
+			throw new IllegalStateException(ERR_PLAN_NOT_RUNNING + planId);
+		}
+		plan.markExecutionFailed(failureReason);
+		return this.infrastructurePlanRepository.save(plan);
 	}
 
 	/**
@@ -169,9 +226,16 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * @param averagePickupTimeMinutes   average pickup time per stop in minutes
 	 * @param providedMaxBudget          optional maximum budget override
 	 * @param executionRequestJson       client request JSON snapshot (optional)
+	 * @param existingPlan               optional placeholder plan to complete; when null a new plan is created
 	 * @return the persisted InfrastructurePlan
 	 */
-	private InfrastructurePlan persistFromNode(JSONObject algorithmResponse, NumberOfDays numberOfDays, AveragePickupTimeMinutes averagePickupTimeMinutes, MaximumBudget providedMaxBudget, AlgorithmJsonPayload executionRequestJson) {
+	private InfrastructurePlan persistFromNode(
+			JSONObject algorithmResponse,
+			NumberOfDays numberOfDays,
+			AveragePickupTimeMinutes averagePickupTimeMinutes,
+			MaximumBudget providedMaxBudget,
+			AlgorithmJsonPayload executionRequestJson,
+			InfrastructurePlan existingPlan) {
 		if (algorithmResponse == null) {
 			throw new IllegalArgumentException(ERR_ALGORITHM_RESPONSE);
 		}
@@ -192,14 +256,24 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 		} else {
 			effectiveMaxBudget = new MaximumBudget(Double.parseDouble(DEFAULT_BUDGET));
 		}
-		InfrastructurePlan plan = new InfrastructurePlan(
-				resolvePlanningPeriod(algorithmResponse),
-				effectiveMaxBudget,
-				null,
-				numberOfDays,
-				averagePickupTimeMinutes,
-				executedAt != null ? new ExecutedAt(executedAt) : null,
-				InfrastructurePlanValidityState.VALID);
+		final InfrastructurePlan plan;
+		if (existingPlan != null) {
+			plan = existingPlan;
+			plan.updatePeriod(resolvePlanningPeriod(algorithmResponse));
+			plan.updateMaxBudget(effectiveMaxBudget);
+			if (executedAt != null) {
+				plan.assignExecutedAt(new ExecutedAt(executedAt));
+			}
+		} else {
+			plan = new InfrastructurePlan(
+					resolvePlanningPeriod(algorithmResponse),
+					effectiveMaxBudget,
+					null,
+					numberOfDays,
+					averagePickupTimeMinutes,
+					executedAt != null ? new ExecutedAt(executedAt) : null,
+					InfrastructurePlanValidityState.VALID);
+		}
 		Map<UUID, Facility> facilitiesById = new LinkedHashMap<>();
 		Map<UUID, Container> containersById = new LinkedHashMap<>();
 		List<ServiceAssignment> serviceAssignments = new ArrayList<>();
@@ -279,6 +353,9 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 				Distance.fromMeters(algorithmResponse.optDouble(FIELD_TOTAL_DISTANCE_METERS, 0.0)));
 		if (executionRequestJson != null) {
 			plan.assignExecutionRequestSnapshot(executionRequestJson.getJson());
+		}
+		if (existingPlan != null) {
+			plan.markExecutionCompleted();
 		}
 		for (ServiceAssignment serviceAssignment : serviceAssignments) {
 			logger.debug("Saving ServiceAssignment for facility: {}", serviceAssignment.getFacility().getId());

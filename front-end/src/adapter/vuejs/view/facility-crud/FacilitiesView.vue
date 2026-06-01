@@ -223,8 +223,16 @@ import { ButtonTooltip, ErrorMessage } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { facilityStatusColor, facilityStatusLocaleKey, facilityStatusToOptions } from '../../../../domain/enumerate/facility-status';
-import { facilityTypeColor, facilityTypeLocaleKey, facilityTypeToOptions } from '../../../../domain/enumerate/facility-type';
+import {
+  facilityStatusColor,
+  facilityStatusLabel,
+  facilityStatusToOptions,
+} from '../../../../domain/enumerate/facility-status';
+import {
+  facilityTypeColor,
+  facilityTypeLabel,
+  facilityTypeToOptions,
+} from '../../../../domain/enumerate/facility-type';
 import BulkImportFileButton from '../../components/common/BulkImportFileButton.vue';
 import EntityTypeStatisticsChart from '../../components/common/EntityTypeStatisticsChart.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
@@ -243,11 +251,7 @@ const listTitleWithTotal = computed(() => {
   return total != null ? `${base} (${total})` : base;
 });
 
-const translateFacilityTypeKey = (typeKey: string): string => {
-  const key = `facility.add.facilityTypes.${facilityTypeLocaleKey(typeKey)}`;
-  const translated = t(key);
-  return translated === key ? typeKey : translated;
-};
+const translateFacilityTypeKey = (typeKey: string): string => facilityTypeLabel(t, typeKey);
 
 const dialogDelete = ref(false);
 const selectedFacilityId = ref('');
@@ -345,13 +349,13 @@ const facilityItems = computed(() => {
       name: facility.getName().getValue(),
       rawFacilityType: facility.getFacilityType(),
       rawStatus: facility.getStatus(),
-      type: t(`facility.add.facilityTypes.${facilityTypeLocaleKey(facility.getFacilityType())}`),
+      type: facilityTypeLabel(t, facility.getFacilityType()),
       location: location.postalAddress,
       storageCapacity: storageCapacity.toFixed(2),
       processingCapacity: processingCapacity.toFixed(2),
       unloadingTime,
       openingCost: openingCost.getAmount().toFixed(2),
-      status: t(`facility.add.statuses.${facilityStatusLocaleKey(facility.getStatus())}`),
+      status: facilityStatusLabel(t, facility.getStatus()),
     };
   });
 });

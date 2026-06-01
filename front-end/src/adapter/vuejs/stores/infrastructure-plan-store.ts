@@ -40,6 +40,12 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
 
     /** Current requested page size */
     rowsPerPage: 10,
+
+    /** Last list sort field requested from the API */
+    lastSortBy: 'executedAt' as string | undefined,
+
+    /** Last list sort order requested from the API */
+    lastSortOrder: 'desc' as 'asc' | 'desc',
     
     /** Currently selected infrastructure plan detail (if any) */
     infrastructurePlan: undefined as InfrastructurePlanDetail | undefined,
@@ -100,6 +106,12 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
     async getInfrastructurePlans(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc') {
       this.loading = true;
       this.infrastructurePlans = [];
+      if (sortBy !== undefined) {
+        this.lastSortBy = sortBy;
+      }
+      if (sortOrder !== undefined) {
+        this.lastSortOrder = sortOrder;
+      }
       
       // Create service instance with repository
       const listService = new ListInfrastructurePlansService(this.infrastructurePlanRepository);
@@ -188,6 +200,18 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
             );
           }
         }
+      );
+    },
+
+    /**
+     * Reloads the current list page using the last sort parameters.
+     */
+    async refreshCurrentPlans() {
+      await this.getInfrastructurePlans(
+        this.currentPage,
+        this.rowsPerPage,
+        this.lastSortBy,
+        this.lastSortOrder,
       );
     },
 

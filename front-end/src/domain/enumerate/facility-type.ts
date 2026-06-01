@@ -1,9 +1,20 @@
 import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
 
+const FACILITY_TYPE_I18N_PREFIX = 'facility.add.facilityTypes';
+
 /** Returns the locale key segment for a facility type enum value. */
 export function facilityTypeLocaleKey(type: FacilityType | string): string {
   const value = typeof type === 'string' ? facilityTypeFromString(type) : type;
   return enumToLocaleKey(value);
+}
+
+/**
+ * Returns the translated label for a facility type using vue-i18n.
+ * @param t Translation function from useI18n().
+ * @param type Facility type value.
+ */
+export function facilityTypeLabel(t: (key: string) => string, type: FacilityType | string): string {
+  return t(`${FACILITY_TYPE_I18N_PREFIX}.${facilityTypeLocaleKey(type)}`);
 }
 
 /**
@@ -101,7 +112,7 @@ export function facilityTypeColor(type: FacilityType | string): string {
  */
 export function facilityTypeToOptions(t: (key: string) => string): { title: string; value: FacilityType }[] {
   return facilityTypeValues().map((type) => ({
-    title: t(`facility.add.facilityTypes.${facilityTypeLocaleKey(type)}`),
+    title: facilityTypeLabel(t, type),
     value: type,
   }));
 }

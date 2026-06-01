@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
@@ -101,6 +102,27 @@ class InfrastructurePlanTests {
         assertEquals(policies, plan.getServicePolicies());
         assertNotNull(plan.getId());
         assertEquals(0.0, plan.getEstimatedTotalCost().getAmount());
+        assertEquals(InfrastructurePlanExecutionState.COMPLETED, plan.getExecutionState());
+        assertTrue(plan.getFailureReason().isEmpty());
+    }
+
+    @Test
+    void executionState_transitions() {
+        InfrastructurePlan plan = new InfrastructurePlan(
+                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null,
+                InfrastructurePlanValidityState.VALID);
+
+        plan.markExecutionRunning();
+        assertEquals(InfrastructurePlanExecutionState.RUNNING, plan.getExecutionState());
+        assertTrue(plan.isExecutionRunning());
+
+        plan.markExecutionCompleted();
+        assertEquals(InfrastructurePlanExecutionState.COMPLETED, plan.getExecutionState());
+        assertFalse(plan.isExecutionRunning());
+
+        plan.markExecutionFailed("Docker timeout");
+        assertEquals(InfrastructurePlanExecutionState.FAILED, plan.getExecutionState());
+        assertEquals("Docker timeout", plan.getFailureReason().orElseThrow());
     }
 
     @Test

@@ -3,6 +3,7 @@ package es.ull.project.adapter.rest.response.infrastructureplan;
 import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
 import es.ull.project.adapter.rest.response.serviceassignment.ServiceAssignmentResponseBody;
+import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanStatus;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
@@ -104,6 +105,16 @@ public class InfrastructurePlanResponseBody {
      * Whether the plan is still valid or obsolete because referenced entities were edited.
      */
     public InfrastructurePlanValidityState validityState;
+
+    /**
+     * Lifecycle state of the algorithm execution (RUNNING, COMPLETED, FAILED).
+     */
+    public InfrastructurePlanExecutionState executionState;
+
+    /**
+     * Optional failure description when executionState is FAILED.
+     */
+    public String failureReason;
 
     /**
      * JSON snapshot of the client request used to execute the algorithm.

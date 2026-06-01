@@ -1,6 +1,7 @@
 package es.ull.project.adapter.mongodb.repository;
 
 import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.adapter.mongodb.mapper.InfrastructurePlanListDocumentMapper;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
@@ -80,10 +81,31 @@ public class InfrastructurePlanMongoRepository implements InfrastructurePlanRepo
      */
     @Override
     public Page<InfrastructurePlan> findAll(Pageable pageable) {
-        Query dataQuery = new Query().with(pageable);
-        List<InfrastructurePlan> infrastructurePlans = this.mongoTemplate.find(dataQuery, InfrastructurePlan.class, COLLECTION_NAME);
-        long total = this.mongoTemplate.count(new Query(), InfrastructurePlan.class, COLLECTION_NAME);
+        Query dataQuery = listSummaryProjectionQuery().with(pageable);
+        List<InfrastructurePlan> infrastructurePlans = this.mongoTemplate.find(dataQuery, Document.class, COLLECTION_NAME).stream()
+                .map(InfrastructurePlanListDocumentMapper::toInfrastructurePlan)
+                .toList();
+        long total = this.mongoTemplate.count(new Query(), COLLECTION_NAME);
         return new PageImpl<>(infrastructurePlans, pageable, total);
+    }
+
+    /**
+     * MongoDB query that projects only fields required for paginated list responses.
+     *
+     * @return query with list-summary field projection
+     */
+    private static Query listSummaryProjectionQuery() {
+        Query query = new Query();
+        query.fields()
+                .include(MongoFields.ID)
+                .include(MongoFields.ESTIMATED_TOTAL_COST)
+                .include(MongoFields.NUMBER_OF_DAYS)
+                .include(MongoFields.AVERAGE_PICKUP_TIME_MINUTES)
+                .include(MongoFields.EXECUTED_AT)
+                .include(MongoFields.VALIDITY_STATE)
+                .include(MongoFields.EXECUTION_STATE)
+                .include(MongoFields.FAILURE_REASON);
+        return query;
     }
 
     /**

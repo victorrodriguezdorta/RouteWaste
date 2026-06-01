@@ -83,6 +83,8 @@ public class InfrastructurePlanResponseMapper {
         responseBody.averagePickupTimeMinutes = plan.getAveragePickupTimeMinutes().orElse(null);
         responseBody.executedAt = plan.getExecutedAt().orElse(null);
         responseBody.validityState = plan.getValidityState();
+        responseBody.executionState = plan.getExecutionState();
+        responseBody.failureReason = plan.getFailureReason().orElse(null);
         responseBody.executionRequestJson = plan.getExecutionRequestJson()
                 .map(AlgorithmJsonPayload::new)
                 .orElse(null);

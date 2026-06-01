@@ -461,15 +461,22 @@
           "estimatedTotalCost": "Costo Total Estimado",
           "numberOfDays": "Número de Días",
           "averagePickupTimeMinutes": "Tiempo Promedio de Recogida (min)",
-          "validityState": "Estado del plan"
+          "validityState": "Estado del plan",
+          "planStatus": "Estado"
         },
         "validity": {
-          "valid": "Correcto",
+          "running": "Ejecutando",
+          "valid": "Válido",
           "obsolete": "Obsoleto"
+        },
+        "execution": {
+          "running": "Ejecutando",
+          "failed": "Fallido"
         },
         "tooltips": {
           "view": "Ver detalles",
-          "delete": "Eliminar"
+          "delete": "Eliminar",
+          "viewUnavailable": "El detalle estará disponible cuando termine la ejecución"
         },
         "noData": "No hay planes de infraestructura disponibles."
       },
@@ -481,6 +488,10 @@
     "show": {
       "title": "Detalle del plan de infraestructura",
       "loading": "Cargando plan de infraestructura...",
+      "execution": {
+        "running": "Este plan sigue ejecutándose. Vuelve a la lista y espera a que finalice.",
+        "failed": "La ejecución del algoritmo falló para este plan."
+      },
       "actions": {
         "editAsNewRun": "Editar",
         "editAsNewRunTooltip": "Abre el asistente con la misma selección (instalaciones, vehículos, contenedores y parámetros). Al ejecutar se creará un plan nuevo."
@@ -676,10 +687,6 @@
       "runAlgorithm": "Ejecutar algoritmo",
       "loadError": "No se pudo cargar el resumen. Comprueba la conexión con el servidor e inténtalo de nuevo.",
       "daysAbbr": "días",
-      "validity": {
-        "valid": "Vigente",
-        "obsolete": "Obsoleto"
-      },
       "totalPlansLabel": "{count} planes en total",
       "viewAllPlans": "Ver todos los planes"
     },

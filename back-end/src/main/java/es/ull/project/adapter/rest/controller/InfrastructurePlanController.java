@@ -1,6 +1,8 @@
 package es.ull.project.adapter.rest.controller;
 
+import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.adapter.mongodb.mapper.InfrastructurePlanFieldMapper;
+import es.ull.project.adapter.rest.sse.InfrastructurePlanExecutionEventPublisher;
 import es.ull.project.adapter.rest.mapper.DailyPlanResponseMapper;
 import es.ull.project.adapter.rest.mapper.InfrastructurePlanListResponseMapper;
 import es.ull.project.adapter.rest.mapper.InfrastructurePlanResponseMapper;
@@ -37,6 +39,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +47,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * InfrastructurePlanController
@@ -56,6 +60,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class InfrastructurePlanController {
 
     private static final int ZERO = 0;
+    private static final long SSE_TIMEOUT_MS = 30L * 60L * 1000L;
 
     @Autowired
     private ReadInfrastructurePlanUseCase readInfrastructurePlanUseCase;
@@ -65,6 +70,27 @@ public class InfrastructurePlanController {
 
     @Autowired
     private DeleteInfrastructurePlanUseCase deleteInfrastructurePlanUseCase;
+
+    @Autowired
+    private InfrastructurePlanExecutionEventPublisher executionEventPublisher;
+
+    /**
+     * GET /infrastructure-plans/execution-events
+     *
+     * @return SSE stream of infrastructure plan execution state updates
+     */
+    @Operation(
+            summary = "Subscribe to infrastructure plan execution events",
+            description = "Server-sent events stream notifying when plan execution state changes")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "SSE stream opened")
+    })
+    @GetMapping(value = "/execution-events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribeToExecutionEvents() {
+        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_MS);
+        this.executionEventPublisher.register(emitter);
+        return emitter;
+    }
 
     /**
      * GET /infrastructure-plans/
@@ -113,7 +139,7 @@ public class InfrastructurePlanController {
      */
     private Sort buildSort(String sortBy, String sortOrder) {
         if (sortBy == null || sortBy.isBlank()) {
-            return Sort.unsorted();
+            return Sort.by(Sort.Direction.DESC, MongoFields.EXECUTED_AT);
         }
         String mongoField = InfrastructurePlanFieldMapper.toMongoField(sortBy);
         if (mongoField == null) {

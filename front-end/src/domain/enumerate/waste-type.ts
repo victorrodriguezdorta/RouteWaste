@@ -1,11 +1,22 @@
 import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
 
+const WASTE_TYPE_I18N_PREFIX = 'container.add.wasteTypes';
+
 /**
  * Returns the locale key segment for a waste type enum value.
  */
 export function wasteTypeLocaleKey(type: WasteType | string): string {
   const value = typeof type === 'string' ? wasteTypeFromString(type) : type;
   return enumToLocaleKey(value);
+}
+
+/**
+ * Returns the translated label for a waste type using vue-i18n.
+ * @param t Translation function from useI18n().
+ * @param type Waste type value.
+ */
+export function wasteTypeLabel(t: (key: string) => string, type: WasteType | string): string {
+  return t(`${WASTE_TYPE_I18N_PREFIX}.${wasteTypeLocaleKey(type)}`);
 }
 
 /**
@@ -120,7 +131,7 @@ export function wasteTypeColor(type: WasteType | string): string {
  */
 export function wasteTypeToOptions(t: (key: string) => string): { title: string; value: WasteType }[] {
   return wasteTypeValues().map((type) => ({
-    title: t(`container.add.wasteTypes.${wasteTypeLocaleKey(type)}`),
+    title: wasteTypeLabel(t, type),
     value: type,
   }));
 }

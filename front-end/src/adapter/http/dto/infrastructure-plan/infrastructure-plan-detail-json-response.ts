@@ -27,6 +27,10 @@ export interface InfrastructurePlanDetailJsonResponse {
   containerStateMonitoring?: ContainerDailyStateJsonResponse[];
   /** Backend: VALID | OBSOLETE */
   validityState?: string;
+  /** Backend: RUNNING | COMPLETED | FAILED */
+  executionState?: string;
+  /** Present when executionState is FAILED */
+  failureReason?: string | null;
   /** JSON snapshot of the client execution request */
   executionRequestJson?: string;
 }

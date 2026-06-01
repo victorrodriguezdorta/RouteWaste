@@ -4,7 +4,10 @@
  */
 export interface CreateAlgorithmResult {
     /** Backend execution status. */
-    status: 'success' | 'error';
+    status: 'success' | 'error' | 'accepted';
+
+    /** Lifecycle state when status is accepted (RUNNING, COMPLETED, FAILED). */
+    executionState?: string;
 
     /** Human-readable backend message. */
     message: string;

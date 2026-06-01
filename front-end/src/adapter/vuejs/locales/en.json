@@ -461,15 +461,22 @@
           "estimatedTotalCost": "Estimated Total Cost",
           "numberOfDays": "Number of Days",
           "averagePickupTimeMinutes": "Average Pickup Time (min)",
-          "validityState": "Plan status"
+          "validityState": "Plan status",
+          "planStatus": "Status"
         },
         "validity": {
+          "running": "Executing",
           "valid": "Valid",
           "obsolete": "Obsolete"
         },
+        "execution": {
+          "running": "Executing",
+          "failed": "Failed"
+        },
         "tooltips": {
           "view": "View details",
-          "delete": "Delete"
+          "delete": "Delete",
+          "viewUnavailable": "Details are available when execution completes"
         },
         "noData": "No infrastructure plans available."
       },
@@ -481,6 +488,10 @@
     "show": {
       "title": "Infrastructure plan details",
       "loading": "Loading infrastructure plan...",
+      "execution": {
+        "running": "This plan is still executing. Return to the list and wait until it finishes.",
+        "failed": "Algorithm execution failed for this plan."
+      },
       "actions": {
         "editAsNewRun": "Edit",
         "editAsNewRunTooltip": "Opens the wizard with the same selection (facilities, vehicles, containers, and parameters). Executing will create a new plan."
@@ -676,10 +687,6 @@
       "runAlgorithm": "Run algorithm",
       "loadError": "Could not load the overview. Check the server connection and try again.",
       "daysAbbr": "days",
-      "validity": {
-        "valid": "Valid",
-        "obsolete": "Obsolete"
-      },
       "totalPlansLabel": "{count} plans in total",
       "viewAllPlans": "View all plans"
     },

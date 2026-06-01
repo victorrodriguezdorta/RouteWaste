@@ -1,5 +1,6 @@
 package es.ull.project.domain.entity;
 
+import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
@@ -32,6 +33,7 @@ public class InfrastructurePlan {
     public static final String PERIOD_NOT_DEFINED = "Planning period is not defined";
     public static final String MAX_BUDGET_NOT_DEFINED = "Maximum budget is not defined";
     public static final String VALIDITY_STATE_NOT_DEFINED = "Infrastructure plan validity state is not defined";
+    public static final String EXECUTION_STATE_NOT_DEFINED = "Infrastructure plan execution state is not defined";
     public static final String TOTAL_COST_EXCEEDED = "Total cost exceeds maximum budget";
     public static final String INVALID_ASSIGNMENT = "Service assignment is invalid";
     private static final int ZERO = 0;
@@ -127,6 +129,18 @@ public class InfrastructurePlan {
     private InfrastructurePlanValidityState validityState;
 
     /**
+     * Lifecycle state while the algorithm runs or after it finishes.
+     * It is a required attribute.
+     */
+    private InfrastructurePlanExecutionState executionState;
+
+    /**
+     * Optional error description when {@link #executionState} is {@link InfrastructurePlanExecutionState#FAILED}.
+     * It is an optional attribute.
+     */
+    private String failureReason;
+
+    /**
      * JSON snapshot of the client execution request used to run the algorithm (identifiers and parameters).
      * It is an optional attribute.
      */
@@ -176,6 +190,8 @@ public class InfrastructurePlan {
         this.totalDistanceMeters = Distance.fromMeters(0.0);
         this.containerDailyStates = new ArrayList<>();
         this.validityState = validityState;
+        this.executionState = InfrastructurePlanExecutionState.COMPLETED;
+        this.failureReason = null;
         this.executionRequestJson = null;
     }
 
@@ -202,6 +218,8 @@ public class InfrastructurePlan {
         this.totalDistanceMeters = otherObject.totalDistanceMeters;
         this.containerDailyStates = new ArrayList<>(otherObject.containerDailyStates);
         this.validityState = otherObject.validityState;
+        this.executionState = otherObject.executionState;
+        this.failureReason = otherObject.failureReason;
         this.executionRequestJson = otherObject.executionRequestJson;
     }
 
@@ -224,6 +242,8 @@ public class InfrastructurePlan {
      * @param averagePickupTimeMinutes the average pickup time in minutes
      * @param executedAt               the timestamp of algorithm execution
      * @param validityState            persisted validity state
+     * @param executionState           persisted algorithm execution lifecycle state
+     * @param failureReason            optional failure description when execution failed
      * @param executionRequestJson     persisted client request JSON snapshot
      * @param containerDailyStates     container daily states restored for the plan
      */
@@ -242,11 +262,14 @@ public class InfrastructurePlan {
             AveragePickupTimeMinutes averagePickupTimeMinutes,
             ExecutedAt executedAt,
             InfrastructurePlanValidityState validityState,
+            InfrastructurePlanExecutionState executionState,
+            String failureReason,
             AlgorithmJsonPayload executionRequestJson,
             List<ContainerDailyState> containerDailyStates) {
         validatePeriod(period);
         validateMaxBudget(maxBudget);
         validateValidityState(validityState);
+        validateExecutionState(executionState);
         this.id = id;
         this.period = period;
         this.selectedFacilities = selectedFacilities != null ? new ArrayList<>(selectedFacilities) : new ArrayList<>();
@@ -267,6 +290,8 @@ public class InfrastructurePlan {
         this.averagePickupTimeMinutes = averagePickupTimeMinutes;
         this.executedAt = executedAt;
         this.validityState = validityState;
+        this.executionState = executionState;
+        this.failureReason = failureReason;
         this.executionRequestJson = executionRequestJson;
     }
 
@@ -282,6 +307,8 @@ public class InfrastructurePlan {
      * @param averagePickupTimeMinutes the average pickup time in minutes
      * @param executedAt               the timestamp of algorithm execution
      * @param validityState            persisted validity state
+     * @param executionState           persisted algorithm execution lifecycle state
+     * @param failureReason            optional failure description
      * @param executionRequestJson     persisted client request JSON snapshot
      */
     private InfrastructurePlan(UUID id,
@@ -292,9 +319,12 @@ public class InfrastructurePlan {
             AveragePickupTimeMinutes averagePickupTimeMinutes,
             ExecutedAt executedAt,
             InfrastructurePlanValidityState validityState,
+            InfrastructurePlanExecutionState executionState,
+            String failureReason,
             AlgorithmJsonPayload executionRequestJson) {
         this(id, period, null, null, null, servicePolicies, maxBudget, null, null, null, null,
-                numberOfDays, averagePickupTimeMinutes, executedAt, validityState, executionRequestJson, null);
+                numberOfDays, averagePickupTimeMinutes, executedAt, validityState, executionState, failureReason,
+                executionRequestJson, null);
     }
 
     /**
@@ -314,6 +344,54 @@ public class InfrastructurePlan {
                 null,
                 null,
                 InfrastructurePlanValidityState.VALID,
+                InfrastructurePlanExecutionState.COMPLETED,
+                null,
+                null);
+    }
+
+    /**
+     * Lightweight aggregate for paginated list reads without hydrating related entities.
+     *
+     * @param id                       plan identifier
+     * @param estimatedTotalCost       persisted estimated total cost, may be null while running
+     * @param numberOfDays             planning horizon length in days
+     * @param averagePickupTimeMinutes average pickup time in minutes
+     * @param executedAt               algorithm execution timestamp
+     * @param validityState            persisted validity state
+     * @param executionState           persisted execution lifecycle state
+     * @param failureReason            optional failure description
+     * @return infrastructure plan carrying only list-summary fields
+     */
+    public static InfrastructurePlan forListSummary(
+            UUID id,
+            TotalCost estimatedTotalCost,
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes,
+            ExecutedAt executedAt,
+            InfrastructurePlanValidityState validityState,
+            InfrastructurePlanExecutionState executionState,
+            String failureReason) {
+        PlanningPeriod placeholderPeriod = new PlanningPeriod(String.valueOf(LocalDate.now().getYear()));
+        MaximumBudget placeholderBudget = new MaximumBudget(0.0);
+        return new InfrastructurePlan(
+                id,
+                placeholderPeriod,
+                null,
+                null,
+                null,
+                null,
+                placeholderBudget,
+                estimatedTotalCost,
+                null,
+                null,
+                null,
+                numberOfDays,
+                averagePickupTimeMinutes,
+                executedAt,
+                validityState,
+                executionState,
+                failureReason,
+                null,
                 null);
     }
 
@@ -350,6 +428,18 @@ public class InfrastructurePlan {
     private void validateValidityState(InfrastructurePlanValidityState validityState) {
         if (validityState == null) {
             throw new IllegalArgumentException(VALIDITY_STATE_NOT_DEFINED);
+        }
+    }
+
+    /**
+     * Validates that the infrastructure plan execution state is defined.
+     *
+     * @param executionState execution state to validate
+     * @throws IllegalArgumentException if the execution state is null
+     */
+    private void validateExecutionState(InfrastructurePlanExecutionState executionState) {
+        if (executionState == null) {
+            throw new IllegalArgumentException(EXECUTION_STATE_NOT_DEFINED);
         }
     }
 
@@ -651,6 +741,67 @@ public class InfrastructurePlan {
     }
 
     /**
+     * Returns the algorithm execution lifecycle state for this plan.
+     *
+     * @return current execution state (never null)
+     */
+    public InfrastructurePlanExecutionState getExecutionState() {
+        return executionState != null ? executionState : InfrastructurePlanExecutionState.COMPLETED;
+    }
+
+    /**
+     * Returns the failure reason when execution ended with {@link InfrastructurePlanExecutionState#FAILED}.
+     *
+     * @return optional failure description
+     */
+    public Optional<String> getFailureReason() {
+        return Optional.ofNullable(failureReason).filter(reason -> !reason.isBlank());
+    }
+
+    /**
+     * Returns whether the algorithm is still running for this plan.
+     *
+     * @return true when execution state is {@link InfrastructurePlanExecutionState#RUNNING}
+     */
+    public boolean isExecutionRunning() {
+        return getValidityState() == InfrastructurePlanValidityState.RUNNING
+                || getExecutionState() == InfrastructurePlanExecutionState.RUNNING;
+    }
+
+    /**
+     * Marks this plan as running while the algorithm executes asynchronously.
+     */
+    public void markExecutionRunning() {
+        validateValidityState(InfrastructurePlanValidityState.RUNNING);
+        validateExecutionState(InfrastructurePlanExecutionState.RUNNING);
+        this.validityState = InfrastructurePlanValidityState.RUNNING;
+        this.executionState = InfrastructurePlanExecutionState.RUNNING;
+        this.failureReason = null;
+    }
+
+    /**
+     * Marks this plan as successfully completed after algorithm persistence.
+     */
+    public void markExecutionCompleted() {
+        validateValidityState(InfrastructurePlanValidityState.VALID);
+        validateExecutionState(InfrastructurePlanExecutionState.COMPLETED);
+        this.validityState = InfrastructurePlanValidityState.VALID;
+        this.executionState = InfrastructurePlanExecutionState.COMPLETED;
+        this.failureReason = null;
+    }
+
+    /**
+     * Marks this plan as failed and stores an optional human-readable reason.
+     *
+     * @param reason failure description; may be null or blank
+     */
+    public void markExecutionFailed(String reason) {
+        validateExecutionState(InfrastructurePlanExecutionState.FAILED);
+        this.executionState = InfrastructurePlanExecutionState.FAILED;
+        this.failureReason = reason != null && !reason.isBlank() ? reason.trim() : null;
+    }
+
+    /**
      * Returns the client execution request JSON snapshot stored when the plan was produced.
      *
      * @return optional raw JSON text
@@ -666,6 +817,15 @@ public class InfrastructurePlan {
      */
     public void assignExecutionRequestSnapshot(String json) {
         this.executionRequestJson = json != null && !json.isBlank() ? new AlgorithmJsonPayload(json) : null;
+    }
+
+    /**
+     * Updates the execution timestamp (for example when the algorithm finishes).
+     *
+     * @param executedAt new execution timestamp
+     */
+    public void assignExecutedAt(ExecutedAt executedAt) {
+        this.executedAt = executedAt;
     }
 
     /**

@@ -12,6 +12,7 @@ import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePla
 import es.ull.project.domain.entity.ContainerDailyState;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.enumerate.ContainerStatus;
+import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
@@ -57,5 +58,6 @@ class InfrastructurePlanResponseMapperTests {
         assertEquals(state.getContainerCapacityLiters(), response.containerStateMonitoring.get(0).containerCapacityLiters.getLiters());
         assertEquals(state.getDailyDemandLitersPerDay(), response.containerStateMonitoring.get(0).dailyDemandLitersPerDay.getLitersPerDay());
         assertEquals(state.getStatus(), response.containerStateMonitoring.get(0).status);
+        assertEquals(InfrastructurePlanExecutionState.COMPLETED, response.executionState);
     }
 }

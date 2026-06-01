@@ -39,6 +39,7 @@ import es.ull.project.domain.entity.ServiceAssignment;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.StopType;
@@ -53,6 +54,7 @@ import es.ull.project.domain.valueobject.capacity.StorageCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.UnloadingTime;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityKilograms;
 import es.ull.project.domain.valueobject.capacity.VehicleCapacityLiters;
+import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
@@ -123,6 +125,79 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
         assertEquals(UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"), firstDailyPlan.getStops().get(0).getContainer().getId());
         assertEquals(StopType.FACILITY, firstDailyPlan.getStops().get(2).getType());
         assertNull(firstDailyPlan.getStops().get(2).getContainer());
+        assertEquals(InfrastructurePlanExecutionState.COMPLETED, plan.getExecutionState());
+    }
+
+    @Test
+    void complete_updatesExistingRunningPlanWithSameId() throws Exception {
+        InMemoryInfrastructurePlanRepository infrastructurePlanRepository = new InMemoryInfrastructurePlanRepository();
+        InMemoryServiceAssignmentRepository serviceAssignmentRepository = new InMemoryServiceAssignmentRepository();
+        InMemoryDailyPlanRepository dailyPlanRepository = new InMemoryDailyPlanRepository();
+        InMemoryContainerDailyStateRepository containerDailyStateRepository = new InMemoryContainerDailyStateRepository();
+        InMemoryFacilityRepository facilityRepository = new InMemoryFacilityRepository();
+        InMemoryContainerRepository containerRepository = new InMemoryContainerRepository();
+        InMemoryVehicleRepository vehicleRepository = new InMemoryVehicleRepository();
+
+        seedInfrastructureEntities(facilityRepository, containerRepository, vehicleRepository);
+
+        CreatePendingInfrastructurePlanService pendingService =
+                new CreatePendingInfrastructurePlanService(infrastructurePlanRepository);
+        PersistAlgorithmExecutionResultService persistService = new PersistAlgorithmExecutionResultService(
+                infrastructurePlanRepository,
+                serviceAssignmentRepository,
+                dailyPlanRepository,
+                containerDailyStateRepository,
+                facilityRepository,
+                containerRepository,
+                vehicleRepository);
+
+        String requestSnap = "{\"facilityId\":\"ce3d2863-eabe-4c6c-a31b-1c3b3ea72038\"}";
+        InfrastructurePlan pending = pendingService.createPending(
+                new NumberOfDays(7),
+                new AveragePickupTimeMinutes(15),
+                new MaximumBudget(1_000_000.0),
+                new AlgorithmJsonPayload(requestSnap));
+        UUID pendingId = pending.getId();
+
+        InfrastructurePlan completed = persistService.complete(
+                pendingId,
+                new AlgorithmJsonPayload(sampleAlgorithmJson()),
+                new NumberOfDays(7),
+                new AveragePickupTimeMinutes(15),
+                null,
+                new AlgorithmJsonPayload(requestSnap));
+
+        assertEquals(pendingId, completed.getId());
+        assertEquals(InfrastructurePlanExecutionState.COMPLETED, completed.getExecutionState());
+        assertEquals(1, completed.getSelectedFacilities().size());
+        assertEquals(2, completed.getDailyPlanIds().size());
+        assertEquals(1, infrastructurePlanRepository.saved.size());
+    }
+
+    @Test
+    void markExecutionFailed_updatesRunningPlan() {
+        InMemoryInfrastructurePlanRepository infrastructurePlanRepository = new InMemoryInfrastructurePlanRepository();
+        CreatePendingInfrastructurePlanService pendingService =
+                new CreatePendingInfrastructurePlanService(infrastructurePlanRepository);
+        PersistAlgorithmExecutionResultService persistService = new PersistAlgorithmExecutionResultService(
+                infrastructurePlanRepository,
+                new InMemoryServiceAssignmentRepository(),
+                new InMemoryDailyPlanRepository(),
+                new InMemoryContainerDailyStateRepository(),
+                new InMemoryFacilityRepository(),
+                new InMemoryContainerRepository(),
+                new InMemoryVehicleRepository());
+
+        InfrastructurePlan pending = pendingService.createPending(
+                new NumberOfDays(2),
+                new AveragePickupTimeMinutes(10),
+                new MaximumBudget(1000.0),
+                null);
+
+        InfrastructurePlan failed = persistService.markExecutionFailed(pending.getId(), "Docker timeout");
+
+        assertEquals(InfrastructurePlanExecutionState.FAILED, failed.getExecutionState());
+        assertEquals("Docker timeout", failed.getFailureReason().orElseThrow());
     }
 
     @Override
@@ -132,6 +207,22 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
             AveragePickupTimeMinutes averagePickupTimeMinutes,
             es.ull.project.domain.valueobject.cost.MaximumBudget providedMaxBudget,
             AlgorithmJsonPayload executionRequestJson) {
+        throw new UnsupportedOperationException("Test class does not implement production persistence.");
+    }
+
+    @Override
+    public InfrastructurePlan complete(
+            UUID planId,
+            AlgorithmJsonPayload algorithmResponse,
+            NumberOfDays numberOfDays,
+            AveragePickupTimeMinutes averagePickupTimeMinutes,
+            es.ull.project.domain.valueobject.cost.MaximumBudget providedMaxBudget,
+            AlgorithmJsonPayload executionRequestJson) {
+        throw new UnsupportedOperationException("Test class does not implement production persistence.");
+    }
+
+    @Override
+    public InfrastructurePlan markExecutionFailed(UUID planId, String failureReason) {
         throw new UnsupportedOperationException("Test class does not implement production persistence.");
     }
 

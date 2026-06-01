@@ -8,6 +8,7 @@ import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.application.service.algorithm.CreatePendingInfrastructurePlanService;
 import es.ull.project.application.service.algorithm.ExecuteAlgorithmService;
 import es.ull.project.application.service.algorithm.PersistAlgorithmExecutionResultService;
 import es.ull.project.application.service.algorithm.RunAlgorithmService;
@@ -32,6 +33,7 @@ import es.ull.project.application.service.vehicle.CreateVehicleService;
 import es.ull.project.application.service.vehicle.DeleteVehicleService;
 import es.ull.project.application.service.vehicle.ReadVehicleService;
 import es.ull.project.application.service.vehicle.UpdateVehicleService;
+import es.ull.project.application.usecase.algorithm.CreatePendingInfrastructurePlanUseCase;
 import es.ull.project.application.usecase.algorithm.ExecuteAlgorithmUseCase;
 import es.ull.project.application.usecase.algorithm.PersistAlgorithmExecutionResultUseCase;
 import es.ull.project.application.usecase.algorithm.RunAlgorithmUseCase;
@@ -104,6 +106,18 @@ public class ServiceConfiguration {
     @Bean
     public RunAlgorithmUseCase runAlgorithmService(AlgorithmRunner algorithmRunner) {
         return new RunAlgorithmService(algorithmRunner);
+    }
+
+    /**
+     * Creates the service bean that stores a RUNNING infrastructure plan placeholder before async execution.
+     *
+     * @param infrastructurePlanRepository repository for infrastructure plan persistence
+     * @return configured {@link CreatePendingInfrastructurePlanService} instance
+     */
+    @Bean
+    public CreatePendingInfrastructurePlanUseCase createPendingInfrastructurePlanService(
+            InfrastructurePlanRepository infrastructurePlanRepository) {
+        return new CreatePendingInfrastructurePlanService(infrastructurePlanRepository);
     }
 
     /**

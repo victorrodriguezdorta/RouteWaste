@@ -1,11 +1,22 @@
 import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
 
+const TIME_UNIT_I18N_PREFIX = 'common.timeUnits';
+
 /**
  * Returns the locale key segment for a time unit enum value.
  */
 export function timeUnitLocaleKey(unit: TimeUnit | string): string {
   const value = typeof unit === 'string' ? timeUnitFromString(unit) : unit;
   return enumToLocaleKey(value);
+}
+
+/**
+ * Returns the translated label for a time unit using vue-i18n.
+ * @param t Translation function from useI18n().
+ * @param unit Time unit value.
+ */
+export function timeUnitLabel(t: (key: string) => string, unit: TimeUnit | string): string {
+  return t(`${TIME_UNIT_I18N_PREFIX}.${timeUnitLocaleKey(unit)}`);
 }
 
 /**
@@ -83,7 +94,26 @@ export function timeUnitRandom(): TimeUnit {
  */
 export function timeUnitToOptions(t: (key: string) => string): { title: string; value: TimeUnit }[] {
   return timeUnitValues().map((unit) => ({
-    title: t(`common.timeUnits.${timeUnitLocaleKey(unit)}`),
+    title: timeUnitLabel(t, unit),
     value: unit,
   }));
+}
+
+/**
+ * Returns the Vuetify color for a time unit chip or badge.
+ */
+export function timeUnitColor(unit: TimeUnit | string): string {
+  const value = typeof unit === 'string' ? timeUnitFromString(unit) : unit;
+  switch (value) {
+    case TimeUnit.DAY:
+      return 'blue';
+    case TimeUnit.WEEK:
+      return 'teal';
+    case TimeUnit.MONTH:
+      return 'indigo';
+    case TimeUnit.YEAR:
+      return 'purple';
+    default:
+      return 'grey';
+  }
 }

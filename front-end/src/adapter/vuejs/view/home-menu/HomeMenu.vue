@@ -213,11 +213,7 @@
                   </template>
                   <template #prepend>
                     <v-chip
-                      :color="
-                        planValidity(plan) === InfrastructurePlanValidityState.VALID
-                          ? 'success'
-                          : 'error'
-                      "
+                      :color="infrastructurePlanValidityStateColor(planValidity(plan))"
                       size="small"
                       variant="flat"
                       class="font-weight-medium"
@@ -253,8 +249,9 @@
 <script setup lang="ts">
 import type { InfrastructurePlanSummaryJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-summary-json-response';
 import {
-  InfrastructurePlanValidityState,
+  infrastructurePlanValidityStateColor,
   infrastructurePlanValidityStateFromString,
+  infrastructurePlanValidityStateLabel,
 } from '@/domain/enumerate/infrastructure-plan-validity-state';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { http } from '@ull-tfg/ull-tfg-typescript';
@@ -323,9 +320,7 @@ const planValidity = (plan: InfrastructurePlanSummaryJsonResponse) =>
   infrastructurePlanValidityStateFromString(plan.validityState);
 
 const validityLabel = (plan: InfrastructurePlanSummaryJsonResponse) =>
-  planValidity(plan) === InfrastructurePlanValidityState.OBSOLETE
-    ? t('selection.dashboard.validity.obsolete')
-    : t('selection.dashboard.validity.valid');
+  infrastructurePlanValidityStateLabel(t, planValidity(plan));
 
 const showInfrastructurePlan = (itemId: string) => {
   void router.push({ name: 'ShowInfrastructurePlan', params: { id: itemId } });

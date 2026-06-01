@@ -3,6 +3,7 @@ import type { InfrastructurePlanDailyPlanDetail } from './details/infrastructure
 import type { InfrastructurePlanFacilityDetail } from './details/infrastructure-plan-facility-detail';
 import type { InfrastructurePlanMetricsDetail } from './details/infrastructure-plan-metrics-detail';
 import { FacilityStatus } from '@/domain/enumerate/facility-status';
+import type { InfrastructurePlanExecutionState } from '@/domain/enumerate/infrastructure-plan-execution-state';
 import type { InfrastructurePlanValidityState } from '@/domain/enumerate/infrastructure-plan-validity-state';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
@@ -20,8 +21,19 @@ export class InfrastructurePlanDetail {
     public readonly facilities: InfrastructurePlanFacilityDetail[],
     public readonly containerStateMonitoring: InfrastructurePlanContainerDailyStateDetail[],
     public readonly validityState: InfrastructurePlanValidityState,
+    public readonly executionState: InfrastructurePlanExecutionState,
+    public readonly failureReason: string | null,
     public readonly executionRequestJson: string | null,
   ) {}
+
+  /**
+   * @returns Whether the algorithm is still running for this plan
+   */
+  isExecutionRunning(): boolean {
+    return (
+      this.validityState === 'RUNNING' || this.executionState === 'RUNNING'
+    );
+  }
 
   /**
    * Flatten all daily plans from the facilities.

@@ -1,9 +1,20 @@
 import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
 
+const VEHICLE_TYPE_I18N_PREFIX = 'vehicle.add.vehicleTypes';
+
 /** Returns the locale key segment for a vehicle type enum value. */
 export function vehicleTypeLocaleKey(type: VehicleType | string): string {
   const value = typeof type === 'string' ? vehicleTypeFromString(type) : type;
   return enumToLocaleKey(value);
+}
+
+/**
+ * Returns the translated label for a vehicle type using vue-i18n.
+ * @param t Translation function from useI18n().
+ * @param type Vehicle type value.
+ */
+export function vehicleTypeLabel(t: (key: string) => string, type: VehicleType | string): string {
+  return t(`${VEHICLE_TYPE_I18N_PREFIX}.${vehicleTypeLocaleKey(type)}`);
 }
 
 /**
@@ -87,7 +98,7 @@ export function vehicleTypeRandom(): VehicleType {
  */
 export function vehicleTypeToOptions(t: (key: string) => string): { title: string; value: VehicleType }[] {
   return vehicleTypeValues().map((type) => ({
-    title: t(`vehicle.add.vehicleTypes.${vehicleTypeLocaleKey(type)}`),
+    title: vehicleTypeLabel(t, type),
     value: type,
   }));
 }

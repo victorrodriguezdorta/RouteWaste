@@ -100,6 +100,12 @@ onMounted(async () => {
 const handleExecuteAlgorithm = async () => {
   const result = await executeAlgorithm();
 
+  if (result?.status === 'accepted' && result.infrastructurePlanId) {
+    algorithmStore.resetForm();
+    void router.push({ name: 'Algorithm' });
+    return;
+  }
+
   if (result?.status === 'success' && result.infrastructurePlanId) {
     void router.push({
       name: 'ShowInfrastructurePlan',

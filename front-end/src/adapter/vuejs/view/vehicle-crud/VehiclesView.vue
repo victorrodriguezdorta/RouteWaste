@@ -175,7 +175,7 @@ import { ButtonTooltip, ErrorMessage } from '@ull-tfg/ull-tfg-vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { VehicleType, vehicleTypeColor, vehicleTypeLocaleKey, vehicleTypeToOptions } from '../../../../domain/enumerate/vehicle-type';
+import { VehicleType, vehicleTypeColor, vehicleTypeLabel, vehicleTypeToOptions } from '../../../../domain/enumerate/vehicle-type';
 import BulkImportFileButton from '../../components/common/BulkImportFileButton.vue';
 import EntityTypeStatisticsChart from '../../components/common/EntityTypeStatisticsChart.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
@@ -320,15 +320,9 @@ const onVehicleTypeFilterChange = async (newType: string | null) => {
  * @param type - VehicleType enum value
  * @returns Formatted vehicle type label
  */
-const formatVehicleType = (type: VehicleType): string => {
-  return t(`vehicle.add.vehicleTypes.${vehicleTypeLocaleKey(type)}`);
-};
+const formatVehicleType = (type: VehicleType): string => vehicleTypeLabel(t, type);
 
-const translateVehicleTypeKey = (typeKey: string): string => {
-  const key = `vehicle.add.vehicleTypes.${vehicleTypeLocaleKey(typeKey)}`;
-  const translated = t(key);
-  return translated === key ? typeKey : translated;
-};
+const translateVehicleTypeKey = (typeKey: string): string => vehicleTypeLabel(t, typeKey);
 
 /**
  * Navigate to add vehicle view

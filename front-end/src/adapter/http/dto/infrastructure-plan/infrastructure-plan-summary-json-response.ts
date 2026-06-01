@@ -9,4 +9,8 @@ export interface InfrastructurePlanSummaryJsonResponse {
   averagePickupTimeMinutes: number | null;
   /** Backend: VALID | OBSOLETE */
   validityState?: string;
+  /** Backend: RUNNING | COMPLETED | FAILED */
+  executionState?: string;
+  /** Present when executionState is FAILED */
+  failureReason?: string | null;
 }

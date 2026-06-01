@@ -117,11 +117,9 @@
 import { buildPlanOverviewAnalytics } from '@/adapter/vuejs/analytics/infrastructure-plan/build-plan-overview-charts';
 import type { PieChartDatum } from '@/adapter/vuejs/analytics/infrastructure-plan/pie-chart-datum';
 import type { InfrastructurePlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
-import {
-  InfrastructurePlanValidityState,
-} from '@/domain/enumerate/infrastructure-plan-validity-state';
-import { vehicleTypeLocaleKey } from '@/domain/enumerate/vehicle-type';
-import { wasteTypeLocaleKey } from '@/domain/enumerate/waste-type';
+import { infrastructurePlanValidityStateLabel } from '@/domain/enumerate/infrastructure-plan-validity-state';
+import { vehicleTypeLabel } from '@/domain/enumerate/vehicle-type';
+import { wasteTypeLabel } from '@/domain/enumerate/waste-type';
 import { PieChart, StackedBarPlot } from '@ull-tfg/ull-tfg-vue';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -149,9 +147,7 @@ const analyticsTotals = computed(() => overviewAnalytics.value?.totals ?? {
 
 const validityLabel = computed(() => {
   if (!props.plan) return '';
-  return props.plan.validityState === InfrastructurePlanValidityState.OBSOLETE
-    ? t('infrastructurePlan.list.table.validity.obsolete')
-    : t('infrastructurePlan.list.table.validity.valid');
+  return infrastructurePlanValidityStateLabel(t, props.plan.validityState);
 });
 
 const generalInfo = computed(() => {
@@ -267,15 +263,11 @@ const compactStats = computed<CompactStat[]>(() => {
 });
 
 function translateVehicleType(typeKey: string): string {
-  const key = `vehicle.add.vehicleTypes.${vehicleTypeLocaleKey(typeKey)}`;
-  const translated = t(key);
-  return translated === key ? typeKey : translated;
+  return vehicleTypeLabel(t, typeKey);
 }
 
 function translateWasteType(typeKey: string): string {
-  const key = `container.add.wasteTypes.${wasteTypeLocaleKey(typeKey)}`;
-  const translated = t(key);
-  return translated === key ? typeKey : translated;
+  return wasteTypeLabel(t, typeKey);
 }
 
 const vehiclesPieData = computed<PieChartDatum[]>(() =>

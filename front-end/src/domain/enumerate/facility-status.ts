@@ -1,9 +1,20 @@
 import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
 
+const FACILITY_STATUS_I18N_PREFIX = 'facility.add.statuses';
+
 /** Returns the locale key segment for a facility status enum value. */
 export function facilityStatusLocaleKey(status: FacilityStatus | string): string {
   const value = typeof status === 'string' ? facilityStatusFromString(status) : status;
   return enumToLocaleKey(value);
+}
+
+/**
+ * Returns the translated label for a facility status using vue-i18n.
+ * @param t Translation function from useI18n().
+ * @param status Facility status value.
+ */
+export function facilityStatusLabel(t: (key: string) => string, status: FacilityStatus | string): string {
+  return t(`${FACILITY_STATUS_I18N_PREFIX}.${facilityStatusLocaleKey(status)}`);
 }
 
 /**
@@ -89,7 +100,7 @@ export function facilityStatusRandom(): FacilityStatus {
  */
 export function facilityStatusToOptions(t: (key: string) => string): { title: string; value: FacilityStatus }[] {
   return facilityStatusValues().map((status) => ({
-    title: t(`facility.add.statuses.${facilityStatusLocaleKey(status)}`),
+    title: facilityStatusLabel(t, status),
     value: status,
   }));
 }

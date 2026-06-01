@@ -255,8 +255,16 @@
 import { InputTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { FacilityStatus, facilityStatusLocaleKey, facilityStatusValues } from '../../../../domain/enumerate/facility-status';
-import { FacilityType, facilityTypeLocaleKey, facilityTypeValues } from '../../../../domain/enumerate/facility-type';
+import {
+  FacilityStatus,
+  facilityStatusLabel,
+  facilityStatusToOptions,
+} from '../../../../domain/enumerate/facility-status';
+import {
+  FacilityType,
+  facilityTypeLabel,
+  facilityTypeToOptions,
+} from '../../../../domain/enumerate/facility-type';
 import { FacilityAdd } from '../../dto/facility/facility-add';
 import LocationPickerMap from '../common/LocationPickerMap.vue';
 
@@ -277,27 +285,17 @@ const emit = defineEmits<{
 }>();
 
 const showMapSelector = ref(false);
-const facilityTypeOptions = computed(() =>
-  facilityTypeValues().map((value) => ({
-    title: t(`facility.add.facilityTypes.${facilityTypeLocaleKey(value)}`),
-    value,
-  }))
-);
-const facilityStatusOptions = computed(() =>
-  facilityStatusValues().map((value) => ({
-    title: t(`facility.add.statuses.${value}`),
-    value,
-  }))
-);
+const facilityTypeOptions = computed(() => facilityTypeToOptions(t));
+const facilityStatusOptions = computed(() => facilityStatusToOptions(t));
 
 const translatedFacilityType = computed(() => {
   if (!props.facility.facilityType) return '';
-  return t(`facility.add.facilityTypes.${facilityTypeLocaleKey(props.facility.facilityType)}`);
+  return facilityTypeLabel(t, props.facility.facilityType);
 });
 
 const translatedStatus = computed(() => {
   if (!props.facility.status) return '';
-  return t(`facility.add.statuses.${facilityStatusLocaleKey(props.facility.status)}`);
+  return facilityStatusLabel(t, props.facility.status);
 });
 
 const updateFacilityType = (value: FacilityType) => {

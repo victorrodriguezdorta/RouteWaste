@@ -153,7 +153,7 @@
 import { InputTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { VehicleType, vehicleTypeLocaleKey, vehicleTypeToOptions } from '../../../../domain/enumerate/vehicle-type';
+import { VehicleType, vehicleTypeLabel, vehicleTypeToOptions } from '../../../../domain/enumerate/vehicle-type';
 import { VehicleAdd } from '../../dto/vehicle/vehicle-add';
 
 // Vue I18n composable for translations
@@ -186,7 +186,7 @@ const vehicleTypeOptions = computed(() => vehicleTypeToOptions(t));
  */
 const translatedVehicleType = computed(() => {
   if (!props.vehicle.vehicleType) return '';
-  return t(`vehicle.add.vehicleTypes.${vehicleTypeLocaleKey(props.vehicle.vehicleType)}`);
+  return vehicleTypeLabel(t, props.vehicle.vehicleType);
 });
 
 const updateName = (value: string) => {

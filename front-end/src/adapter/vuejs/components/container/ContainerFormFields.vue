@@ -211,8 +211,8 @@
 import { InputTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { serviceZoneLocaleKey, serviceZoneToOptions } from '../../../../domain/enumerate/service-zone';
-import { wasteTypeLocaleKey, wasteTypeToOptions } from '../../../../domain/enumerate/waste-type';
+import { serviceZoneLabel, serviceZoneToOptions } from '../../../../domain/enumerate/service-zone';
+import { wasteTypeLabel, wasteTypeToOptions } from '../../../../domain/enumerate/waste-type';
 import { ContainerAdd } from '../../dto/container/container-add';
 import LocationPickerMap from '../common/LocationPickerMap.vue';
 
@@ -238,12 +238,12 @@ const showMapSelector = ref(false);
 
 const translatedWasteType = computed(() => {
   if (!props.container.wasteType) return '';
-  return t(`container.add.wasteTypes.${wasteTypeLocaleKey(props.container.wasteType)}`);
+  return wasteTypeLabel(t, props.container.wasteType);
 });
 
 const translatedServiceZone = computed(() => {
   if (!props.container.serviceZone) return '';
-  return t(`container.add.serviceZones.${serviceZoneLocaleKey(props.container.serviceZone)}`);
+  return serviceZoneLabel(t, props.container.serviceZone);
 });
 
 const updateLatitude = (value: number) => {

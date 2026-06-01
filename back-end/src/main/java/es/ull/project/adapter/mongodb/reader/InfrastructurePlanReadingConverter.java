@@ -5,6 +5,7 @@ import es.ull.project.configuration.MongoConfiguration;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.entity.ServiceAssignment;
+import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
@@ -165,6 +166,14 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
         es.ull.project.domain.valueobject.time.ExecutedAt executedAt = executedAtRaw != null ? new es.ull.project.domain.valueobject.time.ExecutedAt(executedAtRaw) : null;
         String validityStateRaw = document.getString(MongoFields.VALIDITY_STATE);
         InfrastructurePlanValidityState validityState = InfrastructurePlanValidityState.fromStoredString(validityStateRaw);
+        String executionStateRaw = document.getString(MongoFields.EXECUTION_STATE);
+        InfrastructurePlanExecutionState executionState =
+                InfrastructurePlanExecutionState.fromStoredString(executionStateRaw);
+        if (validityState == InfrastructurePlanValidityState.VALID
+                && executionState == InfrastructurePlanExecutionState.RUNNING) {
+            validityState = InfrastructurePlanValidityState.RUNNING;
+        }
+        String failureReason = document.getString(MongoFields.FAILURE_REASON);
         String executionRequestJson = document.getString(MongoFields.EXECUTION_REQUEST_JSON);
         InfrastructurePlan plan = new InfrastructurePlan(
             id,
@@ -182,6 +191,8 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
             averagePickupTimeMinutes,
             executedAt,
             validityState,
+            executionState,
+            failureReason,
             executionRequestJson != null && !executionRequestJson.isBlank() ? new AlgorithmJsonPayload(executionRequestJson) : null,
             containerDailyStates
         );

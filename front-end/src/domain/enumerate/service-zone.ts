@@ -1,11 +1,22 @@
 import { enumToLocaleKey } from '@/domain/util/enum-to-locale-key';
 
+const SERVICE_ZONE_I18N_PREFIX = 'container.add.serviceZones';
+
 /**
  * Returns the locale key segment for a service zone enum value.
  */
 export function serviceZoneLocaleKey(zone: ServiceZone | string): string {
   const value = typeof zone === 'string' ? serviceZoneFromString(zone) : zone;
   return enumToLocaleKey(value);
+}
+
+/**
+ * Returns the translated label for a service zone using vue-i18n.
+ * @param t Translation function from useI18n().
+ * @param zone Service zone value.
+ */
+export function serviceZoneLabel(t: (key: string) => string, zone: ServiceZone | string): string {
+  return t(`${SERVICE_ZONE_I18N_PREFIX}.${serviceZoneLocaleKey(zone)}`);
 }
 
 /**
@@ -112,7 +123,7 @@ export function serviceZoneColor(zone: ServiceZone | string): string {
  */
 export function serviceZoneToOptions(t: (key: string) => string): { title: string; value: ServiceZone }[] {
   return serviceZoneValues().map((zone) => ({
-    title: t(`container.add.serviceZones.${serviceZoneLocaleKey(zone)}`),
+    title: serviceZoneLabel(t, zone),
     value: zone,
   }));
 }

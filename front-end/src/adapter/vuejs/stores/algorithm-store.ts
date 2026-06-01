@@ -289,7 +289,7 @@ export const useAlgorithmStore = defineStore('Algorithm', {
           // Success case: store result and notify user based on backend status
           this.executionResult = data;
           this.loading = false;
-          if (data.status === 'success') {
+          if (data.status === 'success' || data.status === 'accepted') {
             this.setNotification(
               i18n.global.t('common.errors.titles.success'),
               translateBackendMessage(data.message),

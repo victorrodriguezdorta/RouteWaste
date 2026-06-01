@@ -1,5 +1,6 @@
 package es.ull.project.adapter.rest.response.infrastructureplan;
 
+import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
@@ -42,4 +43,14 @@ public class InfrastructurePlanListResponseBody {
      * Whether the plan is still valid or obsolete because referenced entities were edited.
      */
     public InfrastructurePlanValidityState validityState;
+
+    /**
+     * Lifecycle state of the algorithm execution (RUNNING, COMPLETED, FAILED).
+     */
+    public InfrastructurePlanExecutionState executionState;
+
+    /**
+     * Optional failure description when executionState is FAILED.
+     */
+    public String failureReason;
 }
