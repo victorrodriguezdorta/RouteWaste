@@ -72,7 +72,8 @@ jobs:
       - name: Build and push Docker image
         uses: mr-smithers-excellent/docker-build-push@v6
         env:
-          GITHUB_TOKEN: ${{ secrets.ULLSOFTWARE_PASSWORD }}
+          # Secret id=github_token (no comma in value — action splits secrets on commas)
+          github_token: ${{ secrets.ULLSOFTWARE_PASSWORD }}
         with:
           image: ${{ env.DOCKER_IMAGE_NAME }}
           tags: latest
@@ -82,5 +83,4 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
           enableBuildKit: true
-          secrets: |
-            id=github_token,env=GITHUB_TOKEN
+          secrets: id=github_token

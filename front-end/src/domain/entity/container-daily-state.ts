@@ -3,7 +3,7 @@ import { ContainerCapacityLiters } from '@/domain/valueobject/demand/container-c
 import { DailyWasteDemandLitersPerDay } from '@/domain/valueobject/demand/daily-waste-demand-liters-per-day';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
-/**
+/** 
  * ContainerDailyState
  *
  * Domain entity representing a container daily state snapshot returned by the
