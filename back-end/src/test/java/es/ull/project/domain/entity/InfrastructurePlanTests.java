@@ -95,7 +95,7 @@ class InfrastructurePlanTests {
         ServicePolicies policies = randomServicePolicies();
 
         InfrastructurePlan plan = new InfrastructurePlan(
-                period, maxBudget, policies, null, null, null, InfrastructurePlanValidityState.VALID);
+                period, maxBudget, policies, null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
 
         assertEquals(period, plan.getPeriod());
         assertEquals(maxBudget, plan.getMaxBudget());
@@ -110,7 +110,7 @@ class InfrastructurePlanTests {
     void executionState_transitions() {
         InfrastructurePlan plan = new InfrastructurePlan(
                 randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null,
-                InfrastructurePlanValidityState.VALID);
+                InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
 
         plan.markExecutionRunning();
         assertEquals(InfrastructurePlanExecutionState.RUNNING, plan.getExecutionState());
@@ -134,7 +134,8 @@ class InfrastructurePlanTests {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> new InfrastructurePlan(
-                        period, maxBudget, policies, null, null, null, InfrastructurePlanValidityState.VALID)
+                        period, maxBudget, policies, null, null, null, InfrastructurePlanValidityState.VALID,
+                        InfrastructurePlanExecutionState.COMPLETED)
         );
 
         assertEquals(InfrastructurePlan.PERIOD_NOT_DEFINED, exception.getMessage());
@@ -149,7 +150,8 @@ class InfrastructurePlanTests {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> new InfrastructurePlan(
-                        period, maxBudget, policies, null, null, null, InfrastructurePlanValidityState.VALID)
+                        period, maxBudget, policies, null, null, null, InfrastructurePlanValidityState.VALID,
+                        InfrastructurePlanExecutionState.COMPLETED)
         );
 
         assertEquals(InfrastructurePlan.MAX_BUDGET_NOT_DEFINED, exception.getMessage());
@@ -160,9 +162,9 @@ class InfrastructurePlanTests {
     @Test
     void equalsMethod() {
         InfrastructurePlan p1 = new InfrastructurePlan(
-                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID);
+                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
         InfrastructurePlan p2 = new InfrastructurePlan(
-                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID);
+                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
         InfrastructurePlan p3 = p1;
 
         assertTrue(p1.equals(p1));
@@ -175,9 +177,9 @@ class InfrastructurePlanTests {
     @Test
     void hashCodeMethod() {
         InfrastructurePlan p1 = new InfrastructurePlan(
-                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID);
+                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
         InfrastructurePlan p2 = new InfrastructurePlan(
-                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID);
+                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
 
         assertEquals(p1.hashCode(), p1.hashCode());
         assertNotEquals(p1.hashCode(), p2.hashCode());
@@ -189,7 +191,7 @@ class InfrastructurePlanTests {
     void addServiceAssignment_valid() {
         InfrastructurePlan plan = new InfrastructurePlan(
                 randomPeriod(), new MaximumBudget(1_000_000.0), randomServicePolicies(), null, null, null,
-                InfrastructurePlanValidityState.VALID);
+                InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
         Facility facility = randomFacility();
         plan.addFacility(facility);
         ServiceAssignment assignment = randomServiceAssignment(plan, facility);
@@ -203,7 +205,7 @@ class InfrastructurePlanTests {
     @Test
     void addServiceAssignment_invalid_null() {
         InfrastructurePlan plan = new InfrastructurePlan(
-                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID);
+                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
         ServiceAssignment assignment = null;
 
         IllegalArgumentException exc = assertThrows(
@@ -217,7 +219,7 @@ class InfrastructurePlanTests {
     void recalculateTotalCost_exceeded() {
         MaximumBudget smallBudget = new MaximumBudget(1.0);
         InfrastructurePlan plan = new InfrastructurePlan(
-                randomPeriod(), smallBudget, randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID);
+                randomPeriod(), smallBudget, randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
         // Facility with large opening cost
         Facility expensive = new Facility(
             randomName("facility"),
@@ -241,7 +243,7 @@ class InfrastructurePlanTests {
     @Test
     void isPlanValid_afterDiscardingFacility_returnsFalse() {
         InfrastructurePlan plan = new InfrastructurePlan(
-                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID);
+                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
         Facility facility = randomFacility();
         plan.addFacility(facility);
         ServiceAssignment assignment = randomServiceAssignment(plan, facility);
@@ -255,7 +257,7 @@ class InfrastructurePlanTests {
     @Test
     void updateAlgorithmMetrics_valid() {
         InfrastructurePlan plan = new InfrastructurePlan(
-                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID);
+                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
         CollectedWeightKilograms kg = CollectedWeightKilograms.fromKilograms(1000.0);
         CollectedVolumeLiters liters = CollectedVolumeLiters.fromLiters(5000.0);
         Distance distance = Distance.fromKilometers(150.0);
@@ -272,7 +274,7 @@ class InfrastructurePlanTests {
     @Test
     void toStringMethod() {
         InfrastructurePlan plan = new InfrastructurePlan(
-                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID);
+                randomPeriod(), randomMaxBudget(), randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
         String expected = String.format("InfrastructurePlan={id=%s, period=%s, facilities=%s, assignments=%s, totalCost=%s}",
                 plan.getId(), plan.getPeriod(), plan.getSelectedFacilities(), plan.getServiceAssignments(), plan.getEstimatedTotalCost());
 

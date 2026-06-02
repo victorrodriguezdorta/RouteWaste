@@ -1,11 +1,15 @@
-package es.ull.project.application.service.algorithm;
+package es.ull.project.application.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import es.ull.project.adapter.memory.InMemoryInfrastructurePlanRepository;
+import es.ull.project.application.repository.InfrastructurePlanRepository;
+import es.ull.project.application.service.algorithm.CreatePendingInfrastructurePlanService;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
@@ -14,13 +18,22 @@ import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class CreatePendingInfrastructurePlanServiceTests {
+
+    @Mock
+    private InfrastructurePlanRepository infrastructurePlanRepository;
 
     @Test
     void createPending_persistsRunningPlaceholderWithRequestMetadata() {
-        InMemoryInfrastructurePlanRepository repository = new InMemoryInfrastructurePlanRepository();
-        CreatePendingInfrastructurePlanService service = new CreatePendingInfrastructurePlanService(repository);
+        when(this.infrastructurePlanRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        CreatePendingInfrastructurePlanService service =
+                new CreatePendingInfrastructurePlanService(this.infrastructurePlanRepository);
 
         String requestJson = "{\"numberOfDays\":3}";
         InfrastructurePlan plan = service.createPending(
@@ -39,13 +52,16 @@ class CreatePendingInfrastructurePlanServiceTests {
         assertTrue(plan.getExecutedAt().isPresent());
         assertEquals(0, plan.getSelectedFacilities().size());
         assertEquals(0, plan.getDailyPlanIds().size());
-        assertEquals(1, repository.fetchAll().size());
+
+        ArgumentCaptor<InfrastructurePlan> savedPlanCaptor = ArgumentCaptor.forClass(InfrastructurePlan.class);
+        verify(this.infrastructurePlanRepository).save(savedPlanCaptor.capture());
+        assertEquals(plan.getId(), savedPlanCaptor.getValue().getId());
     }
 
     @Test
     void createPending_requiresMaxBudget() {
         CreatePendingInfrastructurePlanService service =
-                new CreatePendingInfrastructurePlanService(new InMemoryInfrastructurePlanRepository());
+                new CreatePendingInfrastructurePlanService(this.infrastructurePlanRepository);
 
         assertThrows(
                 IllegalArgumentException.class,

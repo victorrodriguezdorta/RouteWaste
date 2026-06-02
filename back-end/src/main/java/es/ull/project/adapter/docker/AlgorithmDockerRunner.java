@@ -37,6 +37,7 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
     private static final String CMD_FLAG_FILE = "-f";
     private static final String CMD_RUN = "run";
     private static final String CMD_RM = "--rm";
+    private static final String CMD_INTERACTIVE = "-i";
     private static final String CMD_BUILD = "build";
     private static final String ERR_NO_JSON_PAYLOAD = "The algorithm process did not return a JSON payload";
     private static final String ERR_DOCKER_COMMAND_FAILED = "Failed to execute the docker command";
@@ -65,6 +66,12 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
 
     /**
      * Creates a runner; when {@code dockerImage} is set (profile "docker"), uses {@code docker run -i}.
+     *
+     * @param dockerExecutable path or name of the docker CLI executable
+     * @param projectDirectory base directory where docker compose is located
+     * @param composeFile      compose file name or relative path
+     * @param serviceName      compose service used to run the algorithm
+     * @param dockerImage      pre-built image reference; when blank, compose mode is used
      */
     @Autowired
     public AlgorithmDockerRunner(
@@ -109,6 +116,9 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
 
     /**
      * Runs the algorithm through docker compose.
+     *
+     * @param processedJson JSON payload to send to the algorithm via stdin
+     * @return captured stdout and exit status from the compose run command
      */
     private CommandResult runWithCompose(String processedJson) {
         return this.executeCommandWithStdin(List.of(
@@ -124,14 +134,17 @@ public class AlgorithmDockerRunner implements AlgorithmRunner {
 
     /**
      * Runs a pre-built algorithm image (docker profile / full stack in Docker).
+     *
+     * @param processedJson JSON payload to send to the algorithm via stdin
+     * @return captured stdout and exit status from the docker run command
      */
     private CommandResult runWithDockerImage(String processedJson) {
         logger.info("Using pre-built algorithm image: {}", this.dockerImage);
         return this.executeCommandWithStdin(List.of(
                 this.dockerExecutable,
-                "run",
+                CMD_RUN,
                 CMD_RM,
-                "-i",
+                CMD_INTERACTIVE,
                 this.dockerImage),
                 processedJson);
     }

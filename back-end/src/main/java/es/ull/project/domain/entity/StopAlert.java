@@ -5,11 +5,20 @@ import es.ull.project.domain.valueobject.alert.StopAlertType;
 import es.ull.project.domain.valueobject.alert.StopAlertValue;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Represents an alert generated during stop processing.
  */
 public class StopAlert {
+
+  private static final String STOP_ALERT_ID_REQUIRED = "Stop alert id is required";
+
+  /**
+   * Unique identifier for the stop alert.
+   * It is a computed attribute.
+   */
+  private final UUID id;
 
   /**
    * Type of alert.
@@ -30,7 +39,6 @@ public class StopAlert {
   private final StopAlertValue value;
 
   /**
-   * Restore constructor.
    * Creates a stop alert with an optional numeric context value.
    *
    * @param type the alert type
@@ -38,6 +46,7 @@ public class StopAlert {
    * @param value optional numeric value
    */
   public StopAlert(StopAlertType type, StopAlertMessage message, StopAlertValue value) {
+    this.id = UUID.randomUUID();
     this.type = type;
     this.message = message;
     this.value = value;
@@ -49,9 +58,26 @@ public class StopAlert {
    * @param otherObject the stop alert to copy
    */
   public StopAlert(StopAlert otherObject) {
+    this.id = otherObject.id;
     this.type = otherObject.type;
     this.message = otherObject.message;
     this.value = otherObject.value;
+  }
+
+  /**
+   * Restore constructor.
+   *
+   * @param id alert identifier
+   * @param type the alert type
+   * @param message the alert message
+   * @param value optional numeric value
+   */
+  public StopAlert(UUID id, StopAlertType type, StopAlertMessage message, StopAlertValue value) {
+    validateId(id);
+    this.id = id;
+    this.type = type;
+    this.message = message;
+    this.value = value;
   }
 
   /**
@@ -88,6 +114,26 @@ public class StopAlert {
    */
   public static StopAlert fromValues(String type, String message) {
     return fromValues(type, message, null);
+  }
+
+  /**
+   * Validates that the alert identifier is defined.
+   *
+   * @param id alert identifier
+   */
+  private static void validateId(UUID id) {
+    if (id == null) {
+      throw new IllegalArgumentException(STOP_ALERT_ID_REQUIRED);
+    }
+  }
+
+  /**
+   * Returns the alert identifier.
+   *
+   * @return alert id
+   */
+  public UUID getId() {
+    return this.id;
   }
 
   /**
@@ -132,19 +178,17 @@ public class StopAlert {
       return false;
     }
     StopAlert other = (StopAlert) otherObject;
-    return Objects.equals(this.type, other.type)
-        && Objects.equals(this.message, other.message)
-        && Objects.equals(this.value, other.value);
+    return Objects.equals(this.id, other.id);
   }
 
   /**
-   * Returns a hash code based on all field values.
+   * Returns a hash code based on the alert identifier.
    *
    * @return hash code
    */
   @Override
   public int hashCode() {
-    return Objects.hash(this.type, this.message, this.value);
+    return Objects.hash(this.id);
   }
 
   /**

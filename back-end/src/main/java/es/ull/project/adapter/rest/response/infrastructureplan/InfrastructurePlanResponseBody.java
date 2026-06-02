@@ -13,6 +13,7 @@ import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.TotalCost;
+import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
@@ -114,7 +115,7 @@ public class InfrastructurePlanResponseBody {
     /**
      * Optional failure description when executionState is FAILED.
      */
-    public String failureReason;
+    public InfrastructurePlanFailureReason failureReason;
 
     /**
      * JSON snapshot of the client request used to execute the algorithm.

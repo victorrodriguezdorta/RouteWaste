@@ -5,6 +5,7 @@ import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.TotalCost;
+import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import java.util.UUID;
 
@@ -52,5 +53,5 @@ public class InfrastructurePlanListResponseBody {
     /**
      * Optional failure description when executionState is FAILED.
      */
-    public String failureReason;
+    public InfrastructurePlanFailureReason failureReason;
 }

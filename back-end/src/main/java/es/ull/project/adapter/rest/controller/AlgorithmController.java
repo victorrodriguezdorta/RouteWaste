@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import es.ull.project.adapter.rest.request.algorithm.AlgorithmExecutionRequestBody;
 import es.ull.project.adapter.rest.request.algorithm.FacilityVehiclesSelectionRequestBody;
-import es.ull.project.application.service.algorithm.AlgorithmExecutionJobService;
 import es.ull.project.application.usecase.algorithm.AlgorithmExecutionJobCommand;
 import es.ull.project.application.usecase.algorithm.AlgorithmExecutionSelection;
 import es.ull.project.application.usecase.algorithm.CreatePendingInfrastructurePlanUseCase;
 import es.ull.project.application.usecase.algorithm.ExecuteAlgorithmUseCase;
+import es.ull.project.application.usecase.algorithm.RunAlgorithmExecutionJobAsyncUseCase;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
@@ -75,7 +75,7 @@ public class AlgorithmController {
     private CreatePendingInfrastructurePlanUseCase createPendingInfrastructurePlanUseCase;
 
     @Autowired
-    private AlgorithmExecutionJobService algorithmExecutionJobService;
+    private RunAlgorithmExecutionJobAsyncUseCase runAlgorithmExecutionJobAsyncUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -93,6 +93,7 @@ public class AlgorithmController {
             summary = "Execute the algorithm request flow",
             description = "Validates the request, creates a pending infrastructure plan, and runs the algorithm asynchronously")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Algorithm execution accepted and started asynchronously"),
             @ApiResponse(responseCode = "202", description = "Algorithm execution accepted and started asynchronously"),
             @ApiResponse(responseCode = "400", description = "Invalid request data"),
             @ApiResponse(responseCode = "404", description = "One or more referenced resources were not found"),
@@ -117,13 +118,11 @@ public class AlgorithmController {
         MaximumBudget effectiveMaxBudget = requestBody.maxBudget != null
                 ? requestBody.maxBudget
                 : new MaximumBudget(Double.parseDouble(DEFAULT_BUDGET));
-
         this.executeAlgorithmUseCase.execute(
                 facilitiesWithVehicles,
                 selectedContainerIds,
                 numberOfDaysVo,
                 averagePickupTimeMinutesVo);
-
         AlgorithmJsonPayload executionRequestJson;
         try {
             executionRequestJson = new AlgorithmJsonPayload(this.objectMapper.writeValueAsString(requestBody));
@@ -134,13 +133,11 @@ public class AlgorithmController {
             error.put(KEY_DETAILS, e.getMessage() != null ? e.getMessage() : EMPTY_STRING);
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         InfrastructurePlan pendingPlan = this.createPendingInfrastructurePlanUseCase.createPending(
                 numberOfDaysVo,
                 averagePickupTimeMinutesVo,
                 effectiveMaxBudget,
                 executionRequestJson);
-
         AlgorithmExecutionJobCommand jobCommand = new AlgorithmExecutionJobCommand(
                 pendingPlan.getId(),
                 facilitiesWithVehicles,
@@ -149,8 +146,7 @@ public class AlgorithmController {
                 averagePickupTimeMinutesVo,
                 effectiveMaxBudget,
                 executionRequestJson);
-        this.algorithmExecutionJobService.runAsync(jobCommand);
-
+        this.runAlgorithmExecutionJobAsyncUseCase.runAsync(jobCommand);
         ObjectNode accepted = this.objectMapper.createObjectNode();
         accepted.put(KEY_STATUS, STATUS_ACCEPTED);
         accepted.put(KEY_MESSAGE, MSG_ACCEPTED);
@@ -159,6 +155,12 @@ public class AlgorithmController {
         return new ResponseEntity<>(accepted, HttpStatus.ACCEPTED);
     }
 
+    /**
+     * Maps REST facility-vehicle selections to domain execution selections.
+     *
+     * @param requestSelections facility and vehicle selections from the request body
+     * @return mapped selections for the use case layer
+     */
     private List<AlgorithmExecutionSelection> mapFacilitySelections(
             List<FacilityVehiclesSelectionRequestBody> requestSelections) {
         if (requestSelections == null) {
@@ -169,6 +171,12 @@ public class AlgorithmController {
                 .toList();
     }
 
+    /**
+     * Maps a single facility-vehicle selection to a domain execution selection.
+     *
+     * @param requestSelection one facility with its selected vehicles
+     * @return mapped selection for the use case layer
+     */
     private AlgorithmExecutionSelection mapFacilitySelection(FacilityVehiclesSelectionRequestBody requestSelection) {
         if (requestSelection == null) {
             throw new IllegalArgumentException(ERR_NO_SELECTION);
@@ -178,6 +186,13 @@ public class AlgorithmController {
                 requestSelection.selectedVehicleIds != null ? requestSelection.selectedVehicleIds : this.emptyOrThrow());
     }
 
+    /**
+     * Returns the UUID when present; otherwise throws with the field name in the message.
+     *
+     * @param value     UUID to validate
+     * @param fieldName field name used in the error message
+     * @return the non-null UUID
+     */
     private UUID requireNonNull(UUID value, String fieldName) {
         if (value == null) {
             throw new IllegalArgumentException(fieldName + " is required");
@@ -185,10 +200,23 @@ public class AlgorithmController {
         return value;
     }
 
+    /**
+     * Signals that a required identifier list was not provided in the request.
+     *
+     * @return never returns normally
+     */
     private List<UUID> emptyOrThrow() {
         throw new IllegalArgumentException(ERR_NO_IDS);
     }
 
+    /**
+     * Returns the value when present; otherwise throws with the field name in the message.
+     *
+     * @param <T>       type of the validated value
+     * @param value     value to validate
+     * @param fieldName field name used in the error message
+     * @return the non-null value
+     */
     private <T> T requireNonNull(T value, String fieldName) {
         if (value == null) {
             throw new IllegalArgumentException(fieldName + " is required");

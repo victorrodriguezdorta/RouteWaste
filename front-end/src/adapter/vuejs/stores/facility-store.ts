@@ -1,5 +1,6 @@
 import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
 import { FacilityHttpRepository } from '@/adapter/http/facility-http-repository';
+import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { CreateFacilityService } from '@/application/service/facility/create-facility-service';
 import { DeleteFacilityService } from '@/application/service/facility/delete-facility-service';
 import { FilterFacilitiesService } from '@/application/service/facility/filter-facilities-service';
@@ -10,7 +11,6 @@ import type { Facility } from '@/domain/entity/facility';
 import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
-import { resolveBackendError } from '../utils/translate-backend-error';
 
 /**
  * Facility Store

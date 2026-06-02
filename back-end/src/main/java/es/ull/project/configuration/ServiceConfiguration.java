@@ -1,6 +1,8 @@
 package es.ull.project.configuration;
 
+import es.ull.project.application.port.algorithm.AlgorithmExecutionPayloadSerializer;
 import es.ull.project.application.port.algorithm.AlgorithmRunner;
+import es.ull.project.application.port.infrastructureplan.InfrastructurePlanExecutionNotifier;
 import es.ull.project.application.repository.ContainerDailyStateRepository;
 import es.ull.project.application.repository.ContainerRepository;
 import es.ull.project.application.repository.DailyPlanRepository;
@@ -11,6 +13,7 @@ import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.application.service.algorithm.CreatePendingInfrastructurePlanService;
 import es.ull.project.application.service.algorithm.ExecuteAlgorithmService;
 import es.ull.project.application.service.algorithm.PersistAlgorithmExecutionResultService;
+import es.ull.project.application.service.algorithm.RunAlgorithmExecutionJobService;
 import es.ull.project.application.service.algorithm.RunAlgorithmService;
 import es.ull.project.application.service.container.BulkCreateContainersService;
 import es.ull.project.application.service.container.CreateContainerService;
@@ -36,6 +39,8 @@ import es.ull.project.application.service.vehicle.UpdateVehicleService;
 import es.ull.project.application.usecase.algorithm.CreatePendingInfrastructurePlanUseCase;
 import es.ull.project.application.usecase.algorithm.ExecuteAlgorithmUseCase;
 import es.ull.project.application.usecase.algorithm.PersistAlgorithmExecutionResultUseCase;
+import es.ull.project.application.usecase.algorithm.RunAlgorithmExecutionJobAsyncUseCase;
+import es.ull.project.application.usecase.algorithm.RunAlgorithmExecutionJobUseCase;
 import es.ull.project.application.usecase.algorithm.RunAlgorithmUseCase;
 import es.ull.project.application.usecase.container.BulkCreateContainersUseCase;
 import es.ull.project.application.usecase.container.CreateContainerUseCase;
@@ -118,6 +123,43 @@ public class ServiceConfiguration {
     public CreatePendingInfrastructurePlanUseCase createPendingInfrastructurePlanService(
             InfrastructurePlanRepository infrastructurePlanRepository) {
         return new CreatePendingInfrastructurePlanService(infrastructurePlanRepository);
+    }
+
+    /**
+     * Exposes asynchronous algorithm job execution to adapters.
+     *
+     * @param runAlgorithmExecutionJobUseCase synchronous job use case
+     * @return async runner delegating to the job use case
+     */
+    @Bean
+    public RunAlgorithmExecutionJobAsyncUseCase runAlgorithmExecutionJobAsyncUseCase(
+            RunAlgorithmExecutionJobUseCase runAlgorithmExecutionJobUseCase) {
+        return new AsyncRunAlgorithmExecutionJobRunner(runAlgorithmExecutionJobUseCase);
+    }
+
+    /**
+     * Creates the service bean that runs the asynchronous algorithm execution pipeline.
+     *
+     * @param executeAlgorithmUseCase                resolves request identifiers
+     * @param runAlgorithmUseCase                    invokes the external algorithm runner
+     * @param persistAlgorithmExecutionResultUseCase completes or fails the pending plan
+     * @param executionNotifier                      notifies clients of plan state changes
+     * @param payloadSerializer                      builds JSON for the algorithm runner
+     * @return configured {@link RunAlgorithmExecutionJobService} instance
+     */
+    @Bean
+    public RunAlgorithmExecutionJobUseCase runAlgorithmExecutionJobService(
+            ExecuteAlgorithmUseCase executeAlgorithmUseCase,
+            RunAlgorithmUseCase runAlgorithmUseCase,
+            PersistAlgorithmExecutionResultUseCase persistAlgorithmExecutionResultUseCase,
+            InfrastructurePlanExecutionNotifier executionNotifier,
+            AlgorithmExecutionPayloadSerializer payloadSerializer) {
+        return new RunAlgorithmExecutionJobService(
+                executeAlgorithmUseCase,
+                runAlgorithmUseCase,
+                persistAlgorithmExecutionResultUseCase,
+                executionNotifier,
+                payloadSerializer);
     }
 
     /**

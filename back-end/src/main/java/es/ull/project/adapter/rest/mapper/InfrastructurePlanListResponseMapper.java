@@ -2,6 +2,7 @@ package es.ull.project.adapter.rest.mapper;
 
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanListResponseBody;
 import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 
 /**
  * Mapper class to convert InfrastructurePlan domain entities to lightweight list response DTOs.
@@ -32,7 +33,9 @@ public class InfrastructurePlanListResponseMapper {
         responseBody.averagePickupTimeMinutes = plan.getAveragePickupTimeMinutes().orElse(null);
         responseBody.validityState = plan.getValidityState();
         responseBody.executionState = plan.getExecutionState();
-        responseBody.failureReason = plan.getFailureReason().orElse(null);
+        responseBody.failureReason = plan.getFailureReason()
+                .map(InfrastructurePlanFailureReason::new)
+                .orElse(null);
         return responseBody;
     }
 }

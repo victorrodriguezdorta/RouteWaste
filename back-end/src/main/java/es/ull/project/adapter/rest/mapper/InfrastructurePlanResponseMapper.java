@@ -13,6 +13,7 @@ import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import es.ull.project.domain.valueobject.name.Name;
 import es.ull.project.domain.valueobject.time.PlanDay;
 import java.util.ArrayList;
@@ -84,7 +85,9 @@ public class InfrastructurePlanResponseMapper {
         responseBody.executedAt = plan.getExecutedAt().orElse(null);
         responseBody.validityState = plan.getValidityState();
         responseBody.executionState = plan.getExecutionState();
-        responseBody.failureReason = plan.getFailureReason().orElse(null);
+        responseBody.failureReason = plan.getFailureReason()
+                .map(InfrastructurePlanFailureReason::new)
+                .orElse(null);
         responseBody.executionRequestJson = plan.getExecutionRequestJson()
                 .map(AlgorithmJsonPayload::new)
                 .orElse(null);

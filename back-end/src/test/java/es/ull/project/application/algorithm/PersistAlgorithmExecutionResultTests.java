@@ -1,4 +1,4 @@
-package es.ull.project.application.service.algorithm;
+package es.ull.project.application.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,6 +28,8 @@ import es.ull.project.application.repository.FacilityRepository;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.repository.ServiceAssignmentRepository;
 import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.application.service.algorithm.CreatePendingInfrastructurePlanService;
+import es.ull.project.application.service.algorithm.PersistAlgorithmExecutionResultService;
 import es.ull.project.application.usecase.algorithm.PersistAlgorithmExecutionResultUseCase;
 import es.ull.project.domain.InfrastructurePlanAggregateReferences;
 import es.ull.project.domain.entity.Container;
@@ -194,7 +196,8 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
                 new MaximumBudget(1000.0),
                 null);
 
-        InfrastructurePlan failed = persistService.markExecutionFailed(pending.getId(), "Docker timeout");
+        InfrastructurePlan failed = persistService.markExecutionFailed(
+                pending.getId(), new es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason("Docker timeout"));
 
         assertEquals(InfrastructurePlanExecutionState.FAILED, failed.getExecutionState());
         assertEquals("Docker timeout", failed.getFailureReason().orElseThrow());
@@ -222,7 +225,9 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
     }
 
     @Override
-    public InfrastructurePlan markExecutionFailed(UUID planId, String failureReason) {
+    public InfrastructurePlan markExecutionFailed(
+            UUID planId,
+            es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason failureReason) {
         throw new UnsupportedOperationException("Test class does not implement production persistence.");
     }
 

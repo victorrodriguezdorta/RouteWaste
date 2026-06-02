@@ -3,6 +3,7 @@ package es.ull.project.application.service.algorithm;
 import es.ull.project.application.repository.InfrastructurePlanRepository;
 import es.ull.project.application.usecase.algorithm.CreatePendingInfrastructurePlanUseCase;
 import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
@@ -34,7 +35,13 @@ public class CreatePendingInfrastructurePlanService implements CreatePendingInfr
     }
 
     /**
-     * {@inheritDoc}
+     * Creates and stores an infrastructure plan in {@code RUNNING} state with request metadata only.
+     *
+     * @param numberOfDays               planning horizon from the client request
+     * @param averagePickupTimeMinutes   average pickup time from the client request
+     * @param maxBudget                  maximum budget from the client request (required)
+     * @param executionRequestJson       JSON snapshot of the client execution request
+     * @return the persisted placeholder plan
      */
     @Override
     public InfrastructurePlan createPending(
@@ -60,7 +67,8 @@ public class CreatePendingInfrastructurePlanService implements CreatePendingInfr
                 numberOfDays,
                 averagePickupTimeMinutes,
                 startedAt,
-                InfrastructurePlanValidityState.RUNNING);
+                InfrastructurePlanValidityState.RUNNING,
+                InfrastructurePlanExecutionState.RUNNING);
         plan.markExecutionRunning();
         if (executionRequestJson != null) {
             plan.assignExecutionRequestSnapshot(executionRequestJson.getJson());

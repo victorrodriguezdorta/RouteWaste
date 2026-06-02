@@ -15,6 +15,8 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
 
     private static final String FIELD_ID = "id";
     private static final String FIELD_VALIDITY_STATE = "validityState";
+    private static final String FIELD_EXECUTION_STATE = "executionState";
+    private static final String FIELD_FAILURE_REASON = "failureReason";
     private static final String FIELD_EXECUTION_REQUEST_JSON = "executionRequestJson";
     private static final String FIELD_EXECUTED_AT = "executedAt";
     private static final String FIELD_PERIOD = "period";
@@ -77,6 +79,12 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
         gen.writeStringField(FIELD_ID, value.id.toString());
         if (value.validityState != null) {
             gen.writeStringField(FIELD_VALIDITY_STATE, value.validityState.name());
+        }
+        if (value.executionState != null) {
+            gen.writeStringField(FIELD_EXECUTION_STATE, value.executionState.name());
+        }
+        if (value.failureReason != null) {
+            gen.writeStringField(FIELD_FAILURE_REASON, value.failureReason.getValue());
         }
         if (value.executionRequestJson != null) {
             gen.writeStringField(FIELD_EXECUTION_REQUEST_JSON, value.executionRequestJson.getJson());

@@ -1,5 +1,6 @@
 import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
 import { VehicleHttpRepository } from '@/adapter/http/vehicle-http-repository';
+import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { CreateVehicleService } from '@/application/service/vehicle/create-vehicle-service';
 import { DeleteVehicleService } from '@/application/service/vehicle/delete-vehicle-service';
 import { GetVehicleService } from '@/application/service/vehicle/get-vehicle-service';
@@ -9,7 +10,6 @@ import type { Vehicle } from '@/domain/entity/vehicle';
 import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
-import { resolveBackendError } from '../utils/translate-backend-error';
 
 /**
  * Vehicle Store

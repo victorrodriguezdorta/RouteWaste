@@ -5,6 +5,7 @@ import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
+import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import java.util.UUID;
 
 /**
@@ -55,5 +56,5 @@ public interface PersistAlgorithmExecutionResultUseCase {
      * @param failureReason  optional human-readable failure description
      * @return the updated infrastructure plan in {@code FAILED} state
      */
-    InfrastructurePlan markExecutionFailed(UUID planId, String failureReason);
+    InfrastructurePlan markExecutionFailed(UUID planId, InfrastructurePlanFailureReason failureReason);
 }

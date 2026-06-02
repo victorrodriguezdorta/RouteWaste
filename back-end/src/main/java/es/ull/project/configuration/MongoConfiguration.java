@@ -202,7 +202,7 @@ public class MongoConfiguration extends AbstractMongoClientConfiguration {
                 Arrays.asList(
                         new ContainerReadingConverter(this),
                         new ContainerWritingConverter(this),
-                        new ContainerDailyStateReadingConverter(),
+                        new ContainerDailyStateReadingConverter(this),
                         new ContainerDailyStateWritingConverter(),
                         new DailyPlanReadingConverter(this),
                         new DailyPlanWritingConverter(this),

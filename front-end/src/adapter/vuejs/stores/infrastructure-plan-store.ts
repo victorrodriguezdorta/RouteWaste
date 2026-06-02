@@ -1,12 +1,12 @@
 import type { InfrastructurePlanSummaryJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-summary-json-response';
 import { InfrastructurePlanHttpRepository } from '@/adapter/http/infrastructure-plan-http-repository';
+import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { DeleteInfrastructurePlanService } from '@/application/service/infrastructure-plan/delete-infrastructure-plan-service';
 import { GetInfrastructurePlanService } from '@/application/service/infrastructure-plan/get-infrastructure-plan-service';
 import { ListInfrastructurePlansService } from '@/application/service/infrastructure-plan/list-infrastructure-plans-service';
 import type { InfrastructurePlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
-import { resolveBackendError } from '../utils/translate-backend-error';
 
 /**
  * Infrastructure Plan Store

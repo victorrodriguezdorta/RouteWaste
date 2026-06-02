@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
+import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
@@ -94,7 +95,7 @@ class ServiceAssignmentTests {
                 null,
                 null,
                 null,
-                InfrastructurePlanValidityState.VALID);
+                InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
     }
 
     // ========== Constructors ==========

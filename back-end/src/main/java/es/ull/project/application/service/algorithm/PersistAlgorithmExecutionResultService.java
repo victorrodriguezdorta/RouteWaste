@@ -28,6 +28,7 @@ import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.route.RouteSequence;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
@@ -165,7 +166,15 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Completes a placeholder plan created in {@code RUNNING} state with algorithm output.
+	 *
+	 * @param planId                     identifier of the pending infrastructure plan
+	 * @param algorithmResponse          JSON returned by the algorithm runner
+	 * @param numberOfDays               number of days for the planning period
+	 * @param averagePickupTimeMinutes   average pickup time in minutes
+	 * @param providedMaxBudget          optional maximum budget provided in the request
+	 * @param executionRequestJson       JSON snapshot of the client request (may be null)
+	 * @return the updated infrastructure plan in {@code COMPLETED} state
 	 */
 	@Override
 	public InfrastructurePlan complete(
@@ -202,10 +211,14 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Marks a pending plan as failed when asynchronous execution cannot finish successfully.
+	 *
+	 * @param planId         identifier of the pending infrastructure plan
+	 * @param failureReason  optional human-readable failure description
+	 * @return the updated infrastructure plan in {@code FAILED} state
 	 */
 	@Override
-	public InfrastructurePlan markExecutionFailed(UUID planId, String failureReason) {
+	public InfrastructurePlan markExecutionFailed(UUID planId, InfrastructurePlanFailureReason failureReason) {
 		if (planId == null) {
 			throw new IllegalArgumentException(ERR_PLAN_NOT_FOUND);
 		}
@@ -214,7 +227,8 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 		if (!plan.isExecutionRunning()) {
 			throw new IllegalStateException(ERR_PLAN_NOT_RUNNING + planId);
 		}
-		plan.markExecutionFailed(failureReason);
+		String failureReasonText = failureReason != null ? failureReason.getValue() : null;
+		plan.markExecutionFailed(failureReasonText);
 		return this.infrastructurePlanRepository.save(plan);
 	}
 
@@ -272,7 +286,8 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 					numberOfDays,
 					averagePickupTimeMinutes,
 					executedAt != null ? new ExecutedAt(executedAt) : null,
-					InfrastructurePlanValidityState.VALID);
+					InfrastructurePlanValidityState.VALID,
+					InfrastructurePlanExecutionState.COMPLETED);
 		}
 		Map<UUID, Facility> facilitiesById = new LinkedHashMap<>();
 		Map<UUID, Container> containersById = new LinkedHashMap<>();
@@ -340,7 +355,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			logger.warn("No daily plans found in algorithm response");
 		}
 		JSONArray containerStateMonitoringNode = algorithmResponse.optJSONArray(FIELD_CONTAINER_STATE_MONITORING);
-		List<ContainerDailyState> containerDailyStates = readContainerDailyStates(containerStateMonitoringNode, plan.getId());
+		List<ContainerDailyState> containerDailyStates = readContainerDailyStates(containerStateMonitoringNode, plan);
 		for (ContainerDailyState containerDailyState : containerDailyStates) {
 			plan.addContainerDailyState(containerDailyState);
 			if (this.containerDailyStateRepository != null) {
@@ -494,10 +509,10 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	 * Reads container daily state monitoring entries from the algorithm response.
 	 *
 	 * @param containerStateMonitoringNode JSON array with container daily states
-	 * @param infrastructurePlanId         parent plan id (must match persisted plan)
+	 * @param infrastructurePlan           parent plan being completed
 	 * @return list of parsed ContainerDailyState entities
 	 */
-	private List<ContainerDailyState> readContainerDailyStates(JSONArray containerStateMonitoringNode, UUID infrastructurePlanId) {
+	private List<ContainerDailyState> readContainerDailyStates(JSONArray containerStateMonitoringNode, InfrastructurePlan infrastructurePlan) {
 		List<ContainerDailyState> containerDailyStates = new ArrayList<>();
 		if (containerStateMonitoringNode == null) {
 			return containerDailyStates;
@@ -525,16 +540,19 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 					: null;
 			ContainerStatus status = ContainerStatus.fromString(statusRaw);
 			try {
+				UUID containerUuid = UUID.fromString(containerId);
+				Container container = this.containerRepository.findById(containerUuid)
+						.orElseThrow(() -> new NoSuchElementException("Container not found: " + containerUuid));
 				ContainerDailyState containerDailyState = new ContainerDailyState(
-						infrastructurePlanId,
-						UUID.fromString(containerId),
+						infrastructurePlan,
+						container,
 						new PlanDay(planDay),
 						CollectedVolumeLiters.fromLiters(dailyFillingLiters),
 						new ContainerCapacityLiters(containerCapacityLiters),
 						new DailyWasteDemandLitersPerDay(dailyDemandLitersPerDay),
 						status);
 				containerDailyStates.add(containerDailyState);
-			} catch (IllegalArgumentException ex) {
+			} catch (IllegalArgumentException | NoSuchElementException ex) {
 				logger.debug("Skipping invalid container daily state node: {}", ex.getMessage());
 			}
 		}

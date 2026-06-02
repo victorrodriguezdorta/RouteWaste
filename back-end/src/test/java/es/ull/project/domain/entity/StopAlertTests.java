@@ -48,7 +48,7 @@ class StopAlertTests {
     @Test
     void equalsAndHashCode() {
         StopAlert alert = StopAlert.fromValues("VEHICLE_FULL", "Vehicle is full", 42.0);
-        StopAlert same = StopAlert.fromValues("VEHICLE_FULL", "Vehicle is full", 42.0);
+        StopAlert same = new StopAlert(alert);
         StopAlert different = StopAlert.fromValues("CONTAINER_OVERFLOWED", "Container overflowed", 10.0);
 
         assertTrue(alert.equals(alert));

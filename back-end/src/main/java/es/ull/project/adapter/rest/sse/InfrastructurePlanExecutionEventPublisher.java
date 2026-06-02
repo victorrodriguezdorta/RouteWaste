@@ -2,7 +2,9 @@ package es.ull.project.adapter.rest.sse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.ull.project.application.port.infrastructureplan.InfrastructurePlanExecutionNotifier;
 import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
+import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  * Manages SSE subscribers and broadcasts infrastructure plan execution updates.
  */
 @Component
-public class InfrastructurePlanExecutionEventPublisher {
+public class InfrastructurePlanExecutionEventPublisher implements InfrastructurePlanExecutionNotifier {
 
     private static final Logger logger = LoggerFactory.getLogger(InfrastructurePlanExecutionEventPublisher.class);
     private static final String EVENT_PLAN_UPDATED = "plan-updated";
@@ -54,6 +56,22 @@ public class InfrastructurePlanExecutionEventPublisher {
     }
 
     /**
+     * Notifies subscribers that a plan execution state changed.
+     *
+     * @param planId         updated plan identifier
+     * @param executionState new execution state
+     * @param failureReason  optional failure description
+     */
+    @Override
+    public void notifyPlanUpdated(
+            UUID planId,
+            InfrastructurePlanExecutionState executionState,
+            InfrastructurePlanFailureReason failureReason) {
+        String failureReasonText = failureReason != null ? failureReason.getValue() : null;
+        this.publishPlanUpdated(planId, executionState, failureReasonText);
+    }
+
+    /**
      * Broadcasts a plan execution state change to all connected clients.
      *
      * @param planId          updated plan identifier
@@ -86,6 +104,11 @@ public class InfrastructurePlanExecutionEventPublisher {
         }
     }
 
+    /**
+     * Removes a disconnected or failed emitter from the subscriber list and completes it.
+     *
+     * @param emitter SSE connection to unregister
+     */
     private void remove(SseEmitter emitter) {
         this.emitters.remove(emitter);
         try {

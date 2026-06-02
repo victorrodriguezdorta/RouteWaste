@@ -20,6 +20,9 @@ public final class InfrastructurePlanListDocumentMapper {
 
     private static final String UTILITY_CLASS_EXCEPTION_MESSAGE = "Utility class cannot be instantiated";
 
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
     private InfrastructurePlanListDocumentMapper() {
         throw new UnsupportedOperationException(UTILITY_CLASS_EXCEPTION_MESSAGE);
     }
@@ -61,6 +64,12 @@ public final class InfrastructurePlanListDocumentMapper {
                 failureReason);
     }
 
+    /**
+     * Reads the estimated total cost embedded document from a list projection.
+     *
+     * @param document projected MongoDB document
+     * @return parsed total cost, or {@code null} when absent or incomplete
+     */
     private static TotalCost readEstimatedTotalCost(Document document) {
         Document totalCostDocument = document.get(MongoFields.ESTIMATED_TOTAL_COST, Document.class);
         if (totalCostDocument == null) {

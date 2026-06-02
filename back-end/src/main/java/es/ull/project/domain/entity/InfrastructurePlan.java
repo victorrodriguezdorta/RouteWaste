@@ -10,6 +10,7 @@ import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.TotalCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
@@ -138,7 +139,7 @@ public class InfrastructurePlan {
      * Optional error description when {@link #executionState} is {@link InfrastructurePlanExecutionState#FAILED}.
      * It is an optional attribute.
      */
-    private String failureReason;
+    private InfrastructurePlanFailureReason failureReason;
 
     /**
      * JSON snapshot of the client execution request used to run the algorithm (identifiers and parameters).
@@ -162,6 +163,7 @@ public class InfrastructurePlan {
      * @param averagePickupTimeMinutes Average pickup time in minutes
      * @param executedAt               Timestamp of algorithm execution (ISO 8601)
      * @param validityState            Initial validity state
+     * @param executionState           Initial algorithm execution lifecycle state
      */
     public InfrastructurePlan(
             PlanningPeriod period,
@@ -170,10 +172,12 @@ public class InfrastructurePlan {
             NumberOfDays numberOfDays,
             AveragePickupTimeMinutes averagePickupTimeMinutes,
             ExecutedAt executedAt,
-            InfrastructurePlanValidityState validityState) {
+            InfrastructurePlanValidityState validityState,
+            InfrastructurePlanExecutionState executionState) {
         validatePeriod(period);
         validateMaxBudget(maxBudget);
         validateValidityState(validityState);
+        validateExecutionState(executionState);
         this.id = UUID.randomUUID();
         this.period = period;
         this.maxBudget = maxBudget;
@@ -190,7 +194,7 @@ public class InfrastructurePlan {
         this.totalDistanceMeters = Distance.fromMeters(0.0);
         this.containerDailyStates = new ArrayList<>();
         this.validityState = validityState;
-        this.executionState = InfrastructurePlanExecutionState.COMPLETED;
+        this.executionState = executionState;
         this.failureReason = null;
         this.executionRequestJson = null;
     }
@@ -263,7 +267,7 @@ public class InfrastructurePlan {
             ExecutedAt executedAt,
             InfrastructurePlanValidityState validityState,
             InfrastructurePlanExecutionState executionState,
-            String failureReason,
+            InfrastructurePlanFailureReason failureReason,
             AlgorithmJsonPayload executionRequestJson,
             List<ContainerDailyState> containerDailyStates) {
         validatePeriod(period);
@@ -320,7 +324,7 @@ public class InfrastructurePlan {
             ExecutedAt executedAt,
             InfrastructurePlanValidityState validityState,
             InfrastructurePlanExecutionState executionState,
-            String failureReason,
+            InfrastructurePlanFailureReason failureReason,
             AlgorithmJsonPayload executionRequestJson) {
         this(id, period, null, null, null, servicePolicies, maxBudget, null, null, null, null,
                 numberOfDays, averagePickupTimeMinutes, executedAt, validityState, executionState, failureReason,
@@ -390,7 +394,7 @@ public class InfrastructurePlan {
                 executedAt,
                 validityState,
                 executionState,
-                failureReason,
+                InfrastructurePlanFailureReason.fromNullable(failureReason),
                 null,
                 null);
     }
@@ -755,7 +759,7 @@ public class InfrastructurePlan {
      * @return optional failure description
      */
     public Optional<String> getFailureReason() {
-        return Optional.ofNullable(failureReason).filter(reason -> !reason.isBlank());
+        return Optional.ofNullable(failureReason).map(InfrastructurePlanFailureReason::getValue);
     }
 
     /**
@@ -798,7 +802,7 @@ public class InfrastructurePlan {
     public void markExecutionFailed(String reason) {
         validateExecutionState(InfrastructurePlanExecutionState.FAILED);
         this.executionState = InfrastructurePlanExecutionState.FAILED;
-        this.failureReason = reason != null && !reason.isBlank() ? reason.trim() : null;
+        this.failureReason = InfrastructurePlanFailureReason.fromNullable(reason);
     }
 
     /**

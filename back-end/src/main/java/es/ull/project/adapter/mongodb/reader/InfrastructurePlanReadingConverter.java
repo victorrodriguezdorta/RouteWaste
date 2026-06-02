@@ -13,6 +13,7 @@ import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.TotalCost;
+import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
@@ -173,7 +174,7 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
                 && executionState == InfrastructurePlanExecutionState.RUNNING) {
             validityState = InfrastructurePlanValidityState.RUNNING;
         }
-        String failureReason = document.getString(MongoFields.FAILURE_REASON);
+        String failureReasonRaw = document.getString(MongoFields.FAILURE_REASON);
         String executionRequestJson = document.getString(MongoFields.EXECUTION_REQUEST_JSON);
         InfrastructurePlan plan = new InfrastructurePlan(
             id,
@@ -192,7 +193,7 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
             executedAt,
             validityState,
             executionState,
-            failureReason,
+            InfrastructurePlanFailureReason.fromNullable(failureReasonRaw),
             executionRequestJson != null && !executionRequestJson.isBlank() ? new AlgorithmJsonPayload(executionRequestJson) : null,
             containerDailyStates
         );

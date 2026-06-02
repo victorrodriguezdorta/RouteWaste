@@ -1,5 +1,6 @@
 import { ContainerHttpRepository } from '@/adapter/http/container-http-repository';
 import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
+import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { CreateContainerService } from '@/application/service/container/create-container-service';
 import { DeleteContainerService } from '@/application/service/container/delete-container-service';
 import { GetContainerService } from '@/application/service/container/get-container-service';
@@ -9,7 +10,6 @@ import type { Container } from '@/domain/entity/container';
 import type { EntityTypeStatistics } from '@/domain/read-model/entity-type-statistics';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { defineStore } from 'pinia';
-import { resolveBackendError } from '../utils/translate-backend-error';
 
 /**
  * Container Store

@@ -1,25 +1,7 @@
-import { i18n } from '../i18n';
-
-export type StoreErrorContext =
-  | 'vehicle'
-  | 'facility'
-  | 'container'
-  | 'algorithm'
-  | 'infrastructurePlan'
-  | 'generic';
-
-export interface ResolvedBackendError {
-  title: string;
-  message: string;
-}
-
-type BackendErrorPayload = {
-  kind?: string;
-  error?: unknown;
-  message?: unknown;
-  details?: unknown;
-  status?: string;
-};
+import { i18n } from '@/adapter/vuejs/i18n';
+import type { BackendErrorPayload } from '@/adapter/vuejs/utils/backend-error-payload';
+import type { ResolvedBackendError } from '@/adapter/vuejs/utils/resolved-backend-error';
+import type { StoreErrorContext } from '@/adapter/vuejs/utils/store-error-context';
 
 /** Exact English messages returned by the backend → i18n key under common.errors.backend */
 const BACKEND_MESSAGE_KEYS: Record<string, string> = {

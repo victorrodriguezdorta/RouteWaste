@@ -2,7 +2,6 @@ package es.ull.project.adapter.rest.controller;
 
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.adapter.mongodb.mapper.InfrastructurePlanFieldMapper;
-import es.ull.project.adapter.rest.sse.InfrastructurePlanExecutionEventPublisher;
 import es.ull.project.adapter.rest.mapper.DailyPlanResponseMapper;
 import es.ull.project.adapter.rest.mapper.InfrastructurePlanListResponseMapper;
 import es.ull.project.adapter.rest.mapper.InfrastructurePlanResponseMapper;
@@ -10,6 +9,7 @@ import es.ull.project.adapter.rest.response.dailyplan.DailyPlanResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanListResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanPageResponseBody;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanResponseBody;
+import es.ull.project.adapter.rest.sse.InfrastructurePlanExecutionEventPublisher;
 import es.ull.project.application.usecase.dailyplan.ReadDailyPlanUseCase;
 import es.ull.project.application.usecase.infrastructureplan.DeleteInfrastructurePlanUseCase;
 import es.ull.project.application.usecase.infrastructureplan.ReadInfrastructurePlanUseCase;
@@ -83,7 +83,8 @@ public class InfrastructurePlanController {
             summary = "Subscribe to infrastructure plan execution events",
             description = "Server-sent events stream notifying when plan execution state changes")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "SSE stream opened")
+            @ApiResponse(responseCode = "200", description = "SSE stream opened"),
+            @ApiResponse(responseCode = "500", description = "The event stream could not be established")
     })
     @GetMapping(value = "/execution-events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeToExecutionEvents() {
