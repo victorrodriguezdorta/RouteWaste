@@ -1,5 +1,6 @@
 import type { InfrastructurePlanSummaryJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-summary-json-response';
 import { InfrastructurePlanHttpRepository } from '@/adapter/http/infrastructure-plan-http-repository';
+import { resolveStoreSuccessNotification } from '@/adapter/vuejs/utils/store-notification-messages';
 import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { DeleteInfrastructurePlanService } from '@/application/service/infrastructure-plan/delete-infrastructure-plan-service';
 import { GetInfrastructurePlanService } from '@/application/service/infrastructure-plan/get-infrastructure-plan-service';
@@ -192,12 +193,12 @@ export const useInfrastructurePlanStore = defineStore('InfrastructurePlan', {
           // Success case: remove from local array and notify
           if (success) {
             this.infrastructurePlans = this.infrastructurePlans.filter(plan => plan.id !== id);
-            this.setNotification(
-              'Success', 
-              'Infrastructure plan deleted successfully', 
-              'mdi-check', 
-              'success'
-            );
+            {
+              const { title, message } = resolveStoreSuccessNotification(
+                'common.notifications.infrastructurePlanDeleted'
+              );
+              this.setNotification(title, message, 'mdi-check', 'success');
+            }
           }
         }
       );

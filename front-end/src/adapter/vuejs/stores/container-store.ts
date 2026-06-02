@@ -1,5 +1,6 @@
 import { ContainerHttpRepository } from '@/adapter/http/container-http-repository';
 import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
+import { resolveStoreSuccessNotification } from '@/adapter/vuejs/utils/store-notification-messages';
 import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { CreateContainerService } from '@/application/service/container/create-container-service';
 import { DeleteContainerService } from '@/application/service/container/delete-container-service';
@@ -210,12 +211,12 @@ export const useContainerStore = defineStore('Container', {
         data => {
           // Success case: add to local array and notify
           this.containers.push(data);
-          this.setNotification(
-            'Success', 
-            'Container added successfully', 
-            'mdi-check', 
-            'success'
-          );
+          {
+            const { title, message } = resolveStoreSuccessNotification(
+              'common.notifications.containerAdded'
+            );
+            this.setNotification(title, message, 'mdi-check', 'success');
+          }
         }
       );
     },
@@ -257,12 +258,12 @@ export const useContainerStore = defineStore('Container', {
           this.containers = this.containers.map(c => 
             c.getId().equals(data.getId()) ? data : c
           );
-          this.setNotification(
-            'Success', 
-            'Container updated successfully', 
-            'mdi-check', 
-            'success'
-          );
+          {
+            const { title, message } = resolveStoreSuccessNotification(
+              'common.notifications.containerUpdated'
+            );
+            this.setNotification(title, message, 'mdi-check', 'success');
+          }
         }
       );
     },
@@ -316,12 +317,12 @@ export const useContainerStore = defineStore('Container', {
             this.containers = this.containers.filter(container => 
               container.getId().toString() !== id
             );
-            this.setNotification(
-              'Success', 
-              'Container deleted successfully', 
-              'mdi-check', 
-              'success'
-            );
+            {
+              const { title, message } = resolveStoreSuccessNotification(
+                'common.notifications.containerDeleted'
+              );
+              this.setNotification(title, message, 'mdi-check', 'success');
+            }
           }
         }
       );

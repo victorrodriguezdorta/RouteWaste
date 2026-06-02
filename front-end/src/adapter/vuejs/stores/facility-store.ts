@@ -1,5 +1,6 @@
 import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
 import { FacilityHttpRepository } from '@/adapter/http/facility-http-repository';
+import { resolveStoreSuccessNotification } from '@/adapter/vuejs/utils/store-notification-messages';
 import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { CreateFacilityService } from '@/application/service/facility/create-facility-service';
 import { DeleteFacilityService } from '@/application/service/facility/delete-facility-service';
@@ -206,12 +207,12 @@ export const useFacilityStore = defineStore('Facility', {
         data => {
           // Success case: add to local array and notify
           this.facilities.push(data);
-          this.setNotification(
-            'Success', 
-            'Facility added successfully', 
-            'mdi-check', 
-            'success'
-          );
+          {
+            const { title, message } = resolveStoreSuccessNotification(
+              'common.notifications.facilityAdded'
+            );
+            this.setNotification(title, message, 'mdi-check', 'success');
+          }
         }
       );
     },
@@ -255,12 +256,12 @@ export const useFacilityStore = defineStore('Facility', {
           this.facilities = this.facilities.map(f => 
             f.getId().equals(data.getId()) ? data : f
           );
-          this.setNotification(
-            'Success', 
-            'Facility updated successfully', 
-            'mdi-check', 
-            'success'
-          );
+          {
+            const { title, message } = resolveStoreSuccessNotification(
+              'common.notifications.facilityUpdated'
+            );
+            this.setNotification(title, message, 'mdi-check', 'success');
+          }
         }
       );
     },
@@ -308,12 +309,12 @@ export const useFacilityStore = defineStore('Facility', {
             this.facilities = this.facilities.filter(facility => 
               facility.getId().toString() !== id
             );
-            this.setNotification(
-              'Success', 
-              'Facility deleted successfully', 
-              'mdi-check', 
-              'success'
-            );
+            {
+              const { title, message } = resolveStoreSuccessNotification(
+                'common.notifications.facilityDeleted'
+              );
+              this.setNotification(title, message, 'mdi-check', 'success');
+            }
           }
         }
       );

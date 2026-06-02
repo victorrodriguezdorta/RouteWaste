@@ -1,5 +1,6 @@
 import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
 import { VehicleHttpRepository } from '@/adapter/http/vehicle-http-repository';
+import { resolveStoreSuccessNotification } from '@/adapter/vuejs/utils/store-notification-messages';
 import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { CreateVehicleService } from '@/application/service/vehicle/create-vehicle-service';
 import { DeleteVehicleService } from '@/application/service/vehicle/delete-vehicle-service';
@@ -194,12 +195,12 @@ export const useVehicleStore = defineStore('Vehicle', {
         data => {
           // Success case: add to local array and notify
           this.vehicles.push(data);
-          this.setNotification(
-            'Success', 
-            'Vehicle added successfully', 
-            'mdi-check', 
-            'success'
-          );
+          {
+            const { title, message } = resolveStoreSuccessNotification(
+              'common.notifications.vehicleAdded'
+            );
+            this.setNotification(title, message, 'mdi-check', 'success');
+          }
         }
       );
     },
@@ -240,12 +241,12 @@ export const useVehicleStore = defineStore('Vehicle', {
           this.vehicles = this.vehicles.map(v => 
             v.getId().equals(data.getId()) ? data : v
           );
-          this.setNotification(
-            'Success', 
-            'Vehicle updated successfully', 
-            'mdi-check', 
-            'success'
-          );
+          {
+            const { title, message } = resolveStoreSuccessNotification(
+              'common.notifications.vehicleUpdated'
+            );
+            this.setNotification(title, message, 'mdi-check', 'success');
+          }
         }
       );
     },
@@ -293,12 +294,12 @@ export const useVehicleStore = defineStore('Vehicle', {
             this.vehicles = this.vehicles.filter(vehicle => 
               vehicle.getId().toString() !== id
             );
-            this.setNotification(
-              'Success', 
-              'Vehicle deleted successfully', 
-              'mdi-check', 
-              'success'
-            );
+            {
+              const { title, message } = resolveStoreSuccessNotification(
+                'common.notifications.vehicleDeleted'
+              );
+              this.setNotification(title, message, 'mdi-check', 'success');
+            }
           }
         }
       );

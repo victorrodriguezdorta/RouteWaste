@@ -67,6 +67,18 @@
     "alerts": {
       "requiredFields": "Los campos marcados con * son obligatorios"
     },
+    "notifications": {
+      "vehicleAdded": "Vehículo añadido correctamente",
+      "vehicleUpdated": "Vehículo actualizado correctamente",
+      "vehicleDeleted": "Vehículo eliminado correctamente",
+      "containerAdded": "Contenedor añadido correctamente",
+      "containerUpdated": "Contenedor actualizado correctamente",
+      "containerDeleted": "Contenedor eliminado correctamente",
+      "facilityAdded": "Instalación añadida correctamente",
+      "facilityUpdated": "Instalación actualizada correctamente",
+      "facilityDeleted": "Instalación eliminada correctamente",
+      "infrastructurePlanDeleted": "Plan de infraestructura eliminado correctamente"
+    },
     "errors": {
       "titles": {
         "error": "Error",
@@ -110,7 +122,9 @@
         "fileRequired": "El archivo es obligatorio",
         "fileEmpty": "El archivo no puede estar vacío",
         "invalidJsonFile": "Archivo JSON no válido",
-        "invalidJsonFileWithDetail": "Archivo JSON no válido: {detail}"
+        "invalidJsonFileWithDetail": "Archivo JSON no válido: {detail}",
+        "failedToFetch": "No se pudo contactar con el servidor. Comprueba la conexión e inténtalo de nuevo.",
+        "networkError": "Se produjo un error de red. Inténtalo de nuevo."
       },
       "store": {
         "invalidVehicleData": "Datos de vehículo no válidos",

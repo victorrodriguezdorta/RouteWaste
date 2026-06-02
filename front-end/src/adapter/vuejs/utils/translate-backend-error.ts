@@ -48,6 +48,19 @@ const BACKEND_MESSAGE_KEYS: Record<string, string> = {
   'File is required': 'common.errors.backend.fileRequired',
   'File must not be empty': 'common.errors.backend.fileEmpty',
   'Invalid JSON file': 'common.errors.backend.invalidJsonFile',
+  'Failed to fetch': 'common.errors.backend.failedToFetch',
+  'NetworkError when attempting to fetch resource.': 'common.errors.backend.networkError',
+  'Load failed': 'common.errors.backend.networkError',
+  'Vehicle added successfully': 'common.notifications.vehicleAdded',
+  'Vehicle updated successfully': 'common.notifications.vehicleUpdated',
+  'Vehicle deleted successfully': 'common.notifications.vehicleDeleted',
+  'Container added successfully': 'common.notifications.containerAdded',
+  'Container updated successfully': 'common.notifications.containerUpdated',
+  'Container deleted successfully': 'common.notifications.containerDeleted',
+  'Facility added successfully': 'common.notifications.facilityAdded',
+  'Facility updated successfully': 'common.notifications.facilityUpdated',
+  'Facility deleted successfully': 'common.notifications.facilityDeleted',
+  'Infrastructure plan deleted successfully': 'common.notifications.infrastructurePlanDeleted',
 };
 
 const PREFIX_MESSAGE_KEYS: Array<{ prefix: string; key: string }> = [
@@ -108,6 +121,9 @@ function normalizeText(value: unknown): string | undefined {
     const trimmed = value.trim();
     return trimmed.length > 0 ? trimmed : undefined;
   }
+  if (value instanceof Error) {
+    return normalizeText(value.message);
+  }
   if (value && typeof value === 'object') {
     const record = value as Record<string, unknown>;
     if (typeof record.value === 'string') {
@@ -115,6 +131,9 @@ function normalizeText(value: unknown): string | undefined {
     }
     if (typeof record.message === 'string') {
       return normalizeText(record.message);
+    }
+    if (record.message instanceof Error) {
+      return normalizeText(record.message.message);
     }
   }
   return undefined;

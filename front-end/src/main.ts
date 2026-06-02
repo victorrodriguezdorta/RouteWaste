@@ -112,7 +112,7 @@ const vuetify = createVuetify({
   locale: {
     locale: 'es',
     fallback: 'en',
-    messages: { vuetifyEn, vuetifyEs },
+    messages: { en: vuetifyEn, es: vuetifyEs },
   },
   theme: {
     defaultTheme: 'professionalLight',

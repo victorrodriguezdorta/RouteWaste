@@ -19,6 +19,16 @@ describe('translateBackendMessage', () => {
   it('returns unknown messages unchanged', () => {
     expect(translateBackendMessage('Some custom backend text')).toBe('Some custom backend text');
   });
+
+  it('translates network and CRUD success messages to Spanish', () => {
+    i18n.global.locale.value = 'es';
+    expect(translateBackendMessage('Failed to fetch')).toBe(
+      'No se pudo contactar con el servidor. Comprueba la conexión e inténtalo de nuevo.'
+    );
+    expect(translateBackendMessage('Vehicle deleted successfully')).toBe(
+      'Vehículo eliminado correctamente'
+    );
+  });
 });
 
 describe('resolveBackendError', () => {
@@ -42,5 +52,17 @@ describe('resolveBackendError', () => {
     i18n.global.locale.value = 'es';
     const result = resolveBackendError({ error: 'Total cost exceeds maximum budget' }, 'generic');
     expect(result.message).toBe('El coste total supera el presupuesto máximo');
+  });
+
+  it('translates fetch errors wrapped in UnexpectedError', () => {
+    i18n.global.locale.value = 'es';
+    const result = resolveBackendError(
+      { kind: 'UnexpectedError', message: new TypeError('Failed to fetch') },
+      'vehicle'
+    );
+    expect(result.title).toBe('Error');
+    expect(result.message).toBe(
+      'No se pudo contactar con el servidor. Comprueba la conexión e inténtalo de nuevo.'
+    );
   });
 });

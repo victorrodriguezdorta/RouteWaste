@@ -186,7 +186,7 @@
           <div style="width: 180px;">
             <v-text-field
               v-model="selectedLocationFilter"
-              placeholder="Location"
+              :placeholder="t('container.list.filterByLocation')"
               clearable
               density="compact"
               hide-details

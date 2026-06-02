@@ -67,6 +67,18 @@
     "alerts": {
       "requiredFields": "Fields marked with * are required"
     },
+    "notifications": {
+      "vehicleAdded": "Vehicle added successfully",
+      "vehicleUpdated": "Vehicle updated successfully",
+      "vehicleDeleted": "Vehicle deleted successfully",
+      "containerAdded": "Container added successfully",
+      "containerUpdated": "Container updated successfully",
+      "containerDeleted": "Container deleted successfully",
+      "facilityAdded": "Facility added successfully",
+      "facilityUpdated": "Facility updated successfully",
+      "facilityDeleted": "Facility deleted successfully",
+      "infrastructurePlanDeleted": "Infrastructure plan deleted successfully"
+    },
     "errors": {
       "titles": {
         "error": "Error",
@@ -110,7 +122,9 @@
         "fileRequired": "File is required",
         "fileEmpty": "File must not be empty",
         "invalidJsonFile": "Invalid JSON file",
-        "invalidJsonFileWithDetail": "Invalid JSON file: {detail}"
+        "invalidJsonFileWithDetail": "Invalid JSON file: {detail}",
+        "failedToFetch": "Could not reach the server. Check your connection and try again.",
+        "networkError": "A network error occurred. Please try again."
       },
       "store": {
         "invalidVehicleData": "Invalid vehicle data",
