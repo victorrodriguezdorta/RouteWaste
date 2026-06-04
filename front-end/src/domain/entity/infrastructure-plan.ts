@@ -197,7 +197,7 @@ export class InfrastructurePlan {
     this.recalculateTotalCost();
   }
 
-  /** Recalculate estimated total cost and validate against budget. */
+  /** Recalculate estimated total cost from selected facilities (may exceed max budget). */
   recalculateTotalCost(): void {
     let total = 0.0;
     // Sum opening fixed costs from all selected facilities
@@ -208,11 +208,7 @@ export class InfrastructurePlan {
     // for (const assignment of this.serviceAssignments) {
     //   total += assignment.calculateTransportCost().getAmount();
     // }
-    const newCost = new TotalCost(total);
-    if (newCost.getAmount() > this.maxBudget.getAmount()) {
-      throw new Error('Total cost exceeds maximum budget');
-    }
-    this.estimatedTotalCost = newCost;
+    this.estimatedTotalCost = new TotalCost(total);
   }
 
   /**
@@ -346,11 +342,10 @@ export class InfrastructurePlan {
   updatePeriod(newPeriod: PlanningPeriod): void { if (!newPeriod) throw new Error('Planning period is not defined'); this.period = newPeriod; }
 
   /**
-   * Update maximum budget and validate current estimated cost.
+   * Update maximum budget (estimated cost may exceed the new limit).
    * @param newMaxBudget the new maximum budget
-   * @throws Error when newMaxBudget is not defined or when cost exceeds budget
    */
-  updateMaxBudget(newMaxBudget: MaximumBudget): void { if (!newMaxBudget) throw new Error('Maximum budget is not defined'); this.maxBudget = newMaxBudget; if (this.estimatedTotalCost.getAmount() > this.maxBudget.getAmount()) throw new Error('Total cost exceeds maximum budget'); }
+  updateMaxBudget(newMaxBudget: MaximumBudget): void { if (!newMaxBudget) throw new Error('Maximum budget is not defined'); this.maxBudget = newMaxBudget; }
 
   /**
    * Replace service policies (nullable).

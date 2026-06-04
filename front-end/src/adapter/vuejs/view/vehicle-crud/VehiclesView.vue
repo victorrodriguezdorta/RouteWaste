@@ -123,8 +123,9 @@
             :chart-title="t('vehicle.list.statistics.byType')"
             :empty-message="t('vehicle.list.statistics.noData')"
             :translate-type="translateVehicleTypeKey"
-            :chart-width="280"
-            :chart-height="240"
+            :color-for-type="vehicleTypeColor"
+            :chart-width="300"
+            :chart-height="260"
           />
         </div>
       </div>

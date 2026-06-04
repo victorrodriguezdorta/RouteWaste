@@ -1,46 +1,328 @@
 {
   "containers": [
     {
-      "name": "Contenedor importación Parque García Sanabria",
+      "name": "Contenedor Calle San Agustín 32",
       "location": {
-        "latitude": 28.4682,
-        "longitude": -16.2546,
-        "postalAddress": "Parque García Sanabria, Santa Cruz de Tenerife",
+        "latitude": 28.469346,
+        "longitude": -16.28105,
+        "postalAddress": "Calle San Agustín 32, Santa Cruz de Tenerife",
         "gisReference": "IMPORT-CONTAINER-1"
       },
-      "wasteType": "ORGANIC",
+      "wasteType": "PACKAGING",
       "capacityLiters": 850,
-      "dailyDemandLitersPerDay": 275,
+      "dailyDemandLitersPerDay": 200,
+      "serviceZone": "GEOGRAPHICAL_AREA"
+    },
+    {
+      "name": "Contenedor Calle La Marina 55",
+      "location": {
+        "latitude": 28.471776,
+        "longitude": -16.261276,
+        "postalAddress": "Calle La Marina 55, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-2"
+      },
+      "wasteType": "ORGANIC",
+      "capacityLiters": 750,
+      "dailyDemandLitersPerDay": 200,
       "serviceZone": "NEIGHBORHOOD"
     },
     {
-      "name": "Contenedor importación Mercado Nuestra Señora",
+      "name": "Contenedor Calle San Juan Bosco 26",
       "location": {
-        "latitude": 28.4667,
-        "longitude": -16.2483,
-        "postalAddress": "Mercado de Nuestra Señora de África, Santa Cruz",
-        "gisReference": "IMPORT-CONTAINER-2"
+        "latitude": 28.459584,
+        "longitude": -16.259123,
+        "postalAddress": "Calle San Juan Bosco 26, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-3"
       },
-      "wasteType": "PACKAGING",
-      "capacityLiters": {
-        "liters": 1000
-      },
-      "dailyDemandLitersPerDay": {
-        "litersPerDay": 340
-      },
+      "wasteType": "RESIDUAL",
+      "capacityLiters": 1050,
+      "dailyDemandLitersPerDay": 250,
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor importación Rambla Pulido",
+      "name": "Contenedor Calle del Castillo 98",
       "location": {
-        "latitude": 28.4721,
-        "longitude": -16.2598,
-        "postalAddress": "Rambla de Pulido 45, Santa Cruz de Tenerife",
-        "gisReference": "IMPORT-CONTAINER-3"
+        "latitude": 28.468142,
+        "longitude": -16.251242,
+        "postalAddress": "Calle del Castillo 98, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-4"
+      },
+      "wasteType": "PACKAGING",
+      "capacityLiters": 1050,
+      "dailyDemandLitersPerDay": 300,
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor Calle Bravo Murillo 14",
+      "location": {
+        "latitude": 28.457732,
+        "longitude": -16.245626,
+        "postalAddress": "Calle Bravo Murillo 14, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-5"
+      },
+      "wasteType": "ORGANIC",
+      "capacityLiters": 1050,
+      "dailyDemandLitersPerDay": 200,
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor Calle del Pilar 94",
+      "location": {
+        "latitude": 28.47434,
+        "longitude": -16.259058,
+        "postalAddress": "Calle del Pilar 94, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-6"
+      },
+      "wasteType": "GLASS",
+      "capacityLiters": 1150,
+      "dailyDemandLitersPerDay": 200,
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor Calle Juan Pablo II 80",
+      "location": {
+        "latitude": 28.455891,
+        "longitude": -16.270859,
+        "postalAddress": "Calle Juan Pablo II 80, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-7"
       },
       "wasteType": "PAPER_CARDBOARD",
-      "capacityLiters": 1100,
+      "capacityLiters": 1200,
+      "dailyDemandLitersPerDay": 250,
+      "serviceZone": "GEOGRAPHICAL_AREA"
+    },
+    {
+      "name": "Contenedor Calle San Pedro 38",
+      "location": {
+        "latitude": 28.455669,
+        "longitude": -16.256872,
+        "postalAddress": "Calle San Pedro 38, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-8"
+      },
+      "wasteType": "ORGANIC",
+      "capacityLiters": 900,
+      "dailyDemandLitersPerDay": 200,
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor Calle Juan de Vera 21",
+      "location": {
+        "latitude": 28.460671,
+        "longitude": -16.257844,
+        "postalAddress": "Calle Juan de Vera 21, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-9"
+      },
+      "wasteType": "PAPER_CARDBOARD",
+      "capacityLiters": 1000,
+      "dailyDemandLitersPerDay": 250,
+      "serviceZone": "GEOGRAPHICAL_AREA"
+    },
+    {
+      "name": "Contenedor Calle Juan Pablo II 10",
+      "location": {
+        "latitude": 28.460407,
+        "longitude": -16.246407,
+        "postalAddress": "Calle Juan Pablo II 10, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-10"
+      },
+      "wasteType": "RESIDUAL",
+      "capacityLiters": 850,
+      "dailyDemandLitersPerDay": 360,
+      "serviceZone": "GEOGRAPHICAL_AREA"
+    },
+    {
+      "name": "Contenedor Calle San Agustín 119",
+      "location": {
+        "latitude": 28.459875,
+        "longitude": -16.264434,
+        "postalAddress": "Calle San Agustín 119, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-11"
+      },
+      "wasteType": "RESIDUAL",
+      "capacityLiters": 900,
+      "dailyDemandLitersPerDay": 400,
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor Calle Méndez Núñez 106",
+      "location": {
+        "latitude": 28.474228,
+        "longitude": -16.252512,
+        "postalAddress": "Calle Méndez Núñez 106, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-12"
+      },
+      "wasteType": "ORGANIC",
+      "capacityLiters": 1000,
+      "dailyDemandLitersPerDay": 325,
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor Calle La Marina 113",
+      "location": {
+        "latitude": 28.455589,
+        "longitude": -16.247301,
+        "postalAddress": "Calle La Marina 113, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-13"
+      },
+      "wasteType": "PAPER_CARDBOARD",
+      "capacityLiters": 900,
+      "dailyDemandLitersPerDay": 400,
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor Calle San Isidro 19",
+      "location": {
+        "latitude": 28.463495,
+        "longitude": -16.247247,
+        "postalAddress": "Calle San Isidro 19, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-14"
+      },
+      "wasteType": "PAPER_CARDBOARD",
+      "capacityLiters": 850,
+      "dailyDemandLitersPerDay": 250,
+      "serviceZone": "GEOGRAPHICAL_AREA"
+    },
+    {
+      "name": "Contenedor Calle La Marina 55",
+      "location": {
+        "latitude": 28.467473,
+        "longitude": -16.272016,
+        "postalAddress": "Calle La Marina 55, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-15"
+      },
+      "wasteType": "RESIDUAL",
+      "capacityLiters": 1050,
       "dailyDemandLitersPerDay": 300,
+      "serviceZone": "NEIGHBORHOOD"
+    },
+    {
+      "name": "Contenedor Calle Bethencourt Alfonso 12",
+      "location": {
+        "latitude": 28.477936,
+        "longitude": -16.276743,
+        "postalAddress": "Calle Bethencourt Alfonso 12, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-16"
+      },
+      "wasteType": "ORGANIC",
+      "capacityLiters": 800,
+      "dailyDemandLitersPerDay": 225,
+      "serviceZone": "GEOGRAPHICAL_AREA"
+    },
+    {
+      "name": "Contenedor Calle José Murphy 9",
+      "location": {
+        "latitude": 28.45784,
+        "longitude": -16.256142,
+        "postalAddress": "Calle José Murphy 9, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-17"
+      },
+      "wasteType": "GLASS",
+      "capacityLiters": 1050,
+      "dailyDemandLitersPerDay": 380,
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor Calle del Castillo 88",
+      "location": {
+        "latitude": 28.466699,
+        "longitude": -16.245099,
+        "postalAddress": "Calle del Castillo 88, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-18"
+      },
+      "wasteType": "ORGANIC",
+      "capacityLiters": 1150,
+      "dailyDemandLitersPerDay": 275,
+      "serviceZone": "GEOGRAPHICAL_AREA"
+    },
+    {
+      "name": "Contenedor Calle San Sebastián 59",
+      "location": {
+        "latitude": 28.462164,
+        "longitude": -16.270847,
+        "postalAddress": "Calle San Sebastián 59, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-19"
+      },
+      "wasteType": "ORGANIC",
+      "capacityLiters": 950,
+      "dailyDemandLitersPerDay": 360,
+      "serviceZone": "NEIGHBORHOOD"
+    },
+    {
+      "name": "Contenedor Calle Juan Pablo II 39",
+      "location": {
+        "latitude": 28.466184,
+        "longitude": -16.277956,
+        "postalAddress": "Calle Juan Pablo II 39, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-20"
+      },
+      "wasteType": "RESIDUAL",
+      "capacityLiters": 1200,
+      "dailyDemandLitersPerDay": 250,
+      "serviceZone": "NEIGHBORHOOD"
+    },
+    {
+      "name": "Contenedor Calle San Pedro 119",
+      "location": {
+        "latitude": 28.462974,
+        "longitude": -16.275861,
+        "postalAddress": "Calle San Pedro 119, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-21"
+      },
+      "wasteType": "RESIDUAL",
+      "capacityLiters": 750,
+      "dailyDemandLitersPerDay": 380,
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor Calle Juan de Vera 113",
+      "location": {
+        "latitude": 28.465727,
+        "longitude": -16.277749,
+        "postalAddress": "Calle Juan de Vera 113, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-22"
+      },
+      "wasteType": "PAPER_CARDBOARD",
+      "capacityLiters": 900,
+      "dailyDemandLitersPerDay": 180,
+      "serviceZone": "NEIGHBORHOOD"
+    },
+    {
+      "name": "Contenedor Rambla de Pulido 94",
+      "location": {
+        "latitude": 28.475072,
+        "longitude": -16.246016,
+        "postalAddress": "Rambla de Pulido 94, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-23"
+      },
+      "wasteType": "GLASS",
+      "capacityLiters": 800,
+      "dailyDemandLitersPerDay": 360,
+      "serviceZone": "NEIGHBORHOOD"
+    },
+    {
+      "name": "Contenedor Calle San Juan Bosco 22",
+      "location": {
+        "latitude": 28.457081,
+        "longitude": -16.263939,
+        "postalAddress": "Calle San Juan Bosco 22, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-24"
+      },
+      "wasteType": "PAPER_CARDBOARD",
+      "capacityLiters": 1150,
+      "dailyDemandLitersPerDay": 380,
+      "serviceZone": "DISTRICT"
+    },
+    {
+      "name": "Contenedor Calle San Pedro 94",
+      "location": {
+        "latitude": 28.477145,
+        "longitude": -16.246701,
+        "postalAddress": "Calle San Pedro 94, Santa Cruz de Tenerife",
+        "gisReference": "IMPORT-CONTAINER-25"
+      },
+      "wasteType": "PACKAGING",
+      "capacityLiters": 950,
+      "dailyDemandLitersPerDay": 325,
       "serviceZone": "GEOGRAPHICAL_AREA"
     }
   ]

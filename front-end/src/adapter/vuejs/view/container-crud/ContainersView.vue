@@ -142,8 +142,9 @@
             :chart-title="t('container.list.statistics.byType')"
             :empty-message="t('container.list.statistics.noData')"
             :translate-type="translateWasteTypeKey"
-            :chart-width="280"
-            :chart-height="240"
+            :color-for-type="wasteTypeColor"
+            :chart-width="300"
+            :chart-height="260"
           />
         </div>
       </div>

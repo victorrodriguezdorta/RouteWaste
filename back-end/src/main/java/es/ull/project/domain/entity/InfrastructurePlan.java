@@ -541,11 +541,7 @@ public class InfrastructurePlan {
         for (Facility facility : selectedFacilities) {
             total += facility.getOpeningFixedCost().getAmount();
         }
-        TotalCost newCost = new TotalCost(total);
-        if (newCost.greaterThan(this.maxBudget)) {
-            throw new IllegalStateException(TOTAL_COST_EXCEEDED);
-        }
-        this.estimatedTotalCost = newCost;
+        this.estimatedTotalCost = new TotalCost(total);
     }
 
     /**
@@ -906,15 +902,10 @@ public class InfrastructurePlan {
      * Updates the maximum budget.
      *
      * @param newMaxBudget the new maximum budget
-     * @throws IllegalStateException if the estimated total cost exceeds the new
-     *                               budget
      */
     public void updateMaxBudget(MaximumBudget newMaxBudget) {
         validateMaxBudget(newMaxBudget);
         this.maxBudget = newMaxBudget;
-        if (this.estimatedTotalCost.greaterThan(this.maxBudget)) {
-            throw new IllegalStateException(TOTAL_COST_EXCEEDED);
-        }
     }
 
     /**

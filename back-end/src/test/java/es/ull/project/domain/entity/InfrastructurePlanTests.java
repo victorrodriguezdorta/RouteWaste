@@ -216,11 +216,10 @@ class InfrastructurePlanTests {
     }
 
     @Test
-    void recalculateTotalCost_exceeded() {
+    void recalculateTotalCost_allowsExceedingBudget() {
         MaximumBudget smallBudget = new MaximumBudget(1.0);
         InfrastructurePlan plan = new InfrastructurePlan(
                 randomPeriod(), smallBudget, randomServicePolicies(), null, null, null, InfrastructurePlanValidityState.VALID, InfrastructurePlanExecutionState.COMPLETED);
-        // Facility with large opening cost
         Facility expensive = new Facility(
             randomName("facility"),
             FacilityType.random(),
@@ -233,11 +232,10 @@ class InfrastructurePlanTests {
         );
         plan.addFacility(expensive);
 
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
-                () -> plan.recalculateTotalCost()
-        );
-        assertEquals(InfrastructurePlan.TOTAL_COST_EXCEEDED, exception.getMessage());
+        plan.recalculateTotalCost();
+
+        assertEquals(10000.0, plan.getEstimatedTotalCost().getAmount());
+        assertTrue(plan.getEstimatedTotalCost().greaterThan(plan.getMaxBudget()));
     }
 
     @Test

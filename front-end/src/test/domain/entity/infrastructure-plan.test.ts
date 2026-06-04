@@ -40,10 +40,11 @@ describe('InfrastructurePlan', () => {
     expect(plan.getEstimatedTotalCost().getAmount()).toBe(300);
   });
 
-  it('should reject cost above maximum budget', () => {
+  it('should allow estimated cost above maximum budget', () => {
     const plan = sampleInfrastructurePlan({ maxBudget: new MaximumBudget(100) });
     plan.addFacility(sampleFacility());
+    plan.recalculateTotalCost();
 
-    expect(() => plan.recalculateTotalCost()).toThrow('Total cost exceeds maximum budget');
+    expect(plan.getEstimatedTotalCost().getAmount()).toBeGreaterThan(plan.getMaxBudget().getAmount());
   });
 });

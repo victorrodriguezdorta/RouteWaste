@@ -240,6 +240,28 @@
 
             <ButtonTooltip
 
+              v-if="!item.isRunning"
+
+              text=""
+
+              icon="mdi-pencil"
+
+              :tooltip="t('infrastructurePlan.list.table.tooltips.edit')"
+
+              color="success"
+
+              size="small"
+
+              variant="text"
+
+              :disabled="editingPlanId === item.planId"
+
+              :eventclick="() => editItem(item.planId)"
+
+            />
+
+            <ButtonTooltip
+
               text=""
 
               icon="mdi-delete"
@@ -336,6 +358,8 @@ import CrudLayout from '../../components/common/CrudLayout.vue';
 
 import router from '../../router/router';
 
+import { useAlgorithmStore } from '../../stores/algorithm-store';
+
 import { useInfrastructurePlanStore } from '../../stores/infrastructure-plan-store';
 
 import { useInfrastructurePlanExecutionEvents } from '@/adapter/vuejs/composables/use-infrastructure-plan-execution-events';
@@ -367,6 +391,8 @@ const { t } = useI18n();
 
 const infrastructurePlanStore = useInfrastructurePlanStore();
 
+const algorithmStore = useAlgorithmStore();
+
 const { infrastructurePlans, infrastructurePlanNotification, loading, totalInfrastructurePlans, currentPage, rowsPerPage } = storeToRefs(infrastructurePlanStore);
 
 
@@ -380,6 +406,8 @@ const currentSortOrder = ref<'asc' | 'desc'>('desc');
 const dialogDelete = ref(false);
 
 const selectedPlanId = ref('');
+
+const editingPlanId = ref('');
 
 
 
@@ -603,6 +631,58 @@ const showItem = (item: { planId: string; canView: boolean }) => {
   }
 
   void router.push({ name: 'ShowInfrastructurePlan', params: { id: item.planId } });
+
+};
+
+
+
+const editItem = async (planId: string) => {
+
+  if (!planId || editingPlanId.value) {
+
+    return;
+
+  }
+
+  editingPlanId.value = planId;
+
+  try {
+
+    await infrastructurePlanStore.getInfrastructurePlanById(planId);
+
+    const json = infrastructurePlanStore.infrastructurePlan?.executionRequestJson;
+
+    if (!json?.trim()) {
+
+      infrastructurePlanStore.setNotification(
+
+        t('infrastructurePlan.list.errors.noExecutionRequestTitle'),
+
+        t('infrastructurePlan.list.errors.noExecutionRequest'),
+
+        'mdi-alert',
+
+        'warning',
+
+      );
+
+      return;
+
+    }
+
+    algorithmStore.queueExecutionRequestReplay(json);
+
+    await router.push({ name: 'ExecuteAlgorithm' });
+
+  } catch (error) {
+
+    console.error('Failed to open algorithm replay:', error);
+
+  } finally {
+
+    editingPlanId.value = '';
+
+  }
 
 };
 

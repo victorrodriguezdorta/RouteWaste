@@ -53,18 +53,35 @@
               <div class="chart-panel__title">
                 {{ t('infrastructurePlan.show.generalInfo.charts.vehiclesByType') }}
               </div>
-              <div class="chart-panel__canvas">
-                <PieChart
-                  v-if="vehiclesPieData.length > 0"
-                  :id="1"
-                  :width_props="chartWidth"
-                  :height_props="chartHeight"
-                  :data="vehiclesPieData"
-                />
-                <span v-else class="chart-panel__empty">
-                  {{ t('infrastructurePlan.show.generalInfo.charts.noVehicles') }}
-                </span>
-              </div>
+              <template v-if="vehiclesPieData.length > 0">
+                <div ref="vehiclesChartHostRef" class="chart-panel__canvas chart-panel__canvas--pie">
+                  <PieChart
+                    v-if="chartsReady"
+                    :id="1"
+                    :width_props="chartWidth"
+                    :height_props="chartHeight"
+                    :data="vehiclesPieData"
+                  />
+                </div>
+                <ul class="chart-panel__legend">
+                  <li
+                    v-for="item in vehicleLegendItems"
+                    :key="item.typeKey"
+                    class="chart-panel__legend-item"
+                  >
+                    <span
+                      class="chart-panel__swatch"
+                      :style="{ backgroundColor: item.hexColor }"
+                      aria-hidden="true"
+                    />
+                    <span class="chart-panel__legend-label">{{ item.label }}</span>
+                    <span class="chart-panel__legend-count">{{ item.count }}</span>
+                  </li>
+                </ul>
+              </template>
+              <span v-else class="chart-panel__empty">
+                {{ t('infrastructurePlan.show.generalInfo.charts.noVehicles') }}
+              </span>
             </div>
           </v-col>
 
@@ -73,38 +90,107 @@
               <div class="chart-panel__title">
                 {{ t('infrastructurePlan.show.generalInfo.charts.containersByType') }}
               </div>
-              <div class="chart-panel__canvas">
-                <PieChart
-                  v-if="containersPieData.length > 0"
-                  :id="2"
-                  :width_props="chartWidth"
-                  :height_props="chartHeight"
-                  :data="containersPieData"
-                />
-                <span v-else class="chart-panel__empty">
-                  {{ t('infrastructurePlan.show.generalInfo.charts.noContainers') }}
-                </span>
-              </div>
+              <template v-if="containersPieData.length > 0">
+                <div ref="containersChartHostRef" class="chart-panel__canvas chart-panel__canvas--pie">
+                  <PieChart
+                    v-if="chartsReady"
+                    :id="2"
+                    :width_props="chartWidth"
+                    :height_props="chartHeight"
+                    :data="containersPieData"
+                  />
+                </div>
+                <ul class="chart-panel__legend">
+                  <li
+                    v-for="item in containerLegendItems"
+                    :key="item.typeKey"
+                    class="chart-panel__legend-item"
+                  >
+                    <span
+                      class="chart-panel__swatch"
+                      :style="{ backgroundColor: item.hexColor }"
+                      aria-hidden="true"
+                    />
+                    <span class="chart-panel__legend-label">{{ item.label }}</span>
+                    <span class="chart-panel__legend-count">{{ item.count }}</span>
+                  </li>
+                </ul>
+              </template>
+              <span v-else class="chart-panel__empty">
+                {{ t('infrastructurePlan.show.generalInfo.charts.noContainers') }}
+              </span>
             </div>
           </v-col>
 
-          <v-col cols="4" class="chart-col">
-            <div class="chart-panel">
+          <v-col cols="4" class="chart-col chart-col--bar">
+            <div class="chart-panel chart-panel--facilities">
               <div class="chart-panel__title">
                 {{ t('infrastructurePlan.show.generalInfo.charts.facilityAssignments') }}
               </div>
-              <div class="chart-panel__canvas chart-panel__canvas--scroll">
-                <StackedBarPlot
-                  v-if="facilityBarData.length > 0"
-                  :id="3"
-                  :width_props="chartWidth"
-                  :height_props="chartHeight"
-                  :data="facilityBarData"
-                />
-                <span v-else class="chart-panel__empty">
-                  {{ t('infrastructurePlan.show.generalInfo.charts.noFacilities') }}
-                </span>
+              <div
+                v-if="facilityBarData.length > 0"
+                class="chart-panel__bar-wrap"
+              >
+                <div class="chart-panel__series-legend">
+                  <span class="chart-panel__series">
+                    <span
+                      class="chart-panel__swatch"
+                      :style="{ backgroundColor: facilityVehiclesColor }"
+                      aria-hidden="true"
+                    />
+                    {{ facilityVehiclesSeriesLabel }}
+                  </span>
+                  <span class="chart-panel__series">
+                    <span
+                      class="chart-panel__swatch"
+                      :style="{ backgroundColor: facilityContainersColor }"
+                      aria-hidden="true"
+                    />
+                    {{ facilityContainersSeriesLabel }}
+                  </span>
+                </div>
+                <div
+                  ref="facilityBarChartHostRef"
+                  class="chart-panel__canvas chart-panel__canvas--bar"
+                >
+                  <StackedBarPlot
+                    v-if="chartsReady && facilityBarWidth > 0"
+                    :key="`facility-bar-${chartRenderKey}-${facilityBarWidth}-${facilityBarHeight}`"
+                    :id="3"
+                    :width_props="facilityBarWidth"
+                    :height_props="facilityBarHeight"
+                    :data="facilityBarData"
+                  />
+                </div>
+                <ul v-if="facilityBarSummary.length > 0" class="chart-panel__facility-list">
+                  <li
+                    v-for="(row, index) in facilityBarSummary"
+                    :key="`${row.group}-${index}`"
+                    class="chart-panel__facility-item"
+                  >
+                    <span class="chart-panel__facility-name" :title="row.group">
+                      {{ row.group }}
+                    </span>
+                    <span class="chart-panel__facility-metrics">
+                      <span
+                        class="chart-panel__facility-metric chart-panel__facility-metric--vehicles"
+                        :title="facilityVehiclesSeriesLabel"
+                      >
+                        {{ row.vehicles }}
+                      </span>
+                      <span
+                        class="chart-panel__facility-metric chart-panel__facility-metric--containers"
+                        :title="facilityContainersSeriesLabel"
+                      >
+                        {{ row.containers }}
+                      </span>
+                    </span>
+                  </li>
+                </ul>
               </div>
+              <span v-else class="chart-panel__empty">
+                {{ t('infrastructurePlan.show.generalInfo.charts.noFacilities') }}
+              </span>
             </div>
           </v-col>
         </v-row>
@@ -116,24 +202,39 @@
 <script lang="ts" setup>
 import { buildPlanOverviewAnalytics } from '@/adapter/vuejs/analytics/infrastructure-plan/build-plan-overview-charts';
 import type { PieChartDatum } from '@/adapter/vuejs/analytics/infrastructure-plan/pie-chart-datum';
+import type { TypeCountDatum } from '@/adapter/vuejs/analytics/infrastructure-plan/type-count-datum';
+import { vuetifyColorToHex } from '@/adapter/vuejs/utils/vuetify-semantic-color';
 import type { InfrastructurePlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import { infrastructurePlanValidityStateLabel } from '@/domain/enumerate/infrastructure-plan-validity-state';
-import { vehicleTypeLabel } from '@/domain/enumerate/vehicle-type';
-import { wasteTypeLabel } from '@/domain/enumerate/waste-type';
+import { vehicleTypeColor, vehicleTypeLabel } from '@/domain/enumerate/vehicle-type';
+import { wasteTypeColor, wasteTypeLabel } from '@/domain/enumerate/waste-type';
 import { PieChart, StackedBarPlot } from '@ull-tfg/ull-tfg-vue';
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useTheme } from 'vuetify';
 
 const props = defineProps<{
   plan?: InfrastructurePlanDetail;
 }>();
 
 const { t } = useI18n();
+const theme = useTheme();
 const isExpanded = ref(false);
 const chartsReady = ref(false);
+const vehiclesChartHostRef = ref<HTMLElement | null>(null);
+const containersChartHostRef = ref<HTMLElement | null>(null);
+const facilityBarChartHostRef = ref<HTMLElement | null>(null);
 
-const chartWidth = 300;
-const chartHeight = 260;
+const chartWidth = 340;
+const chartHeight = 300;
+/** Matches StackedBarPlot margins (top 30 + bottom 70) in ull-tfg-vue. */
+const facilityBarChartChrome = 118;
+const facilityBarBandHeight = 58;
+const facilityBarWidthPerGroup = 72;
+
+const facilityBarHostWidth = ref(0);
+let facilityBarResizeObserver: ResizeObserver | undefined;
+let facilityBarResizeFrame = 0;
 
 const overviewAnalytics = computed(() => buildPlanOverviewAnalytics(props.plan));
 
@@ -270,30 +371,225 @@ function translateWasteType(typeKey: string): string {
   return wasteTypeLabel(t, typeKey);
 }
 
+interface PieSliceMeta {
+  typeKey: string;
+  label: string;
+  count: number;
+}
+
+function resolveEnumColor(typeKey: string, colorForType: (typeKey: string) => string): string {
+  try {
+    return colorForType(typeKey);
+  } catch {
+    return 'grey';
+  }
+}
+
+function themeColorStrings(): Record<string, string | undefined> {
+  const result: Record<string, string | undefined> = {};
+  for (const [key, value] of Object.entries(theme.current.value.colors)) {
+    if (typeof value === 'string') {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
+function resolveHexColor(typeKey: string, colorForType: (typeKey: string) => string): string {
+  return vuetifyColorToHex(resolveEnumColor(typeKey, colorForType), themeColorStrings());
+}
+
+function buildPieSliceMeta(
+  entries: TypeCountDatum[],
+  translate: (typeKey: string) => string,
+): PieSliceMeta[] {
+  return entries.map((entry) => ({
+    typeKey: entry.typeKey,
+    label: translate(entry.typeKey),
+    count: entry.value,
+  }));
+}
+
+/**
+ * ull-tfg-vue PieChart sorts data ascending by `value` before drawing arcs.
+ * Slice colors must use the same order as `path` elements in the SVG.
+ */
+function slicesSortedForPieColor(slices: PieSliceMeta[]): PieSliceMeta[] {
+  return [...slices].sort((left, right) => left.count - right.count);
+}
+
+const vehiclePieSlices = computed(() =>
+  buildPieSliceMeta(overviewAnalytics.value?.vehiclesByType ?? [], translateVehicleType),
+);
+
+const containerPieSlices = computed(() =>
+  buildPieSliceMeta(overviewAnalytics.value?.containersByType ?? [], translateWasteType),
+);
+
 const vehiclesPieData = computed<PieChartDatum[]>(() =>
-  (overviewAnalytics.value?.vehiclesByType ?? []).map((entry) => ({
-    name: translateVehicleType(entry.typeKey),
-    value: entry.value,
+  vehiclePieSlices.value.map((slice) => ({
+    name: slice.label,
+    value: slice.count,
   })),
 );
 
 const containersPieData = computed<PieChartDatum[]>(() =>
-  (overviewAnalytics.value?.containersByType ?? []).map((entry) => ({
-    name: translateWasteType(entry.typeKey),
-    value: entry.value,
+  containerPieSlices.value.map((slice) => ({
+    name: slice.label,
+    value: slice.count,
   })),
 );
 
-const facilityBarData = computed(() => {
-  const vehiclesLabel = t('infrastructurePlan.show.generalInfo.charts.series.vehicles');
-  const containersLabel = t('infrastructurePlan.show.generalInfo.charts.series.containers');
+const vehicleLegendItems = computed(() =>
+  [...vehiclePieSlices.value]
+    .sort((left, right) => right.count - left.count)
+    .map((slice) => ({
+      typeKey: slice.typeKey,
+      label: slice.label,
+      count: slice.count,
+      hexColor: resolveHexColor(slice.typeKey, vehicleTypeColor),
+    })),
+);
 
-  return (overviewAnalytics.value?.facilityAssignmentBar ?? []).map((row) => ({
+const containerLegendItems = computed(() =>
+  [...containerPieSlices.value]
+    .sort((left, right) => right.count - left.count)
+    .map((slice) => ({
+      typeKey: slice.typeKey,
+      label: slice.label,
+      count: slice.count,
+      hexColor: resolveHexColor(slice.typeKey, wasteTypeColor),
+    })),
+);
+
+const facilityBarData = computed(
+  () => overviewAnalytics.value?.facilityAssignmentBar ?? [],
+);
+
+const facilityBarSummary = computed(() =>
+  facilityBarData.value.map((row) => ({
     group: row.group,
-    [vehiclesLabel]: row.vehicles,
-    [containersLabel]: row.containers,
-  }));
+    vehicles: row.vehicles,
+    containers: row.containers,
+  })),
+);
+
+const facilityBarWidth = computed(() => {
+  const groupCount = facilityBarData.value.length;
+  const measured = facilityBarHostWidth.value;
+  const scrollableMin = groupCount * facilityBarWidthPerGroup + 112;
+  return Math.max(measured || chartWidth, scrollableMin);
 });
+
+const facilityBarHeight = computed(() => {
+  const groupCount = Math.max(facilityBarData.value.length, 1);
+  return facilityBarChartChrome + groupCount * facilityBarBandHeight;
+});
+
+const facilityVehiclesSeriesLabel = computed(() =>
+  t('infrastructurePlan.show.generalInfo.charts.series.vehicles'),
+);
+
+const facilityContainersSeriesLabel = computed(() =>
+  t('infrastructurePlan.show.generalInfo.charts.series.containers'),
+);
+
+const facilityVehiclesColor = vuetifyColorToHex('blue', themeColorStrings());
+const facilityContainersColor = vuetifyColorToHex('red', themeColorStrings());
+
+function applyPieSliceColors(
+  host: HTMLElement | null,
+  slices: PieSliceMeta[],
+  colorForType: (typeKey: string) => string,
+): void {
+  if (!host) {
+    return;
+  }
+
+  const paths = host.querySelectorAll('svg path');
+  const ordered = slicesSortedForPieColor(slices);
+
+  paths.forEach((path, index) => {
+    const slice = ordered[index];
+    if (!slice) {
+      return;
+    }
+    path.setAttribute('fill', resolveHexColor(slice.typeKey, colorForType));
+    path.setAttribute('stroke', '#ffffff');
+    path.setAttribute('stroke-width', '2.5');
+    path.setAttribute('opacity', '1');
+  });
+}
+
+function applyFacilityBarStyles(host: HTMLElement | null): void {
+  if (!host) {
+    return;
+  }
+
+  const axisLabelFill = 'rgba(0, 0, 0, 0.62)';
+  const axisTickStroke = 'rgba(0, 0, 0, 0.14)';
+
+  const layerGroups = [...host.querySelectorAll('svg > g > g > g')].filter(
+    (group) => group.querySelector('rect') !== null,
+  );
+  const seriesColors = [facilityVehiclesColor, facilityContainersColor];
+
+  layerGroups.forEach((layer, index) => {
+    const fill = seriesColors[index] ?? seriesColors[seriesColors.length - 1];
+    layer.setAttribute('fill', fill);
+    layer.querySelectorAll('rect').forEach((rect) => {
+      rect.setAttribute('fill', fill);
+      rect.setAttribute('rx', '3');
+      rect.setAttribute('ry', '3');
+    });
+  });
+
+  const axisGroups = host.querySelectorAll('svg > g > g');
+  axisGroups.forEach((axisGroup, axisIndex) => {
+    const isXAxis = axisIndex === 0;
+    axisGroup.querySelectorAll('.tick text').forEach((node) => {
+      const text = node as SVGTextElement;
+      text.setAttribute('fill', axisLabelFill);
+      text.style.fontSize = '11px';
+      text.style.fontFamily = 'inherit';
+
+      if (!isXAxis) {
+        return;
+      }
+
+      const label = text.textContent?.trim() ?? '';
+      if (label.length > 22) {
+        text.textContent = `${label.slice(0, 20)}…`;
+      }
+      text.setAttribute('transform', 'rotate(-24)');
+      text.setAttribute('text-anchor', 'end');
+      text.setAttribute('dx', '-0.35em');
+      text.setAttribute('dy', '0.15em');
+    });
+
+    axisGroup.querySelectorAll('.tick line').forEach((line) => {
+      line.setAttribute('stroke', axisTickStroke);
+    });
+  });
+}
+
+async function scheduleChartStyleSync(): Promise<void> {
+  if (!chartsReady.value) {
+    return;
+  }
+  await nextTick();
+  await nextTick();
+  requestAnimationFrame(() => {
+    applyPieSliceColors(vehiclesChartHostRef.value, vehiclePieSlices.value, vehicleTypeColor);
+    applyPieSliceColors(containersChartHostRef.value, containerPieSlices.value, wasteTypeColor);
+    applyFacilityBarStyles(facilityBarChartHostRef.value);
+    requestAnimationFrame(() => {
+      applyPieSliceColors(vehiclesChartHostRef.value, vehiclePieSlices.value, vehicleTypeColor);
+      applyPieSliceColors(containersChartHostRef.value, containerPieSlices.value, wasteTypeColor);
+      applyFacilityBarStyles(facilityBarChartHostRef.value);
+    });
+  });
+}
 
 watch(
   () => [props.plan?.id?.getValue(), isExpanded.value, overviewAnalytics.value?.hasChartData] as const,
@@ -308,6 +604,63 @@ watch(
   },
   { immediate: true },
 );
+
+watch(
+  () => [
+    chartsReady.value,
+    vehiclesPieData.value.length,
+    containersPieData.value.length,
+    vehiclePieSlices.value,
+    containerPieSlices.value,
+    facilityBarData.value,
+    facilityBarWidth.value,
+    facilityBarHeight.value,
+  ] as const,
+  () => {
+    void scheduleChartStyleSync();
+  },
+);
+
+function syncFacilityBarHostWidth(): void {
+  const host = facilityBarChartHostRef.value;
+  if (!host) {
+    return;
+  }
+  const width = Math.floor(host.clientWidth);
+  if (width > 0) {
+    facilityBarHostWidth.value = width;
+  }
+}
+
+function setupFacilityBarResizeObserver(): void {
+  facilityBarResizeObserver?.disconnect();
+  const host = facilityBarChartHostRef.value;
+  if (!host) {
+    return;
+  }
+  syncFacilityBarHostWidth();
+  facilityBarResizeObserver = new ResizeObserver(() => {
+    cancelAnimationFrame(facilityBarResizeFrame);
+    facilityBarResizeFrame = requestAnimationFrame(syncFacilityBarHostWidth);
+  });
+  facilityBarResizeObserver.observe(host);
+}
+
+watch(
+  [chartsReady, isExpanded],
+  () => {
+    if (chartsReady.value && isExpanded.value) {
+      void nextTick(() => setupFacilityBarResizeObserver());
+      return;
+    }
+    facilityBarResizeObserver?.disconnect();
+  },
+);
+
+onBeforeUnmount(() => {
+  facilityBarResizeObserver?.disconnect();
+  cancelAnimationFrame(facilityBarResizeFrame);
+});
 
 function formatDateTime(value: string | undefined): string {
   if (!value) return '-';
@@ -395,6 +748,13 @@ function getServiceDate(value: unknown): string | undefined {
 
 .chart-col {
   display: flex;
+  min-width: 260px;
+  flex: 1 1 260px;
+}
+
+.chart-col--bar {
+  min-width: 300px;
+  flex: 1.15 1 300px;
 }
 
 .chart-panel {
@@ -402,10 +762,11 @@ function getServiceDate(value: unknown): string | undefined {
   flex-direction: column;
   flex: 1;
   min-width: 0;
-  background: #fff;
+  background: rgb(var(--v-theme-surface));
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   border-radius: 8px;
-  padding: 8px 6px 4px;
+  padding: 8px 6px 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .chart-panel__title {
@@ -422,17 +783,35 @@ function getServiceDate(value: unknown): string | undefined {
 }
 
 .chart-panel__canvas {
-  flex: 1;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: #fff;
+  background: rgb(var(--v-theme-surface));
   overflow: hidden;
 }
 
-.chart-panel__canvas--scroll {
+.chart-panel__canvas--pie {
+  flex: 1;
+}
+
+.chart-panel--facilities .chart-panel__title {
+  font-size: 0.78rem;
+}
+
+.chart-panel__canvas--bar {
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 200px;
   overflow-x: auto;
-  justify-content: flex-start;
+  overflow-y: hidden;
+  justify-content: center;
+  padding: 6px 8px 4px;
+  border-radius: 6px;
+  background: rgba(var(--v-theme-on-surface), 0.03);
+}
+
+.chart-panel__canvas--bar :deep(svg) {
+  min-width: 100%;
 }
 
 .chart-panel__empty {
@@ -442,15 +821,166 @@ function getServiceDate(value: unknown): string | undefined {
   padding: 24px 8px;
 }
 
+.chart-panel__bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.chart-panel__facility-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 4px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.chart-panel__facility-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: rgba(var(--v-theme-on-surface), 0.04);
+}
+
+.chart-panel__facility-name {
+  word-break: break-word;
+  color: rgba(var(--v-theme-on-surface), 0.87);
+  font-weight: 500;
+}
+
+.chart-panel__facility-metrics {
+  display: inline-flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.chart-panel__facility-metric {
+  min-width: 1.75rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: #fff;
+}
+
+.chart-panel__facility-metric--vehicles {
+  background-color: v-bind(facilityVehiclesColor);
+}
+
+.chart-panel__facility-metric--containers {
+  background-color: v-bind(facilityContainersColor);
+}
+
+.chart-panel__series-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 18px;
+  font-size: 0.78rem;
+  color: rgba(var(--v-theme-on-surface), 0.75);
+}
+
+.chart-panel--facilities .chart-panel__swatch {
+  width: 12px;
+  height: 12px;
+}
+
+.chart-panel__series {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-panel__legend {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0 4px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chart-panel__legend-item {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: start;
+  column-gap: 6px;
+  font-size: 0.7rem;
+  line-height: 1.3;
+}
+
+.chart-panel__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.chart-panel__legend-label {
+  word-break: break-word;
+  color: rgba(var(--v-theme-on-surface), 0.87);
+}
+
+.chart-panel__legend-count {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: rgba(var(--v-theme-on-surface), 0.87);
+}
+
 .chart-panel :deep(h1) {
   display: none;
 }
 
 .chart-panel :deep(svg) {
-  background: #fff;
+  background: transparent;
+  display: block;
 }
 
 .chart-panel :deep([id^='mainDiv']) {
-  background: #fff;
+  background: transparent;
+  line-height: 0;
+}
+
+.chart-panel__canvas--bar :deep(.domain) {
+  stroke: rgba(var(--v-theme-on-surface), 0.22);
+}
+
+.chart-panel__canvas--bar :deep(.tick text) {
+  fill: rgba(var(--v-theme-on-surface), 0.72);
+  font-size: 11px;
+}
+
+.chart-panel__canvas--bar :deep(rect) {
+  transition: opacity 0.15s ease;
+}
+
+.chart-panel__canvas--bar :deep(rect:hover) {
+  opacity: 0.88;
+}
+
+.chart-panel__canvas--bar :deep(.tooltip) {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: rgba(var(--v-theme-on-surface), 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+
+/* PieChart labels overlap slices; legend below is the source of truth. */
+.chart-panel__canvas--pie :deep(svg text) {
+  display: none;
 }
 </style>

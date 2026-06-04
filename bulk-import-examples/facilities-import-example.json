@@ -49,12 +49,12 @@
       "status": "PLANNED"
     },
     {
-      "name": "Instalación importación Planta Tratamiento Sur",
+      "name": "Instalación importación Planta Tratamiento Santa Cruz",
       "facilityType": "TREATMENT_PLANT",
       "location": {
-        "latitude": 28.0961,
-        "longitude": -16.6806,
-        "postalAddress": "Polígono Industrial Sur, Tenerife",
+        "latitude": 28.4548,
+        "longitude": -16.2685,
+        "postalAddress": "Polígono Industrial de Añaza, Santa Cruz de Tenerife",
         "gisReference": "IMPORT-FACILITY-3"
       },
       "storageCapacity": {

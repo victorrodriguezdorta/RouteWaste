@@ -13,6 +13,7 @@
     "menu": "Menú"
   },
   "common": {
+    "total": "Total",
     "buttons": {
       "cancel": "Cancelar",
       "save": "Guardar",
@@ -489,6 +490,7 @@
         },
         "tooltips": {
           "view": "Ver detalles",
+          "edit": "Abre el asistente con la misma selección (instalaciones, vehículos, contenedores y parámetros). Al ejecutar se creará un plan nuevo.",
           "delete": "Eliminar",
           "viewUnavailable": "El detalle estará disponible cuando termine la ejecución"
         },
@@ -497,6 +499,10 @@
       "deleteDialog": {
         "title": "Confirmar Eliminación",
         "message": "¿Está seguro que desea eliminar este plan de infraestructura? Esta acción no se puede deshacer."
+      },
+      "errors": {
+        "noExecutionRequestTitle": "No se puede editar",
+        "noExecutionRequest": "Este plan no tiene guardada la petición de ejecución para reutilizarla."
       }
     },
     "show": {

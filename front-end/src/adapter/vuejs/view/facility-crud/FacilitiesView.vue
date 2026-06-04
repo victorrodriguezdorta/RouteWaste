@@ -148,8 +148,9 @@
             :chart-title="t('facility.list.statistics.byType')"
             :empty-message="t('facility.list.statistics.noData')"
             :translate-type="translateFacilityTypeKey"
-            :chart-width="280"
-            :chart-height="240"
+            :color-for-type="facilityTypeColor"
+            :chart-width="300"
+            :chart-height="260"
           />
         </div>
       </div>

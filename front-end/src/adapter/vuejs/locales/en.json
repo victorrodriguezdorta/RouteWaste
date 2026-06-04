@@ -13,6 +13,7 @@
     "menu": "Menu"
   },
   "common": {
+    "total": "Total",
     "buttons": {
       "cancel": "Cancel",
       "save": "Save",
@@ -489,6 +490,7 @@
         },
         "tooltips": {
           "view": "View details",
+          "edit": "Opens the wizard with the same selection (facilities, vehicles, containers, and parameters). Executing will create a new plan.",
           "delete": "Delete",
           "viewUnavailable": "Details are available when execution completes"
         },
@@ -497,6 +499,10 @@
       "deleteDialog": {
         "title": "Confirm Deletion",
         "message": "Are you sure you want to delete this infrastructure plan? This action cannot be undone."
+      },
+      "errors": {
+        "noExecutionRequestTitle": "Cannot edit",
+        "noExecutionRequest": "This plan has no saved execution request to reuse."
       }
     },
     "show": {

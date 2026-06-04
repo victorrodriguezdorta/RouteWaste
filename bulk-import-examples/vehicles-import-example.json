@@ -1,32 +1,112 @@
 {
   "vehicles": [
     {
-      "name": "Vehículo importación Recolector Ligero A",
+      "name": "Vehículo A",
       "vehicleType": "COLLECTION_TRUCK",
-      "capacityKilograms": 3500,
-      "CapacityLiters": 7000,
+      "capacityKilograms": 850,
+      "CapacityLiters": 1500,
+      "costPerKilometer": {
+        "amount": 0.82,
+        "currency": "EUR"
+      }
+    },
+    {
+      "name": "Vehículo B",
+      "vehicleType": "COLLECTION_TRUCK",
+      "capacityKilograms": 720,
+      "CapacityLiters": 1300,
+      "costPerKilometer": {
+        "amount": 0.79,
+        "currency": "EUR"
+      }
+    },
+    {
+      "name": "Vehículo C",
+      "vehicleType": "COLLECTION_TRUCK",
+      "capacityKilograms": 340,
+      "CapacityLiters": 620,
+      "costPerKilometer": {
+        "amount": 0.76,
+        "currency": "EUR"
+      }
+    },
+    {
+      "name": "Vehículo D",
+      "vehicleType": "TRANSFER_TRUCK",
+      "capacityKilograms": 7500,
+      "CapacityLiters": 10000,
+      "costPerKilometer": {
+        "amount": 1.45,
+        "currency": "EUR"
+      }
+    },
+    {
+      "name": "Vehículo E",
+      "vehicleType": "COLLECTION_TRUCK",
+      "capacityKilograms": 900,
+      "CapacityLiters": 1650,
       "costPerKilometer": {
         "amount": 0.85,
         "currency": "EUR"
       }
     },
     {
-      "name": "Vehículo importación Recolector Medio B",
-      "vehicleType": "COLLECTION_TRUCK",
-      "capacityKilograms": 5200,
-      "CapacityLiters": 10500,
+      "name": "Vehículo F",
+      "vehicleType": "SUPPORT_VEHICLE",
+      "capacityKilograms": 280,
+      "CapacityLiters": 450,
       "costPerKilometer": {
-        "amount": 1.1,
+        "amount": 0.55,
         "currency": "EUR"
       }
     },
     {
-      "name": "Vehículo importación Transferencia C",
-      "vehicleType": "TRANSFER_TRUCK",
-      "capacityKilograms": 12000,
-      "CapacityLiters": 22000,
+      "name": "Vehículo G",
+      "vehicleType": "COLLECTION_TRUCK",
+      "capacityKilograms": 680,
+      "CapacityLiters": 1200,
       "costPerKilometer": {
-        "amount": 1.8,
+        "amount": 0.81,
+        "currency": "EUR"
+      }
+    },
+    {
+      "name": "Vehículo H",
+      "vehicleType": "COLLECTION_TRUCK",
+      "capacityKilograms": 310,
+      "CapacityLiters": 580,
+      "costPerKilometer": {
+        "amount": 0.74,
+        "currency": "EUR"
+      }
+    },
+    {
+      "name": "Vehículo I",
+      "vehicleType": "TRANSFER_TRUCK",
+      "capacityKilograms": 9000,
+      "CapacityLiters": 12000,
+      "costPerKilometer": {
+        "amount": 1.6,
+        "currency": "EUR"
+      }
+    },
+    {
+      "name": "Vehículo J",
+      "vehicleType": "SUPPORT_VEHICLE",
+      "capacityKilograms": 320,
+      "CapacityLiters": 500,
+      "costPerKilometer": {
+        "amount": 0.58,
+        "currency": "EUR"
+      }
+    },
+    {
+      "name": "Vehículo K",
+      "vehicleType": "COLLECTION_TRUCK",
+      "capacityKilograms": 360,
+      "CapacityLiters": 650,
+      "costPerKilometer": {
+        "amount": 0.77,
         "currency": "EUR"
       }
     }
