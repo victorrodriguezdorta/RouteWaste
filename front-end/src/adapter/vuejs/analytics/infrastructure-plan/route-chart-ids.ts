@@ -1,4 +1,5 @@
 export interface RouteChartIds {
-  collection: number;
+  kilograms: number;
+  liters: number;
   distance: number;
 }

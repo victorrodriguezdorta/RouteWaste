@@ -598,7 +598,11 @@
           },
           "charts": {
             "collectionTitle": "Kg y litros acumulados",
+            "kilogramsChartTitle": "Kilogramos acumulados",
+            "litersChartTitle": "Litros acumulados",
             "distanceTitle": "Metros acumulados",
+            "stopAxisLabel": "Parada",
+            "collectionYAxisLabel": "Cantidad",
             "kilogramsSeries": "Kilogramos",
             "litersSeries": "Litros",
             "distanceSeries": "Metros"
@@ -614,6 +618,8 @@
           "capacityLabel": "Capacidad",
           "demandPerDayLabel": "Demanda/día",
           "fillEvolutionChartTitle": "Evolución del porcentaje de llenado por contenedor",
+          "dayAxisLabel": "Día",
+          "fillPercentAxisLabel": "% Llenado",
           "noData": "Sin datos",
           "statuses": {
             "overflowed": "Desbordado",

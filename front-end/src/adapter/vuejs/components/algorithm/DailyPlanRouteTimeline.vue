@@ -111,39 +111,36 @@
 
           <div v-if="route.hasChartData" class="route-charts mt-3">
             <v-row dense class="route-charts__row">
-              <v-col cols="12" md="6">
+              <v-col cols="12" lg="6">
                 <div class="chart-panel">
                   <div class="chart-panel__title">
                     {{ t('infrastructurePlan.show.daily.route.charts.collectionTitle') }}
                   </div>
-                  <div class="chart-panel__legend">
-                    <span class="chart-panel__legend-item chart-panel__legend-item--kg">
-                      {{ t('infrastructurePlan.show.daily.route.charts.kilogramsSeries') }}
-                    </span>
-                    <span class="chart-panel__legend-item chart-panel__legend-item--liters">
-                      {{ t('infrastructurePlan.show.daily.route.charts.litersSeries') }}
-                    </span>
-                  </div>
                   <div class="chart-panel__canvas">
-                    <SimpleLineChart
+                    <RouteProgressLineChart
+                      :data="route.collectionChart"
+                      :series="collectionChartSeries"
                       :width="chartWidth"
                       :height="chartHeight"
-                      :data="route.collectionChart"
-                      :colors="['#4e79a7', '#f28e2b']"
+                      :x-axis-label="stopAxisLabel"
+                      :left-y-axis-label="collectionAxisLabel"
                     />
                   </div>
                 </div>
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col cols="12" lg="6">
                 <div class="chart-panel">
                   <div class="chart-panel__title">
                     {{ t('infrastructurePlan.show.daily.route.charts.distanceTitle') }}
                   </div>
                   <div class="chart-panel__canvas">
-                    <SimpleLineChart
+                    <RouteProgressLineChart
+                      :data="route.distanceChart"
+                      :series="distanceChartSeries"
                       :width="chartWidth"
                       :height="chartHeight"
-                      :data="route.distanceChart"
+                      :x-axis-label="stopAxisLabel"
+                      :left-y-axis-label="distanceAxisLabel"
                     />
                   </div>
                 </div>
@@ -157,15 +154,18 @@
 </template>
 
 <script lang="ts" setup>
+import { buildRouteSummaryMetrics } from '@/adapter/vuejs/analytics/infrastructure-plan/build-route-progress-charts';
 import {
-  buildRouteChartIds,
-  buildRouteCollectionLineSeries,
-  buildRouteDistanceLineSeries,
-  buildRouteSummaryMetrics,
-} from '@/adapter/vuejs/analytics/infrastructure-plan/build-route-progress-charts';
-import type { RouteLinePlotDatum } from '@/adapter/vuejs/analytics/infrastructure-plan/route-line-plot-datum';
+  RouteProgressLineChart,
+  buildRouteCollectionChartData,
+  buildRouteDistanceChartData,
+} from '@/adapter/vuejs/charts';
+import type {
+  RouteCollectionChartDatum,
+  RouteDistanceChartDatum,
+  RouteProgressChartSeries,
+} from '@/adapter/vuejs/charts';
 import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
-import SimpleLineChart from '@/adapter/vuejs/components/common/SimpleLineChart.vue';
 import { StopType } from '@/domain/enumerate/stop-type';
 import type { InfrastructurePlanDailyPlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
@@ -207,9 +207,8 @@ interface NormalizedRoute {
   facilityLabel: string;
   stops: NormalizedStop[];
   summaryStats: RouteCompactStat[];
-  collectionChart: RouteLinePlotDatum[];
-  distanceChart: RouteLinePlotDatum[];
-  chartIds: ReturnType<typeof buildRouteChartIds>;
+  collectionChart: RouteCollectionChartDatum[];
+  distanceChart: RouteDistanceChartDatum[];
   hasChartData: boolean;
 }
 
@@ -219,8 +218,47 @@ const props = defineProps<{
 
 const { t } = useI18n();
 
-const chartWidth = 360;
-const chartHeight = 220;
+const chartWidth = 520;
+const chartHeight = 260;
+
+const COLLECTION_CHART_COLORS = {
+  kilograms: '#4e79a7',
+  liters: '#f28e2b',
+} as const;
+
+const DISTANCE_CHART_COLOR = '#59a14f';
+
+const collectionChartSeries = computed<RouteProgressChartSeries[]>(() => [
+  {
+    key: 'kilograms',
+    label: t('infrastructurePlan.show.daily.route.charts.kilogramsSeries'),
+    color: COLLECTION_CHART_COLORS.kilograms,
+  },
+  {
+    key: 'liters',
+    label: t('infrastructurePlan.show.daily.route.charts.litersSeries'),
+    color: COLLECTION_CHART_COLORS.liters,
+  },
+]);
+
+const distanceChartSeries = computed<RouteProgressChartSeries[]>(() => [
+  {
+    key: 'meters',
+    label: t('infrastructurePlan.show.daily.route.charts.distanceSeries'),
+    color: DISTANCE_CHART_COLOR,
+    yAxis: 'left',
+  },
+]);
+
+const stopAxisLabel = computed(() =>
+  t('infrastructurePlan.show.daily.route.charts.stopAxisLabel'),
+);
+const collectionAxisLabel = computed(() =>
+  t('infrastructurePlan.show.daily.route.charts.collectionYAxisLabel'),
+);
+const distanceAxisLabel = computed(() =>
+  t('infrastructurePlan.show.daily.route.charts.distanceSeries'),
+);
 
 function unnamedEntityLabel(): string {
   const key = 'infrastructurePlan.show.daily.display.unnamedEntity';
@@ -234,7 +272,7 @@ const viewTooltip = computed(() => {
 });
 
 const normalizedRoutes = computed<NormalizedRoute[]>(() =>
-  props.routes.map((route, routeIndex) => {
+  props.routes.map((route) => {
     const vehicleName = route.dailyPlan.vehicle?.name?.getValue()?.trim();
     const facilityName = route.dailyPlan.facilityName?.trim();
     const stops = normalizeStops(route.dailyPlan.stops);
@@ -250,16 +288,8 @@ const normalizedRoutes = computed<NormalizedRoute[]>(() =>
         facilityName && facilityName.length > 0 ? facilityName : unnamedEntityLabel(),
       stops,
       summaryStats: buildSummaryStats(summary),
-      collectionChart: buildRouteCollectionLineSeries(
-        stops,
-        t('infrastructurePlan.show.daily.route.charts.kilogramsSeries'),
-        t('infrastructurePlan.show.daily.route.charts.litersSeries'),
-      ),
-      distanceChart: buildRouteDistanceLineSeries(
-        stops,
-        t('infrastructurePlan.show.daily.route.charts.distanceSeries'),
-      ),
-      chartIds: buildRouteChartIds(routeIndex),
+      collectionChart: buildRouteCollectionChartData(stops),
+      distanceChart: buildRouteDistanceChartData(stops),
       hasChartData: stops.length > 0,
     };
   }),
@@ -327,6 +357,16 @@ function normalizeStops(stops: InfrastructurePlanDailyPlanDetail['stops']): Norm
   let runningCumulativeLiters = 0;
 
   return sorted.map((stop) => {
+    if (stop.type === StopType.FACILITY) {
+      cumulativeKg = 0;
+      runningCumulativeLiters = 0;
+      return {
+        ...stop,
+        cumulativeKilograms: 0,
+        cumulativeLiters: 0,
+      };
+    }
+
     if (typeof stop.collectedKilograms === 'number') {
       cumulativeKg += stop.collectedKilograms;
     }
@@ -334,13 +374,10 @@ function normalizeStops(stops: InfrastructurePlanDailyPlanDetail['stops']): Norm
       runningCumulativeLiters += stop.collectedLiters;
     }
 
-    const cumulativeKilograms = stop.type === StopType.FACILITY ? 0 : cumulativeKg;
-    const cumulativeLiters = stop.type === StopType.FACILITY ? 0 : runningCumulativeLiters;
-
     return {
       ...stop,
-      cumulativeKilograms,
-      cumulativeLiters,
+      cumulativeKilograms: cumulativeKg,
+      cumulativeLiters: runningCumulativeLiters,
     };
   });
 }
@@ -622,69 +659,41 @@ function openFacility(facilityId: string): void {
 }
 
 .chart-panel {
-  background: #fff;
+  align-items: stretch;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--v-theme-surface), 1) 0%,
+    rgba(var(--v-theme-on-surface), 0.02) 100%
+  );
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 8px;
-  padding: 8px 6px 4px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(var(--v-theme-neutral-base), 0.05);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 10px 8px;
+  width: 100%;
 }
 
 .chart-panel__title {
-  font-size: 0.7rem;
-  font-weight: 600;
+  color: rgba(var(--v-theme-on-surface), 0.82);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  margin-bottom: 6px;
   text-align: center;
-  line-height: 1.2;
-  margin-bottom: 4px;
-  color: rgba(var(--v-theme-on-surface), 0.75);
-}
-
-.chart-panel__legend {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 4px;
-}
-
-.chart-panel__legend-item {
-  align-items: center;
-  color: rgba(var(--v-theme-on-surface), 0.68);
-  display: inline-flex;
-  font-size: 0.68rem;
-  gap: 4px;
-}
-
-.chart-panel__legend-item::before {
-  border-radius: 999px;
-  content: '';
-  display: inline-block;
-  height: 8px;
-  width: 8px;
-}
-
-.chart-panel__legend-item--kg::before {
-  background: #4e79a7;
-}
-
-.chart-panel__legend-item--liters::before {
-  background: #f28e2b;
 }
 
 .chart-panel__canvas {
+  align-items: center;
   display: flex;
   justify-content: center;
-  background: #fff;
   overflow-x: auto;
+  width: 100%;
 }
 
-.chart-panel :deep(h1) {
-  display: none;
-}
-
-.chart-panel :deep(svg) {
-  background: #fff;
-}
-
-.chart-panel :deep([id^='mainDiv']) {
-  background: #fff;
+.chart-panel__canvas :deep(.route-progress-chart) {
+  min-width: 320px;
 }
 
 @media (max-width: 700px) {

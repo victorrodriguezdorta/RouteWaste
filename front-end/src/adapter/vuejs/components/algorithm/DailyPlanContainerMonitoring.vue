@@ -92,20 +92,16 @@
             <div class="monitoring-chart__title">
               {{ t('infrastructurePlan.show.daily.monitoring.fillEvolutionChartTitle') }}
             </div>
-            <div class="monitoring-chart__legend">
-              <span
-                v-for="legendItem in facilityMonitoring.fillChartLegend"
-                :key="legendItem.key"
-                class="monitoring-chart__legend-item"
-              >
-                {{ legendItem.label }}
-              </span>
-            </div>
             <div class="monitoring-chart__canvas">
-              <SimpleLineChart
-                :width="chartWidth"
-                :height="chartHeight"
+              <RouteProgressLineChart
                 :data="facilityMonitoring.fillChartData"
+                :series="facilityMonitoring.fillChartSeries"
+                :width="chartMinWidth"
+                :height="facilityMonitoring.fillChartHeight"
+                fluid
+                legend-position="side-left"
+                :x-axis-label="dayAxisLabel"
+                :left-y-axis-label="fillPercentAxisLabel"
               />
             </div>
           </div>
@@ -123,7 +119,11 @@ import type {
     InfrastructurePlanFacilityDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
 import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
-import SimpleLineChart from '@/adapter/vuejs/components/common/SimpleLineChart.vue';
+import {
+  RouteProgressLineChart,
+  buildContainerFillChartData,
+} from '@/adapter/vuejs/charts';
+import type { RouteProgressChartDatum, RouteProgressChartSeries } from '@/adapter/vuejs/charts';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -142,18 +142,9 @@ interface FacilityMonitoringEntry {
     container: InfrastructurePlanContainerDetail;
     state?: InfrastructurePlanContainerDailyStateDetail;
   }>;
-  chartId: number;
-  fillChartData: ContainerFillLinePlotDatum[];
-  fillChartLegend: ContainerFillChartLegendItem[];
-}
-
-type ContainerFillLinePlotDatum = Record<string, number> & {
-  product: number;
-};
-
-interface ContainerFillChartLegendItem {
-  key: string;
-  label: string;
+  fillChartData: RouteProgressChartDatum[];
+  fillChartSeries: RouteProgressChartSeries[];
+  fillChartHeight: number;
 }
 
 const props = defineProps<{
@@ -165,8 +156,16 @@ const props = defineProps<{
 const { t } = useI18n();
 
 const themeColorsRevision = ref(0);
-const chartWidth = 720;
-const chartHeight = 260;
+const chartMinWidth = 640;
+const FILL_CHART_BASE_HEIGHT = 280;
+const FILL_CHART_MAX_HEIGHT = 520;
+
+const dayAxisLabel = computed(() =>
+  t('infrastructurePlan.show.daily.monitoring.dayAxisLabel'),
+);
+const fillPercentAxisLabel = computed(() =>
+  t('infrastructurePlan.show.daily.monitoring.fillPercentAxisLabel'),
+);
 
 const fillThemeStyle = computed(() => {
   themeColorsRevision.value;
@@ -216,77 +215,35 @@ const selectedFacilityMonitoring = computed<FacilityMonitoringEntry[]>(() => {
       .map((state) => [normalizeIdentifier(state.containerId.getValue()), state]),
   );
 
-  return props.selectedFacilities.map((facility, facilityIndex) => {
+  return props.selectedFacilities.map((facility) => {
     const containers = (facility.assignedContainers ?? []).map((container) => ({
       container,
       state: monitoringByContainerId.get(normalizeIdentifier(container.id.getValue())),
     }));
 
+    const fillChart = buildContainerFillChartData({
+      containers: facility.assignedContainers ?? [],
+      monitoringStates: props.containerStateMonitoring,
+      labelForContainer: chartSeriesLabelForContainer,
+    });
+
+    const seriesCount = fillChart.series.length;
+
     return {
       facility,
       containers,
-      chartId: 20_000 + facilityIndex,
-      fillChartData: buildFacilityFillChartData(facility),
-      fillChartLegend: buildFacilityFillChartLegend(facility),
+      fillChartData: fillChart.data,
+      fillChartSeries: fillChart.series,
+      fillChartHeight: Math.min(
+        Math.max(FILL_CHART_BASE_HEIGHT, seriesCount * 28),
+        FILL_CHART_MAX_HEIGHT,
+      ),
     };
   });
 });
 
-function buildFacilityFillChartLegend(
-  facility: InfrastructurePlanFacilityDetail,
-): ContainerFillChartLegendItem[] {
-  return (facility.assignedContainers ?? []).map((container, index) => ({
-    key: container.id.getValue(),
-    label: chartSeriesLabelForContainer(container, index),
-  }));
-}
-
-function buildFacilityFillChartData(
-  facility: InfrastructurePlanFacilityDetail,
-): ContainerFillLinePlotDatum[] {
-  const containers = facility.assignedContainers ?? [];
-  if (containers.length === 0) {
-    return [];
-  }
-
-  const containerIds = new Set(containers.map((container) => normalizeIdentifier(container.id.getValue())));
-  const statesByDayAndContainer = new Map<string, InfrastructurePlanContainerDailyStateDetail>();
-  const availableDays = new Set<number>();
-
-  props.containerStateMonitoring.forEach((state) => {
-    const containerId = normalizeIdentifier(state.containerId.getValue());
-    if (!containerIds.has(containerId)) {
-      return;
-    }
-
-    const day = normalizePlanDay(state.planDay);
-    if (day < 0) {
-      return;
-    }
-
-    availableDays.add(day);
-    statesByDayAndContainer.set(`${day}::${containerId}`, state);
-  });
-
-  return Array.from(availableDays)
-    .sort((left, right) => left - right)
-    .map((day) => {
-      const row: ContainerFillLinePlotDatum = { product: day };
-
-      containers.forEach((container, index) => {
-        const containerId = normalizeIdentifier(container.id.getValue());
-        const state = statesByDayAndContainer.get(`${day}::${containerId}`);
-        const percent = computeContainerFillPercent({ container, state });
-        row[chartSeriesLabelForContainer(container, index)] = percent ?? 0;
-      });
-
-      return row;
-    });
-}
-
-function chartSeriesLabelForContainer(container: InfrastructurePlanContainerDetail, index: number): string {
-  const name = displayEntityNameOrUnnamed(container.name.getValue());
-  return `${name} ${index + 1}`;
+function chartSeriesLabelForContainer(container: InfrastructurePlanContainerDetail): string {
+  return displayEntityNameOrUnnamed(container.name.getValue());
 }
 
 function formatContainerLocation(container: InfrastructurePlanContainerDetail): string {
@@ -487,63 +444,40 @@ function formatFacilityType(value?: FacilityType | string): string {
 }
 
 .monitoring-chart {
-  background: #fff;
+  align-items: stretch;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--v-theme-surface), 1) 0%,
+    rgba(var(--v-theme-on-surface), 0.02) 100%
+  );
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 10px;
-  padding: 10px 8px 6px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(var(--v-theme-neutral-base), 0.05);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 10px 8px;
+  width: 100%;
 }
 
 .monitoring-chart__title {
-  color: rgba(var(--v-theme-on-surface), 0.75);
+  color: rgba(var(--v-theme-on-surface), 0.82);
   font-size: 0.78rem;
   font-weight: 700;
-  line-height: 1.2;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
   margin-bottom: 6px;
   text-align: center;
 }
 
-.monitoring-chart__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 12px;
-  justify-content: center;
-  margin-bottom: 6px;
-}
-
-.monitoring-chart__legend-item {
-  align-items: center;
-  color: rgba(var(--v-theme-on-surface), 0.68);
-  display: inline-flex;
-  font-size: 0.68rem;
-  gap: 4px;
-}
-
-.monitoring-chart__legend-item::before {
-  background: rgb(var(--v-theme-primary));
-  border-radius: 999px;
-  content: '';
-  display: inline-block;
-  height: 8px;
-  width: 8px;
-}
-
 .monitoring-chart__canvas {
-  background: #fff;
+  align-items: stretch;
   display: flex;
-  justify-content: center;
-  overflow-x: auto;
+  justify-content: stretch;
+  width: 100%;
 }
 
-.monitoring-chart :deep(h1) {
-  display: none;
-}
-
-.monitoring-chart :deep(svg) {
-  background: #fff;
-}
-
-.monitoring-chart :deep([id^='mainDiv']) {
-  background: #fff;
+.monitoring-chart__canvas :deep(.route-progress-chart-host) {
+  width: 100%;
 }
 
 @media (max-width: 900px) {

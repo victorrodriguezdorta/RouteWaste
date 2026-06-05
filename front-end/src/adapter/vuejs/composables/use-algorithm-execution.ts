@@ -229,27 +229,6 @@ export function useAlgorithmExecution() {
   });
 
   /**
-   * Generate the command JSON that will be sent to the backend
-   */
-  const formattedCommandJson = computed(() => {
-    const command = {
-      facilitiesWithVehicles: algorithmStore.facilitiesWithVehicles.map(f => ({
-        facilityId: f.facilityId,
-        selectedVehicleIds: f.selectedVehicleIds,
-      })),
-      selectedContainerIds: algorithmStore.selectedContainerIds,
-      numberOfDays: algorithmStore.extraData.numberOfDays,
-      averagePickupTimeMinutes: algorithmStore.extraData.averagePickupTimeMinutes,
-      maxBudget: {
-        amount: algorithmStore.extraData.maxBudgetAmount,
-        currency: 'EUR',
-      },
-    };
-    
-    return JSON.stringify(command, null, 2);
-  });
-
-  /**
    * Get the currently selected facility for vehicle selection
    */
   const selectedFacilityForVehicles = computed(() => {
@@ -873,7 +852,6 @@ export function useAlgorithmExecution() {
     vehicleItems,
     isStep1Valid,
     totalSelectedVehicles,
-    formattedCommandJson,
     selectedFacilityForVehicles,
     
     // Store references

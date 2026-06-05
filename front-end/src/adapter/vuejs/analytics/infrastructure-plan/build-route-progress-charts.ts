@@ -8,38 +8,54 @@ import type { TransportationVariableCost } from '@/domain/valueobject/cost/trans
 export function buildRouteChartIds(routeIndex: number): RouteChartIds {
   const baseId = 10_000 + routeIndex * 10;
   return {
-    collection: baseId + 1,
-    distance: baseId + 2,
+    kilograms: baseId + 1,
+    liters: baseId + 2,
+    distance: baseId + 3,
   };
 }
 
-export function buildRouteCollectionLineSeries(
-  stops: RouteProgressStop[],
-  kilogramsLabel = 'kg',
-  litersLabel = 'L',
-): RouteLinePlotDatum[] {
+const LINE_PLOT_EPOCH_MS = Date.UTC(2020, 0, 1);
+
+/**
+ * LinePlot uses a time scale on the x axis; map stop sequence to evenly spaced timestamps.
+ */
+function toLinePlotProduct(sequence: number): number {
+  return LINE_PLOT_EPOCH_MS + sequence * 60_000;
+}
+
+export function buildRouteKilogramsLineSeries(stops: RouteProgressStop[]): RouteLinePlotDatum[] {
   let cumulativeKilograms = 0;
-  let cumulativeLiters = 0;
 
   return stops.map((stop) => {
     cumulativeKilograms += stop.collectedKilograms ?? 0;
-    cumulativeLiters += stop.collectedLiters ?? 0;
 
     return {
-      product: stop.sequence,
-      [kilogramsLabel]: cumulativeKilograms,
-      [litersLabel]: cumulativeLiters,
+      product: toLinePlotProduct(stop.sequence),
+      value: cumulativeKilograms,
+      stop: stop.sequence,
     };
   });
 }
 
-export function buildRouteDistanceLineSeries(
-  stops: RouteProgressStop[],
-  distanceLabel = 'm',
-): RouteLinePlotDatum[] {
+export function buildRouteLitersLineSeries(stops: RouteProgressStop[]): RouteLinePlotDatum[] {
+  let cumulativeLiters = 0;
+
+  return stops.map((stop) => {
+    cumulativeLiters += stop.collectedLiters ?? 0;
+
+    return {
+      product: toLinePlotProduct(stop.sequence),
+      value: cumulativeLiters,
+      stop: stop.sequence,
+    };
+  });
+}
+
+export function buildRouteDistanceLineSeries(stops: RouteProgressStop[]): RouteLinePlotDatum[] {
   return stops.map((stop) => ({
-    product: stop.sequence,
-    [distanceLabel]: stop.cumulativeDistanceMeters ?? 0,
+    product: toLinePlotProduct(stop.sequence),
+    value: stop.cumulativeDistanceMeters ?? 0,
+    stop: stop.sequence,
   }));
 }
 

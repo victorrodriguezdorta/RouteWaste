@@ -185,26 +185,6 @@
         </v-window>
       </v-card>
     </section>
-
-    <v-card elevation="1" variant="flat" class="route-visualizer__json-toggle">
-      <v-btn
-        block
-        variant="text"
-        color="primary"
-        class="json-toggle-btn text-none"
-        :append-icon="jsonExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-        @click="jsonExpanded = !jsonExpanded"
-      >
-        <v-icon start icon="mdi-code-json" />
-        {{ technicalJsonTitle }}
-      </v-btn>
-
-      <v-expand-transition>
-        <div v-show="jsonExpanded" class="px-4 pb-4">
-          <pre class="json-block">{{ jsonContent }}</pre>
-        </div>
-      </v-expand-transition>
-    </v-card>
   </div>
 </template>
 
@@ -300,15 +280,8 @@ function leafletRouteLineColors(): { returnLeg: string; departureLeg: string; pr
 const containerFillPalette = computed(() => buildContainerFillThemePalette());
 
 const dailyDetailsTab = ref<'routes' | 'monitoring'>('routes');
-const jsonExpanded = ref(false);
 const mapStageRef = ref<HTMLElement | null>(null);
 let mapStageResizeObserver: ResizeObserver | null = null;
-
-const technicalJsonTitle = computed(() => {
-  const key = 'infrastructurePlan.show.daily.content.technicalJsonTitle';
-  const translated = t(key);
-  return translated === key ? 'Datos técnicos (JSON)' : translated;
-});
 
 const detailsSectionHeadline = computed(() => {
   const key = 'infrastructurePlan.show.daily.content.visualizerDetailsTitle';
@@ -365,8 +338,6 @@ const selectedVehicleRoutes = computed<VehicleRouteOption[]>(() => {
   return selectableVehicleRoutes.value.filter((route) => selectedKeys.has(route.key));
 });
 
-const jsonContent = computed(() => JSON.stringify(buildPublicDaySummary(), null, 2));
-
 watch(
   () => selectableFacilities.value.map((facility) => facility.id.getValue()),
   (ids) => {
@@ -396,14 +367,6 @@ watch(
     renderMarkers();
   },
 );
-
-watch(jsonExpanded, (open) => {
-  if (open) {
-    void nextTick(() => {
-      mapInstance.value?.invalidateSize();
-    });
-  }
-});
 
 watch(
   () => props.facilities,
@@ -509,111 +472,6 @@ function escapeHtml(text: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
-}
-
-function publicLocationSnapshot(location: InfrastructurePlanContainerDetail['location']): Record<string, unknown> {
-  return {
-    latitude: location.latitude,
-    longitude: location.longitude,
-    postalAddress: location.postalAddress,
-    gisReference: location.gisReference,
-  };
-}
-
-function serializeVehicleSnapshot(vehicle: InfrastructurePlanDailyPlanDetail['vehicle']): Record<string, unknown> | null {
-  if (!vehicle) {
-    return null;
-  }
-
-  const cost = vehicle.costPerKilometer;
-  return {
-    name: vehicle.name?.getValue() ?? null,
-    vehicleType: vehicle.vehicleType,
-    capacityKilograms: vehicle.capacityKilograms?.getKilograms() ?? null,
-    capacityLiters: vehicle.capacityLiters?.getLiters() ?? null,
-    costPerKilometer:
-      cost != null
-        ? {
-            amount: cost.getAmount(),
-            currency: cost.getCurrency().getCode(),
-          }
-        : null,
-  };
-}
-
-function serializeStopPublic(stop: InfrastructurePlanDailyPlanDetail['stops'][number]): Record<string, unknown> {
-  return {
-    sequence: stop.sequence.getValue(),
-    type: stop.type,
-    containerName: stop.containerName?.getValue() ?? null,
-    collectedKilograms: stop.collectedKilograms.getKilograms(),
-    collectedLiters: stop.collectedLiters.getLiters(),
-    distanceFromPreviousMeters: stop.distanceFromPreviousMeters.getValue(),
-    cumulativeDistanceMeters: stop.cumulativeDistanceMeters.getValue(),
-    containerActualLiters: stop.containerActualLiters,
-    alerts: stop.alerts.map((alert) => ({
-      type: alert.type,
-      message: alert.message,
-      value: alert.value,
-    })),
-  };
-}
-
-function serializeDailyPlanPublic(plan: InfrastructurePlanDailyPlanDetail): Record<string, unknown> {
-  return {
-    facilityName: plan.facilityName,
-    serviceDate: plan.serviceDate,
-    planDay: plan.planDay,
-    vehicle: serializeVehicleSnapshot(plan.vehicle),
-    totalCollectedKilograms: plan.totalCollectedKilograms.getKilograms(),
-    totalCollectedLiters: plan.totalCollectedLiters.getLiters(),
-    totalDistanceMeters: plan.totalDistanceMeters.getValue(),
-    stops: plan.stops.map(serializeStopPublic),
-  };
-}
-
-function serializeFacilityPublic(facility: InfrastructurePlanFacilityDetail): Record<string, unknown> {
-  return {
-    name: facility.name.getValue(),
-    facilityType: facility.facilityType,
-    status: facility.status,
-    location: publicLocationSnapshot(facility.location),
-    storageCapacityKilograms: facility.storageCapacity.getKilograms(),
-    processingCapacityKilogramsPerDay: facility.processingCapacity.getKilogramsPerDay(),
-    assignedContainers: (facility.assignedContainers ?? []).map((container) => ({
-      name: container.name.getValue(),
-      wasteType: container.wasteType,
-      serviceZone: container.serviceZone,
-      capacityLiters: container.capacityLiters.getLiters(),
-      dailyDemandLitersPerDay: container.dailyDemandLitersPerDay.getLitersPerDay(),
-      location: publicLocationSnapshot(container.location),
-    })),
-    dailyPlans: facility.dailyPlans.map(serializeDailyPlanPublic),
-  };
-}
-
-function buildPublicDaySummary(): Record<string, unknown> {
-  return {
-    planDay: props.planDay,
-    serviceDate: props.serviceDate ?? null,
-    totals: {
-      dailyPlans: props.dailyPlans.length,
-      facilities: props.facilities.length,
-      stops: props.dailyPlans.reduce((acc, plan) => acc + (Array.isArray(plan.stops) ? plan.stops.length : 0), 0),
-    },
-    facilities: props.facilities.map(serializeFacilityPublic),
-    dailyPlans: props.dailyPlans.map(serializeDailyPlanPublic),
-    containerStateMonitoring: props.containerStateMonitoring
-      .filter((state) => state.planDay === props.planDay)
-      .map((state) => ({
-        planDay: state.planDay,
-        containerName: state.containerName?.getValue() ?? null,
-        dailyFillingLiters: state.dailyFillingLiters,
-        containerCapacityLiters: state.containerCapacityLiters.getLiters(),
-        dailyDemandLitersPerDay: state.dailyDemandLitersPerDay?.getLitersPerDay() ?? null,
-        status: state.status,
-      })),
-  };
 }
 
 function isFacilitySelected(facilityId: string): boolean {
@@ -1100,31 +958,6 @@ function renderMarkers(): void {
 
 .details-shell__window {
   background: rgba(var(--v-theme-surface), 0.5);
-}
-
-.route-visualizer__json-toggle {
-  border: 1px solid rgba(var(--v-theme-neutral-base), 0.08);
-  border-radius: 14px;
-  overflow: hidden;
-}
-
-.json-toggle-btn {
-  justify-content: center;
-  letter-spacing: 0.01em;
-}
-
-.json-block {
-  background: rgb(var(--v-theme-surface-variant));
-  border-radius: 10px;
-  font-family: Consolas, 'Courier New', monospace;
-  font-size: 0.8rem;
-  line-height: 1.45;
-  margin: 0;
-  max-height: min(50vh, 480px);
-  overflow: auto;
-  padding: 14px;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
 
 :global(.leaflet-container) {

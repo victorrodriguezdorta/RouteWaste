@@ -246,16 +246,6 @@
             vehicleCount: totalSelectedVehicles
           }) }}
         </p>
-
-        <!-- JSON Preview -->
-        <div class="mt-4">
-          <p class="text-caption font-weight-bold mb-2">{{ t('algorithm.execute.step1.jsonPreview') }}</p>
-          <v-card variant="outlined" class="bg-surface-soft">
-            <v-card-text class="pa-3">
-              <pre class="text-caption" style="overflow-x: auto; font-size: 11px; line-height: 1.4;">{{ formattedCommandJson }}</pre>
-            </v-card-text>
-          </v-card>
-        </div>
       </div>
     </v-card-text>
   </v-card>
@@ -307,7 +297,6 @@ const {
   vehicleItems,
   isStep1Valid,
   totalSelectedVehicles,
-  formattedCommandJson,
   selectedFacilityForVehicles,
 
   // Store reference
