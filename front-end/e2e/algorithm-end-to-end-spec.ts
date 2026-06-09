@@ -45,7 +45,7 @@ test.describe('Algorithm / infrastructure plans', () => {
     await expect(
       page.getByRole('heading', { name: /Ejecutar Algoritmo/i }),
     ).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText('Instalaciones y Vehículos').first()).toBeVisible();
+    await expect(page.getByText('Seleccionar Instalaciones y Vehículos').first()).toBeVisible();
   });
 });
 

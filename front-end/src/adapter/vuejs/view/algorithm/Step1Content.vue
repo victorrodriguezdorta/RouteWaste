@@ -1,17 +1,5 @@
 <template>
-  <v-card flat class="mt-4">
-    <v-card-actions>
-      <v-spacer />
-      <v-btn
-        variant="elevated"
-        color="primary"
-        append-icon="mdi-chevron-right"
-        @click="emit('next')"
-        :disabled="!isStep1Valid"
-      >
-        {{ t('common.buttons.next') }}
-      </v-btn>
-    </v-card-actions>
+  <v-card flat>
     <v-card-text>
       <!-- Filtros -->
       <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px; margin-bottom: 16px;">
@@ -266,10 +254,6 @@ type FacilityTableRowClickPayload = {
   internalItem?: { raw?: { id: string } };
 };
 
-const emit = defineEmits<{
-  next: [];
-}>();
-
 const {
   // State
   tablePage,
@@ -295,7 +279,6 @@ const {
   facilityItems,
   step1FacilityMapPins,
   vehicleItems,
-  isStep1Valid,
   totalSelectedVehicles,
   selectedFacilityForVehicles,
 

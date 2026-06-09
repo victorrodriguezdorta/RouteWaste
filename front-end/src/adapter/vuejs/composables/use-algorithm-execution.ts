@@ -50,12 +50,18 @@ export function useAlgorithmExecution() {
   // Alias for easier access
   const facilities = computed(() => allFacilities.value);
 
-  // Compute stepper items from translations
-  const stepperItems = computed(() => [
-    t('algorithm.execute.step1.label'),
-    t('algorithm.execute.step2.label'),
-    t('algorithm.execute.step3.label'),
-  ]);
+  const currentStepTitle = computed(() => {
+    switch (currentStep.value) {
+      case 1:
+        return t('algorithm.execute.step1.title');
+      case 2:
+        return t('algorithm.execute.step2.title');
+      case 3:
+        return t('algorithm.execute.step3.title');
+      default:
+        return '';
+    }
+  });
 
   // Table headers
   const headers = computed(() => [
@@ -841,7 +847,7 @@ export function useAlgorithmExecution() {
     
     // Computed
     facilities,
-    stepperItems,
+    currentStepTitle,
     headers,
     facilityTypeFilterOptions,
     facilityStatusFilterOptions,

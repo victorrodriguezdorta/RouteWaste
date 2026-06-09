@@ -69,18 +69,18 @@
               </div>
 
               <div class="monitoring-item__metrics">
-                <div>
+                <span class="monitoring-item__metric">
                   <strong>{{ t('infrastructurePlan.show.daily.monitoring.fillingLabel') }}:</strong>
                   {{ formatLiters(containerMonitoring.state?.dailyFillingLiters) }}
-                </div>
-                <div>
+                </span>
+                <span class="monitoring-item__metric">
                   <strong>{{ t('infrastructurePlan.show.daily.monitoring.capacityLabel') }}:</strong>
                   {{ formatLiters(containerMonitoring.state?.containerCapacityLiters?.getLiters?.() ?? containerMonitoring.container.capacityLiters.getLiters()) }}
-                </div>
-                <div>
+                </span>
+                <span class="monitoring-item__metric">
                   <strong>{{ t('infrastructurePlan.show.daily.monitoring.demandPerDayLabel') }}:</strong>
                   {{ formatLiters(containerMonitoring.state?.dailyDemandLitersPerDay?.getLitersPerDay?.() ?? containerMonitoring.container.dailyDemandLitersPerDay.getLitersPerDay()) }}
-                </div>
+                </span>
               </div>
             </div>
           </div>
@@ -357,7 +357,6 @@ function formatFacilityType(value?: FacilityType | string): string {
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(var(--v-theme-neutral-base), 0.04);
-  min-height: 160px;
   padding: 12px 14px;
 }
 
@@ -418,8 +417,16 @@ function formatFacilityType(value?: FacilityType | string): string {
 }
 
 .monitoring-item__metrics {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.monitoring-item__metric {
+  white-space: nowrap;
 }
 
 .monitoring-item__view-button {

@@ -1,5 +1,5 @@
 <template>
-  <CrudLayout :title="t('algorithm.execute.title')" icon="mdi-play">
+  <CrudLayout :title="t('algorithm.execute.title')" hide-header>
     <v-snackbar
       v-model="algorithmNotification.flag"
       :color="algorithmNotification.color"
@@ -11,7 +11,7 @@
       <p class="mb-0">{{ algorithmNotification.msg }}</p>
     </v-snackbar>
 
-    <div class="pa-4">
+    <div class="pa-4 execute-algorithm">
       <div v-if="loading" class="algorithm-loader-overlay">
         <div class="algorithm-loader-card">
           <v-progress-circular indeterminate color="primary" size="56" width="5" />
@@ -21,39 +21,56 @@
         </div>
       </div>
 
-      <v-stepper
-        v-model="currentStep"
-        :items="stepperItems"
-        class="execute-algorithm-stepper elevation-0"
-        flat
-        hide-actions
+      <AlgorithmStepIndicator
+        :title="t('algorithm.execute.title')"
+        icon="mdi-play"
+        :current-step="currentStep"
+        :total-steps="3"
+      />
+
+      <AlgorithmStepFooter
+        :step-title="currentStepTitle"
+        :show-back="currentStep > 1"
+        :back-disabled="loading"
+        :is-last-step="currentStep === 3"
+        :can-proceed="canProceedCurrentStep"
+        :loading="loading"
+        @back="goToPreviousStep"
+        @next="goToNextStep"
+        @execute="handleExecuteAlgorithm"
       >
-        <template v-slot:default>
-          <v-stepper-window>
-            
-            <v-stepper-window-item :value="1">
-              <Step1Content @next="currentStep = 2" />
-            </v-stepper-window-item>
-
-            <v-stepper-window-item :value="2">
-              <Step2Content @back="currentStep = 1" @next="currentStep = 3" />
-            </v-stepper-window-item>
-
-            <v-stepper-window-item :value="3">
-              <Step3Content :loading="loading" @back="currentStep = 2" @execute="handleExecuteAlgorithm" />
-            </v-stepper-window-item>
-
-          </v-stepper-window>
+        <template v-if="currentStep === 2" #left-actions>
+          <v-btn
+            variant="outlined"
+            color="primary"
+            :disabled="step2ContainerItems.length === 0"
+            @click="toggleVisibleContainersSelection"
+          >
+            {{
+              areAllVisibleContainersSelected
+                ? t('common.buttons.deselectAll')
+                : t('common.buttons.selectAll')
+            }}
+          </v-btn>
         </template>
-      </v-stepper>
+      </AlgorithmStepFooter>
+
+      <div class="execute-algorithm__content">
+        <Step1Content v-if="currentStep === 1" />
+        <Step2Content v-else-if="currentStep === 2" />
+        <Step3Content v-else :loading="loading" />
+      </div>
     </div>
   </CrudLayout>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import AlgorithmStepFooter from '../../components/algorithm/AlgorithmStepFooter.vue';
+import AlgorithmStepIndicator from '../../components/algorithm/AlgorithmStepIndicator.vue';
 import CrudLayout from '../../components/common/CrudLayout.vue';
 import { useAlgorithmExecution } from '@/adapter/vuejs/composables/use-algorithm-execution';
 import router from '../../router/router';
@@ -68,10 +85,38 @@ const { algorithmNotification, loading } = storeToRefs(algorithmStore);
 
 const {
   currentStep,
-  stepperItems,
+  currentStepTitle,
   initializeData,
   executeAlgorithm,
+  isStep1Valid,
+  isStep2Valid,
+  isStep3Valid,
+  step2ContainerItems,
+  areAllVisibleContainersSelected,
+  toggleVisibleContainersSelection,
 } = useAlgorithmExecution();
+
+const canProceedCurrentStep = computed(() => {
+  if (currentStep.value === 1) {
+    return isStep1Valid.value;
+  }
+  if (currentStep.value === 2) {
+    return isStep2Valid.value;
+  }
+  return isStep3Valid.value;
+});
+
+const goToPreviousStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value -= 1;
+  }
+};
+
+const goToNextStep = () => {
+  if (currentStep.value < 3 && canProceedCurrentStep.value) {
+    currentStep.value += 1;
+  }
+};
 
 onMounted(async () => {
   const pendingJson = algorithmStore.dequeuePendingExecutionRequestJson();
@@ -136,37 +181,7 @@ const handleExecuteAlgorithm = async () => {
   min-width: 240px;
 }
 
-/* Stepper header: sin sombra duplicada y líneas de unión más claras */
-.execute-algorithm-stepper :deep(.v-stepper-header) {
-  box-shadow: none;
-  background: color-mix(in srgb, rgb(var(--v-theme-surface)) 92%, rgb(var(--v-theme-primary)) 8%);
-  border-radius: 12px;
-  padding-block: 8px 12px;
-  padding-inline: 4px;
-  margin-bottom: 4px;
-}
-
-.execute-algorithm-stepper :deep(.v-stepper-header .v-divider) {
-  align-self: center;
-  flex: 1 1 auto;
-  height: 4px;
-  min-height: 4px;
-  max-height: 4px;
-  margin-block: 0;
-  margin-inline: 4px;
-  border: none;
-  opacity: 1;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, rgb(var(--v-theme-primary)) 18%, transparent),
-    color-mix(in srgb, rgb(var(--v-theme-primary)) 55%, transparent),
-    color-mix(in srgb, rgb(var(--v-theme-primary)) 18%, transparent)
-  );
-  box-shadow: 0 1px 2px color-mix(in srgb, rgb(var(--v-theme-primary)) 12%, transparent);
-}
-
-.execute-algorithm-stepper :deep(.v-stepper-window) {
-  margin-top: 0.5rem;
+.execute-algorithm__content {
+  margin-top: 0;
 }
 </style>

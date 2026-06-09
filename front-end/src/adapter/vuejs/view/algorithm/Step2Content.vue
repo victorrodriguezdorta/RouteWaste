@@ -1,28 +1,5 @@
 <template>
-  <v-card flat class="mt-4">
-    <v-card-actions>
-      <v-btn variant="outlined" prepend-icon="mdi-chevron-left" @click="emit('back')">
-        {{ t('common.buttons.back') }}
-      </v-btn>
-      <v-btn
-        variant="outlined"
-        color="primary"
-        @click="toggleVisibleContainersSelection"
-        :disabled="step2ContainerItems.length === 0"
-      >
-        {{ areAllVisibleContainersSelected ? t('common.buttons.deselectAll') : t('common.buttons.selectAll') }}
-      </v-btn>
-      <v-spacer />
-      <v-btn
-        variant="elevated"
-        color="primary"
-        append-icon="mdi-chevron-right"
-        @click="emit('next')"
-        :disabled="!isStep2Valid"
-      >
-        {{ t('common.buttons.next') }}
-      </v-btn>
-    </v-card-actions>
+  <v-card flat>
     <v-card-text>
       <!-- Filtros -->
       <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px; margin-bottom: 16px;">
@@ -176,12 +153,7 @@ import { useAlgorithmExecution } from '@/adapter/vuejs/composables/use-algorithm
 
 const { t } = useI18n();
 
-const emit = defineEmits<{
-  back: [];
-  next: [];
-}>();
-
-  const {
+const {
   // State - Step 2
   step2TablePage,
   step2ItemsPerPage,
@@ -197,9 +169,6 @@ const emit = defineEmits<{
   serviceZoneFilterOptions,
   step2ContainerItems,
   step2ContainerMapPins,
-  isStep2Valid,
-  areAllVisibleContainersSelected,
-
   // Store reference
   algorithmStore,
 
@@ -210,7 +179,6 @@ const emit = defineEmits<{
   onStep2TableOptionsUpdate,
   isContainerSelected,
   toggleContainer,
-  toggleVisibleContainersSelection,
 } = useAlgorithmExecution();
 
 // Handler wrapper for location filter (Step 2 version)

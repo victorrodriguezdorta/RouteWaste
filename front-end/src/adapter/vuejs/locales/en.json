@@ -658,6 +658,7 @@
       "opening": "Opening the algorithm...",
       "loadingData": "Loading facilities, vehicles and containers...",
       "executing": "Executing algorithm...",
+      "stepIndicatorAria": "Algorithm execution wizard progress",
       "step1": {
         "label": "Facilities & Vehicles",
         "title": "Select Facilities and Vehicles",

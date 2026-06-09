@@ -658,6 +658,7 @@
       "opening": "Abriendo el algoritmo...",
       "loadingData": "Cargando instalaciones, vehiculos y contenedores...",
       "executing": "Ejecutando algoritmo...",
+      "stepIndicatorAria": "Progreso del asistente de ejecución",
       "step1": {
         "label": "Instalaciones y Vehículos",
         "title": "Seleccionar Instalaciones y Vehículos",

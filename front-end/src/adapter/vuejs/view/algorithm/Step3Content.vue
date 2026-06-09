@@ -1,21 +1,5 @@
 <template>
-  <v-card flat class="mt-4">
-    <v-card-actions>
-      <v-btn variant="outlined" prepend-icon="mdi-chevron-left" :disabled="loading" @click="emit('back')">
-        {{ t('common.buttons.back') }}
-      </v-btn>
-      <v-spacer />
-      <v-btn
-        variant="elevated"
-        color="success"
-        :loading="loading"
-        @click="emit('execute')"
-        :disabled="!isStep3Valid || loading"
-      >
-        {{ t('algorithm.list.runButton') }}
-      </v-btn>
-    </v-card-actions>
-
+  <v-card flat>
     <v-card-text>
       <!-- Input Fields -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
@@ -147,11 +131,6 @@ import { useAlgorithmExecution } from '@/adapter/vuejs/composables/use-algorithm
 
 const { t } = useI18n();
 
-const emit = defineEmits<{
-  back: [];
-  execute: [];
-}>();
-
 defineProps<{
   loading?: boolean;
 }>();
@@ -161,7 +140,6 @@ const {
   totalSelectedVehicles,
   
   // Computed - Step 3
-  isStep3Valid,
   numberOfDaysRef,
   averagePickupTimeMinutesRef,
   maxBudgetAmountRef,
