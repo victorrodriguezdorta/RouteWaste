@@ -73,6 +73,112 @@ class AlgorithmTest {
         "DISTRICT");
   }
 
+  private String firstContainerStopId(DailyPlan plan) {
+    return plan.getStops().stream()
+        .filter(stop -> stop.getType() == StopType.CONTAINER)
+        .findFirst()
+        .map(stop -> stop.getContainer().getId())
+        .orElseThrow();
+  }
+
+  @Test
+  void shouldPrioritizeHigherFillPercentageOverCloserContainer() {
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Container nearLowFillContainer = container(
+        "container-near-low-fill",
+        28.4698,
+        -16.2498,
+        200.0,
+        10.0);
+    Container farHighFillContainer = container(
+        "container-far-high-fill",
+        28.460,
+        -16.260,
+        100.0,
+        90.0);
+
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+        15,
+        1,
+        List.of(facilityWithVehicles),
+        List.of(nearLowFillContainer, farHighFillContainer),
+        new MaximumBudget(5000.0, "EUR"));
+
+    DeliveryPlanningSolution solution = new Algorithm(problem).run();
+
+    DailyPlan dailyPlan = solution.getDailyPlans().get(0);
+    assertEquals("container-far-high-fill", firstContainerStopId(dailyPlan));
+  }
+
+  @Test
+  void shouldPrioritizeOverflowedContainerOverCloserLowFillContainer() {
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Container nearLowFillContainer = container(
+        "container-near-low-fill",
+        28.4698,
+        -16.2498,
+        500.0,
+        30.0);
+    Container farOverflowedContainer = container(
+        "container-far-overflowed",
+        28.460,
+        -16.260,
+        50.0,
+        65.0);
+
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+        15,
+        1,
+        List.of(facilityWithVehicles),
+        List.of(nearLowFillContainer, farOverflowedContainer),
+        new MaximumBudget(5000.0, "EUR"));
+
+    DeliveryPlanningSolution solution = new Algorithm(problem).run();
+
+    DailyPlan dailyPlan = solution.getDailyPlans().get(0);
+    assertEquals("container-far-overflowed", firstContainerStopId(dailyPlan));
+    DailyPlanStop firstStop = dailyPlan.getStops().stream()
+        .filter(stop -> stop.getType() == StopType.CONTAINER)
+        .findFirst()
+        .orElseThrow();
+    assertTrue(firstStop.getContainerActualLiters() > farOverflowedContainer.getCapacityLiters());
+  }
+
+  @Test
+  void shouldPreferCloserContainerWhenFillLevelsAreEqual() {
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Container nearContainer = container(
+        "container-near",
+        28.469,
+        -16.252,
+        100.0,
+        50.0);
+    Container farContainer = container(
+        "container-far",
+        28.460,
+        -16.260,
+        100.0,
+        50.0);
+
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+        15,
+        1,
+        List.of(facilityWithVehicles),
+        List.of(nearContainer, farContainer),
+        new MaximumBudget(5000.0, "EUR"));
+
+    DeliveryPlanningSolution solution = new Algorithm(problem).run();
+
+    DailyPlan dailyPlan = solution.getDailyPlans().get(0);
+    assertEquals("container-near", firstContainerStopId(dailyPlan));
+  }
+
   @Test
   void shouldReturnSuboptimalSolutionForSimpleProblem() {
     Facility facility = facility("facility-1");

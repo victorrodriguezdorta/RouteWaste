@@ -29,8 +29,9 @@ import java.util.Map;
  *
  * <p>Current implementation:
  * Phase 1: Clusterization by distance - each container is assigned to the nearest facility.
- * Phase 2: Day-by-day greedy routing - each vehicle serves the nearest container with pending
- * liters, can unload at the facility, and may continue collecting on the same day.
+ * Phase 2: Day-by-day greedy routing - each vehicle repeatedly selects the next container
+ * balancing proximity and fill percentage, can unload at the facility, and may continue
+ * collecting on the same day.
  * Phase 3: Container state monitoring - tracks the remaining liters after each simulated day.
  */
 public class Algorithm {
@@ -40,6 +41,9 @@ public class Algorithm {
   private static final double EPSILON = 0.000001;
   private static final int MAX_FACILITY_VISITS = 3;
   private static final int MIN_NUMBER_OF_DAYS = 1;
+  private static final double DISTANCE_WEIGHT = 0.45;
+  private static final double FILL_WEIGHT = 0.55;
+  private static final double OVERFLOW_SCORE_BONUS = 1.5;
 
   private final DeliveryPlanningProblem problem;
   /**
@@ -186,9 +190,10 @@ public class Algorithm {
   }
 
   /**
-   * Builds a greedy route for a daily plan by repeatedly visiting the nearest container with
-   * pending liters. When the vehicle becomes full, it returns to the facility, unloads, and
-   * continues serving pending work on the same day.
+   * Builds a greedy route for a daily plan by repeatedly visiting the best-scored container
+   * with pending liters. Selection balances distance from the current location and the container
+   * fill percentage for the day. When the vehicle becomes full, it returns to the facility,
+   * unloads, and continues serving pending work on the same day.
    *
    * @param dailyPlan the daily plan to populate
    * @param availableContainers the containers assigned to the plan facility
@@ -225,19 +230,19 @@ public class Algorithm {
           && (vehicleCurrentLoadLiters > EPSILON || vehicleCurrentLoadKilograms > EPSILON)) {
         break;
       }
-      Container nearest = findNearestCollectableContainer(currentLocation, availableContainers);
-      if (nearest == null) {
+      Container nextContainer = findNextCollectableContainer(currentLocation, availableContainers);
+      if (nextContainer == null) {
         break;
       }
-      double pendingLiters = getPendingLiters(nearest);
+      double pendingLiters = getPendingLiters(nextContainer);
       if (pendingLiters <= EPSILON) {
-        updatePendingLiters(nearest, 0.0);
+        updatePendingLiters(nextContainer, 0.0);
         continue;
       }
       double remainingLiters = remainingLiterCapacity(vehicle, vehicleCurrentLoadLiters);
       double remainingKilograms = remainingKilogramCapacity(vehicle, vehicleCurrentLoadKilograms);
       double collectedLiters = computeCollectableLiters(
-          nearest,
+          nextContainer,
           pendingLiters,
           remainingLiters,
           remainingKilograms);
@@ -254,21 +259,21 @@ public class Algorithm {
       }
       double collectedKilograms = WasteVolumeToMassConverter.litersToKilograms(
           collectedLiters,
-          nearest.getWasteType());
-      double distanceFromCurrentLocation = calculateDistanceToContainer(currentLocation, nearest);
+          nextContainer.getWasteType());
+      double distanceFromCurrentLocation = calculateDistanceToContainer(currentLocation, nextContainer);
       dailyPlan.addStop(
-          nearest,
+          nextContainer,
           collectedKilograms,
           collectedLiters,
           pendingLiters,
           distanceFromCurrentLocation,
-          createStopAlerts(nearest, pendingLiters, collectedLiters));
-      updatePendingLiters(nearest, pendingLiters - collectedLiters);
+          createStopAlerts(nextContainer, pendingLiters, collectedLiters));
+      updatePendingLiters(nextContainer, pendingLiters - collectedLiters);
       vehicleCurrentLoadLiters += collectedLiters;
       vehicleCurrentLoadKilograms += collectedKilograms;
       vehicle.updateCurrentLoadLiters(vehicleCurrentLoadLiters);
       vehicle.updateCurrentLoadKilograms(vehicleCurrentLoadKilograms);
-      currentLocation = nearest;
+      currentLocation = nextContainer;
       if (isVehicleLoadFull(vehicle, vehicleCurrentLoadLiters, vehicleCurrentLoadKilograms)) {
         if (facilityVisits >= MAX_FACILITY_VISITS) {
           break;
@@ -463,15 +468,21 @@ public class Algorithm {
   }
 
   /**
-   * Finds the nearest container that still has pending liters.
+   * Finds the next container to collect using a greedy score that balances distance and fill
+   * percentage. Lower scores are preferred. Overflowed containers receive additional priority.
    *
    * @param currentLocation current facility or container location anchor
    * @param containers candidate containers
-   * @return nearest collectable container, or null when none can be collected
+   * @return best-scored collectable container, or null when none can be collected
    */
-  private Container findNearestCollectableContainer(Object currentLocation, List<Container> containers) {
-    Container nearest = null;
-    double minDistance = Double.MAX_VALUE;
+  private Container findNextCollectableContainer(Object currentLocation, List<Container> containers) {
+    Container bestContainer = null;
+    double bestScore = Double.MAX_VALUE;
+    double bestFillPercentage = -1.0;
+    double bestDistance = Double.MAX_VALUE;
+    double maxDistance = 0.0;
+    double maxFillPercentage = 0.0;
+
     for (Container container : containers) {
       if (container == null || container.getLocation() == null) {
         continue;
@@ -481,15 +492,115 @@ public class Algorithm {
       }
       try {
         double distance = calculateDistanceToContainer(currentLocation, container);
-        if (distance < minDistance) {
-          minDistance = distance;
-          nearest = container;
+        double fillPercentage = getFillPercentage(container);
+        maxDistance = Math.max(maxDistance, distance);
+        maxFillPercentage = Math.max(maxFillPercentage, fillPercentage);
+      } catch (Exception e) {
+        continue;
+      }
+    }
+
+    for (Container container : containers) {
+      if (container == null || container.getLocation() == null) {
+        continue;
+      }
+      if (getPendingLiters(container) <= EPSILON) {
+        continue;
+      }
+      try {
+        double distance = calculateDistanceToContainer(currentLocation, container);
+        double fillPercentage = getFillPercentage(container);
+        double score = computeContainerSelectionScore(
+            distance,
+            fillPercentage,
+            maxDistance,
+            maxFillPercentage);
+        if (isBetterContainerCandidate(
+            score,
+            fillPercentage,
+            distance,
+            bestScore,
+            bestFillPercentage,
+            bestDistance)) {
+          bestScore = score;
+          bestFillPercentage = fillPercentage;
+          bestDistance = distance;
+          bestContainer = container;
         }
       } catch (Exception e) {
         continue;
       }
     }
-    return nearest;
+    return bestContainer;
+  }
+
+  /**
+   * Computes the greedy selection score for a container candidate.
+   *
+   * @param distance distance from the current location in meters
+   * @param fillPercentage container fill percentage for the day
+   * @param maxDistance maximum distance among current candidates
+   * @param maxFillPercentage maximum fill percentage among current candidates
+   * @return selection score where lower values are preferred
+   */
+  private double computeContainerSelectionScore(
+      double distance,
+      double fillPercentage,
+      double maxDistance,
+      double maxFillPercentage) {
+    double normalizedDistance = maxDistance > EPSILON ? distance / maxDistance : 0.0;
+    double normalizedFill = maxFillPercentage > EPSILON ? fillPercentage / maxFillPercentage : 0.0;
+    double score = DISTANCE_WEIGHT * normalizedDistance - FILL_WEIGHT * normalizedFill;
+    if (fillPercentage > 100.0) {
+      score -= OVERFLOW_SCORE_BONUS;
+    }
+    return score;
+  }
+
+  /**
+   * Compares two container candidates for greedy selection.
+   *
+   * @param score candidate score
+   * @param fillPercentage candidate fill percentage
+   * @param distance candidate distance
+   * @param bestScore current best score
+   * @param bestFillPercentage current best fill percentage
+   * @param bestDistance current best distance
+   * @return true when the candidate should replace the current best
+   */
+  private boolean isBetterContainerCandidate(
+      double score,
+      double fillPercentage,
+      double distance,
+      double bestScore,
+      double bestFillPercentage,
+      double bestDistance) {
+    if (score < bestScore - EPSILON) {
+      return true;
+    }
+    if (Math.abs(score - bestScore) <= EPSILON) {
+      if (fillPercentage > bestFillPercentage + EPSILON) {
+        return true;
+      }
+      if (Math.abs(fillPercentage - bestFillPercentage) <= EPSILON && distance < bestDistance - EPSILON) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns the fill percentage of a container based on its pending liters for the day.
+   *
+   * @param container container to inspect
+   * @return fill percentage (may exceed 100 when overflowed)
+   */
+  private double getFillPercentage(Container container) {
+    double capacityLiters = container.getCapacityLiters();
+    if (capacityLiters <= EPSILON) {
+      return 0.0;
+    }
+    return (getPendingLiters(container) / capacityLiters) * 100.0;
   }
 
   /**
