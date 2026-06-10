@@ -69,6 +69,9 @@ export class VehicleHttpRepository implements VehicleRepository {
     if (command?.vehicleType) {
       url += `&vehicleType=${encodeURIComponent(command.vehicleType)}`;
     }
+    if (command?.name) {
+      url += `&name=${encodeURIComponent(command.name)}`;
+    }
 
     return new Promise((resolve, reject) => {
       http

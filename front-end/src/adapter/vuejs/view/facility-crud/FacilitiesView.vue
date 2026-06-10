@@ -189,6 +189,19 @@
             />
           </div>
 
+          <!-- Filter by Name -->
+          <div style="width: 180px;">
+            <v-text-field
+              v-model="selectedNameFilter"
+              :placeholder="t('facility.list.filterByName')"
+              clearable
+              density="compact"
+              hide-details
+              variant="outlined"
+              @update:model-value="onNameFilterChange"
+            />
+          </div>
+
           <!-- Filter by Location -->
           <div style="width: 180px;">
             <v-text-field
@@ -259,6 +272,7 @@ const selectedFacilityId = ref('');
 const selectedFacilityTypeFilter = ref<string | undefined>(undefined);
 const selectedFacilityStatusFilter = ref<string | undefined>(undefined);
 const selectedLocationFilter = ref<string | undefined>(undefined);
+const selectedNameFilter = ref<string | undefined>(undefined);
 const tablePage = ref(1);
 const itemsPerPage = ref(10);
 const currentSortBy = ref<string | undefined>(undefined);
@@ -374,28 +388,35 @@ const loadFacilities = async (
   sortOrder?: 'asc' | 'desc',
   facilityType?: string,
   status?: string,
-  location?: string
+  location?: string,
+  name?: string
 ) => {
   currentSortBy.value = sortBy;
   currentSortOrder.value = sortOrder ?? 'asc';
-  await facilityStore.getFacilities(page, size, sortBy, sortOrder, facilityType, status, location);
+  await facilityStore.getFacilities(page, size, sortBy, sortOrder, facilityType, status, location, name);
 };
 
 const onFacilityTypeFilterChange = async (newType: string | null) => {
   const facilityType = newType ?? undefined;
-  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, facilityType, selectedFacilityStatusFilter.value, selectedLocationFilter.value);
+  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, facilityType, selectedFacilityStatusFilter.value, selectedLocationFilter.value, selectedNameFilter.value);
   tablePage.value = currentPage.value + 1;
 };
 
 const onFacilityStatusFilterChange = async (newStatus: string | null) => {
   const status = newStatus ?? undefined;
-  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value, status, selectedLocationFilter.value);
+  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value, status, selectedLocationFilter.value, selectedNameFilter.value);
   tablePage.value = currentPage.value + 1;
 };
 
 const onLocationFilterChange = async (newLocation: string | null) => {
   const location = newLocation ?? undefined;
-  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value, selectedFacilityStatusFilter.value, location);
+  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value, selectedFacilityStatusFilter.value, location, selectedNameFilter.value);
+  tablePage.value = currentPage.value + 1;
+};
+
+const onNameFilterChange = async (newName: string | null) => {
+  const name = newName ?? undefined;
+  await loadFacilities(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value, selectedFacilityStatusFilter.value, selectedLocationFilter.value, name);
   tablePage.value = currentPage.value + 1;
 };
 
@@ -409,7 +430,7 @@ const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: numbe
   const newSortBy = options.sortBy[0]?.key;
   const newSortOrder = options.sortBy[0]?.order ?? 'asc';
 
-  await loadFacilities(requestedPage, requestedSize, newSortBy, newSortOrder, selectedFacilityTypeFilter.value, selectedFacilityStatusFilter.value, selectedLocationFilter.value);
+  await loadFacilities(requestedPage, requestedSize, newSortBy, newSortOrder, selectedFacilityTypeFilter.value, selectedFacilityStatusFilter.value, selectedLocationFilter.value, selectedNameFilter.value);
   tablePage.value = currentPage.value + 1;
   itemsPerPage.value = rowsPerPage.value;
 };
@@ -455,6 +476,7 @@ const onImportFacilitiesFile = async (file: File) => {
     selectedFacilityTypeFilter.value,
     selectedFacilityStatusFilter.value,
     selectedLocationFilter.value,
+    selectedNameFilter.value,
   );
   tablePage.value = currentPage.value + 1;
 };
@@ -474,9 +496,9 @@ const deleteItem = (itemId: string) => {
 
 const confirmDelete = async () => {
   await facilityStore.deleteFacility(selectedFacilityId.value);
-  await loadFacilities(currentPage.value, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value);
+  await loadFacilities(currentPage.value, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value, selectedFacilityStatusFilter.value, selectedLocationFilter.value, selectedNameFilter.value);
   if (facilities.value.length === 0 && currentPage.value > 0) {
-    await loadFacilities(currentPage.value - 1, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value);
+    await loadFacilities(currentPage.value - 1, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedFacilityTypeFilter.value, selectedFacilityStatusFilter.value, selectedLocationFilter.value, selectedNameFilter.value);
   }
   tablePage.value = currentPage.value + 1;
   dialogDelete.value = false;

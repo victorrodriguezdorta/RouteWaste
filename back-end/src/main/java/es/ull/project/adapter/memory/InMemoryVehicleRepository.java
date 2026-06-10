@@ -1,5 +1,6 @@
 package es.ull.project.adapter.memory;
 
+import es.ull.project.application.query.VehicleSearchCriteria;
 import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
@@ -26,6 +27,7 @@ public class InMemoryVehicleRepository implements VehicleRepository {
     private static final String FIELD_CAPACITY_LITERS = "CapacityLiters.liters";
     private static final String FIELD_COST = "costPerKilometer.amount";
     private static final String FIELD_TYPE = "vehicleType";
+    private static final String FIELD_NAME = "name";
 
     private final Map<UUID, Vehicle> store = new LinkedHashMap<>();
 
@@ -92,6 +94,59 @@ public class InMemoryVehicleRepository implements VehicleRepository {
         Stream<Vehicle> stream = fetchAll().stream();
         if (vehicleType != null) {
             stream = stream.filter(v -> vehicleType.equals(v.getVehicleType()));
+        }
+        if (pageable.getSort().isSorted()) {
+            Comparator<Vehicle> comparator = null;
+            for (Sort.Order order : pageable.getSort()) {
+                Comparator<Vehicle> fieldComparator = switch (order.getProperty()) {
+                    case FIELD_CAPACITY_KILOGRAMS ->
+                            Comparator.comparingDouble(v -> v.getCapacityKilograms().getKilograms());
+                    case FIELD_CAPACITY_LITERS ->
+                            Comparator.comparingDouble(v -> v.getCapacityLiters().getLiters());
+                    case FIELD_COST ->
+                            Comparator.comparingDouble(v -> v.getCostPerKilometer().getAmount());
+                    case FIELD_TYPE ->
+                            Comparator.comparing((Vehicle v) -> v.getVehicleType().name());
+                    default -> Comparator.comparingInt(v -> 0);
+                };
+                if (order.isDescending()) {
+                    fieldComparator = fieldComparator.reversed();
+                }
+                comparator = comparator == null ? fieldComparator : comparator.thenComparing(fieldComparator);
+            }
+            if (comparator != null) {
+                stream = stream.sorted(comparator);
+            }
+        }
+        List<Vehicle> filtered = stream.collect(Collectors.toList());
+        long total = filtered.size();
+        int start = (int) pageable.getOffset();
+        if (start >= filtered.size()) {
+            return new PageImpl<>(List.of(), pageable, total);
+        }
+        int end = Math.min(start + pageable.getPageSize(), filtered.size());
+        return new PageImpl<>(filtered.subList(start, end), pageable, total);
+    }
+
+    /**
+     * Finds vehicles in the repository using pagination, search criteria and sort.
+     *
+     * @param pageable pagination and sort configuration
+     * @param criteria search criteria with optional filters
+     * @return a page of matching vehicles
+     */
+    @Override
+    public Page<Vehicle> findAll(Pageable pageable, VehicleSearchCriteria criteria) {
+        Stream<Vehicle> stream = fetchAll().stream();
+        if (criteria != null && criteria.hasCriteria()) {
+            if (criteria.getVehicleType() != null) {
+                stream = stream.filter(v -> criteria.getVehicleType().equals(v.getVehicleType()));
+            }
+            if (criteria.getName() != null) {
+                String nameFilter = criteria.getName().toLowerCase();
+                stream = stream.filter(v -> v.getName() != null
+                        && v.getName().getValue().toLowerCase().contains(nameFilter));
+            }
         }
         if (pageable.getSort().isSorted()) {
             Comparator<Vehicle> comparator = null;

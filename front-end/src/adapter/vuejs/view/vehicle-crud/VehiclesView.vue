@@ -131,7 +131,19 @@
       </div>
 
       <template #toolbar-append>
-        <div style="width: 250px;">
+        <div style="display: flex; gap: 8px;">
+          <div style="width: 180px;">
+            <v-text-field
+              v-model="selectedNameFilter"
+              :placeholder="t('vehicle.list.filterByName')"
+              clearable
+              density="compact"
+              hide-details
+              variant="outlined"
+              @update:model-value="onNameFilterChange"
+            />
+          </div>
+          <div style="width: 250px;">
           <v-select
             v-model="selectedVehicleTypeFilter"
             :items="vehicleTypeFilterOptions"
@@ -144,6 +156,7 @@
             variant="outlined"
             @update:model-value="onVehicleTypeFilterChange"
           />
+          </div>
         </div>
       </template>
     </CrudLayout>
@@ -202,6 +215,7 @@ const selectedIdVehicle = ref('');
 const tablePage = ref(1);
 const itemsPerPage = ref(10);
 const selectedVehicleTypeFilter = ref<string | undefined>(undefined);
+const selectedNameFilter = ref<string | undefined>(undefined);
 const currentSortBy = ref<string | undefined>(undefined);
 const currentSortOrder = ref<'asc' | 'desc'>('asc');
 
@@ -279,10 +293,10 @@ onMounted(async () => {
 /**
  * Fetch vehicles from the server via store
  */
-const loadVehicles = async (page: number, size: number, sortBy?: string, sortOrder?: 'asc' | 'desc', vehicleType?: string) => {
+const loadVehicles = async (page: number, size: number, sortBy?: string, sortOrder?: 'asc' | 'desc', vehicleType?: string, name?: string) => {
   currentSortBy.value = sortBy;
   currentSortOrder.value = sortOrder ?? 'asc';
-  await vehicleStore.getVehicles(page, size, sortBy, sortOrder, vehicleType);
+  await vehicleStore.getVehicles(page, size, sortBy, sortOrder, vehicleType, name);
 };
 
 /**
@@ -302,7 +316,7 @@ const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: numbe
   const newSortBy = options.sortBy[0]?.key;  // Can be: type, capacityKilograms, capacityLiters, cost
   const newSortOrder = options.sortBy[0]?.order ?? 'asc';
 
-  await loadVehicles(requestedPage, requestedSize, newSortBy, newSortOrder, selectedVehicleTypeFilter.value);
+  await loadVehicles(requestedPage, requestedSize, newSortBy, newSortOrder, selectedVehicleTypeFilter.value, selectedNameFilter.value);
   tablePage.value = currentPage.value + 1;
   itemsPerPage.value = rowsPerPage.value;
 };
@@ -312,7 +326,13 @@ const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: numbe
  */
 const onVehicleTypeFilterChange = async (newType: string | null) => {
   const vehicleType = newType ?? undefined;
-  await loadVehicles(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, vehicleType);
+  await loadVehicles(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, vehicleType, selectedNameFilter.value);
+  tablePage.value = currentPage.value + 1;
+};
+
+const onNameFilterChange = async (newName: string | null) => {
+  const name = newName ?? undefined;
+  await loadVehicles(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedVehicleTypeFilter.value, name);
   tablePage.value = currentPage.value + 1;
 };
 
@@ -367,6 +387,7 @@ const onImportVehiclesFile = async (file: File) => {
     currentSortBy.value,
     currentSortOrder.value,
     selectedVehicleTypeFilter.value,
+    selectedNameFilter.value,
   );
   tablePage.value = currentPage.value + 1;
 };
@@ -403,9 +424,9 @@ const deleteItem = (itemId: string) => {
 const confirmDelete = async () => {
   await vehicleStore.deleteVehicle(selectedIdVehicle.value);
 
-  await loadVehicles(currentPage.value, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedVehicleTypeFilter.value);
+  await loadVehicles(currentPage.value, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedVehicleTypeFilter.value, selectedNameFilter.value);
   if (vehicles.value.length === 0 && currentPage.value > 0) {
-    await loadVehicles(currentPage.value - 1, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedVehicleTypeFilter.value);
+    await loadVehicles(currentPage.value - 1, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedVehicleTypeFilter.value, selectedNameFilter.value);
   }
 
   tablePage.value = currentPage.value + 1;

@@ -1,6 +1,7 @@
 package es.ull.project.application.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -200,6 +201,8 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
                 pending.getId(), new es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason("Docker timeout"));
 
         assertEquals(InfrastructurePlanExecutionState.FAILED, failed.getExecutionState());
+        assertEquals(InfrastructurePlanValidityState.VALID, failed.getValidityState());
+        assertFalse(failed.isExecutionRunning());
         assertEquals("Docker timeout", failed.getFailureReason().orElseThrow());
     }
 
@@ -803,6 +806,11 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
 
         @Override
         public Page<Vehicle> findAll(Pageable pageable, VehicleType vehicleType) {
+          return new PageImpl<>(fetchAll(), pageable, saved.size());
+        }
+
+        @Override
+        public Page<Vehicle> findAll(Pageable pageable, es.ull.project.application.query.VehicleSearchCriteria criteria) {
           return new PageImpl<>(fetchAll(), pageable, saved.size());
         }
 

@@ -16,6 +16,7 @@ public class FacilitySearchCriteria {
     private FacilityType facilityType;
     private FacilityStatus status;
     private String locationPostalAddress;
+    private String name;
 
     /**
      * Public constructor for use by builders.
@@ -50,6 +51,15 @@ public class FacilitySearchCriteria {
     }
 
     /**
+     * Returns the name filter criterion.
+     *
+     * @return the name substring to filter by, or {@code null} if not set
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
      * Checks whether any search criterion has been set.
      *
      * @return {@code true} if at least one criterion is non-null, {@code false} otherwise
@@ -57,7 +67,8 @@ public class FacilitySearchCriteria {
     public boolean hasCriteria() {
         return facilityType != null
             || status != null
-            || locationPostalAddress != null;
+            || locationPostalAddress != null
+            || name != null;
     }
 
     /**
@@ -85,5 +96,14 @@ public class FacilitySearchCriteria {
      */
     public void setLocationPostalAddress(String locationPostalAddress) {
         this.locationPostalAddress = locationPostalAddress;
+    }
+
+    /**
+     * Sets the name criterion.
+     *
+     * @param name the name substring to filter by
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 }

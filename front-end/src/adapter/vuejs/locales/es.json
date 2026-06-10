@@ -229,6 +229,7 @@
       "addButton": "Agregar Vehículo",
       "importButton": "Importar JSON",
       "filterByType": "Filtrar por tipo",
+      "filterByName": "Buscar por nombre",
       "filterAll": "Todos los tipos",
       "table": {
         "headers": {
@@ -334,6 +335,7 @@
       "filterByWasteType": "Filtrar por tipo de residuo",
       "filterByServiceZone": "Filtrar por zona de servicio",
       "filterByLocation": "Buscar por ubicación",
+      "filterByName": "Buscar por nombre",
       "notAssigned": "No asignada",
       "table": {
         "headers": {
@@ -440,6 +442,7 @@
       "addButton": "Agregar Instalación",
       "importButton": "Importar JSON",
       "filterByType": "Filtrar por tipo",
+      "filterByName": "Buscar por nombre",
       "filterByStatus": "Filtrar por estado",
       "filterByLocation": "Buscar por ubicación",
       "table": {
@@ -492,7 +495,8 @@
           "view": "Ver detalles",
           "edit": "Abre el asistente con la misma selección (instalaciones, vehículos, contenedores y parámetros). Al ejecutar se creará un plan nuevo.",
           "delete": "Eliminar",
-          "viewUnavailable": "El detalle estará disponible cuando termine la ejecución"
+          "viewUnavailable": "El detalle estará disponible cuando termine la ejecución",
+          "viewUnavailableFailed": "No hay detalle porque la ejecución falló"
         },
         "noData": "No hay planes de infraestructura disponibles."
       },

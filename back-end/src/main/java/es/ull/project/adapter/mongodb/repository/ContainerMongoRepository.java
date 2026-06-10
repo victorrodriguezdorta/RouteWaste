@@ -37,6 +37,7 @@ public class ContainerMongoRepository implements ContainerRepository {
     private static final String FIELD_WASTE_TYPE = "wasteType";
     private static final String FIELD_SERVICE_ZONE = "serviceZone";
     private static final String FIELD_LOCATION_POSTAL_ADDRESS = "location.postalAddress";
+    private static final String FIELD_NAME = "name";
     private static final String FIELD_CAPACITY_LITERS_VALUE = "capacityLiters.liters";
     private static final String FIELD_DAILY_DEMAND_VALUE = "dailyDemandLitersPerDay.litersPerDay";
     private static final String REGEX_CASE_INSENSITIVE = "i";
@@ -181,6 +182,10 @@ public class ContainerMongoRepository implements ContainerRepository {
         if (criteria.getLocationPostalAddress() != null) {
             criterias.add(Criteria.where(FIELD_LOCATION_POSTAL_ADDRESS)
                     .regex(criteria.getLocationPostalAddress(), REGEX_CASE_INSENSITIVE));
+        }
+        if (criteria.getName() != null) {
+            criterias.add(Criteria.where(FIELD_NAME)
+                    .regex(criteria.getName(), REGEX_CASE_INSENSITIVE));
         }
         if (criteria.getMinCapacityLiters() != null) {
             criterias.add(Criteria.where(FIELD_CAPACITY_LITERS_VALUE).gte(criteria.getMinCapacityLiters()));

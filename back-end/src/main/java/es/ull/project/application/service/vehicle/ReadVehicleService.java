@@ -1,6 +1,7 @@
 package es.ull.project.application.service.vehicle;
 
 import es.ull.project.application.common.EntityTypeBreakdownBuilder;
+import es.ull.project.application.query.VehicleSearchCriteria;
 import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
@@ -74,6 +75,18 @@ public class ReadVehicleService implements ReadVehicleUseCase {
     @Override
     public Page<Vehicle> fetchAll(@NonNull Pageable pageable, VehicleType vehicleType) {
         return this.repository.findAll(pageable, vehicleType);
+    }
+
+    /**
+     * Retrieves vehicles using pagination and search criteria.
+     *
+     * @param pageable pagination and sort information
+     * @param criteria search criteria with optional filters
+     * @return a page containing matching vehicles
+     */
+    @Override
+    public Page<Vehicle> fetchAll(@NonNull Pageable pageable, @NonNull VehicleSearchCriteria criteria) {
+        return this.repository.findAll(pageable, criteria);
     }
 
     /**

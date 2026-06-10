@@ -229,6 +229,7 @@
       "addButton": "Add Vehicle",
       "importButton": "Import JSON",
       "filterByType": "Filter by type",
+      "filterByName": "Search by name",
       "filterAll": "All types",
       "table": {
         "headers": {
@@ -334,6 +335,7 @@
       "filterByWasteType": "Filter by waste type",
       "filterByServiceZone": "Filter by service zone",
       "filterByLocation": "Search by location",
+      "filterByName": "Search by name",
       "notAssigned": "Not assigned",
       "table": {
         "headers": {
@@ -440,6 +442,7 @@
       "addButton": "Add Facility",
       "importButton": "Import JSON",
       "filterByType": "Filter by type",
+      "filterByName": "Search by name",
       "filterByStatus": "Filter by status",
       "filterByLocation": "Search by location",
       "table": {
@@ -492,7 +495,8 @@
           "view": "View details",
           "edit": "Opens the wizard with the same selection (facilities, vehicles, containers, and parameters). Executing will create a new plan.",
           "delete": "Delete",
-          "viewUnavailable": "Details are available when execution completes"
+          "viewUnavailable": "Details are available when execution completes",
+          "viewUnavailableFailed": "No details are available because execution failed"
         },
         "noData": "No infrastructure plans available."
       },

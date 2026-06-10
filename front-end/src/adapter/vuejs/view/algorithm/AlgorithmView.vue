@@ -134,25 +134,7 @@
 
           <v-chip
 
-            v-if="item.validityState === InfrastructurePlanValidityState.RUNNING"
-
-            :color="item.planStatusColor"
-
-            size="small"
-
-            variant="flat"
-
-            class="font-weight-medium"
-
-          >
-
-            {{ item.validityLabel }}
-
-          </v-chip>
-
-          <v-chip
-
-            v-else-if="item.executionState === InfrastructurePlanExecutionState.FAILED"
+            v-if="item.executionState === InfrastructurePlanExecutionState.FAILED"
 
             :color="item.planStatusColor"
 
@@ -167,6 +149,24 @@
           >
 
             {{ item.executionLabel }}
+
+          </v-chip>
+
+          <v-chip
+
+            v-else-if="item.isRunning"
+
+            :color="item.planStatusColor"
+
+            size="small"
+
+            variant="flat"
+
+            class="font-weight-medium"
+
+          >
+
+            {{ item.validityLabel }}
 
           </v-chip>
 
@@ -224,7 +224,11 @@
 
                 ? t('algorithm.list.table.tooltips.view')
 
-                : t('infrastructurePlan.list.table.tooltips.viewUnavailable')"
+                : (item.isFailed
+
+                  ? t('infrastructurePlan.list.table.tooltips.viewUnavailableFailed')
+
+                  : t('infrastructurePlan.list.table.tooltips.viewUnavailable'))"
 
               color="info"
 
@@ -376,8 +380,6 @@ import {
 
 import {
 
-  InfrastructurePlanValidityState,
-
   infrastructurePlanValidityStateFromString,
   infrastructurePlanValidityStateLabel,
 
@@ -502,9 +504,9 @@ const infrastructureItems = computed(() => {
     const executionLabel =
       infrastructurePlanExecutionStateLabel(t, executionState) ?? validityLabel;
 
-    const isRunning = validityState === InfrastructurePlanValidityState.RUNNING;
-    const isCompleted =
-      !isRunning && executionState === InfrastructurePlanExecutionState.COMPLETED;
+    const isRunning = executionState === InfrastructurePlanExecutionState.RUNNING;
+    const isFailed = executionState === InfrastructurePlanExecutionState.FAILED;
+    const isCompleted = executionState === InfrastructurePlanExecutionState.COMPLETED;
 
     return {
 
@@ -535,6 +537,8 @@ const infrastructureItems = computed(() => {
       failureReason: plan.failureReason ?? null,
 
       isRunning,
+
+      isFailed,
 
       canView: isCompleted,
 

@@ -106,8 +106,9 @@ export const useFacilityStore = defineStore('Facility', {
      * @param facilityType Optional facility type filter
      * @param status Optional facility status filter
      * @param location Optional location filter (postal address)
+     * @param name Optional name filter
      */
-    async getFacilities(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', facilityType?: string, status?: string, location?: string) {
+    async getFacilities(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', facilityType?: string, status?: string, location?: string, name?: string) {
       this.loading = true;
       this.facilities = [];
       const requestedPage = page ?? this.currentPage;
@@ -124,7 +125,8 @@ export const useFacilityStore = defineStore('Facility', {
         sortOrder,
         facilityType,
         status,
-        location
+        location,
+        name
       });
       
       // Handle the result using Either pattern

@@ -163,6 +163,8 @@ class InfrastructurePlanTests {
 
         plan.markExecutionFailed("Docker timeout");
         assertEquals(InfrastructurePlanExecutionState.FAILED, plan.getExecutionState());
+        assertEquals(InfrastructurePlanValidityState.VALID, plan.getValidityState());
+        assertFalse(plan.isExecutionRunning());
         assertEquals("Docker timeout", plan.getFailureReason().orElseThrow());
     }
 

@@ -1,9 +1,11 @@
 package es.ull.project.adapter.mongodb.repository;
 
 import es.ull.project.adapter.mongodb.support.MongoEnumTypeCounts;
+import es.ull.project.application.query.VehicleSearchCriteria;
 import es.ull.project.application.repository.VehicleRepository;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +34,9 @@ public class VehicleMongoRepository implements VehicleRepository {
 
     public static final String COLLECTION_NAME = "vehicles";
     private static final String FIELD_VEHICLE_TYPE = "vehicleType";
+    private static final String FIELD_NAME = "name";
     private static final String FIELD_ID = "id";
+    private static final String REGEX_CASE_INSENSITIVE = "i";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -104,6 +108,40 @@ public class VehicleMongoRepository implements VehicleRepository {
         List<Vehicle> vehicles = this.mongoTemplate.find(dataQuery, Vehicle.class, COLLECTION_NAME);
         long total = this.mongoTemplate.count(countQuery, Vehicle.class, COLLECTION_NAME);
         return new PageImpl<>(vehicles, pageable, total);
+    }
+
+    /**
+     * Find vehicles with pagination and search criteria.
+     *
+     * @param pageable pagination and sort configuration
+     * @param criteria search criteria with optional filters
+     * @return page of matching vehicles
+     */
+    @Override
+    public Page<Vehicle> findAll(@NonNull Pageable pageable, @NonNull VehicleSearchCriteria criteria) {
+        Query dataQuery = new Query();
+        Query countQuery = new Query();
+        List<Criteria> criterias = buildSearchCriterias(criteria);
+        if (!criterias.isEmpty()) {
+            Criteria combinedCriteria = new Criteria().andOperator(criterias.toArray(new Criteria[0]));
+            dataQuery.addCriteria(combinedCriteria);
+            countQuery.addCriteria(combinedCriteria);
+        }
+        dataQuery.with(pageable);
+        List<Vehicle> vehicles = this.mongoTemplate.find(dataQuery, Vehicle.class, COLLECTION_NAME);
+        long total = this.mongoTemplate.count(countQuery, Vehicle.class, COLLECTION_NAME);
+        return new PageImpl<>(vehicles, pageable, total);
+    }
+
+    private List<Criteria> buildSearchCriterias(@NonNull VehicleSearchCriteria criteria) {
+        List<Criteria> criterias = new ArrayList<>();
+        if (criteria.getVehicleType() != null) {
+            criterias.add(Criteria.where(FIELD_VEHICLE_TYPE).is(criteria.getVehicleType()));
+        }
+        if (criteria.getName() != null) {
+            criterias.add(Criteria.where(FIELD_NAME).regex(criteria.getName(), REGEX_CASE_INSENSITIVE));
+        }
+        return criterias;
     }
 
     /**

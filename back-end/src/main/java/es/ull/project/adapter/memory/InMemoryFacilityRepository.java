@@ -181,6 +181,9 @@ public class InMemoryFacilityRepository implements FacilityRepository {
                             (f.getLocation() != null && f.getLocation().getPostalAddress() != null &&
                              f.getLocation().getPostalAddress().toLowerCase()
                                 .contains(criteria.getLocationPostalAddress().toLowerCase())))
+                    .filter(f -> criteria.getName() == null ||
+                            (f.getName() != null && f.getName().getValue().toLowerCase()
+                                .contains(criteria.getName().toLowerCase())))
                     .toList();
         }
         if (!pageable.getSort().isEmpty()) {

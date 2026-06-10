@@ -5,4 +5,5 @@ export interface ListVehiclesCommand {
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
     vehicleType?: string;
+    name?: string;
 }

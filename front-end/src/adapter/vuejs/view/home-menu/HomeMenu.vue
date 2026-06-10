@@ -204,21 +204,27 @@
                     <ButtonTooltip
                       text=""
                       icon="mdi-eye"
-                      :tooltip="t('selection.dashboard.viewPlan')"
+                      :tooltip="canViewPlan(plan)
+                        ? t('selection.dashboard.viewPlan')
+                        : (isPlanFailed(plan)
+                          ? t('infrastructurePlan.list.table.tooltips.viewUnavailableFailed')
+                          : t('infrastructurePlan.list.table.tooltips.viewUnavailable'))"
                       color="info"
                       size="small"
                       variant="text"
-                      :eventclick="() => showInfrastructurePlan(plan.id)"
+                      :disabled="!canViewPlan(plan)"
+                      :eventclick="() => showInfrastructurePlan(plan)"
                     />
                   </template>
                   <template #prepend>
                     <v-chip
-                      :color="infrastructurePlanValidityStateColor(planValidity(plan))"
+                      :color="planStatusColor(plan)"
                       size="small"
                       variant="flat"
                       class="font-weight-medium"
+                      :title="isPlanFailed(plan) ? (plan.failureReason ?? undefined) : undefined"
                     >
-                      {{ validityLabel(plan) }}
+                      {{ planStatusLabel(plan) }}
                     </v-chip>
                   </template>
                 </v-list-item>
@@ -249,7 +255,12 @@
 <script setup lang="ts">
 import type { InfrastructurePlanSummaryJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-summary-json-response';
 import {
-  infrastructurePlanValidityStateColor,
+  InfrastructurePlanExecutionState,
+  infrastructurePlanExecutionStateFromString,
+  infrastructurePlanExecutionStateLabel,
+  infrastructurePlanPlanStatusChipColor,
+} from '@/domain/enumerate/infrastructure-plan-execution-state';
+import {
   infrastructurePlanValidityStateFromString,
   infrastructurePlanValidityStateLabel,
 } from '@/domain/enumerate/infrastructure-plan-validity-state';
@@ -316,14 +327,35 @@ const formatExecutedAt = (plan: InfrastructurePlanSummaryJsonResponse) => {
   }
 };
 
+const planExecutionState = (plan: InfrastructurePlanSummaryJsonResponse) =>
+  infrastructurePlanExecutionStateFromString(plan.executionState);
+
 const planValidity = (plan: InfrastructurePlanSummaryJsonResponse) =>
   infrastructurePlanValidityStateFromString(plan.validityState);
 
-const validityLabel = (plan: InfrastructurePlanSummaryJsonResponse) =>
-  infrastructurePlanValidityStateLabel(t, planValidity(plan));
+const isPlanFailed = (plan: InfrastructurePlanSummaryJsonResponse) =>
+  planExecutionState(plan) === InfrastructurePlanExecutionState.FAILED;
 
-const showInfrastructurePlan = (itemId: string) => {
-  void router.push({ name: 'ShowInfrastructurePlan', params: { id: itemId } });
+const canViewPlan = (plan: InfrastructurePlanSummaryJsonResponse) =>
+  planExecutionState(plan) === InfrastructurePlanExecutionState.COMPLETED;
+
+const planStatusColor = (plan: InfrastructurePlanSummaryJsonResponse) =>
+  infrastructurePlanPlanStatusChipColor(planValidity(plan), planExecutionState(plan));
+
+const planStatusLabel = (plan: InfrastructurePlanSummaryJsonResponse) => {
+  const executionState = planExecutionState(plan);
+  const executionLabel = infrastructurePlanExecutionStateLabel(t, executionState);
+  if (executionLabel) {
+    return executionLabel;
+  }
+  return infrastructurePlanValidityStateLabel(t, planValidity(plan));
+};
+
+const showInfrastructurePlan = (plan: InfrastructurePlanSummaryJsonResponse) => {
+  if (!canViewPlan(plan) || !plan.id) {
+    return;
+  }
+  void router.push({ name: 'ShowInfrastructurePlan', params: { id: plan.id } });
 };
 
 const loadEntityCounts = async () => {

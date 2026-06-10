@@ -183,6 +183,19 @@
             />
           </div>
 
+          <!-- Filter by Name -->
+          <div style="width: 180px;">
+            <v-text-field
+              v-model="selectedNameFilter"
+              :placeholder="t('container.list.filterByName')"
+              clearable
+              density="compact"
+              hide-details
+              variant="outlined"
+              @update:model-value="onNameFilterChange"
+            />
+          </div>
+
           <!-- Filter by Location -->
           <div style="width: 180px;">
             <v-text-field
@@ -245,6 +258,7 @@ const selectedContainerId = ref('');
 const selectedWasteTypeFilter = ref<string | undefined>(undefined);
 const selectedServiceZoneFilter = ref<string | undefined>(undefined);
 const selectedLocationFilter = ref<string | undefined>(undefined);
+const selectedNameFilter = ref<string | undefined>(undefined);
 const tablePage = ref(1);
 const itemsPerPage = ref(10);
 const currentSortBy = ref<string | undefined>(undefined);
@@ -346,28 +360,35 @@ const loadContainers = async (
   sortOrder?: 'asc' | 'desc',
   wasteType?: string,
   serviceZone?: string,
-  location?: string
+  location?: string,
+  name?: string
 ) => {
   currentSortBy.value = sortBy;
   currentSortOrder.value = sortOrder ?? 'asc';
-  await containerStore.getContainers(page, size, sortBy, sortOrder, wasteType, serviceZone, location);
+  await containerStore.getContainers(page, size, sortBy, sortOrder, wasteType, serviceZone, location, name);
 };
 
 const onWasteTypeFilterChange = async (newType: string | null) => {
   const wasteType = newType ?? undefined;
-  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, wasteType, selectedServiceZoneFilter.value, selectedLocationFilter.value);
+  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, wasteType, selectedServiceZoneFilter.value, selectedLocationFilter.value, selectedNameFilter.value);
   tablePage.value = currentPage.value + 1;
 };
 
 const onServiceZoneFilterChange = async (newZone: string | null) => {
   const serviceZone = newZone ?? undefined;
-  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, serviceZone, selectedLocationFilter.value);
+  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, serviceZone, selectedLocationFilter.value, selectedNameFilter.value);
   tablePage.value = currentPage.value + 1;
 };
 
 const onLocationFilterChange = async (newLocation: string | null) => {
   const location = newLocation ?? undefined;
-  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, location);
+  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, location, selectedNameFilter.value);
+  tablePage.value = currentPage.value + 1;
+};
+
+const onNameFilterChange = async (newName: string | null) => {
+  const name = newName ?? undefined;
+  await loadContainers(0, itemsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value, name);
   tablePage.value = currentPage.value + 1;
 };
 
@@ -381,7 +402,7 @@ const onTableOptionsUpdate = async (options: { page: number; itemsPerPage: numbe
   const newSortBy = options.sortBy[0]?.key;
   const newSortOrder = options.sortBy[0]?.order ?? 'asc';
 
-  await loadContainers(requestedPage, requestedSize, newSortBy, newSortOrder, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value);
+  await loadContainers(requestedPage, requestedSize, newSortBy, newSortOrder, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value, selectedNameFilter.value);
   tablePage.value = currentPage.value + 1;
   itemsPerPage.value = rowsPerPage.value;
 };
@@ -427,6 +448,7 @@ const onImportContainersFile = async (file: File) => {
     selectedWasteTypeFilter.value,
     selectedServiceZoneFilter.value,
     selectedLocationFilter.value,
+    selectedNameFilter.value,
   );
   tablePage.value = currentPage.value + 1;
 };
@@ -446,9 +468,9 @@ const deleteItem = (itemId: string) => {
 
 const confirmDelete = async () => {
   await containerStore.deleteContainer(selectedContainerId.value);
-  await loadContainers(currentPage.value, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value);
+  await loadContainers(currentPage.value, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value, selectedNameFilter.value);
   if (containers.value.length === 0 && currentPage.value > 0) {
-    await loadContainers(currentPage.value - 1, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value);
+    await loadContainers(currentPage.value - 1, rowsPerPage.value, currentSortBy.value, currentSortOrder.value, selectedWasteTypeFilter.value, selectedServiceZoneFilter.value, selectedLocationFilter.value, selectedNameFilter.value);
   }
   tablePage.value = currentPage.value + 1;
   dialogDelete.value = false;

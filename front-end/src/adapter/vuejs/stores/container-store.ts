@@ -105,6 +105,7 @@ export const useContainerStore = defineStore('Container', {
      * @param wasteType Optional waste type filter
      * @param serviceZone Optional service zone filter
      * @param location Optional location filter
+     * @param name Optional name filter
      */
     async getContainers(
       page?: number, 
@@ -113,7 +114,8 @@ export const useContainerStore = defineStore('Container', {
       sortOrder?: 'asc' | 'desc', 
       wasteType?: string,
       serviceZone?: string,
-      location?: string
+      location?: string,
+      name?: string
     ) {
       this.loading = true;
       this.containers = [];
@@ -131,7 +133,8 @@ export const useContainerStore = defineStore('Container', {
         sortOrder,
         wasteType,
         serviceZone,
-        location
+        location,
+        name
       });
       
       // Handle the result using Either pattern

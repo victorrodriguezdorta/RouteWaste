@@ -83,6 +83,9 @@ export class ContainerHttpRepository implements ContainerRepository {
     if (command?.location) {
       url += `&location=${encodeURIComponent(command.location)}`;
     }
+    if (command?.name) {
+      url += `&name=${encodeURIComponent(command.name)}`;
+    }
 
     return new Promise((resolve, reject) => {
       http

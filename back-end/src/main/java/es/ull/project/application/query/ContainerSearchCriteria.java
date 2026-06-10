@@ -19,6 +19,7 @@ public class ContainerSearchCriteria {
     private Integer minDailyDemand;
     private Integer maxDailyDemand;
     private String locationPostalAddress;
+    private String name;
 
     /**
      * Package-accessible constructor for use by builders.
@@ -89,6 +90,15 @@ public class ContainerSearchCriteria {
     }
 
     /**
+     * Returns the name filter criterion.
+     *
+     * @return the name substring to filter by, or {@code null} if not set
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
      * Checks whether any search criterion has been set.
      *
      * @return {@code true} if at least one criterion is non-null, {@code false} otherwise
@@ -100,7 +110,8 @@ public class ContainerSearchCriteria {
             || maxCapacityLiters != null
             || minDailyDemand != null
             || maxDailyDemand != null
-            || locationPostalAddress != null;
+            || locationPostalAddress != null
+            || name != null;
     }
 
     /**
@@ -164,5 +175,14 @@ public class ContainerSearchCriteria {
      */
     public void setLocationPostalAddress(String locationPostalAddress) {
         this.locationPostalAddress = locationPostalAddress;
+    }
+
+    /**
+     * Sets the name criterion.
+     *
+     * @param name the name substring to filter by
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 }

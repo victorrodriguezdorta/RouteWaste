@@ -135,6 +135,11 @@ public class InMemoryContainerRepository implements ContainerRepository {
                             && (container.getLocation() == null || !container.getLocation().getPostalAddress().contains(criteria.getLocationPostalAddress()))) {
                         return false;
                     }
+                    if (criteria.getName() != null
+                            && (container.getName() == null || !container.getName().getValue().toLowerCase()
+                                    .contains(criteria.getName().toLowerCase()))) {
+                        return false;
+                    }
                     if (criteria.getMinCapacityLiters() != null && container.getCapacityLiters().getLiters() < criteria.getMinCapacityLiters()) {
                         return false;
                     }

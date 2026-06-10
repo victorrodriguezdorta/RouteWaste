@@ -9,4 +9,5 @@ export interface ListContainersCommand {
     wasteType?: string;
     serviceZone?: string;
     location?: string;
+    name?: string;
 }

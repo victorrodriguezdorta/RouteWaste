@@ -1,5 +1,6 @@
 package es.ull.project.application.usecase.vehicle;
 
+import es.ull.project.application.query.VehicleSearchCriteria;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.readmodel.EntityTypeBreakdown;
@@ -47,6 +48,15 @@ public interface ReadVehicleUseCase {
      * @return a page of vehicles
      */
     Page<Vehicle> fetchAll(@NonNull Pageable pageable, VehicleType vehicleType);
+
+    /**
+     * Retrieves vehicles with pagination and search criteria.
+     *
+     * @param pageable pagination and sort information
+     * @param criteria search criteria with optional filters
+     * @return a page of matching vehicles
+     */
+    Page<Vehicle> fetchAll(@NonNull Pageable pageable, @NonNull VehicleSearchCriteria criteria);
 
     /**
      * Returns global vehicle statistics: total count and count per {@link VehicleType}.

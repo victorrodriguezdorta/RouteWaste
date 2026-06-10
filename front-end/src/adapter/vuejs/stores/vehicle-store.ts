@@ -103,10 +103,11 @@ export const useVehicleStore = defineStore('Vehicle', {
      * @param sortBy       Optional sort field: type, vehicleType, capacityKilograms, CapacityLiters, capacityLiters, cost, costPerKilometer, etc.
      * @param sortOrder    Optional sort direction ('asc' or 'desc')
      * @param vehicleType  Optional vehicle type enum name to filter by
+     * @param name         Optional name substring to filter by
      * 
      * Note: sortBy values are mapped by backend VehicleFieldMapper to MongoDB field paths
      */
-    async getVehicles(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', vehicleType?: string) {
+    async getVehicles(page?: number, rowsPerPage?: number, sortBy?: string, sortOrder?: 'asc' | 'desc', vehicleType?: string, name?: string) {
       this.loading = true;
       this.vehicles = [];
 
@@ -117,7 +118,7 @@ export const useVehicleStore = defineStore('Vehicle', {
       const listService = new ListVehiclesService(this.vehicleRepository);
       
       // Execute the list operation
-      const result = await listService.execute({ page: requestedPage, pageSize: requestedRowsPerPage, sortBy, sortOrder, vehicleType });
+      const result = await listService.execute({ page: requestedPage, pageSize: requestedRowsPerPage, sortBy, sortOrder, vehicleType, name });
       
       // Handle the result using Either pattern
       result.fold(

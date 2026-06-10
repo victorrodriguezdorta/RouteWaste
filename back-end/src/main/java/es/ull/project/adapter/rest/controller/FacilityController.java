@@ -143,7 +143,8 @@ public class FacilityController {
             @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder,
             @Parameter(description = "Filter by facility type") @RequestParam(required = false) String facilityType,
             @Parameter(description = "Filter by facility status") @RequestParam(required = false) String status,
-            @Parameter(description = "Filter by location (postal address)") @RequestParam(required = false) String location) {
+            @Parameter(description = "Filter by location (postal address)") @RequestParam(required = false) String location,
+            @Parameter(description = "Filter by name") @RequestParam(required = false) String name) {
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -171,6 +172,7 @@ public class FacilityController {
                 .withFacilityType(facilityTypeFilter)
                 .withStatus(statusFilter)
                 .withLocationPostalAddress(location)
+                .withName(name)
                 .build();
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Facility> facilityPage = this.readFacilityUseCase.fetchAll(pageable, criteria);

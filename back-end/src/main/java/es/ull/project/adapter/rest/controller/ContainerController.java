@@ -161,7 +161,8 @@ public class ContainerController {
             @Parameter(description = "Maximum capacity in liters") @RequestParam(required = false) Integer maxCapacity,
             @Parameter(description = "Minimum daily demand") @RequestParam(required = false) Integer minDemand,
             @Parameter(description = "Maximum daily demand") @RequestParam(required = false) Integer maxDemand,
-            @Parameter(description = "Filter by location (postal address)") @RequestParam(required = false) String location) {
+            @Parameter(description = "Filter by location (postal address)") @RequestParam(required = false) String location,
+            @Parameter(description = "Filter by name") @RequestParam(required = false) String name) {
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -185,6 +186,7 @@ public class ContainerController {
                 .withMinDailyDemand(minDemand)
                 .withMaxDailyDemand(maxDemand)
                 .withLocationPostalAddress(location)
+                .withName(name)
                 .build();
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Container> containerPage = this.readContainerUseCase.fetchAll(pageable, criteria);

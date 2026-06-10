@@ -7,4 +7,5 @@ export interface ListFacilitiesCommand {
     facilityType?: string;
     status?: string;
     location?: string;
+    name?: string;
 }

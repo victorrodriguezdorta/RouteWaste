@@ -764,8 +764,7 @@ public class InfrastructurePlan {
      * @return true when execution state is {@link InfrastructurePlanExecutionState#RUNNING}
      */
     public boolean isExecutionRunning() {
-        return getValidityState() == InfrastructurePlanValidityState.RUNNING
-                || getExecutionState() == InfrastructurePlanExecutionState.RUNNING;
+        return getExecutionState() == InfrastructurePlanExecutionState.RUNNING;
     }
 
     /**
@@ -797,6 +796,7 @@ public class InfrastructurePlan {
      */
     public void markExecutionFailed(String reason) {
         validateExecutionState(InfrastructurePlanExecutionState.FAILED);
+        this.validityState = InfrastructurePlanValidityState.VALID;
         this.executionState = InfrastructurePlanExecutionState.FAILED;
         this.failureReason = InfrastructurePlanFailureReason.fromNullable(reason);
     }

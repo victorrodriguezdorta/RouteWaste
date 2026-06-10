@@ -1,6 +1,7 @@
 package es.ull.project.adapter.rest.controller;
 
 import es.ull.project.adapter.mongodb.mapper.VehicleFieldMapper;
+import es.ull.project.adapter.mongodb.query.VehicleSearchCriteriaBuilder;
 import es.ull.project.adapter.rest.mapper.BulkImportResponseMapper;
 import es.ull.project.adapter.rest.mapper.VehicleResponseMapper;
 import es.ull.project.adapter.rest.request.vehicle.VehicleBulkPostRequestBody;
@@ -11,6 +12,7 @@ import es.ull.project.adapter.rest.response.vehicle.VehiclePageResponseBody;
 import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
 import es.ull.project.adapter.rest.support.BulkImportMultipartSupport;
 import es.ull.project.application.model.BulkCreateOutcome;
+import es.ull.project.application.query.VehicleSearchCriteria;
 import es.ull.project.application.usecase.vehicle.BulkCreateVehiclesUseCase;
 import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
@@ -133,7 +135,8 @@ public class VehicleController {
             @Parameter(description = "Number of elements per page") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Field to sort by (e.g., vehicleType, capacityKilograms, CapacityLiters, cost, etc.)") @RequestParam(required = false) String sortBy,
             @Parameter(description = "Sort direction: asc or desc") @RequestParam(defaultValue = "asc") String sortOrder,
-            @Parameter(description = "Filter by vehicle type") @RequestParam(required = false) String vehicleType) {
+            @Parameter(description = "Filter by vehicle type") @RequestParam(required = false) String vehicleType,
+            @Parameter(description = "Filter by name") @RequestParam(required = false) String name) {
         if (page < ZERO || size <= ZERO) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -149,8 +152,12 @@ public class VehicleController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+        VehicleSearchCriteria criteria = new VehicleSearchCriteriaBuilder()
+                .withVehicleType(vehicleTypeFilter)
+                .withName(name)
+                .build();
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Vehicle> vehiclePage = this.readVehicleUseCase.fetchAll(pageable, vehicleTypeFilter);
+        Page<Vehicle> vehiclePage = this.readVehicleUseCase.fetchAll(pageable, criteria);
         return buildSuccessResponse(vehiclePage);
     }
 

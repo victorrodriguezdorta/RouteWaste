@@ -15,6 +15,7 @@ public class FacilitySearchCriteriaBuilder {
     private FacilityType facilityType;
     private FacilityStatus status;
     private String locationPostalAddress;
+    private String name;
 
     /**
      * Sets the facility type filter criterion.
@@ -51,6 +52,18 @@ public class FacilitySearchCriteriaBuilder {
     }
 
     /**
+     * Sets the name filter criterion.
+     * Blank or null values are treated as no filter.
+     *
+     * @param name the name substring to filter by
+     * @return this builder instance for chaining
+     */
+    public FacilitySearchCriteriaBuilder withName(String name) {
+        this.name = name == null || name.isBlank() ? null : name;
+        return this;
+    }
+
+    /**
      * Constructs a {@link FacilitySearchCriteria} from the configured criteria.
      *
      * @return a new {@link FacilitySearchCriteria} instance
@@ -60,6 +73,7 @@ public class FacilitySearchCriteriaBuilder {
         criteria.setFacilityType(this.facilityType);
         criteria.setStatus(this.status);
         criteria.setLocationPostalAddress(this.locationPostalAddress);
+        criteria.setName(this.name);
         return criteria;
     }
 }

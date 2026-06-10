@@ -1,5 +1,6 @@
 package es.ull.project.application.repository;
 
+import es.ull.project.application.query.VehicleSearchCriteria;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
 import java.util.List;
@@ -55,6 +56,15 @@ public interface VehicleRepository {
      * @return page of matching vehicles
      */
     public abstract Page<Vehicle> findAll(@NonNull Pageable pageable, VehicleType vehicleType);
+
+    /**
+     * Find vehicles using pagination and search criteria.
+     *
+     * @param pageable pagination and sort configuration
+     * @param criteria search criteria with optional filters
+     * @return page of matching vehicles
+     */
+    public abstract Page<Vehicle> findAll(@NonNull Pageable pageable, @NonNull VehicleSearchCriteria criteria);
 
     /**
      * Save or update a vehicle.

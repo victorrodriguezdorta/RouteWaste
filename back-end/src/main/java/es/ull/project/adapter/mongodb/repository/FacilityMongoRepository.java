@@ -38,6 +38,7 @@ public class FacilityMongoRepository implements FacilityRepository {
     public static final String COLLECTION_NAME = "facilities";
     private static final String FIELD_ID = "id";
     private static final String FIELD_LOCATION_POSTAL_ADDRESS = "location.postalAddress";
+    private static final String FIELD_NAME = "name";
     private static final String CASE_INSENSITIVE_REGEX_FLAG = "i";
 
     @Autowired
@@ -172,6 +173,10 @@ public class FacilityMongoRepository implements FacilityRepository {
         if (criteria.getLocationPostalAddress() != null) {
             criterias.add(Criteria.where(FIELD_LOCATION_POSTAL_ADDRESS)
                     .regex(criteria.getLocationPostalAddress(), CASE_INSENSITIVE_REGEX_FLAG));
+        }
+        if (criteria.getName() != null) {
+            criterias.add(Criteria.where(FIELD_NAME)
+                    .regex(criteria.getName(), CASE_INSENSITIVE_REGEX_FLAG));
         }
         return criterias;
     }

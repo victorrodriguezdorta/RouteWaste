@@ -18,6 +18,7 @@ public class ContainerSearchCriteriaBuilder {
     private Integer minDailyDemand;
     private Integer maxDailyDemand;
     private String locationPostalAddress;
+    private String name;
 
     /**
      * Sets the waste type filter criterion.
@@ -99,6 +100,18 @@ public class ContainerSearchCriteriaBuilder {
     }
 
     /**
+     * Sets the name filter criterion.
+     * Blank or null values are treated as no filter.
+     *
+     * @param name the name substring to filter by
+     * @return this builder instance for chaining
+     */
+    public ContainerSearchCriteriaBuilder withName(String name) {
+        this.name = name == null || name.isBlank() ? null : name;
+        return this;
+    }
+
+    /**
      * Constructs a {@link ContainerSearchCriteria} from the configured criteria.
      *
      * @return a new {@link ContainerSearchCriteria} instance
@@ -112,6 +125,7 @@ public class ContainerSearchCriteriaBuilder {
         criteria.setMinDailyDemand(this.minDailyDemand);
         criteria.setMaxDailyDemand(this.maxDailyDemand);
         criteria.setLocationPostalAddress(this.locationPostalAddress);
+        criteria.setName(this.name);
         return criteria;
     }
 }

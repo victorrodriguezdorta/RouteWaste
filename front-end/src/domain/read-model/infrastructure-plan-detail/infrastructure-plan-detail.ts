@@ -30,9 +30,7 @@ export class InfrastructurePlanDetail {
    * @returns Whether the algorithm is still running for this plan
    */
   isExecutionRunning(): boolean {
-    return (
-      this.validityState === 'RUNNING' || this.executionState === 'RUNNING'
-    );
+    return this.executionState === 'RUNNING';
   }
 
   /**

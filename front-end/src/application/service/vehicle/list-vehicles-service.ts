@@ -28,11 +28,6 @@ export class ListVehiclesService implements ListVehiclesUseCase {
      * @returns Either a `DataError` or an array of `Vehicle` entities.
      */
     async execute(command?: ListVehiclesCommand): Promise<Either<DataError, ListVehiclesResult>> {
-        const page = command?.page;
-        const pageSize = command?.pageSize;
-        const sortBy = command?.sortBy;
-        const sortOrder = command?.sortOrder;
-        const vehicleType = command?.vehicleType;
-        return this.vehicleRepository.list({ page, pageSize, sortBy, sortOrder, vehicleType });
+        return this.vehicleRepository.list(command);
     }
 }
