@@ -58,6 +58,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { loadLeaflet } from '../../utils/leaflet';
+import { createMapPinIcon } from '../../utils/map-pin-icon';
 
 interface Props {
   latitude: number;
@@ -156,7 +157,10 @@ const initializeMap = async () => {
     attribution: '&copy; OpenStreetMap contributors',
   }).addTo(map);
 
-  const marker = L.marker(initialCoordinates, { draggable: false }).addTo(map);
+  const marker = L.marker(initialCoordinates, {
+    draggable: false,
+    icon: createMapPinIcon('success'),
+  }).addTo(map);
 
   clickHandler = (event: any) => {
     const latitude = event.latlng.lat;

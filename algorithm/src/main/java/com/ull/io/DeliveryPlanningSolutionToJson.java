@@ -100,6 +100,8 @@ public class DeliveryPlanningSolutionToJson
   public static final String MESSAGE_FIELD = "message";
   public static final String VALUE_FIELD = "value";
   public static final String DAILY_FILLING_LITERS_FIELD = "dailyFillingLiters";
+  public static final String DAILY_FILLING_LITERS_BEFORE_COLLECTION_FIELD =
+      "dailyFillingLitersBeforeCollection";
   public static final String CONTAINER_CAPACITY_LITERS_FIELD = "containerCapacityLiters";
   public static final String DAILY_DEMAND_LITERS_PER_DAY_FIELD = "dailyDemandLitersPerDay";
   public static final String ID_FIELD = "id";
@@ -272,6 +274,9 @@ public class DeliveryPlanningSolutionToJson
       json.put(CONTAINER_ID_FIELD, state.getContainerId());
       json.put(PLAN_DAY_FIELD, state.getPlanDay());
       json.put(DAILY_FILLING_LITERS_FIELD, state.getDailyFillingLiters());
+      json.put(
+          DAILY_FILLING_LITERS_BEFORE_COLLECTION_FIELD,
+          state.getDailyFillingLitersBeforeCollection());
       json.put(CONTAINER_CAPACITY_LITERS_FIELD, state.getContainerCapacityLiters());
       json.put(DAILY_DEMAND_LITERS_PER_DAY_FIELD, state.getDailyDemandLitersPerDay());
       json.put(STATUS_FIELD, state.getStatus().name());

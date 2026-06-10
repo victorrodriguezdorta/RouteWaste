@@ -180,6 +180,27 @@ class AlgorithmTest {
   }
 
   @Test
+  void shouldRecordFillLevelBeforeAndAfterCollectionInMonitoring() {
+    Facility facility = facility("facility-1");
+    Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");
+    Container container = container("container-1", 28.465, -16.263, 100.0, 80.0);
+
+    FacilityWithVehicles facilityWithVehicles = new FacilityWithVehicles(facility, List.of(vehicle));
+    DeliveryPlanningProblem problem = new DeliveryPlanningProblem(
+        15,
+        1,
+        List.of(facilityWithVehicles),
+        List.of(container),
+        new MaximumBudget(5000.0, "EUR"));
+
+    DeliveryPlanningSolution solution = new Algorithm(problem).run();
+
+    ContainerDailyState state = solution.getContainerStateMonitoring().get(0);
+    assertEquals(0.0, state.getDailyFillingLiters(), DELTA);
+    assertEquals(80.0, state.getDailyFillingLitersBeforeCollection(), DELTA);
+  }
+
+  @Test
   void shouldReturnSuboptimalSolutionForSimpleProblem() {
     Facility facility = facility("facility-1");
     Vehicle vehicle = vehicle("vehicle-1", "COLLECTION_TRUCK");

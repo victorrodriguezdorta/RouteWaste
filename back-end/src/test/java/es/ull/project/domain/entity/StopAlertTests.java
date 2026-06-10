@@ -3,7 +3,11 @@ package es.ull.project.domain.entity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.UUID;
 
 import es.ull.project.domain.valueobject.alert.StopAlertMessage;
 import es.ull.project.domain.valueobject.alert.StopAlertType;
@@ -43,6 +47,72 @@ class StopAlertTests {
 
         assertEquals(original, copy);
         assertEquals(original.hashCode(), copy.hashCode());
+    }
+
+    @Test
+    void restoreConstructor_right() {
+        UUID id = UUID.randomUUID();
+        StopAlertType type = new StopAlertType("VEHICLE_FULL");
+        StopAlertMessage message = new StopAlertMessage("Vehicle is full");
+        StopAlertValue value = new StopAlertValue(42.0);
+
+        StopAlert alert = new StopAlert(id, type, message, value);
+
+        assertEquals(id, alert.getId());
+        assertEquals(type, alert.getType());
+        assertEquals(message, alert.getMessage());
+        assertEquals(value, alert.getValue().orElseThrow());
+    }
+
+    @Test
+    void restoreConstructor_rejectsNullId() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> new StopAlert(
+                        null,
+                        new StopAlertType("VEHICLE_FULL"),
+                        new StopAlertMessage("Vehicle is full"),
+                        null));
+
+        assertEquals("Stop alert id is required", exception.getMessage());
+    }
+
+    @Test
+    void fromValues_withoutNumericValue() {
+        StopAlert alert = StopAlert.fromValues("CONTAINER_OVERFLOWED", "Container overflowed");
+
+        assertEquals(new StopAlertType("CONTAINER_OVERFLOWED"), alert.getType());
+        assertTrue(alert.getValue().isEmpty());
+    }
+
+    @Test
+    void getId_isAssignedOnCreation() {
+        StopAlert alert = new StopAlert(
+                new StopAlertType("VEHICLE_FULL"),
+                new StopAlertMessage("Vehicle is full"));
+
+        assertNotNull(alert.getId());
+    }
+
+    @Test
+    void toString_withValue() {
+        StopAlert alert = StopAlert.fromValues("VEHICLE_FULL", "Vehicle is full", 42.0);
+
+        String result = alert.toString();
+
+        assertTrue(result.contains("VEHICLE_FULL"));
+        assertTrue(result.contains("Vehicle is full"));
+        assertTrue(result.contains("value="));
+    }
+
+    @Test
+    void toString_withoutValue() {
+        StopAlert alert = StopAlert.fromValues("CONTAINER_OVERFLOWED", "Container overflowed");
+
+        String result = alert.toString();
+
+        assertTrue(result.contains("CONTAINER_OVERFLOWED"));
+        assertFalse(result.contains("value="));
     }
 
     @Test

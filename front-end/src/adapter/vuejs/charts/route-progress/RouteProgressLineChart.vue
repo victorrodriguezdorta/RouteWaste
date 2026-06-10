@@ -104,8 +104,18 @@ const innerHeight = computed(() =>
 );
 
 const stopValues = computed(() =>
-  props.data.map((row) => row.stop).filter((value) => Number.isFinite(value)),
+  props.data
+    .map((row) => row.stop)
+    .filter((value): value is number => typeof value === 'number' && Number.isFinite(value)),
 );
+
+function stopAxisLabel(stop: number): string {
+  const row = props.data.find((entry) => entry.stop === stop);
+  if (row?.stopLabel) {
+    return String(row.stopLabel);
+  }
+  return formatTick(stop);
+}
 
 const leftSeries = computed(() =>
   props.series.filter((item) => item.yAxis !== 'right'),
@@ -371,7 +381,7 @@ function clearSeriesTooltip(): void {
           text-anchor="middle"
           class="route-progress-chart__tick route-progress-chart__tick--x"
         >
-          {{ stop }}
+          {{ stopAxisLabel(stop) }}
         </text>
       </g>
 

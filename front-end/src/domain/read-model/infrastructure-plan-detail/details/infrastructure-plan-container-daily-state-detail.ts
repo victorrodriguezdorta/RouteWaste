@@ -13,6 +13,7 @@ export class InfrastructurePlanContainerDailyStateDetail {
     public readonly containerId: UllUUID,
     public readonly planDay: number,
     public readonly dailyFillingLiters: number,
+    public readonly dailyFillingLitersBeforeCollection: number | null = null,
     public readonly containerCapacityLiters: ContainerCapacityLiters,
     public readonly dailyDemandLitersPerDay: DailyWasteDemandLitersPerDay | null,
     public readonly status: ContainerStatus,

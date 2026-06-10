@@ -74,6 +74,7 @@ class DeliveryPlanningSolutionToJsonTest {
     assertEquals(container.getId(), stateJson.getString("containerId"));
     assertEquals(1, stateJson.getInt("planDay"));
     assertEquals(90.0, stateJson.getDouble("dailyFillingLiters"));
+    assertTrue(stateJson.has("dailyFillingLitersBeforeCollection"));
     assertEquals(10.0, stateJson.getDouble("dailyDemandLitersPerDay"));
     assertEquals("OVERFLOWED", stateJson.getString("status"));
 

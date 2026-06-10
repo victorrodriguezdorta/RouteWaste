@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 
 import es.ull.project.domain.enumerate.FacilityStatus;
@@ -91,6 +93,7 @@ class FacilityTests {
         );
         
         // Required attributes:
+        assertEquals(name, facility.getName());
         assertEquals(facilityType, facility.getFacilityType());
         assertEquals(location, facility.getLocation());
         assertEquals(storageCapacity, facility.getStorageCapacity());
@@ -105,6 +108,24 @@ class FacilityTests {
         assertEquals(0.0, facility.getCurrentFillingLevel().getLitersPerDay());
     }
     
+    @Test
+    void constructor_1_name_undefined() {
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> new Facility(
+                null,
+                FacilityType.random(),
+                randomLocation(),
+                randomStorageCapacity(),
+                randomProcessingCapacity(),
+                randomUnloadingTime(),
+                randomOpeningFixedCost(),
+                FacilityStatus.random())
+        );
+
+        assertEquals(Facility.NAME_NOT_DEFINED, exception.getMessage());
+    }
+
     @Test
     void constructor_1_facilityType_undefined() {
         FacilityType facilityType = null;
@@ -231,6 +252,303 @@ class FacilityTests {
         assertEquals(Facility.STATUS_NOT_DEFINED, exception.getMessage());
     }
     
+    // ========== COPY & RESTORE CONSTRUCTORS ==========
+
+    @Test
+    void copyConstructor_right() {
+        Facility original = new Facility(
+            randomName(),
+            FacilityType.random(),
+            randomLocation(),
+            randomStorageCapacity(),
+            randomProcessingCapacity(),
+            randomUnloadingTime(),
+            randomOpeningFixedCost(),
+            FacilityStatus.PLANNED);
+        original.assignWasteDemand(new DailyWasteDemandLitersPerDay(15.0));
+
+        Facility copy = new Facility(original);
+
+        assertEquals(original.getId(), copy.getId());
+        assertEquals(original.getName(), copy.getName());
+        assertEquals(original.getFacilityType(), copy.getFacilityType());
+        assertEquals(original.getLocation(), copy.getLocation());
+        assertEquals(original.getCurrentFillingLevel(), copy.getCurrentFillingLevel());
+    }
+
+    @Test
+    void restoreConstructor_right() {
+        UUID id = UUID.randomUUID();
+        Name name = randomName();
+        FacilityType facilityType = FacilityType.random();
+        Location location = randomLocation();
+        StorageCapacityKilograms storageCapacity = randomStorageCapacity();
+        ProcessingCapacityKilogramsPerDay processingCapacity = randomProcessingCapacity();
+        UnloadingTime unloadingTime = randomUnloadingTime();
+        OpeningFixedCost openingFixedCost = randomOpeningFixedCost();
+        FacilityStatus status = FacilityStatus.PLANNED;
+        DailyWasteDemandLitersPerDay fillingLevel = new DailyWasteDemandLitersPerDay(25.0);
+
+        Facility facility = new Facility(
+            id, name, facilityType, location, storageCapacity, processingCapacity,
+            unloadingTime, openingFixedCost, status, fillingLevel);
+
+        assertEquals(id, facility.getId());
+        assertEquals(name, facility.getName());
+        assertEquals(fillingLevel, facility.getCurrentFillingLevel());
+    }
+
+    @Test
+    void restoreConstructor_nullCurrentFillingLevel_defaultsToZero() {
+        Facility facility = new Facility(
+            UUID.randomUUID(),
+            randomName(),
+            FacilityType.random(),
+            randomLocation(),
+            randomStorageCapacity(),
+            randomProcessingCapacity(),
+            randomUnloadingTime(),
+            randomOpeningFixedCost(),
+            FacilityStatus.PLANNED,
+            null);
+
+        assertEquals(0.0, facility.getCurrentFillingLevel().getLitersPerDay());
+    }
+
+    // ========== UPDATE METHODS ==========
+
+    @Test
+    void updateName_valid() {
+        Facility facility = randomFacility();
+        Name newName = randomName();
+
+        facility.updateName(newName);
+
+        assertEquals(newName, facility.getName());
+    }
+
+    @Test
+    void updateName_undefined() {
+        Facility facility = randomFacility();
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> facility.updateName(null)
+        );
+
+        assertEquals(Facility.NAME_NOT_DEFINED, exception.getMessage());
+    }
+
+    @Test
+    void updateFacilityType_valid() {
+        Facility facility = randomFacility();
+        FacilityType newType = FacilityType.random();
+
+        facility.updateFacilityType(newType);
+
+        assertEquals(newType, facility.getFacilityType());
+    }
+
+    @Test
+    void updateFacilityType_undefined() {
+        Facility facility = randomFacility();
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> facility.updateFacilityType(null)
+        );
+
+        assertEquals(Facility.TYPE_NOT_DEFINED, exception.getMessage());
+    }
+
+    @Test
+    void updateLocation_valid() {
+        Facility facility = randomFacility();
+        Location newLocation = randomLocation();
+
+        facility.updateLocation(newLocation);
+
+        assertEquals(newLocation, facility.getLocation());
+    }
+
+    @Test
+    void updateLocation_undefined() {
+        Facility facility = randomFacility();
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> facility.updateLocation(null)
+        );
+
+        assertEquals(Facility.LOCATION_NOT_DEFINED, exception.getMessage());
+    }
+
+    @Test
+    void updateStorageCapacity_valid() {
+        Facility facility = randomFacility();
+        StorageCapacityKilograms newCapacity = new StorageCapacityKilograms(2000.0);
+
+        facility.updateStorageCapacity(newCapacity);
+
+        assertEquals(newCapacity, facility.getStorageCapacity());
+    }
+
+    @Test
+    void updateStorageCapacity_undefined() {
+        Facility facility = randomFacility();
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> facility.updateStorageCapacity(null)
+        );
+
+        assertEquals(Facility.STORAGE_CAPACITY_NOT_DEFINED, exception.getMessage());
+    }
+
+    @Test
+    void updateProcessingCapacity_valid() {
+        Facility facility = randomFacility();
+        ProcessingCapacityKilogramsPerDay newCapacity = new ProcessingCapacityKilogramsPerDay(800.0);
+
+        facility.updateProcessingCapacity(newCapacity);
+
+        assertEquals(newCapacity, facility.getProcessingCapacity());
+    }
+
+    @Test
+    void updateProcessingCapacity_undefined() {
+        Facility facility = randomFacility();
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> facility.updateProcessingCapacity(null)
+        );
+
+        assertEquals(Facility.PROCESSING_CAPACITY_NOT_DEFINED, exception.getMessage());
+    }
+
+    @Test
+    void updateUnloadingTime_valid() {
+        Facility facility = randomFacility();
+        UnloadingTime newTime = new UnloadingTime(90);
+
+        facility.updateUnloadingTime(newTime);
+
+        assertEquals(newTime, facility.getUnloadingTime());
+    }
+
+    @Test
+    void updateUnloadingTime_undefined() {
+        Facility facility = randomFacility();
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> facility.updateUnloadingTime(null)
+        );
+
+        assertEquals(Facility.UNLOADING_TIME_NOT_DEFINED, exception.getMessage());
+    }
+
+    @Test
+    void updateOpeningFixedCost_valid() {
+        Facility facility = randomFacility();
+        OpeningFixedCost newCost = new OpeningFixedCost(5000.0);
+
+        facility.updateOpeningFixedCost(newCost);
+
+        assertEquals(newCost, facility.getOpeningFixedCost());
+    }
+
+    @Test
+    void updateOpeningFixedCost_undefined() {
+        Facility facility = randomFacility();
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> facility.updateOpeningFixedCost(null)
+        );
+
+        assertEquals(Facility.OPENING_COST_NOT_DEFINED, exception.getMessage());
+    }
+
+    // ========== processWaste & recordTruckUnload ==========
+
+    @Test
+    void processWaste_negativeAmount() {
+        Facility facility = randomFacility();
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> facility.processWaste(-1.0)
+        );
+
+        assertEquals("Processing amount cannot be negative", exception.getMessage());
+    }
+
+    @Test
+    void processWaste_validAmount_doesNotThrow() {
+        Facility facility = randomFacility();
+
+        facility.processWaste(0.0);
+        facility.processWaste(100.0);
+    }
+
+    @Test
+    void recordTruckUnload_discardedFacility() {
+        Facility facility = new Facility(
+            randomName(),
+            FacilityType.random(),
+            randomLocation(),
+            randomStorageCapacity(),
+            randomProcessingCapacity(),
+            randomUnloadingTime(),
+            randomOpeningFixedCost(),
+            FacilityStatus.DISCARDED);
+
+        IllegalStateException exception = assertThrows(
+            IllegalStateException.class,
+            () -> facility.recordTruckUnload(50.0)
+        );
+
+        assertEquals(Facility.FACILITY_DISCARDED, exception.getMessage());
+    }
+
+    @Test
+    void recordTruckUnload_negativeWaste() {
+        Facility facility = new Facility(
+            randomName(),
+            FacilityType.random(),
+            randomLocation(),
+            randomStorageCapacity(),
+            randomProcessingCapacity(),
+            randomUnloadingTime(),
+            randomOpeningFixedCost(),
+            FacilityStatus.PLANNED);
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> facility.recordTruckUnload(-0.1)
+        );
+
+        assertEquals("Waste amount cannot be negative", exception.getMessage());
+    }
+
+    @Test
+    void recordTruckUnload_validAmount_doesNotThrow() {
+        Facility facility = new Facility(
+            randomName(),
+            FacilityType.random(),
+            randomLocation(),
+            randomStorageCapacity(),
+            randomProcessingCapacity(),
+            randomUnloadingTime(),
+            randomOpeningFixedCost(),
+            FacilityStatus.PLANNED);
+
+        facility.recordTruckUnload(0.0);
+        facility.recordTruckUnload(120.0);
+    }
+
     // ========== equals() ==========
     
     @Test

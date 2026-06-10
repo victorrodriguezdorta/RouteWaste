@@ -307,11 +307,11 @@ La primera ejecución de `docker:full` puede tardar varios minutos (Maven en el 
 | Front-end | http://localhost |
 | Back-end (API) | http://localhost:8080/api/v1/ |
 | Swagger | http://localhost:8080/swagger-ui.html |
-| MongoDB (host) | `mongodb://localhost:27017/db-application` |
+| MongoDB (host, desde Docker) | `mongodb://localhost:27018/db-application` |
 
 ### Notas
 
-- Si el puerto **27017** está ocupado (MongoDB local), para el stack `full` o detén ese servicio o cambia el mapeo de puertos en `docker-compose.yml`.
+- El contenedor `mongo` publica el puerto **27018** en el host para no chocar con una MongoDB local en **27017**. Dentro de Docker, el back-end sigue usando `mongo:27017`.
 - Tras cambiar código del **back-end** (p. ej. CORS o algoritmo), reconstruye: `docker compose build back-end && docker compose --profile full up -d back-end`.
 - Perfil Compose: `full` (servicios `mongodb`, `back-end`, `front-end`). Imagen del algoritmo: `sensor-app_algorithm:latest` (se construye antes de levantar el stack).
 

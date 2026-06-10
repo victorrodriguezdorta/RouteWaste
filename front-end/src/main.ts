@@ -2,6 +2,7 @@ import { i18n } from './adapter/vuejs/i18n';
 import router from './adapter/vuejs/router/router';
 import App from './App.vue';
 import './style.css';
+import './adapter/vuejs/styles/map-pin-icon.css';
 /** Colores del tema: edítalos en `src/theme/professional-light-colors.ts` */
 import { professionalLightColors } from './theme/professional-light-colors';
 import '@mdi/font/css/materialdesignicons.css';
@@ -23,6 +24,7 @@ import {
   VCol,
   VContainer,
   VDataTableServer,
+  VDialog,
   VDivider,
   VExpandTransition,
   VFooter,
@@ -73,6 +75,7 @@ const vuetify = createVuetify({
     VCol,
     VContainer,
     VDataTableServer,
+    VDialog,
     VDivider,
     VExpandTransition,
     VFooter,

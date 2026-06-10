@@ -52,10 +52,10 @@ export interface MapLocationPin {
   longitude: number;
   label: string;
   /**
-   * Colored map-pin marker: gray (`muted`) or theme primary (`primary`).
-   * When omitted, the default Leaflet marker is used (list views).
+   * Colored map-pin marker: gray (`muted`), theme primary (`primary`) or green (`success`).
+   * Defaults to `success` (list views).
    */
-  markerTone?: 'muted' | 'primary';
+  markerTone?: 'muted' | 'primary' | 'success';
 }
 </script>
 
@@ -65,6 +65,7 @@ import { useI18n } from 'vue-i18n';
 import type { RouteRecordNameGeneric } from 'vue-router';
 import router from '../../router/router';
 import { loadLeaflet } from '../../utils/leaflet';
+import { createMapPinIcon, type MapPinTone } from '../../utils/map-pin-icon';
 
 interface Props {
   locations: MapLocationPin[];
@@ -157,17 +158,6 @@ const resolvedEyebrow = computed(() => props.eyebrow || t('common.map.listOvervi
 const canNavigateFromPin = (pin: MapLocationPin) =>
   Boolean(props.detailRouteName && pin.id && String(pin.id).length > 0);
 
-const toneMarkerIcon = (L: LeafletNamespace, tone: 'muted' | 'primary') => {
-  const fill = tone === 'primary' ? 'rgb(var(--v-theme-primary))' : 'rgb(var(--v-theme-map-pin-muted))';
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="28" height="42" aria-hidden="true" style="display:block;filter:drop-shadow(0 2px 3px rgba(var(--v-theme-neutral-base),0.35))"><path fill="${fill}" stroke="rgb(var(--v-theme-surface))" stroke-width="1.1" stroke-linejoin="round" d="M12 1C6.48 1 2 5.48 2 11c0 7.75 10 23 10 23s10-15.25 10-23C22 5.48 17.52 1 12 1z"/><circle cx="12" cy="11" r="3.6" fill="rgb(var(--v-theme-surface))"/></svg>`;
-  return L.divIcon({
-    className: 'locations-list-map__tone-marker',
-    html: `<div class="locations-list-map__tone-marker-pin">${svg}</div>`,
-    iconSize: [28, 42],
-    iconAnchor: [14, 40],
-  });
-};
-
 const destroyMap = () => {
   if (mapInstance.value) {
     mapInstance.value.remove();
@@ -193,9 +183,10 @@ const renderMarkers = () => {
 
   pts.forEach((p, i) => {
     const coord = latlngs[i];
-    const tone = p.markerTone;
-    const markerOptions = tone ? { icon: toneMarkerIcon(L, tone) } : undefined;
-    const marker = L.marker(coord, markerOptions)
+    const tone: MapPinTone = p.markerTone ?? 'success';
+    const marker = L.marker(coord, {
+      icon: createMapPinIcon(tone, canNavigateFromPin(p)),
+    })
       .addTo(layer)
       .bindTooltip(escapeHtml(p.label), {
         sticky: true,
@@ -354,17 +345,4 @@ onUnmounted(() => {
   width: 100%;
 }
 
-/* DivIcon markers (algorithm selection map): neutralize Leaflet default frame */
-.locations-list-map__map :deep(.leaflet-div-icon.locations-list-map__tone-marker) {
-  background: transparent !important;
-  border: none !important;
-  cursor: pointer;
-}
-
-.locations-list-map__map :deep(.locations-list-map__tone-marker-pin) {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  line-height: 0;
-}
 </style>

@@ -1,0 +1,15 @@
+.leaflet-div-icon.map-pin-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.leaflet-div-icon.map-pin-icon.map-pin-icon--interactive {
+  cursor: pointer;
+}
+
+.map-pin-icon__pin {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  line-height: 0;
+}

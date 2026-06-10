@@ -57,6 +57,12 @@ public class ContainerDailyState {
     private final CollectedVolumeLiters dailyFillingLiters;
 
     /**
+     * Container filling level before any collection on the day.
+     * It is an optional attribute for legacy snapshots.
+     */
+    private final CollectedVolumeLiters dailyFillingLitersBeforeCollection;
+
+    /**
      * Container capacity at planning time.
      * It is a required attribute.
      */
@@ -93,12 +99,45 @@ public class ContainerDailyState {
             ContainerCapacityLiters containerCapacityLiters,
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
             ContainerStatus status) {
+        this(
+                infrastructurePlan,
+                container,
+                planDay,
+                dailyFillingLiters,
+                containerCapacityLiters,
+                dailyDemandLitersPerDay,
+                status,
+                null);
+    }
+
+    /**
+     * Creates a new container daily state snapshot including the before-collection level.
+     *
+     * @param infrastructurePlan                   the parent infrastructure plan
+     * @param container                              the referenced container
+     * @param planDay                                the planning day represented by the snapshot
+     * @param dailyFillingLiters                     the container filling level in liters
+     * @param containerCapacityLiters                the container capacity in liters
+     * @param dailyDemandLitersPerDay                the estimated daily demand in liters per day
+     * @param status                                 the computed container status
+     * @param dailyFillingLitersBeforeCollection     the filling level before collection
+     */
+    public ContainerDailyState(
+            InfrastructurePlan infrastructurePlan,
+            Container container,
+            PlanDay planDay,
+            CollectedVolumeLiters dailyFillingLiters,
+            ContainerCapacityLiters containerCapacityLiters,
+            DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
+            ContainerStatus status,
+            CollectedVolumeLiters dailyFillingLitersBeforeCollection) {
         validate(container, planDay, dailyFillingLiters, containerCapacityLiters, dailyDemandLitersPerDay);
         this.id = UUID.randomUUID();
         this.infrastructurePlan = infrastructurePlan;
         this.container = container;
         this.planDay = planDay;
         this.dailyFillingLiters = dailyFillingLiters;
+        this.dailyFillingLitersBeforeCollection = dailyFillingLitersBeforeCollection;
         this.containerCapacityLiters = containerCapacityLiters;
         this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
         this.status = status != null ? status : ContainerStatus.CORRECT;
@@ -115,6 +154,7 @@ public class ContainerDailyState {
         this.container = otherObject.container;
         this.planDay = otherObject.planDay;
         this.dailyFillingLiters = otherObject.dailyFillingLiters;
+        this.dailyFillingLitersBeforeCollection = otherObject.dailyFillingLitersBeforeCollection;
         this.containerCapacityLiters = otherObject.containerCapacityLiters;
         this.dailyDemandLitersPerDay = otherObject.dailyDemandLitersPerDay;
         this.status = otherObject.status;
@@ -141,12 +181,48 @@ public class ContainerDailyState {
             ContainerCapacityLiters containerCapacityLiters,
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
             ContainerStatus status) {
+        this(
+                id,
+                infrastructurePlan,
+                container,
+                planDay,
+                dailyFillingLiters,
+                containerCapacityLiters,
+                dailyDemandLitersPerDay,
+                status,
+                null);
+    }
+
+    /**
+     * Restore constructor including the before-collection level.
+     *
+     * @param id                                     the daily state identifier
+     * @param infrastructurePlan                     the parent infrastructure plan
+     * @param container                              the referenced container
+     * @param planDay                                the planning day represented by the snapshot
+     * @param dailyFillingLiters                     the container filling level in liters
+     * @param containerCapacityLiters                the container capacity in liters
+     * @param dailyDemandLitersPerDay                the estimated daily demand in liters per day
+     * @param status                                 the computed container status
+     * @param dailyFillingLitersBeforeCollection     the filling level before collection
+     */
+    public ContainerDailyState(
+            UUID id,
+            InfrastructurePlan infrastructurePlan,
+            Container container,
+            PlanDay planDay,
+            CollectedVolumeLiters dailyFillingLiters,
+            ContainerCapacityLiters containerCapacityLiters,
+            DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
+            ContainerStatus status,
+            CollectedVolumeLiters dailyFillingLitersBeforeCollection) {
         validate(container, planDay, dailyFillingLiters, containerCapacityLiters, dailyDemandLitersPerDay);
         this.id = id;
         this.infrastructurePlan = infrastructurePlan;
         this.container = container;
         this.planDay = planDay;
         this.dailyFillingLiters = dailyFillingLiters;
+        this.dailyFillingLitersBeforeCollection = dailyFillingLitersBeforeCollection;
         this.containerCapacityLiters = containerCapacityLiters;
         this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
         this.status = status != null ? status : ContainerStatus.CORRECT;
@@ -251,6 +327,17 @@ public class ContainerDailyState {
      */
     public double getDailyFillingLiters() {
         return dailyFillingLiters.getValue();
+    }
+
+    /**
+     * Gets the container filling level before any collection on the day.
+     *
+     * @return optional filling level in liters before collection
+     */
+    public Optional<Double> getDailyFillingLitersBeforeCollection() {
+        return dailyFillingLitersBeforeCollection != null
+                ? Optional.of(dailyFillingLitersBeforeCollection.getValue())
+                : Optional.empty();
     }
 
     /**

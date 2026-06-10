@@ -53,6 +53,7 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
     private static final String FIELD_CONTAINER_NAME = "containerName";
     private static final String FIELD_PLAN_DAY = "planDay";
     private static final String FIELD_DAILY_FILLING_LITERS = "dailyFillingLiters";
+    private static final String FIELD_DAILY_FILLING_LITERS_BEFORE_COLLECTION = "dailyFillingLitersBeforeCollection";
     private static final String FIELD_CONTAINER_CAPACITY_LITERS = "containerCapacityLiters";
     private static final String FIELD_DAILY_DEMAND_LITERS_PER_DAY = "dailyDemandLitersPerDay";
 
@@ -209,6 +210,11 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
                 }
                 if (state.dailyFillingLiters != null) {
                     gen.writeNumberField(FIELD_DAILY_FILLING_LITERS, state.dailyFillingLiters.getValue());
+                }
+                if (state.dailyFillingLitersBeforeCollection != null) {
+                    gen.writeNumberField(
+                            FIELD_DAILY_FILLING_LITERS_BEFORE_COLLECTION,
+                            state.dailyFillingLitersBeforeCollection.getValue());
                 }
                 if (state.containerCapacityLiters != null) {
                     gen.writeNumberField(FIELD_CONTAINER_CAPACITY_LITERS, state.containerCapacityLiters.getLiters());

@@ -24,28 +24,50 @@ export function normalizePlanDay(value: number | string | null | undefined): num
   return -1;
 }
 
-export function computeContainerFillPercent(entry: {
-  container: InfrastructurePlanContainerDetail;
-  state?: InfrastructurePlanContainerDailyStateDetail;
-}): number | null {
-  const filling = entry.state?.dailyFillingLiters;
-  const capacityFromState = entry.state?.containerCapacityLiters?.getLiters?.();
-  const capacityFromContainer = entry.container.capacityLiters?.getLiters?.();
-  const capacity = typeof capacityFromState === 'number' ? capacityFromState : capacityFromContainer;
-
-  if (typeof filling !== 'number' || !Number.isFinite(filling)) {
+export function computeContainerFillPercentFromLiters(
+  fillingLiters: number | null | undefined,
+  capacityLiters: number | null | undefined,
+): number | null {
+  if (typeof fillingLiters !== 'number' || !Number.isFinite(fillingLiters)) {
     return null;
   }
-  if (typeof capacity !== 'number' || !Number.isFinite(capacity) || capacity === 0) {
+  if (typeof capacityLiters !== 'number' || !Number.isFinite(capacityLiters) || capacityLiters === 0) {
     return null;
   }
 
-  const percent = (filling / capacity) * 100;
+  const percent = (fillingLiters / capacityLiters) * 100;
   if (!Number.isFinite(percent)) {
     return null;
   }
 
   return Math.round(percent);
+}
+
+export function computeContainerFillPercent(entry: {
+  container: InfrastructurePlanContainerDetail;
+  state?: InfrastructurePlanContainerDailyStateDetail;
+}): number | null {
+  const capacityFromState = entry.state?.containerCapacityLiters?.getLiters?.();
+  const capacityFromContainer = entry.container.capacityLiters?.getLiters?.();
+  const capacity = typeof capacityFromState === 'number' ? capacityFromState : capacityFromContainer;
+
+  return computeContainerFillPercentFromLiters(entry.state?.dailyFillingLiters, capacity);
+}
+
+export function computeContainerFillPercentBeforeCollection(entry: {
+  container: InfrastructurePlanContainerDetail;
+  state?: InfrastructurePlanContainerDailyStateDetail;
+}): number | null {
+  const capacityFromState = entry.state?.containerCapacityLiters?.getLiters?.();
+  const capacityFromContainer = entry.container.capacityLiters?.getLiters?.();
+  const capacity = typeof capacityFromState === 'number' ? capacityFromState : capacityFromContainer;
+  const beforeCollection = entry.state?.dailyFillingLitersBeforeCollection;
+
+  if (typeof beforeCollection === 'number' && Number.isFinite(beforeCollection)) {
+    return computeContainerFillPercentFromLiters(beforeCollection, capacity);
+  }
+
+  return computeContainerFillPercent(entry);
 }
 
 export function resolveContainerFillMarkerTone(fillPercent: number | null): ContainerFillMarkerTone {

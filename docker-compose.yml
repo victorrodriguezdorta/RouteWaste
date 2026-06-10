@@ -65,13 +65,13 @@ services:
       - mongodb-api-test
     profiles: ["api-test"]
   
-  # MongoDB
+  # MongoDB (host port 27018 avoids conflict with a local MongoDB on 27017)
   mongodb:
     image: mongo:latest
     container_name: mongo
     command: mongod --port 27017
     ports:
-      - 27017:27017
+      - 27018:27017
     volumes:
       - mongodb_volume:/data/db
     profiles: ["database", "back-end", "full"]

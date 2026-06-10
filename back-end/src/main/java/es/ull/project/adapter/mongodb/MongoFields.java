@@ -32,6 +32,7 @@ public class MongoFields {
     public static final String SERVICE_ZONE = "serviceZone";
     public static final String CONTAINER_ID = "containerId";
     public static final String DAILY_FILLING_LITERS = "dailyFillingLiters";
+    public static final String DAILY_FILLING_LITERS_BEFORE_COLLECTION = "dailyFillingLitersBeforeCollection";
 
     /**
      * ContainerDailyState ids stored in InfrastructurePlan documents.

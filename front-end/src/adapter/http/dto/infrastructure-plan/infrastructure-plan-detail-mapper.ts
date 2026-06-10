@@ -403,6 +403,9 @@ export class InfrastructurePlanDetailMapper {
       new UllUUID(state.containerId),
       state.planDay,
       state.dailyFillingLiters,
+      typeof state.dailyFillingLitersBeforeCollection === 'number'
+        ? state.dailyFillingLitersBeforeCollection
+        : null,
       new ContainerCapacityLiters(state.containerCapacityLiters),
       typeof state.dailyDemandLitersPerDay === 'number'
         ? new DailyWasteDemandLitersPerDay(state.dailyDemandLitersPerDay)

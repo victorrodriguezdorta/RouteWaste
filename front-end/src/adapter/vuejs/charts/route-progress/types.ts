@@ -10,7 +10,8 @@ export interface RouteProgressChartSeries {
 
 export interface RouteProgressChartDatum {
   stop: number;
-  [metricKey: string]: number;
+  stopLabel?: string;
+  [metricKey: string]: number | string | undefined;
 }
 
 export interface RouteCollectionChartDatum {

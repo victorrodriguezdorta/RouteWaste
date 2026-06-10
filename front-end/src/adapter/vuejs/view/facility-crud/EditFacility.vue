@@ -125,6 +125,16 @@ const onPickerLocation = (value: { latitude: number; longitude: number }) => {
   editFacility.value.longitude = value.longitude;
 };
 
+const redirectToListAfterSuccess = () => {
+  if (facilityNotification.value.color !== 'success') {
+    return;
+  }
+
+  setTimeout(() => {
+    router.push({ name: 'Facilities' });
+  }, 1000);
+};
+
 const updateFacility = async () => {
   if (!editFacility.value) return;
 
@@ -132,6 +142,7 @@ const updateFacility = async () => {
     facilityId.value,
     FacilityEdit.toFacility(editFacility.value)
   );
+  redirectToListAfterSuccess();
 };
 
 const validate = async () => {
@@ -153,16 +164,6 @@ const goBack = () => {
   router.push({ name: 'Facilities' });
 };
 
-watch(
-  () => facilityNotification.value,
-  (newValue) => {
-    if (newValue.color === 'success') {
-      setTimeout(() => {
-        router.push({ name: 'Facilities' });
-      }, 1000);
-    }
-  }
-);
 </script>
 
 <style scoped>

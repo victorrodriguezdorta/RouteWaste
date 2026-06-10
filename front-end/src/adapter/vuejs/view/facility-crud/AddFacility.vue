@@ -17,16 +17,30 @@
       :show-go-back="true"
       :go-back="goBack"
     >
-      <v-form ref="facilityForm">
-        <FacilityFormFields
-          :facility="newFacility"
-          @update:facility="newFacility = $event"
-        />
+      <v-row class="show-entity-detail-layout ma-0" align="start">
+        <v-col cols="12" md="6" lg="5" class="pa-0 pr-md-4">
+          <v-form ref="facilityForm">
+            <FacilityFormFields
+              :facility="newFacility"
+              map-picker-aside
+              @update:facility="newFacility = $event"
+            />
 
-        <v-alert type="info" variant="tonal" class="mt-4">
-          {{ t('common.alerts.requiredFields') }}
-        </v-alert>
-      </v-form>
+            <v-alert type="info" variant="tonal" class="mt-4">
+              {{ t('common.alerts.requiredFields') }}
+            </v-alert>
+          </v-form>
+        </v-col>
+
+        <v-col cols="12" md="6" lg="7" class="pa-0 pl-md-4">
+          <LocationPickerMap
+            class="mt-6 mt-md-0"
+            :latitude="newFacility.latitude"
+            :longitude="newFacility.longitude"
+            @update:location="onPickerLocation"
+          />
+        </v-col>
+      </v-row>
 
       <template #toolbar-append>
         <ButtonTooltip
@@ -51,6 +65,7 @@ import { useI18n } from 'vue-i18n';
 import { FacilityStatus } from '../../../../domain/enumerate/facility-status';
 import { FacilityType } from '../../../../domain/enumerate/facility-type';
 import CrudLayout from '../../components/common/CrudLayout.vue';
+import LocationPickerMap from '../../components/common/LocationPickerMap.vue';
 import FacilityFormFields from '../../components/facility/FacilityFormFields.vue';
 import { FacilityAdd } from '../../dto/facility/facility-add';
 import router from '../../router/router';
@@ -79,6 +94,11 @@ const newFacility = ref<FacilityAdd>(
 );
 
 const facilityForm = ref();
+
+const onPickerLocation = (value: { latitude: number; longitude: number }) => {
+  newFacility.value.latitude = value.latitude;
+  newFacility.value.longitude = value.longitude;
+};
 
 const registerFacility = async () => {
   await facilityStore.registerFacility(

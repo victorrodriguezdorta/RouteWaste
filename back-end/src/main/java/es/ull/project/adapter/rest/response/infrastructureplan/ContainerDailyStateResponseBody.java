@@ -21,6 +21,7 @@ public class ContainerDailyStateResponseBody {
     public Name containerName;
     public PlanDay planDay;
     public CollectedVolumeLiters dailyFillingLiters;
+    public CollectedVolumeLiters dailyFillingLitersBeforeCollection;
     public ContainerCapacityLiters containerCapacityLiters;
     public DailyWasteDemandLitersPerDay dailyDemandLitersPerDay;
     public ContainerStatus status;

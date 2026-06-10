@@ -57,6 +57,7 @@ public class ContainerDailyStateReadingConverter implements Converter<Document, 
                 .orElseThrow(() -> new IllegalStateException(String.format(ERR_CONTAINER_SNAPSHOT, containerId)));
         Integer planDay = document.getInteger(MongoFields.PLAN_DAY);
         Double dailyFilling = document.getDouble(MongoFields.DAILY_FILLING_LITERS);
+        Double dailyFillingBeforeCollection = document.getDouble(MongoFields.DAILY_FILLING_LITERS_BEFORE_COLLECTION);
         Double capacity = document.getDouble(MongoFields.CAPACITY_LITERS);
         Double dailyDemand = document.getDouble(MongoFields.DAILY_DEMAND_LITERS_PER_DAY);
         String statusRaw = document.getString(MongoFields.STATUS);
@@ -69,6 +70,9 @@ public class ContainerDailyStateReadingConverter implements Converter<Document, 
                 CollectedVolumeLiters.fromLiters(dailyFilling != null ? dailyFilling : 0.0),
                 new ContainerCapacityLiters(capacity != null ? capacity : 0.0),
                 new DailyWasteDemandLitersPerDay(dailyDemand != null ? dailyDemand : 0.0),
-                status);
+                status,
+                dailyFillingBeforeCollection != null
+                        ? CollectedVolumeLiters.fromLiters(dailyFillingBeforeCollection)
+                        : null);
     }
 }

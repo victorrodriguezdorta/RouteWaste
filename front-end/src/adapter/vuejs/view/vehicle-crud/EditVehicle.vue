@@ -138,6 +138,16 @@ const setVehicle = () => {
  * Update vehicle in the system
  * Converts DTO to domain entity and calls store method
  */
+const redirectToListAfterSuccess = () => {
+  if (vehicleNotification.value.color !== 'success') {
+    return;
+  }
+
+  setTimeout(() => {
+    router.push({ name: 'Vehicles' });
+  }, 1000);
+};
+
 const updateVehicle = async () => {
   if (!editVehicle.value) return;
   
@@ -145,6 +155,7 @@ const updateVehicle = async () => {
     vehicleId.value,
     VehicleEdit.toVehicle(editVehicle.value)
   );
+  redirectToListAfterSuccess();
 };
 
 /**
@@ -173,20 +184,6 @@ const goBack = () => {
   router.push({ name: 'Vehicles' });
 };
 
-/**
- * Watch notification changes to redirect after successful update
- * Redirects to vehicles list after 1 second when operation succeeds
- */
-watch(
-  () => vehicleNotification.value,
-  (newValue) => {
-    if (newValue.color === 'success') {
-      setTimeout(() => {
-        router.push({ name: 'Vehicles' });
-      }, 1000);
-    }
-  }
-);
 </script>
 
 <style scoped>

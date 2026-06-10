@@ -22,12 +22,47 @@ public class ContainerDailyState {
   private final String containerId;
   private final int planDay;
   private final double dailyFillingLiters;
+  private final double dailyFillingLitersBeforeCollection;
   private final double containerCapacityLiters;
   private final double dailyDemandLitersPerDay;
   private final ContainerStatus status;
 
   /**
    * Creates a container daily state.
+   *
+   * @param containerId the container identifier
+   * @param planDay the day in the planning horizon (1-based)
+   * @param dailyFillingLiters the liters remaining at the end of the day
+   * @param dailyFillingLitersBeforeCollection the liters accumulated before any collection
+   * @param containerCapacityLiters the container's maximum capacity
+   * @param dailyDemandLitersPerDay the container's daily demand in liters
+   * @param status the current status (CORRECT or OVERFLOWED)
+   */
+  public ContainerDailyState(
+      String containerId,
+      int planDay,
+      double dailyFillingLiters,
+      double dailyFillingLitersBeforeCollection,
+      double containerCapacityLiters,
+      double dailyDemandLitersPerDay,
+      ContainerStatus status) {
+    validateContainerId(containerId);
+    validatePlanDay(planDay);
+    validateDailyFilling(dailyFillingLiters);
+    validateDailyFilling(dailyFillingLitersBeforeCollection);
+    validateContainerCapacity(containerCapacityLiters);
+    validateDailyDemand(dailyDemandLitersPerDay);
+    this.containerId = containerId;
+    this.planDay = planDay;
+    this.dailyFillingLiters = dailyFillingLiters;
+    this.dailyFillingLitersBeforeCollection = dailyFillingLitersBeforeCollection;
+    this.containerCapacityLiters = containerCapacityLiters;
+    this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
+    this.status = status != null ? status : ContainerStatus.CORRECT;
+  }
+
+  /**
+   * Creates a container daily state without an explicit before-collection snapshot.
    *
    * @param containerId the container identifier
    * @param planDay the day in the planning horizon (1-based)
@@ -43,17 +78,14 @@ public class ContainerDailyState {
       double containerCapacityLiters,
       double dailyDemandLitersPerDay,
       ContainerStatus status) {
-    validateContainerId(containerId);
-    validatePlanDay(planDay);
-    validateDailyFilling(dailyFillingLiters);
-    validateContainerCapacity(containerCapacityLiters);
-    validateDailyDemand(dailyDemandLitersPerDay);
-    this.containerId = containerId;
-    this.planDay = planDay;
-    this.dailyFillingLiters = dailyFillingLiters;
-    this.containerCapacityLiters = containerCapacityLiters;
-    this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
-    this.status = status != null ? status : ContainerStatus.CORRECT;
+    this(
+        containerId,
+        planDay,
+        dailyFillingLiters,
+        dailyFillingLiters,
+        containerCapacityLiters,
+        dailyDemandLitersPerDay,
+        status);
   }
 
   /**
@@ -173,6 +205,15 @@ public class ContainerDailyState {
   }
 
   /**
+   * Returns the liters accumulated before any collection on the day.
+   *
+   * @return daily filling liters before collection
+   */
+  public double getDailyFillingLitersBeforeCollection() {
+    return this.dailyFillingLitersBeforeCollection;
+  }
+
+  /**
    * Returns the container capacity in liters.
    *
    * @return container capacity liters
@@ -206,6 +247,15 @@ public class ContainerDailyState {
    */
   public double getFillPercentage() {
     return (this.dailyFillingLiters / this.containerCapacityLiters) * 100.0;
+  }
+
+  /**
+   * Calculates the fill percentage before any collection on the day.
+   *
+   * @return the fill percentage before collection (0-100 or higher if overflowed)
+   */
+  public double getFillPercentageBeforeCollection() {
+    return (this.dailyFillingLitersBeforeCollection / this.containerCapacityLiters) * 100.0;
   }
 
   /**

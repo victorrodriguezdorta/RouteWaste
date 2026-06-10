@@ -41,8 +41,8 @@ public class Algorithm {
   private static final double EPSILON = 0.000001;
   private static final int MAX_FACILITY_VISITS = 3;
   private static final int MIN_NUMBER_OF_DAYS = 1;
-  private static final double DISTANCE_WEIGHT = 0.45;
-  private static final double FILL_WEIGHT = 0.55;
+  private static final double DISTANCE_WEIGHT = 0.40;
+  private static final double FILL_WEIGHT = 0.60;
   private static final double OVERFLOW_SCORE_BONUS = 1.5;
 
   private final DeliveryPlanningProblem problem;
@@ -111,6 +111,7 @@ public class Algorithm {
           }
           List<Container> clusterContainers = new ArrayList<>(cluster.getAssignedContainers());
           addDailyDemand(clusterContainers);
+          Map<String, Double> fillingBeforeCollection = snapshotPendingLiters(clusterContainers);
           FacilityWithVehicles facilityWithVehicles = findFacilityWithVehicles(
               facilitiesWithVehicles,
               facility.getId());
@@ -129,7 +130,7 @@ public class Algorithm {
               }
             }
           }
-          recordContainerStates(solution, clusterContainers, day);
+          recordContainerStates(solution, clusterContainers, day, fillingBeforeCollection);
         }
       }
       if (solution.getDailyPlans() != null && !solution.getDailyPlans().isEmpty()) {
@@ -444,7 +445,8 @@ public class Algorithm {
   private void recordContainerStates(
       DeliveryPlanningSolution solution,
       List<Container> containers,
-      int day) {
+      int day,
+      Map<String, Double> fillingBeforeCollection) {
     if (containers == null) {
       return;
     }
@@ -453,6 +455,9 @@ public class Algorithm {
         continue;
       }
       double pendingLiters = getPendingLiters(container);
+      double beforeCollectionLiters = fillingBeforeCollection != null
+          ? fillingBeforeCollection.getOrDefault(container.getId(), pendingLiters)
+          : pendingLiters;
       ContainerStatus status = pendingLiters > container.getCapacityLiters()
           ? ContainerStatus.OVERFLOWED
           : ContainerStatus.CORRECT;
@@ -460,11 +465,32 @@ public class Algorithm {
           container.getId(),
           day,
           pendingLiters,
+          beforeCollectionLiters,
           container.getCapacityLiters(),
           container.getDailyDemandLitersPerDay(),
           status));
       this.containerDailyState.put(buildDayKey(container.getId(), day), pendingLiters);
     }
+  }
+
+  /**
+   * Captures the pending liters for each container at the current simulation point.
+   *
+   * @param containers containers whose pending liters should be captured
+   * @return map keyed by container id
+   */
+  private Map<String, Double> snapshotPendingLiters(List<Container> containers) {
+    Map<String, Double> snapshot = new HashMap<>();
+    if (containers == null) {
+      return snapshot;
+    }
+    for (Container container : containers) {
+      if (container == null || container.getId() == null) {
+        continue;
+      }
+      snapshot.put(container.getId(), getPendingLiters(container));
+    }
+    return snapshot;
   }
 
   /**

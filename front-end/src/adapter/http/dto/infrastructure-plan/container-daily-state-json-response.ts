@@ -7,6 +7,7 @@ export interface ContainerDailyStateJsonResponse {
   containerName?: string;
   planDay: number;
   dailyFillingLiters: number;
+  dailyFillingLitersBeforeCollection?: number;
   containerCapacityLiters: number;
   dailyDemandLitersPerDay?: number;
   status: 'CORRECT' | 'OVERFLOWED';

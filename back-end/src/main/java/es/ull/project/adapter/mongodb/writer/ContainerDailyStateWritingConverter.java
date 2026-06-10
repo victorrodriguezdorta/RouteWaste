@@ -32,6 +32,8 @@ public class ContainerDailyStateWritingConverter implements Converter<ContainerD
         document.put(MongoFields.CONTAINER_ID, state.getContainer().getId());
         document.put(MongoFields.PLAN_DAY, state.getPlanDay());
         document.put(MongoFields.DAILY_FILLING_LITERS, state.getDailyFillingLiters());
+        state.getDailyFillingLitersBeforeCollection()
+                .ifPresent(value -> document.put(MongoFields.DAILY_FILLING_LITERS_BEFORE_COLLECTION, value));
         document.put(MongoFields.CAPACITY_LITERS, state.getContainerCapacityLiters());
         document.put(MongoFields.DAILY_DEMAND_LITERS_PER_DAY, state.getDailyDemandLitersPerDay());
         document.put(MongoFields.STATUS, state.getStatus().name());

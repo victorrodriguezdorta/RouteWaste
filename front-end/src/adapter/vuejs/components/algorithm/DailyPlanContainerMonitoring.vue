@@ -34,7 +34,7 @@
               v-for="containerMonitoring in facilityMonitoring.containers"
               :key="containerMonitoring.container.id.getValue()"
               class="monitoring-item"
-              :class="`monitoring-item--fill-${containerFillTone(containerMonitoring)}`"
+              :class="`monitoring-item--fill-${containerFillToneBeforeCollection(containerMonitoring)}`"
             >
               <div class="monitoring-item__header">
                 <div>
@@ -59,10 +59,10 @@
                 <v-chip
                   size="small"
                   class="monitoring-chip"
-                  :class="`monitoring-chip--fill-${containerFillTone(containerMonitoring)}`"
+                  :class="`monitoring-chip--fill-${containerFillToneBeforeCollection(containerMonitoring)}`"
                   variant="flat"
                 >
-                  <strong v-if="fillPercent(containerMonitoring) !== null">{{ fillPercent(containerMonitoring) }}%</strong>
+                  <strong v-if="fillPercentBeforeCollection(containerMonitoring) !== null">{{ fillPercentBeforeCollection(containerMonitoring) }}%</strong>
                   <span v-else>-</span>
                   &nbsp;{{ monitoringStatusLabel(containerMonitoring.state?.status) }}
                 </v-chip>
@@ -70,7 +70,11 @@
 
               <div class="monitoring-item__metrics">
                 <span class="monitoring-item__metric">
-                  <strong>{{ t('infrastructurePlan.show.daily.monitoring.fillingLabel') }}:</strong>
+                  <strong>{{ t('infrastructurePlan.show.daily.monitoring.fillingBeforeLabel') }}:</strong>
+                  {{ formatLiters(containerMonitoring.state?.dailyFillingLitersBeforeCollection ?? containerMonitoring.state?.dailyFillingLiters) }}
+                </span>
+                <span class="monitoring-item__metric">
+                  <strong>{{ t('infrastructurePlan.show.daily.monitoring.fillingAfterLabel') }}:</strong>
                   {{ formatLiters(containerMonitoring.state?.dailyFillingLiters) }}
                 </span>
                 <span class="monitoring-item__metric">
@@ -91,6 +95,9 @@
           >
             <div class="monitoring-chart__title">
               {{ t('infrastructurePlan.show.daily.monitoring.fillEvolutionChartTitle') }}
+            </div>
+            <div class="monitoring-chart__subtitle text-medium-emphasis">
+              {{ t('infrastructurePlan.show.daily.monitoring.fillEvolutionChartHint') }}
             </div>
             <div class="monitoring-chart__canvas">
               <RouteProgressLineChart
@@ -131,8 +138,8 @@ import router from '../../router/router';
 import {
   type ContainerFillMarkerTone,
   buildContainerFillCssVars,
-  computeContainerFillPercent,
-  containerFillToneForEntry,
+  computeContainerFillPercentBeforeCollection,
+  resolveContainerFillMarkerTone,
   normalizePlanDay,
 } from '../../utils/container-fill-level';
 
@@ -225,6 +232,8 @@ const selectedFacilityMonitoring = computed<FacilityMonitoringEntry[]>(() => {
       containers: facility.assignedContainers ?? [],
       monitoringStates: props.containerStateMonitoring,
       labelForContainer: chartSeriesLabelForContainer,
+      beforeCollectionLabel: t('infrastructurePlan.show.daily.monitoring.fillBeforeCollectionShortLabel'),
+      afterCollectionLabel: t('infrastructurePlan.show.daily.monitoring.fillAfterCollectionShortLabel'),
     });
 
     const seriesCount = fillChart.series.length;
@@ -272,12 +281,12 @@ function monitoringStatusLabel(status: string | null | undefined): string {
   return containerStatusLabel(t, status);
 }
 
-function fillPercent(entry: { container: InfrastructurePlanContainerDetail; state?: InfrastructurePlanContainerDailyStateDetail }): number | null {
-  return computeContainerFillPercent(entry);
+function fillPercentBeforeCollection(entry: { container: InfrastructurePlanContainerDetail; state?: InfrastructurePlanContainerDailyStateDetail }): number | null {
+  return computeContainerFillPercentBeforeCollection(entry);
 }
 
-function containerFillTone(entry: { container: InfrastructurePlanContainerDetail; state?: InfrastructurePlanContainerDailyStateDetail }): ContainerFillMarkerTone {
-  return containerFillToneForEntry(entry);
+function containerFillToneBeforeCollection(entry: { container: InfrastructurePlanContainerDetail; state?: InfrastructurePlanContainerDailyStateDetail }): ContainerFillMarkerTone {
+  return resolveContainerFillMarkerTone(computeContainerFillPercentBeforeCollection(entry));
 }
 
 function openContainer(containerId: string | null): void {
@@ -473,6 +482,13 @@ function formatFacilityType(value?: FacilityType | string): string {
   letter-spacing: 0.01em;
   line-height: 1.25;
   margin-bottom: 6px;
+  text-align: center;
+}
+
+.monitoring-chart__subtitle {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  margin-bottom: 8px;
   text-align: center;
 }
 

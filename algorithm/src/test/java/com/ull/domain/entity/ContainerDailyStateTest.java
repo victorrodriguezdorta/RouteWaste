@@ -11,6 +11,23 @@ import com.ull.domain.enumerate.ContainerStatus;
 class ContainerDailyStateTest {
 
   @Test
+  void shouldTrackFillLevelsBeforeAndAfterCollection() {
+    ContainerDailyState state = new ContainerDailyState(
+        "container-before-after",
+        1,
+        0.0,
+        80.0,
+        100.0,
+        20.0,
+        ContainerStatus.CORRECT);
+
+    assertEquals(0.0, state.getDailyFillingLiters());
+    assertEquals(80.0, state.getDailyFillingLitersBeforeCollection());
+    assertEquals(0.0, state.getFillPercentage());
+    assertEquals(80.0, state.getFillPercentageBeforeCollection());
+  }
+
+  @Test
   void shouldCreateContainerDailyStateWithExternalStatusEnum() {
     ContainerDailyState state = new ContainerDailyState(
         "container-1",

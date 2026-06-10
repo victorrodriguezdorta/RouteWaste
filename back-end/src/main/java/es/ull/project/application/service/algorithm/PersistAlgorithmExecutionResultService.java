@@ -81,6 +81,7 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	private static final String FIELD_VEHICLE = "vehicle";
 	private static final String FIELD_CONTAINER_STATE_MONITORING = "containerStateMonitoring";
 	private static final String FIELD_DAILY_FILLING_LITERS = "dailyFillingLiters";
+	private static final String FIELD_DAILY_FILLING_LITERS_BEFORE_COLLECTION = "dailyFillingLitersBeforeCollection";
 	private static final String FIELD_CONTAINER_CAPACITY_LITERS = "containerCapacityLiters";
 	private static final String FIELD_DAILY_DEMAND_LITERS_PER_DAY = "dailyDemandLitersPerDay";
 	private static final String FIELD_STATUS = "status";
@@ -533,6 +534,10 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 					? stateNode.getInt(FIELD_PLAN_DAY)
 					: 1;
 			double dailyFillingLiters = stateNode.optDouble(FIELD_DAILY_FILLING_LITERS, 0.0);
+			Double dailyFillingLitersBeforeCollection = stateNode.has(FIELD_DAILY_FILLING_LITERS_BEFORE_COLLECTION)
+					&& !stateNode.isNull(FIELD_DAILY_FILLING_LITERS_BEFORE_COLLECTION)
+					? stateNode.getDouble(FIELD_DAILY_FILLING_LITERS_BEFORE_COLLECTION)
+					: null;
 			double containerCapacityLiters = stateNode.optDouble(FIELD_CONTAINER_CAPACITY_LITERS, 0.0);
 			double dailyDemandLitersPerDay = stateNode.optDouble(FIELD_DAILY_DEMAND_LITERS_PER_DAY, 0.0);
 			String statusRaw = stateNode.has(FIELD_STATUS) && !stateNode.isNull(FIELD_STATUS)
@@ -550,7 +555,10 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 						CollectedVolumeLiters.fromLiters(dailyFillingLiters),
 						new ContainerCapacityLiters(containerCapacityLiters),
 						new DailyWasteDemandLitersPerDay(dailyDemandLitersPerDay),
-						status);
+						status,
+						dailyFillingLitersBeforeCollection != null
+								? CollectedVolumeLiters.fromLiters(dailyFillingLitersBeforeCollection)
+								: null);
 				containerDailyStates.add(containerDailyState);
 			} catch (IllegalArgumentException | NoSuchElementException ex) {
 				logger.debug("Skipping invalid container daily state node: {}", ex.getMessage());

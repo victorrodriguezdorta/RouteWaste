@@ -125,6 +125,16 @@ const onPickerLocation = (value: { latitude: number; longitude: number }) => {
   editContainer.value.longitude = value.longitude;
 };
 
+const redirectToListAfterSuccess = () => {
+  if (containerNotification.value.color !== 'success') {
+    return;
+  }
+
+  setTimeout(() => {
+    router.push({ name: 'Containers' });
+  }, 1000);
+};
+
 const updateContainer = async () => {
   if (!editContainer.value) return;
 
@@ -132,6 +142,7 @@ const updateContainer = async () => {
     containerId.value,
     ContainerEdit.toContainer(editContainer.value)
   );
+  redirectToListAfterSuccess();
 };
 
 const validate = async () => {
@@ -153,16 +164,6 @@ const goBack = () => {
   router.push({ name: 'Containers' });
 };
 
-watch(
-  () => containerNotification.value,
-  (newValue) => {
-    if (newValue.color === 'success') {
-      setTimeout(() => {
-        router.push({ name: 'Containers' });
-      }, 1000);
-    }
-  }
-);
 </script>
 
 <style scoped>

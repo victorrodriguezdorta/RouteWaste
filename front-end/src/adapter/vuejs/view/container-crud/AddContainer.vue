@@ -17,16 +17,30 @@
       :show-go-back="true"
       :go-back="goBack"
     >
-      <v-form ref="containerForm">
-        <ContainerFormFields
-          :container="newContainer"
-          @update:container="newContainer = $event"
-        />
+      <v-row class="show-entity-detail-layout ma-0" align="start">
+        <v-col cols="12" md="6" lg="5" class="pa-0 pr-md-4">
+          <v-form ref="containerForm">
+            <ContainerFormFields
+              :container="newContainer"
+              map-picker-aside
+              @update:container="newContainer = $event"
+            />
 
-        <v-alert type="info" variant="tonal" class="mt-4">
-          {{ t('common.alerts.requiredFields') }}
-        </v-alert>
-      </v-form>
+            <v-alert type="info" variant="tonal" class="mt-4">
+              {{ t('common.alerts.requiredFields') }}
+            </v-alert>
+          </v-form>
+        </v-col>
+
+        <v-col cols="12" md="6" lg="7" class="pa-0 pl-md-4">
+          <LocationPickerMap
+            class="mt-6 mt-md-0"
+            :latitude="newContainer.latitude"
+            :longitude="newContainer.longitude"
+            @update:location="onPickerLocation"
+          />
+        </v-col>
+      </v-row>
 
       <template #toolbar-append>
         <ButtonTooltip
@@ -50,6 +64,7 @@ import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { WasteType } from '../../../../domain/enumerate/waste-type';
 import CrudLayout from '../../components/common/CrudLayout.vue';
+import LocationPickerMap from '../../components/common/LocationPickerMap.vue';
 import ContainerFormFields from '../../components/container/ContainerFormFields.vue';
 import { ContainerAdd } from '../../dto/container/container-add';
 import router from '../../router/router';
@@ -74,6 +89,11 @@ const newContainer = ref<ContainerAdd>(
 );
 
 const containerForm = ref();
+
+const onPickerLocation = (value: { latitude: number; longitude: number }) => {
+  newContainer.value.latitude = value.latitude;
+  newContainer.value.longitude = value.longitude;
+};
 
 const registerContainer = async () => {
   await containerStore.registerContainer(
