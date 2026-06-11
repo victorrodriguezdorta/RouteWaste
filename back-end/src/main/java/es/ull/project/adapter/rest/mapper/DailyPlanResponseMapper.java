@@ -70,6 +70,7 @@ public class DailyPlanResponseMapper {
         response.distanceFromPreviousMeters = stop.getDistanceFromPreviousMeters();
         response.cumulativeDistanceMeters = stop.getCumulativeDistanceMeters();
         response.containerActualLiters = stop.getContainerActualLiters().orElse(null);
+        response.collectedAt = stop.getCollectedAt().orElse(null);
         response.alerts = stop.getAlerts().orElse(null);
         return response;
     }

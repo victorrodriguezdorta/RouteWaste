@@ -195,9 +195,15 @@ class AlgorithmTest {
 
     DeliveryPlanningSolution solution = new Algorithm(problem).run();
 
-    ContainerDailyState state = solution.getContainerStateMonitoring().get(0);
-    assertEquals(0.0, state.getDailyFillingLiters(), DELTA);
-    assertEquals(80.0, state.getDailyFillingLitersBeforeCollection(), DELTA);
+    List<ContainerDailyState> states = solution.getContainerStateMonitoring();
+    assertEquals(2, states.size());
+    ContainerDailyState dayStartState = states.get(0);
+    assertEquals(80.0, dayStartState.getDailyFillingLiters(), DELTA);
+    assertNotNull(dayStartState.getTime());
+    ContainerDailyState afterCollectionState = states.get(1);
+    assertEquals(0.0, afterCollectionState.getDailyFillingLiters(), DELTA);
+    assertEquals(80.0, afterCollectionState.getDailyFillingLitersBeforeCollection(), DELTA);
+    assertNotNull(afterCollectionState.getTime());
   }
 
   @Test
@@ -297,8 +303,11 @@ class AlgorithmTest {
     assertEquals(234.0, solution.getTotalCollectedLiters(), DELTA);
 
     List<ContainerDailyState> monitoring = solution.getContainerStateMonitoring();
-    assertEquals(4, monitoring.size());
-    assertTrue(monitoring.stream().allMatch(state -> Math.abs(state.getDailyFillingLiters()) <= DELTA));
+    assertTrue(monitoring.stream().anyMatch(state -> "container-1".equals(state.getContainerId())
+        && Math.abs(state.getDailyFillingLiters()) <= DELTA));
+    assertTrue(monitoring.stream().anyMatch(state -> "container-2".equals(state.getContainerId())
+        && Math.abs(state.getDailyFillingLiters()) <= DELTA));
+    assertTrue(monitoring.stream().allMatch(state -> state.getTime() != null));
   }
 
   @Test
@@ -382,7 +391,13 @@ class AlgorithmTest {
       assertEquals(60.0, containerStops.get(0).getCollectedLiters(), DELTA);
       assertEquals(40.0, containerStops.get(1).getCollectedLiters(), DELTA);
     assertEquals(100.0, dailyPlan.getTotalCollectedLiters(), DELTA);
-    assertEquals(0.0, solution.getContainerStateMonitoring().get(0).getDailyFillingLiters(), DELTA);
+    assertEquals(
+        0.0,
+        solution.getContainerStateMonitoring().stream()
+            .mapToDouble(ContainerDailyState::getDailyFillingLiters)
+            .min()
+            .orElse(-1.0),
+        DELTA);
   }
 
   @Test

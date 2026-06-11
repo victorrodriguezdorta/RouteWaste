@@ -2,6 +2,7 @@ package com.ull.domain.entity;
 
 import com.ull.domain.enumerate.StopType;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -224,6 +225,17 @@ public class DailyPlan {
    * @param alerts optional alerts for the stop
    */
   public void addFacilityStop(double distanceFromPreviousMeters, List<Alert> alerts) {
+    addFacilityStop(distanceFromPreviousMeters, alerts, null);
+  }
+
+  /**
+   * Adds a facility stop (no container) to the daily plan including the time of the visit.
+   *
+   * @param distanceFromPreviousMeters distance travelled to reach the facility
+   * @param alerts optional alerts for the stop
+   * @param collectedAt time of day at which the facility stop is performed
+   */
+  public void addFacilityStop(double distanceFromPreviousMeters, List<Alert> alerts, LocalTime collectedAt) {
     if (distanceFromPreviousMeters < ZERO_AMOUNT) {
       throw new IllegalArgumentException(DISTANCE_NOT_VALID);
     }
@@ -233,7 +245,8 @@ public class DailyPlan {
         sequence,
         distanceFromPreviousMeters,
         cumulativeDistanceMeters,
-        alerts != null ? alerts : new ArrayList<>());
+        alerts != null ? alerts : new ArrayList<>(),
+        collectedAt);
     this.stops.add(stop);
     this.totalDistanceMeters = cumulativeDistanceMeters;
   }
@@ -291,6 +304,35 @@ public class DailyPlan {
       double containerActualLiters,
       double distanceFromPreviousMeters,
       List<Alert> alerts) {
+    addStop(
+        container,
+        collectedKilograms,
+        collectedLiters,
+        containerActualLiters,
+        distanceFromPreviousMeters,
+        alerts,
+        null);
+  }
+
+  /**
+   * Adds a new stop using an explicitly supplied distance and the time of the visit.
+   *
+   * @param container the visited container
+   * @param collectedKilograms kilograms collected at the stop
+   * @param collectedLiters liters collected at the stop
+   * @param containerActualLiters the actual liters in the container before collection
+   * @param distanceFromPreviousMeters distance travelled to reach the stop
+   * @param alerts list of alerts generated at this stop
+   * @param collectedAt time of day at which the container is collected
+   */
+  public void addStop(
+      Container container,
+      double collectedKilograms,
+      double collectedLiters,
+      double containerActualLiters,
+      double distanceFromPreviousMeters,
+      List<Alert> alerts,
+      LocalTime collectedAt) {
     validateContainer(container);
     validateCollectedKilograms(collectedKilograms);
     validateCollectedLiters(collectedLiters);
@@ -308,7 +350,8 @@ public class DailyPlan {
       collectedKilograms,
       collectedLiters,
       containerActualLiters,
-      alerts);
+      alerts,
+      collectedAt);
     this.stops.add(stop);
     this.totalDistanceMeters = cumulativeDistanceMeters;
     this.totalCollectedKilograms += collectedKilograms;

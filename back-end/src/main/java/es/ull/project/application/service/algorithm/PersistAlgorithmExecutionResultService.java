@@ -36,6 +36,7 @@ import es.ull.project.domain.valueobject.time.PlanDay;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -78,6 +79,8 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 	private static final String FIELD_COLLECTED_LITERS = "collectedLiters";
 	private static final String FIELD_DISTANCE_FROM_PREVIOUS_METERS = "distanceFromPreviousMeters";
 	private static final String FIELD_CUMULATIVE_DISTANCE_METERS = "cumulativeDistanceMeters";
+	private static final String FIELD_COLLECTED_AT = "collectedAt";
+	private static final String FIELD_TIME = "time";
 	private static final String FIELD_VEHICLE = "vehicle";
 	private static final String FIELD_CONTAINER_STATE_MONITORING = "containerStateMonitoring";
 	private static final String FIELD_DAILY_FILLING_LITERS = "dailyFillingLiters";
@@ -493,6 +496,10 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 					}
 				}
 			}
+			String collectedAtRaw = stopNode.has(FIELD_COLLECTED_AT) && !stopNode.isNull(FIELD_COLLECTED_AT)
+					? stopNode.getString(FIELD_COLLECTED_AT)
+					: null;
+			LocalTime collectedAt = parseLocalTime(collectedAtRaw);
 			Stop stop = new Stop(
 					RouteSequence.of(sequence),
 					stopType,
@@ -500,7 +507,10 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 					CollectedWeightKilograms.fromKilograms(stopNode.optDouble(FIELD_COLLECTED_KILOGRAMS, 0.0)),
 					CollectedVolumeLiters.fromLiters(stopNode.optDouble(FIELD_COLLECTED_LITERS, 0.0)),
 					Distance.fromMeters(stopNode.optDouble(FIELD_DISTANCE_FROM_PREVIOUS_METERS, 0.0)),
-					Distance.fromMeters(stopNode.optDouble(FIELD_CUMULATIVE_DISTANCE_METERS, 0.0)));
+					Distance.fromMeters(stopNode.optDouble(FIELD_CUMULATIVE_DISTANCE_METERS, 0.0)),
+					null,
+					null,
+					collectedAt);
 			stops.add(stop);
 		}
 		return stops;
@@ -533,6 +543,10 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			int planDay = stateNode.has(FIELD_PLAN_DAY) && !stateNode.isNull(FIELD_PLAN_DAY)
 					? stateNode.getInt(FIELD_PLAN_DAY)
 					: 1;
+			String timeRaw = stateNode.has(FIELD_TIME) && !stateNode.isNull(FIELD_TIME)
+					? stateNode.getString(FIELD_TIME)
+					: null;
+			LocalTime time = parseLocalTime(timeRaw);
 			double dailyFillingLiters = stateNode.optDouble(FIELD_DAILY_FILLING_LITERS, 0.0);
 			Double dailyFillingLitersBeforeCollection = stateNode.has(FIELD_DAILY_FILLING_LITERS_BEFORE_COLLECTION)
 					&& !stateNode.isNull(FIELD_DAILY_FILLING_LITERS_BEFORE_COLLECTION)
@@ -558,7 +572,8 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 						status,
 						dailyFillingLitersBeforeCollection != null
 								? CollectedVolumeLiters.fromLiters(dailyFillingLitersBeforeCollection)
-								: null);
+								: null,
+						time);
 				containerDailyStates.add(containerDailyState);
 			} catch (IllegalArgumentException | NoSuchElementException ex) {
 				logger.debug("Skipping invalid container daily state node: {}", ex.getMessage());
@@ -629,5 +644,23 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 			throw new IllegalArgumentException(fieldName + " is required");
 		}
 		return UUID.fromString(value);
+	}
+
+	/**
+	 * Parses a time-of-day value ("HH:mm" or "HH:mm:ss") into a {@link LocalTime}.
+	 *
+	 * @param value the raw time value (may be null or blank)
+	 * @return the parsed time, or {@code null} when the value is missing or malformed
+	 */
+	private LocalTime parseLocalTime(String value) {
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+		try {
+			return LocalTime.parse(value);
+		} catch (DateTimeParseException ex) {
+			logger.debug("Skipping invalid time value: {}", value);
+			return null;
+		}
 	}
 }

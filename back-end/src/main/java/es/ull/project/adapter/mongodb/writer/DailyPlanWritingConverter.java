@@ -79,6 +79,7 @@ public class DailyPlanWritingConverter implements Converter<DailyPlan, Document>
         document.put(MongoFields.DISTANCE_FROM_PREVIOUS_METERS, stop.getDistanceFromPreviousMeters().getValue());
         document.put(MongoFields.CUMULATIVE_DISTANCE_METERS, stop.getCumulativeDistanceMeters().getValue());
         document.put(CONTAINER_FIELD, stop.getContainer() != null ? stop.getContainer().getId() : null);
+        stop.getCollectedAt().ifPresent(collectedAt -> document.put(MongoFields.COLLECTED_AT, collectedAt.toString()));
         return document;
     }
 }

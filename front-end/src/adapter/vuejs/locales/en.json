@@ -629,10 +629,10 @@
           "capacityLabel": "Capacity",
           "demandPerDayLabel": "Demand/day",
           "fillEvolutionChartTitle": "Fill percentage evolution by container",
-          "fillEvolutionChartHint": "Each day shows the level before collection and the level at the end of the day.",
+          "fillEvolutionChartHint": "Shows the fill level at every collection moment across the days and hours of the plan.",
           "fillBeforeCollectionShortLabel": "before",
           "fillAfterCollectionShortLabel": "after",
-          "dayAxisLabel": "Day",
+          "dayAxisLabel": "Day and time",
           "fillPercentAxisLabel": "Fill %",
           "noData": "No data",
           "statuses": {

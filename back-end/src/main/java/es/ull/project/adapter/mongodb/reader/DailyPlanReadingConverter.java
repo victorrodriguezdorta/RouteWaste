@@ -15,6 +15,8 @@ import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.route.RouteSequence;
 import es.ull.project.domain.valueobject.time.PlanDay;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -123,6 +125,7 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
             container = mongoConfiguration.containerRepository().findById(containerId)
                 .orElseThrow(() -> new IllegalStateException(String.format(ERR_CONTAINER_SNAPSHOT, containerId)));
         }
+        LocalTime collectedAt = readLocalTime(document.getString(MongoFields.COLLECTED_AT));
         return new Stop(
                 RouteSequence.of(sequence),
             stopType,
@@ -130,6 +133,27 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
                 CollectedWeightKilograms.fromKilograms(collectedKilograms),
                 CollectedVolumeLiters.fromLiters(collectedLiters),
                 Distance.fromMeters(distanceFromPreviousMeters),
-                Distance.fromMeters(cumulativeDistanceMeters));
+                Distance.fromMeters(cumulativeDistanceMeters),
+                null,
+                null,
+                collectedAt);
+    }
+
+    /**
+     * Parses a persisted time-of-day value, tolerating missing or malformed data.
+     *
+     * @param value the raw time value
+     * @return the parsed time, or {@code null} when unavailable
+     */
+    private LocalTime readLocalTime(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalTime.parse(value);
+        } catch (DateTimeParseException ex) {
+            logger.debug("Skipping invalid stop time value: {}", value);
+            return null;
+        }
     }
 }

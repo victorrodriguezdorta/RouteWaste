@@ -15,5 +15,7 @@ export interface InfrastructurePlanStopJsonResponse {
   distanceFromPreviousMeters: number | { value: number };
   cumulativeDistanceMeters: number | { value: number };
   containerActualLiters?: number;
+  /** Time of day ("HH:mm") at which the vehicle performs this stop, when available. */
+  collectedAt?: string;
   alerts?: StopAlertJsonResponse[];
 }

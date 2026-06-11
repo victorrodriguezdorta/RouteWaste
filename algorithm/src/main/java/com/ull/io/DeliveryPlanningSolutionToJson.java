@@ -95,6 +95,8 @@ public class DeliveryPlanningSolutionToJson
   public static final String COLLECTED_KILOGRAMS_FIELD = "collectedKilograms";
   public static final String COLLECTED_LITERS_FIELD = "collectedLiters";
   public static final String CONTAINER_ACTUAL_LITERS_FIELD = "containerActualLiters";
+  public static final String COLLECTED_AT_FIELD = "collectedAt";
+  public static final String TIME_FIELD = "time";
   public static final String CONTAINER_ID_FIELD = "containerId";
   public static final String ALERTS_FIELD = "alerts";
   public static final String MESSAGE_FIELD = "message";
@@ -232,6 +234,9 @@ public class DeliveryPlanningSolutionToJson
     json.put(COLLECTED_KILOGRAMS_FIELD, stop.getCollectedKilograms());
     json.put(COLLECTED_LITERS_FIELD, stop.getCollectedLiters());
     json.put(CONTAINER_ACTUAL_LITERS_FIELD, stop.getContainerActualLiters());
+    json.put(
+        COLLECTED_AT_FIELD,
+        stop.getCollectedAt() != null ? stop.getCollectedAt().toString() : JSONObject.NULL);
     if (stop.getType() == StopType.CONTAINER && stop.getContainer() != null) {
       json.put(CONTAINER_ID_FIELD, stop.getContainer().getId());
     } else {
@@ -273,6 +278,7 @@ public class DeliveryPlanningSolutionToJson
       JSONObject json = new JSONObject();
       json.put(CONTAINER_ID_FIELD, state.getContainerId());
       json.put(PLAN_DAY_FIELD, state.getPlanDay());
+      json.put(TIME_FIELD, state.getTime() != null ? state.getTime().toString() : JSONObject.NULL);
       json.put(DAILY_FILLING_LITERS_FIELD, state.getDailyFillingLiters());
       json.put(
           DAILY_FILLING_LITERS_BEFORE_COLLECTION_FIELD,

@@ -10,6 +10,8 @@ import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
 import es.ull.project.domain.valueobject.time.PlanDay;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.UUID;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -62,6 +64,7 @@ public class ContainerDailyStateReadingConverter implements Converter<Document, 
         Double dailyDemand = document.getDouble(MongoFields.DAILY_DEMAND_LITERS_PER_DAY);
         String statusRaw = document.getString(MongoFields.STATUS);
         ContainerStatus status = ContainerStatus.fromString(statusRaw);
+        LocalTime time = readLocalTime(document.getString(MongoFields.TIME));
         return new ContainerDailyState(
                 id,
                 infrastructurePlan,
@@ -73,6 +76,25 @@ public class ContainerDailyStateReadingConverter implements Converter<Document, 
                 status,
                 dailyFillingBeforeCollection != null
                         ? CollectedVolumeLiters.fromLiters(dailyFillingBeforeCollection)
-                        : null);
+                        : null,
+                time);
+    }
+
+    /**
+     * Parses a persisted time-of-day value, tolerating missing or malformed data.
+     *
+     * @param value the raw time value
+     * @return the parsed time, or {@code null} when unavailable
+     */
+    private LocalTime readLocalTime(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalTime.parse(value);
+        } catch (DateTimeParseException ex) {
+            logger.debug("Skipping invalid container state time value: {}", value);
+            return null;
+        }
     }
 }

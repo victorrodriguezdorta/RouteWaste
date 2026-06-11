@@ -22,5 +22,7 @@ export class InfrastructurePlanStopDetail {
     public readonly containerActualLiters: number | null = null,
     public readonly alerts: InfrastructurePlanStopAlertDetail[] = [],
     public readonly containerName: Name | null = null,
+    /** Time of day ("HH:mm") at which the vehicle performs this stop, when available. */
+    public readonly collectedAt: string | null = null,
   ) {}
 }

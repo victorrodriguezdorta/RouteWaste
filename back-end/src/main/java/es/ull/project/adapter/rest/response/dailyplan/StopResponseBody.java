@@ -7,6 +7,7 @@ import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.name.Name;
 import es.ull.project.domain.valueobject.route.RouteSequence;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,6 +63,11 @@ public class StopResponseBody {
      * Useful for displaying the container's state to the user.
      */
     public CollectedVolumeLiters containerActualLiters;
+
+    /**
+     * Time of day at which the vehicle performs this stop.
+     */
+    public LocalTime collectedAt;
 
     /**
      * List of alerts generated at this stop.

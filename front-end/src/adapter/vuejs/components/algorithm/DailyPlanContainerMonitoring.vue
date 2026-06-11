@@ -120,8 +120,8 @@
 <script lang="ts" setup>
 import { FacilityType, facilityTypeLabel } from '@/domain/enumerate/facility-type';
 import { containerStatusLabel } from '@/domain/enumerate/container-status';
+import { InfrastructurePlanContainerDailyStateDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import type {
-    InfrastructurePlanContainerDailyStateDetail,
     InfrastructurePlanContainerDetail,
     InfrastructurePlanFacilityDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
@@ -214,12 +214,85 @@ function normalizeIdentifier(value: string | null | undefined): string {
   return String(value ?? '').trim().toLowerCase();
 }
 
+/**
+ * Parses a "HH:mm" snapshot time into minutes from midnight, defaulting to 0.
+ *
+ * @param time snapshot time-of-day string, when available
+ * @returns minutes from midnight
+ */
+function parseSnapshotMinutes(time: string | null | undefined): number {
+  if (typeof time !== 'string' || time.trim().length === 0) {
+    return 0;
+  }
+  const [hoursRaw, minutesRaw] = time.split(':');
+  const hours = Number(hoursRaw);
+  const minutes = Number(minutesRaw);
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+    return 0;
+  }
+  return hours * 60 + minutes;
+}
+
+/**
+ * Collapses the multiple per-moment snapshots recorded for a container during a day into a single
+ * representative state for the summary cards.
+ *
+ * <p>The "before collection" filling comes from the earliest snapshot (workday start) while the
+ * remaining figures (filling after, status, capacity, demand) come from the latest snapshot.</p>
+ *
+ * @param states snapshots of the selected day
+ * @returns map from normalized container id to its representative state
+ */
+function buildDailyRepresentativeByContainer(
+  states: InfrastructurePlanContainerDailyStateDetail[],
+): Map<string, InfrastructurePlanContainerDailyStateDetail> {
+  const statesByContainer = new Map<string, InfrastructurePlanContainerDailyStateDetail[]>();
+  states.forEach((state) => {
+    const containerId = normalizeIdentifier(state.containerId.getValue());
+    const bucket = statesByContainer.get(containerId);
+    if (bucket) {
+      bucket.push(state);
+    } else {
+      statesByContainer.set(containerId, [state]);
+    }
+  });
+
+  const representatives = new Map<string, InfrastructurePlanContainerDailyStateDetail>();
+  statesByContainer.forEach((bucket, containerId) => {
+    const sorted = [...bucket].sort(
+      (left, right) => parseSnapshotMinutes(left.time) - parseSnapshotMinutes(right.time),
+    );
+    const earliest = sorted[0];
+    const latest = sorted[sorted.length - 1];
+    const beforeCollection =
+      earliest.dailyFillingLitersBeforeCollection ?? earliest.dailyFillingLiters;
+
+    representatives.set(
+      containerId,
+      new InfrastructurePlanContainerDailyStateDetail(
+        latest.id,
+        latest.containerId,
+        latest.planDay,
+        latest.time,
+        latest.dailyFillingLiters,
+        beforeCollection,
+        latest.containerCapacityLiters,
+        latest.dailyDemandLitersPerDay,
+        latest.status,
+        latest.containerName,
+      ),
+    );
+  });
+
+  return representatives;
+}
+
 const selectedFacilityMonitoring = computed<FacilityMonitoringEntry[]>(() => {
   const selectedDay = normalizePlanDay(props.planDay);
-  const monitoringByContainerId = new Map(
-    props.containerStateMonitoring
-      .filter((state) => normalizePlanDay(state.planDay) === selectedDay)
-      .map((state) => [normalizeIdentifier(state.containerId.getValue()), state]),
+  const monitoringByContainerId = buildDailyRepresentativeByContainer(
+    props.containerStateMonitoring.filter(
+      (state) => normalizePlanDay(state.planDay) === selectedDay,
+    ),
   );
 
   return props.selectedFacilities.map((facility) => {

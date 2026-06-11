@@ -12,6 +12,8 @@ export class InfrastructurePlanContainerDailyStateDetail {
     public readonly id: UllUUID | null,
     public readonly containerId: UllUUID,
     public readonly planDay: number,
+    /** Time of day ("HH:mm") represented by this snapshot, when available. */
+    public readonly time: string | null = null,
     public readonly dailyFillingLiters: number,
     public readonly dailyFillingLitersBeforeCollection: number | null = null,
     public readonly containerCapacityLiters: ContainerCapacityLiters,

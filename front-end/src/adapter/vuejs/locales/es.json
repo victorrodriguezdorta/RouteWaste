@@ -629,10 +629,10 @@
           "capacityLabel": "Capacidad",
           "demandPerDayLabel": "Demanda/día",
           "fillEvolutionChartTitle": "Evolución del porcentaje de llenado por contenedor",
-          "fillEvolutionChartHint": "Cada día muestra el nivel antes de la recogida y el nivel al finalizar el día.",
+          "fillEvolutionChartHint": "Muestra el nivel de llenado en cada momento de recogida a lo largo de los días y horas del plan.",
           "fillBeforeCollectionShortLabel": "antes",
           "fillAfterCollectionShortLabel": "después",
-          "dayAxisLabel": "Día",
+          "dayAxisLabel": "Día y hora",
           "fillPercentAxisLabel": "% Llenado",
           "noData": "Sin datos",
           "statuses": {

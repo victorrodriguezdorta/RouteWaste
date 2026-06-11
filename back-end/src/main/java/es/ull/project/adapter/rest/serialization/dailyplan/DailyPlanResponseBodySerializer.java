@@ -34,6 +34,7 @@ public class DailyPlanResponseBodySerializer extends StdSerializer<DailyPlanResp
     private static final String FIELD_DISTANCE_FROM_PREVIOUS_METERS = "distanceFromPreviousMeters";
     private static final String FIELD_CUMULATIVE_DISTANCE_METERS = "cumulativeDistanceMeters";
     private static final String FIELD_CONTAINER_ACTUAL_LITERS = "containerActualLiters";
+    private static final String FIELD_COLLECTED_AT = "collectedAt";
     private static final String FIELD_ALERTS = "alerts";
     private static final String FIELD_ALERT_TYPE = "type";
     private static final String FIELD_ALERT_MESSAGE = "message";
@@ -134,6 +135,9 @@ public class DailyPlanResponseBodySerializer extends StdSerializer<DailyPlanResp
         }
         if (stop.containerActualLiters != null) {
             gen.writeNumberField(FIELD_CONTAINER_ACTUAL_LITERS, stop.containerActualLiters.getValue());
+        }
+        if (stop.collectedAt != null) {
+            gen.writeStringField(FIELD_COLLECTED_AT, stop.collectedAt.toString());
         }
         writeAlerts(gen, stop.alerts);
         gen.writeEndObject();

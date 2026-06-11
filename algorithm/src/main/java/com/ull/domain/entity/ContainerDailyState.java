@@ -1,6 +1,7 @@
 package com.ull.domain.entity;
 
 import com.ull.domain.enumerate.ContainerStatus;
+import java.time.LocalTime;
 import java.util.Objects;
 
 /**
@@ -26,6 +27,8 @@ public class ContainerDailyState {
   private final double containerCapacityLiters;
   private final double dailyDemandLitersPerDay;
   private final ContainerStatus status;
+  /** Time of day this snapshot represents (null for plain daily snapshots). */
+  private final LocalTime time;
 
   /**
    * Creates a container daily state.
@@ -46,6 +49,38 @@ public class ContainerDailyState {
       double containerCapacityLiters,
       double dailyDemandLitersPerDay,
       ContainerStatus status) {
+    this(
+        containerId,
+        planDay,
+        dailyFillingLiters,
+        dailyFillingLitersBeforeCollection,
+        containerCapacityLiters,
+        dailyDemandLitersPerDay,
+        status,
+        null);
+  }
+
+  /**
+   * Creates a container state snapshot tied to a specific moment of the day.
+   *
+   * @param containerId the container identifier
+   * @param planDay the day in the planning horizon (1-based)
+   * @param dailyFillingLiters the liters present at the snapshot moment
+   * @param dailyFillingLitersBeforeCollection the liters present before the related collection
+   * @param containerCapacityLiters the container's maximum capacity
+   * @param dailyDemandLitersPerDay the container's daily demand in liters
+   * @param status the current status (CORRECT or OVERFLOWED)
+   * @param time the time of day represented by this snapshot
+   */
+  public ContainerDailyState(
+      String containerId,
+      int planDay,
+      double dailyFillingLiters,
+      double dailyFillingLitersBeforeCollection,
+      double containerCapacityLiters,
+      double dailyDemandLitersPerDay,
+      ContainerStatus status,
+      LocalTime time) {
     validateContainerId(containerId);
     validatePlanDay(planDay);
     validateDailyFilling(dailyFillingLiters);
@@ -59,6 +94,7 @@ public class ContainerDailyState {
     this.containerCapacityLiters = containerCapacityLiters;
     this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
     this.status = status != null ? status : ContainerStatus.CORRECT;
+    this.time = time;
   }
 
   /**
@@ -238,6 +274,15 @@ public class ContainerDailyState {
    */
   public ContainerStatus getStatus() {
     return this.status;
+  }
+
+  /**
+   * Returns the time of day represented by this snapshot.
+   *
+   * @return snapshot time, or {@code null} for plain daily snapshots
+   */
+  public LocalTime getTime() {
+    return this.time;
   }
 
   /**

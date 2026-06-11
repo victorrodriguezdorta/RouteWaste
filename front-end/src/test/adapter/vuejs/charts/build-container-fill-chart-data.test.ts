@@ -11,81 +11,98 @@ import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 import { ServiceZone } from '@/domain/enumerate/service-zone';
 import { WasteType } from '@/domain/enumerate/waste-type';
 
+const MINUTES_PER_DAY = 24 * 60;
+
+function columnKey(day: number, hours: number, minutes: number): number {
+  return day * MINUTES_PER_DAY + hours * 60 + minutes;
+}
+
 describe('buildContainerFillChartData', () => {
-  const containerId = new UllUUID('11111111-1111-1111-1111-111111111111');
+  const containerAId = new UllUUID('11111111-1111-1111-1111-111111111111');
+  const containerBId = new UllUUID('22222222-2222-2222-2222-222222222222');
 
-  const container = new InfrastructurePlanContainerDetail(
-    containerId,
-    new Name('Container A'),
-    new Location(28.47, -16.25, 'Test street', 'GIS-1'),
-    WasteType.ORGANIC,
-    new ContainerCapacityLiters(100),
-    new DailyWasteDemandLitersPerDay(20),
-    ServiceZone.DISTRICT,
-  );
+  function buildContainer(id: UllUUID, name: string): InfrastructurePlanContainerDetail {
+    return new InfrastructurePlanContainerDetail(
+      id,
+      new Name(name),
+      new Location(28.47, -16.25, 'Test street', 'GIS-1'),
+      WasteType.ORGANIC,
+      new ContainerCapacityLiters(100),
+      new DailyWasteDemandLitersPerDay(20),
+      ServiceZone.DISTRICT,
+    );
+  }
 
-  it('builds before and after points for each day', () => {
+  function buildState(
+    containerId: UllUUID,
+    day: number,
+    time: string,
+    fillingLiters: number,
+  ): InfrastructurePlanContainerDailyStateDetail {
+    return new InfrastructurePlanContainerDailyStateDetail(
+      null,
+      containerId,
+      day,
+      time,
+      fillingLiters,
+      null,
+      new ContainerCapacityLiters(100),
+      new DailyWasteDemandLitersPerDay(20),
+      ContainerStatus.CORRECT,
+    );
+  }
+
+  const containerA = buildContainer(containerAId, 'Container A');
+  const containerB = buildContainer(containerBId, 'Container B');
+
+  it('builds a day+time timeline and carries forward fill levels between snapshots', () => {
     const monitoringStates = [
-      new InfrastructurePlanContainerDailyStateDetail(
-        null,
-        containerId,
-        1,
-        0,
-        80,
-        new ContainerCapacityLiters(100),
-        new DailyWasteDemandLitersPerDay(20),
-        ContainerStatus.CORRECT,
-      ),
-      new InfrastructurePlanContainerDailyStateDetail(
-        null,
-        containerId,
-        2,
-        0,
-        20,
-        new ContainerCapacityLiters(100),
-        new DailyWasteDemandLitersPerDay(20),
-        ContainerStatus.CORRECT,
-      ),
+      buildState(containerAId, 1, '08:00', 80),
+      buildState(containerBId, 1, '08:30', 50),
+      buildState(containerAId, 1, '09:00', 0),
     ];
 
     const result = buildContainerFillChartData({
-      containers: [container],
+      containers: [containerA, containerB],
       monitoringStates,
       labelForContainer: (entry) => entry.name.getValue(),
     });
 
-    expect(result.data).toHaveLength(4);
-    expect(result.data[0].stop).toBeCloseTo(0.75);
-    expect(result.data[0][containerId.getValue()]).toBe(80);
-    expect(result.data[1].stop).toBeCloseTo(1.25);
-    expect(result.data[1][containerId.getValue()]).toBe(0);
-    expect(result.data[2].stop).toBeCloseTo(1.75);
-    expect(result.data[2][containerId.getValue()]).toBe(20);
-    expect(result.data[3].stop).toBeCloseTo(2.25);
-    expect(result.data[3][containerId.getValue()]).toBe(0);
+    expect(result.series).toHaveLength(2);
+    expect(result.data).toHaveLength(3);
+
+    expect(result.data[0].stop).toBe(columnKey(1, 8, 0));
+    expect(result.data[0].stopLabel).toBe('D1 08:00');
+    expect(result.data[0][containerAId.getValue()]).toBe(80);
+    expect(result.data[0][containerBId.getValue()]).toBeUndefined();
+
+    expect(result.data[1].stop).toBe(columnKey(1, 8, 30));
+    expect(result.data[1].stopLabel).toBe('08:30');
+    expect(result.data[1][containerAId.getValue()]).toBe(80);
+    expect(result.data[1][containerBId.getValue()]).toBe(50);
+
+    expect(result.data[2].stop).toBe(columnKey(1, 9, 0));
+    expect(result.data[2].stopLabel).toBe('09:00');
+    expect(result.data[2][containerAId.getValue()]).toBe(0);
+    expect(result.data[2][containerBId.getValue()]).toBe(50);
   });
 
-  it('falls back to end-of-day liters when before-collection data is missing', () => {
+  it('prefixes the day on the first snapshot of each day', () => {
     const monitoringStates = [
-      new InfrastructurePlanContainerDailyStateDetail(
-        null,
-        containerId,
-        1,
-        35,
-        null,
-        new ContainerCapacityLiters(100),
-        new DailyWasteDemandLitersPerDay(20),
-        ContainerStatus.CORRECT,
-      ),
+      buildState(containerAId, 1, '08:00', 80),
+      buildState(containerAId, 2, '08:00', 20),
     ];
 
     const result = buildContainerFillChartData({
-      containers: [container],
+      containers: [containerA],
       monitoringStates,
       labelForContainer: (entry) => entry.name.getValue(),
     });
 
-    expect(result.data[0][containerId.getValue()]).toBe(35);
-    expect(result.data[1][containerId.getValue()]).toBe(35);
+    expect(result.data).toHaveLength(2);
+    expect(result.data[0].stopLabel).toBe('D1 08:00');
+    expect(result.data[1].stopLabel).toBe('D2 08:00');
+    expect(result.data[0][containerAId.getValue()]).toBe(80);
+    expect(result.data[1][containerAId.getValue()]).toBe(20);
   });
 });

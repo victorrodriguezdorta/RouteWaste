@@ -17,6 +17,7 @@ import com.ull.domain.valueobject.algorithm.GreedyWeights;
 import com.ull.domain.valueobject.converter.WasteVolumeToMassConverter;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -117,6 +118,7 @@ public class Algorithm {
           List<Container> clusterContainers = new ArrayList<>(cluster.getAssignedContainers());
           addDailyDemand(clusterContainers);
           Map<String, Double> fillingBeforeCollection = snapshotPendingLiters(clusterContainers);
+          recordContainerDayStartStates(solution, clusterContainers, day, fillingBeforeCollection);
           FacilityWithVehicles facilityWithVehicles = findFacilityWithVehicles(
               facilitiesWithVehicles,
               facility.getId());
@@ -128,14 +130,13 @@ public class Algorithm {
               try {
                 vehicle.emptyLoad();
                 DailyPlan dailyPlan = new DailyPlan(day, serviceDate, facility, vehicle);
-                buildGreedyRoute(dailyPlan, clusterContainers);
+                buildGreedyRoute(solution, dailyPlan, clusterContainers, day);
                 solution.addDailyPlan(dailyPlan);
               } catch (Exception e) {
                 continue;
               }
             }
           }
-          recordContainerStates(solution, clusterContainers, day, fillingBeforeCollection);
         }
       }
       if (solution.getDailyPlans() != null && !solution.getDailyPlans().isEmpty()) {
@@ -201,10 +202,16 @@ public class Algorithm {
    * fill percentage for the day. When the vehicle becomes full, it returns to the facility,
    * unloads, and continues serving pending work on the same day.
    *
+   * @param solution the solution receiving per-stop container state snapshots
    * @param dailyPlan the daily plan to populate
    * @param availableContainers the containers assigned to the plan facility
+   * @param day the simulated planning day
    */
-  private void buildGreedyRoute(DailyPlan dailyPlan, List<Container> availableContainers) {
+  private void buildGreedyRoute(
+      DeliveryPlanningSolution solution,
+      DailyPlan dailyPlan,
+      List<Container> availableContainers,
+      int day) {
     if (availableContainers == null || availableContainers.isEmpty()) {
       return;
     }
@@ -220,12 +227,16 @@ public class Algorithm {
     double vehicleCurrentLoadKilograms = 0.0;
     Object currentLocation = facility;
     int facilityVisits = MIN_NUMBER_OF_DAYS;
+    // The vehicle clock starts at the configured collection start time for the day.
+    LocalTime currentTime = problem.getCollectionStartTime();
+    int transferMinutes = problem.getAverageTransferTimeMinutes();
+    int pickupMinutes = problem.getAveragePickupTimeMinutes();
     while (hasPendingLiters(availableContainers)) {
       if (isVehicleLoadFull(vehicle, vehicleCurrentLoadLiters, vehicleCurrentLoadKilograms)) {
         if (facilityVisits >= MAX_FACILITY_VISITS) {
           break;
         }
-        returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
+        currentTime = returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility, currentTime);
         vehicleCurrentLoadLiters = 0.0;
         vehicleCurrentLoadKilograms = 0.0;
         currentLocation = facility;
@@ -256,7 +267,7 @@ public class Algorithm {
         if (facilityVisits >= MAX_FACILITY_VISITS) {
           break;
         }
-        returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
+        currentTime = returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility, currentTime);
         vehicleCurrentLoadLiters = 0.0;
         vehicleCurrentLoadKilograms = 0.0;
         currentLocation = facility;
@@ -267,14 +278,27 @@ public class Algorithm {
           collectedLiters,
           nextContainer.getWasteType());
       double distanceFromCurrentLocation = calculateDistanceToContainer(currentLocation, nextContainer);
+      // Travel to the container, then this is the time the container is collected.
+      LocalTime collectedAt = advanceTime(currentTime, transferMinutes);
       dailyPlan.addStop(
           nextContainer,
           collectedKilograms,
           collectedLiters,
           pendingLiters,
           distanceFromCurrentLocation,
-          createStopAlerts(nextContainer, pendingLiters, collectedLiters));
-      updatePendingLiters(nextContainer, pendingLiters - collectedLiters);
+          createStopAlerts(nextContainer, pendingLiters, collectedLiters),
+          collectedAt);
+      double remainingAfterCollection = pendingLiters - collectedLiters;
+      updatePendingLiters(nextContainer, remainingAfterCollection);
+      recordContainerStopState(
+          solution,
+          nextContainer,
+          day,
+          getPendingLiters(nextContainer),
+          pendingLiters,
+          collectedAt);
+      // The collection itself consumes the average pickup time.
+      currentTime = advanceTime(collectedAt, pickupMinutes);
       vehicleCurrentLoadLiters += collectedLiters;
       vehicleCurrentLoadKilograms += collectedKilograms;
       vehicle.updateCurrentLoadLiters(vehicleCurrentLoadLiters);
@@ -284,7 +308,7 @@ public class Algorithm {
         if (facilityVisits >= MAX_FACILITY_VISITS) {
           break;
         }
-        returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
+        currentTime = returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility, currentTime);
         vehicleCurrentLoadLiters = 0.0;
         vehicleCurrentLoadKilograms = 0.0;
         currentLocation = facility;
@@ -293,9 +317,20 @@ public class Algorithm {
     }
     if ((vehicleCurrentLoadLiters > EPSILON || vehicleCurrentLoadKilograms > EPSILON)
         && facilityVisits < MAX_FACILITY_VISITS) {
-      returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility);
+      returnToFacilityAndUnload(dailyPlan, vehicle, currentLocation, facility, currentTime);
       facilityVisits++;
     }
+  }
+
+  /**
+   * Adds the given number of minutes to a time of day, tolerating a null clock.
+   *
+   * @param time base time of day (may be null)
+   * @param minutes minutes to add
+   * @return the resulting time, or null when no base time is available
+   */
+  private LocalTime advanceTime(LocalTime time, long minutes) {
+    return time != null ? time.plusMinutes(minutes) : null;
   }
 
   /**
@@ -441,14 +476,18 @@ public class Algorithm {
   }
 
   /**
-   * Records end-of-day container states in the solution.
+   * Records the start-of-day container states in the solution.
+   *
+   * <p>This snapshot captures the filling level at the configured collection start time, right
+   * after the daily demand has been added and before any collection happens. It guarantees that
+   * every container appears in the monitoring timeline even when it is never collected.
    *
    * @param solution solution receiving the monitoring snapshots
    * @param containers containers to monitor
    * @param day simulated planning day
    * @param fillingBeforeCollection pending liters per container before the day collection starts
    */
-  private void recordContainerStates(
+  private void recordContainerDayStartStates(
       DeliveryPlanningSolution solution,
       List<Container> containers,
       int day,
@@ -456,27 +495,64 @@ public class Algorithm {
     if (containers == null) {
       return;
     }
+    LocalTime dayStartTime = problem.getCollectionStartTime();
     for (Container container : containers) {
       if (container == null || container.getId() == null) {
         continue;
       }
-      double pendingLiters = getPendingLiters(container);
       double beforeCollectionLiters = fillingBeforeCollection != null
-          ? fillingBeforeCollection.getOrDefault(container.getId(), pendingLiters)
-          : pendingLiters;
-      ContainerStatus status = pendingLiters > container.getCapacityLiters()
+          ? fillingBeforeCollection.getOrDefault(container.getId(), getPendingLiters(container))
+          : getPendingLiters(container);
+      ContainerStatus status = beforeCollectionLiters > container.getCapacityLiters()
           ? ContainerStatus.OVERFLOWED
           : ContainerStatus.CORRECT;
       solution.addContainerDailyState(new ContainerDailyState(
           container.getId(),
           day,
-          pendingLiters,
+          beforeCollectionLiters,
           beforeCollectionLiters,
           container.getCapacityLiters(),
           container.getDailyDemandLitersPerDay(),
-          status));
-      this.containerDailyState.put(buildDayKey(container.getId(), day), pendingLiters);
+          status,
+          dayStartTime));
+      this.containerDailyState.put(buildDayKey(container.getId(), day), beforeCollectionLiters);
     }
+  }
+
+  /**
+   * Records the container state captured right after a collection stop.
+   *
+   * @param solution solution receiving the monitoring snapshot
+   * @param container the collected container
+   * @param day simulated planning day
+   * @param fillingAfterCollection pending liters left after the collection
+   * @param fillingBeforeCollection pending liters before this collection
+   * @param time time of day when the collection happened
+   */
+  private void recordContainerStopState(
+      DeliveryPlanningSolution solution,
+      Container container,
+      int day,
+      double fillingAfterCollection,
+      double fillingBeforeCollection,
+      LocalTime time) {
+    if (solution == null || container == null || container.getId() == null) {
+      return;
+    }
+    double normalizedAfter = Math.max(0.0, fillingAfterCollection);
+    ContainerStatus status = normalizedAfter > container.getCapacityLiters()
+        ? ContainerStatus.OVERFLOWED
+        : ContainerStatus.CORRECT;
+    solution.addContainerDailyState(new ContainerDailyState(
+        container.getId(),
+        day,
+        normalizedAfter,
+        Math.max(0.0, fillingBeforeCollection),
+        container.getCapacityLiters(),
+        container.getDailyDemandLitersPerDay(),
+        status,
+        time));
+    this.containerDailyState.put(buildDayKey(container.getId(), day), normalizedAfter);
   }
 
   /**
@@ -716,18 +792,24 @@ public class Algorithm {
    * @param vehicle vehicle to unload
    * @param currentLocation current route location
    * @param facility facility to return to
+   * @param currentTime the vehicle clock before travelling back to the facility
+   * @return the vehicle clock after travelling and unloading at the facility
    */ 
-  private void returnToFacilityAndUnload(
+  private LocalTime returnToFacilityAndUnload(
       DailyPlan dailyPlan,
       Vehicle vehicle,
       Object currentLocation,
-      Facility facility) {
+      Facility facility,
+      LocalTime currentTime) {
     if (dailyPlan == null || vehicle == null || currentLocation == null || facility == null) {
-      return;
+      return currentTime;
     }
     double distanceToFacility = calculateDistanceToFacility(currentLocation, facility);
-    dailyPlan.addFacilityStop(distanceToFacility, new ArrayList<>());
+    // Travel back to the facility, then unload during the facility unloading time.
+    LocalTime arrivalAtFacility = advanceTime(currentTime, problem.getAverageTransferTimeMinutes());
+    dailyPlan.addFacilityStop(distanceToFacility, new ArrayList<>(), arrivalAtFacility);
     vehicle.emptyLoad();
+    return advanceTime(arrivalAtFacility, (long) facility.getUnloadingTimeMinutes());
   }
 
   /**

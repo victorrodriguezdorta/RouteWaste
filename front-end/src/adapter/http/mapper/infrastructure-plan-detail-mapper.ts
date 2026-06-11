@@ -325,6 +325,7 @@ export class InfrastructurePlanDetailMapper {
       typeof stop.containerActualLiters === 'number' ? stop.containerActualLiters : null,
       (stop.alerts ?? []).map((alert) => this.mapAlert(alert)),
       containerName,
+      typeof stop.collectedAt === 'string' && stop.collectedAt.length > 0 ? stop.collectedAt : null,
     );
   }
 
@@ -441,6 +442,7 @@ export class InfrastructurePlanDetailMapper {
       this.parseOptionalUuid(state.id),
       new UllUUID(state.containerId),
       state.planDay,
+      typeof state.time === 'string' && state.time.length > 0 ? state.time : null,
       state.dailyFillingLiters,
       typeof state.dailyFillingLitersBeforeCollection === 'number'
         ? state.dailyFillingLitersBeforeCollection

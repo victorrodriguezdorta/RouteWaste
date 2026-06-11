@@ -1,6 +1,7 @@
 package com.ull.domain.entity;
 
 import com.ull.domain.enumerate.StopType;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +29,8 @@ public class DailyPlanStop {
   private final double collectedKilograms;
   private final double collectedLiters;
   private final double containerActualLiters;
+  /** Time of day at which the vehicle performs this stop (null when not computed). */
+  private final LocalTime collectedAt;
   private final List<Alert> alerts;
 
   /**
@@ -53,6 +56,44 @@ public class DailyPlanStop {
       double collectedLiters,
       double containerActualLiters,
       List<Alert> alerts) {
+    this(
+        sequence,
+        type,
+        container,
+        distanceFromPreviousMeters,
+        cumulativeDistanceMeters,
+        collectedKilograms,
+        collectedLiters,
+        containerActualLiters,
+        alerts,
+        null);
+  }
+
+  /**
+   * Creates a stop with its route and collection metrics including the scheduled time.
+   *
+   * @param sequence stop sequence inside the plan
+   * @param type kind of stop represented in the daily plan
+   * @param container visited container
+   * @param distanceFromPreviousMeters distance from the previous point in meters
+   * @param cumulativeDistanceMeters cumulative route distance in meters
+   * @param collectedKilograms kilograms collected at this stop
+   * @param collectedLiters liters collected at this stop
+   * @param containerActualLiters the actual liters in the container before collection
+   * @param alerts list of alerts generated at this stop
+   * @param collectedAt time of day at which the stop is performed
+   */
+  public DailyPlanStop(
+      int sequence,
+      StopType type,
+      Container container,
+      double distanceFromPreviousMeters,
+      double cumulativeDistanceMeters,
+      double collectedKilograms,
+      double collectedLiters,
+      double containerActualLiters,
+      List<Alert> alerts,
+      LocalTime collectedAt) {
     validateSequence(sequence);
     if (type == StopType.CONTAINER) {
       validateContainer(container);
@@ -70,6 +111,7 @@ public class DailyPlanStop {
     this.collectedKilograms = collectedKilograms;
     this.collectedLiters = collectedLiters;
     this.containerActualLiters = containerActualLiters;
+    this.collectedAt = collectedAt;
     this.alerts = alerts != null ? new ArrayList<>(alerts) : new ArrayList<>();
   }
 
@@ -116,6 +158,25 @@ public class DailyPlanStop {
       double distanceFromPreviousMeters,
       double cumulativeDistanceMeters,
       List<Alert> alerts) {
+    return forFacility(sequence, distanceFromPreviousMeters, cumulativeDistanceMeters, alerts, null);
+  }
+
+  /**
+   * Factory to create a facility stop (no container) with a scheduled time.
+   *
+   * @param sequence stop sequence inside the plan
+   * @param distanceFromPreviousMeters distance from the previous point in meters
+   * @param cumulativeDistanceMeters cumulative route distance in meters
+   * @param alerts list of alerts generated at the facility stop
+   * @param collectedAt time of day at which the facility stop is performed
+   * @return a daily plan stop representing a visit to the facility
+   */
+  public static DailyPlanStop forFacility(
+      int sequence,
+      double distanceFromPreviousMeters,
+      double cumulativeDistanceMeters,
+      List<Alert> alerts,
+      LocalTime collectedAt) {
     return new DailyPlanStop(
         sequence,
         StopType.FACILITY,
@@ -125,7 +186,8 @@ public class DailyPlanStop {
         ZERO_AMOUNT,
         ZERO_AMOUNT,
         ZERO_AMOUNT,
-        alerts != null ? alerts : new ArrayList<>());
+        alerts != null ? alerts : new ArrayList<>(),
+        collectedAt);
   }
 
   /**
@@ -275,6 +337,15 @@ public class DailyPlanStop {
    */
   public double getContainerActualLiters() {
     return this.containerActualLiters;
+  }
+
+  /**
+   * Gets the time of day at which the vehicle performs this stop.
+   *
+   * @return scheduled stop time, or {@code null} when it was not computed
+   */
+  public LocalTime getCollectedAt() {
+    return this.collectedAt;
   }
 
   /**

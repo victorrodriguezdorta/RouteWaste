@@ -33,6 +33,7 @@ public class MongoFields {
     public static final String CONTAINER_ID = "containerId";
     public static final String DAILY_FILLING_LITERS = "dailyFillingLiters";
     public static final String DAILY_FILLING_LITERS_BEFORE_COLLECTION = "dailyFillingLitersBeforeCollection";
+    public static final String TIME = "time";
 
     /**
      * ContainerDailyState ids stored in InfrastructurePlan documents.
@@ -130,6 +131,7 @@ public class MongoFields {
     public static final String COLLECTED_LITERS = "collectedLiters";
     public static final String DISTANCE_FROM_PREVIOUS_METERS = "distanceFromPreviousMeters";
     public static final String CUMULATIVE_DISTANCE_METERS = "cumulativeDistanceMeters";
+    public static final String COLLECTED_AT = "collectedAt";
 
     /**
      * Private constructor to prevent instantiation.

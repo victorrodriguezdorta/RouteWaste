@@ -76,6 +76,10 @@
                   <span class="route-stop__title">
                     {{ t('infrastructurePlan.show.daily.route.stopLabel', { sequence: stop.sequence }) }}
                   </span>
+                  <span v-if="stop.collectedAt" class="route-stop__time">
+                    <v-icon icon="mdi-clock-outline" size="x-small" />
+                    <span>{{ stop.collectedAt }}</span>
+                  </span>
                   <div v-if="stop.type === StopType.FACILITY" class="route-stop__facility-indicator">
                     <v-icon icon="mdi-office-building" color="danger-dark" size="small" />
                     <span>{{ t('infrastructurePlan.show.daily.route.facilityStopMessage') }}</span>
@@ -185,6 +189,7 @@ interface NormalizedStop {
   type: StopType;
   containerId: string | null;
   containerDisplay: string;
+  collectedAt: string | null;
   collectedKilograms?: number;
   collectedLiters?: number;
   distanceFromPreviousMeters?: number;
@@ -345,6 +350,7 @@ function normalizeStops(stops: InfrastructurePlanDailyPlanDetail['stops']): Norm
         type: stop.type,
         containerId,
         containerDisplay,
+        collectedAt: formatStopTime(stop.collectedAt),
         collectedKilograms: stop.collectedKilograms.getKilograms(),
         collectedLiters: stop.collectedLiters.getLiters(),
         distanceFromPreviousMeters: stop.distanceFromPreviousMeters.getValue(),
@@ -388,6 +394,20 @@ function formatMeters(value: number | undefined): string {
   }
 
   return `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })} m`;
+}
+
+/**
+ * Normalizes a stop time-of-day string into a "HH:mm" label.
+ *
+ * @param value time-of-day string ("HH:mm" or "HH:mm:ss"), when available
+ * @returns trimmed "HH:mm" label, or null when absent
+ */
+function formatStopTime(value: string | null): string | null {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return null;
+  }
+
+  return value.trim().slice(0, 5);
 }
 
 function formatCapacity(value: number | null, unit: string): string {
@@ -610,6 +630,15 @@ function openFacility(facilityId: string): void {
 .route-stop__title {
   color: rgb(var(--v-theme-primary));
   font-weight: 700;
+}
+
+.route-stop__time {
+  align-items: center;
+  color: rgba(var(--v-theme-neutral-base), 0.7);
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 600;
+  gap: 4px;
 }
 
 .route-stop__facility-indicator {
