@@ -1,4 +1,4 @@
-import { AlgorithmHttpRepository } from '@/adapter/http/algorithm-http-repository';
+import { AlgorithmHttpRepository } from '@/adapter/http/repository/algorithm-http-repository';
 import { i18n } from '@/adapter/vuejs/i18n';
 import { resolveBackendError, translateBackendMessage } from '@/adapter/vuejs/utils/translate-backend-error';
 import { CreateAlgorithmService } from '@/application/service/algorithm/create-algorithm-service';

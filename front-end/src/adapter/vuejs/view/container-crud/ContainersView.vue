@@ -188,6 +188,7 @@
             <v-text-field
               v-model="selectedNameFilter"
               :placeholder="t('container.list.filterByName')"
+              prepend-inner-icon="mdi-magnify"
               clearable
               density="compact"
               hide-details
@@ -201,6 +202,7 @@
             <v-text-field
               v-model="selectedLocationFilter"
               :placeholder="t('container.list.filterByLocation')"
+              prepend-inner-icon="mdi-magnify"
               clearable
               density="compact"
               hide-details

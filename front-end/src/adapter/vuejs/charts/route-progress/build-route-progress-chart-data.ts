@@ -1,8 +1,6 @@
 import type { RouteProgressStop } from '@/adapter/vuejs/analytics/infrastructure-plan/route-progress-stop';
-import type {
-  RouteCollectionChartDatum,
-  RouteDistanceChartDatum,
-} from './types';
+import type { RouteCollectionChartDatum } from '@/adapter/vuejs/charts/route-progress/route-collection-chart-datum';
+import type { RouteDistanceChartDatum } from '@/adapter/vuejs/charts/route-progress/route-distance-chart-datum';
 
 export function buildRouteCollectionChartData(
   stops: RouteProgressStop[],

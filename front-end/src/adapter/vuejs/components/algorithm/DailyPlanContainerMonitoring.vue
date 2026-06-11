@@ -125,7 +125,7 @@ import type {
     InfrastructurePlanContainerDetail,
     InfrastructurePlanFacilityDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
-import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
+import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/mapper/infrastructure-plan-detail-mapper';
 import {
   RouteProgressLineChart,
   buildContainerFillChartData,

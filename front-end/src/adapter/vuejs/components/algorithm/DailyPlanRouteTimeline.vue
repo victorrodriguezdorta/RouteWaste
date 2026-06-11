@@ -165,7 +165,7 @@ import type {
   RouteDistanceChartDatum,
   RouteProgressChartSeries,
 } from '@/adapter/vuejs/charts';
-import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
+import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/mapper/infrastructure-plan-detail-mapper';
 import { StopType } from '@/domain/enumerate/stop-type';
 import type { InfrastructurePlanDailyPlanDetail } from '@/domain/read-model/infrastructure-plan-detail';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
@@ -254,7 +254,7 @@ const stopAxisLabel = computed(() =>
   t('infrastructurePlan.show.daily.route.charts.stopAxisLabel'),
 );
 const collectionAxisLabel = computed(() =>
-  t('infrastructurePlan.show.daily.route.charts.collectionYAxisLabel'),
+  t('infrastructurePlan.show.daily.route.charts.collectionYaxisLabel'),
 );
 const distanceAxisLabel = computed(() =>
   t('infrastructurePlan.show.daily.route.charts.distanceSeries'),

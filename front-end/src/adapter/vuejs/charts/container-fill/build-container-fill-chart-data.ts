@@ -1,10 +1,10 @@
-import type { InfrastructurePlanContainerDailyStateDetail } from '@/domain/read-model/infrastructure-plan-detail';
-import type { InfrastructurePlanContainerDetail } from '@/domain/read-model/infrastructure-plan-detail';
+import type { ContainerFillChartInput } from '@/adapter/vuejs/charts/container-fill/container-fill-chart-input';
+import type { ContainerFillChartResult } from '@/adapter/vuejs/charts/container-fill/container-fill-chart-result';
+import type { RouteProgressChartDatum } from '@/adapter/vuejs/charts/route-progress/route-progress-chart-datum';
 import {
   computeContainerFillPercentFromLiters,
   normalizePlanDay,
 } from '@/adapter/vuejs/utils/container-fill-level';
-import type { RouteProgressChartDatum, RouteProgressChartSeries } from '../route-progress/types';
 
 const CONTAINER_FILL_CHART_COLORS = [
   '#4e79a7',
@@ -32,26 +32,13 @@ const CONTAINER_FILL_CHART_COLORS = [
 const BEFORE_COLLECTION_OFFSET = -0.25;
 const AFTER_COLLECTION_OFFSET = 0.25;
 
-export interface ContainerFillChartInput {
-  containers: InfrastructurePlanContainerDetail[];
-  monitoringStates: InfrastructurePlanContainerDailyStateDetail[];
-  labelForContainer: (container: InfrastructurePlanContainerDetail) => string;
-  beforeCollectionLabel?: string;
-  afterCollectionLabel?: string;
-}
-
-export interface ContainerFillChartResult {
-  data: RouteProgressChartDatum[];
-  series: RouteProgressChartSeries[];
-}
-
 function normalizeIdentifier(value: string | null | undefined): string {
   return String(value ?? '').trim().toLowerCase();
 }
 
 function resolveCapacityLiters(
-  container: InfrastructurePlanContainerDetail,
-  state?: InfrastructurePlanContainerDailyStateDetail,
+  container: ContainerFillChartInput['containers'][number],
+  state?: ContainerFillChartInput['monitoringStates'][number],
 ): number | null {
   const capacityFromState = state?.containerCapacityLiters?.getLiters?.();
   const capacityFromContainer = container.capacityLiters?.getLiters?.();
@@ -65,7 +52,7 @@ function resolveCapacityLiters(
 }
 
 function resolveBeforeCollectionLiters(
-  state?: InfrastructurePlanContainerDailyStateDetail,
+  state?: ContainerFillChartInput['monitoringStates'][number],
 ): number | null {
   const beforeCollection = state?.dailyFillingLitersBeforeCollection;
   if (typeof beforeCollection === 'number' && Number.isFinite(beforeCollection)) {
@@ -78,7 +65,7 @@ function resolveBeforeCollectionLiters(
 }
 
 function resolveAfterCollectionLiters(
-  state?: InfrastructurePlanContainerDailyStateDetail,
+  state?: ContainerFillChartInput['monitoringStates'][number],
 ): number | null {
   return typeof state?.dailyFillingLiters === 'number' && Number.isFinite(state.dailyFillingLiters)
     ? state.dailyFillingLiters
@@ -102,7 +89,7 @@ export function buildContainerFillChartData(
   const containerIds = new Set(
     containers.map((container) => normalizeIdentifier(container.id.getValue())),
   );
-  const statesByDayAndContainer = new Map<string, InfrastructurePlanContainerDailyStateDetail>();
+  const statesByDayAndContainer = new Map<string, ContainerFillChartInput['monitoringStates'][number]>();
   const availableDays = new Set<number>();
 
   monitoringStates.forEach((state) => {

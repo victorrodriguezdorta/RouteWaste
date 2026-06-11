@@ -1,5 +1,5 @@
-import { ContainerHttpRepository } from '@/adapter/http/container-http-repository';
-import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
+import { ContainerHttpRepository } from '@/adapter/http/repository/container-http-repository';
+import type { BulkImportResult } from '@/adapter/http/response/common/bulk-import-result';
 import { resolveStoreSuccessNotification } from '@/adapter/vuejs/utils/store-notification-messages';
 import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { CreateContainerService } from '@/application/service/container/create-container-service';

@@ -58,7 +58,7 @@ public class ContainerDailyState {
 
     /**
      * Container filling level before any collection on the day.
-     * It is an optional attribute for legacy snapshots.
+     * It is an optional attribute.
      */
     private final CollectedVolumeLiters dailyFillingLitersBeforeCollection;
 
@@ -100,6 +100,7 @@ public class ContainerDailyState {
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
             ContainerStatus status) {
         this(
+                UUID.randomUUID(),
                 infrastructurePlan,
                 container,
                 planDay,
@@ -131,16 +132,16 @@ public class ContainerDailyState {
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
             ContainerStatus status,
             CollectedVolumeLiters dailyFillingLitersBeforeCollection) {
-        validate(container, planDay, dailyFillingLiters, containerCapacityLiters, dailyDemandLitersPerDay);
-        this.id = UUID.randomUUID();
-        this.infrastructurePlan = infrastructurePlan;
-        this.container = container;
-        this.planDay = planDay;
-        this.dailyFillingLiters = dailyFillingLiters;
-        this.dailyFillingLitersBeforeCollection = dailyFillingLitersBeforeCollection;
-        this.containerCapacityLiters = containerCapacityLiters;
-        this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
-        this.status = status != null ? status : ContainerStatus.CORRECT;
+        this(
+                UUID.randomUUID(),
+                infrastructurePlan,
+                container,
+                planDay,
+                dailyFillingLiters,
+                containerCapacityLiters,
+                dailyDemandLitersPerDay,
+                status,
+                dailyFillingLitersBeforeCollection);
     }
 
     /**

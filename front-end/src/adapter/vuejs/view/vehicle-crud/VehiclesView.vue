@@ -136,6 +136,7 @@
             <v-text-field
               v-model="selectedNameFilter"
               :placeholder="t('vehicle.list.filterByName')"
+              prepend-inner-icon="mdi-magnify"
               clearable
               density="compact"
               hide-details

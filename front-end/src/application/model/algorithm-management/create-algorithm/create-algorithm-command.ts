@@ -1,4 +1,4 @@
-import type { FacilityVehicleCommand } from '@/adapter/http/dto/algorithm/facility-vehicle-command';
+import type { FacilityVehicleCommand } from '@/adapter/http/request/algorithm/facility-vehicle-command';
 import type { AlgorithmMaxBudgetCommand } from '@/application/model/algorithm-management/create-algorithm/algorithm-max-budget-command';
 import type { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 /**

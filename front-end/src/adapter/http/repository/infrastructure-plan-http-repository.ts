@@ -1,6 +1,6 @@
-import { InfrastructurePlanDetailMapper } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
-import type { InfrastructurePlanJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-json-response';
-import type { InfrastructurePlansResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plans-response';
+import { InfrastructurePlanDetailMapper } from '@/adapter/http/mapper/infrastructure-plan-detail-mapper';
+import type { InfrastructurePlanJsonResponse } from '@/adapter/http/response/infrastructure-plan/infrastructure-plan-json-response';
+import type { InfrastructurePlansResponse } from '@/adapter/http/response/infrastructure-plan/infrastructure-plans-response';
 import type { InfrastructurePlanRepository } from '@/application/repository/infrastructure-plan-repository';
 import type { DeleteInfrastructurePlanCommand, DeleteInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/delete-infrastructure-plan/delete-infrastructure-plan-use-case';
 import type { GetInfrastructurePlanCommand, GetInfrastructurePlanResult } from '@/application/usecase/infrastructure-plan-management/get-infrastructure-plan/get-infrastructure-plan-use-case';

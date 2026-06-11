@@ -1,9 +1,8 @@
 import { i18n } from './adapter/vuejs/i18n';
 import router from './adapter/vuejs/router/router';
+import './adapter/vuejs/styles/map-pin-icon.css';
 import App from './App.vue';
 import './style.css';
-import './adapter/vuejs/styles/map-pin-icon.css';
-/** Colores del tema: edítalos en `src/theme/professional-light-colors.ts` */
 import { professionalLightColors } from './theme/professional-light-colors';
 import '@mdi/font/css/materialdesignicons.css';
 import { createPinia } from 'pinia';
@@ -134,4 +133,4 @@ app.use(pinia)
 app.use(router)
 app.use(vuetify)
 app.use(i18n)
-app.mount('#app')       
+app.mount('#app')

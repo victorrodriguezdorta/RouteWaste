@@ -121,6 +121,7 @@ public class VehicleController {
      * @param sortBy      optional column to sort by: capacityKilograms, CapacityLiters, cost, type, etc.
      * @param sortOrder   sort direction: "asc" (default) or "desc"
      * @param vehicleType optional vehicle type filter (enum name, e.g. "COLLECTION_TRUCK")
+     * @param name        optional filter by vehicle name
      * @return paginated list of vehicles or 400 if parameters are invalid
      */
     @Operation(summary = "Get all vehicles", description = "Retrieves a paginated list of vehicles with optional sorting and filtering")

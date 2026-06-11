@@ -126,6 +126,7 @@ public class FacilityController {
      * @param facilityType optional filter by facility type
      * @param status optional filter by facility status
      * @param location optional filter by location (postal address)
+     * @param name optional filter by facility name
      * @return ResponseEntity containing a page of facilities with HTTP 200 (OK) status
      */
     @Operation(summary = "Get all facilities", description = "Retrieves a paginated list of facilities with optional sorting and advanced filtering")

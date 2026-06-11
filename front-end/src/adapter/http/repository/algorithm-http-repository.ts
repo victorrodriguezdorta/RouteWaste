@@ -1,5 +1,5 @@
-import { AlgorithmExecutionRequestJson } from '@/adapter/http/dto/algorithm/algorithm-execution-request-json';
-import type { AlgorithmJsonResponse } from '@/adapter/http/dto/algorithm/algorithm-json-response';
+import { AlgorithmExecutionRequestJson } from '@/adapter/http/request/algorithm/algorithm-execution-request-json';
+import type { AlgorithmJsonResponse } from '@/adapter/http/response/algorithm/algorithm-json-response';
 import type { AlgorithmRepository } from '@/application/repository/algorithm-repository';
 import type { CreateAlgorithmCommand, CreateAlgorithmResult } from '@/application/usecase/algorithm-management/create-algorithm/create-algorithm-use-case';
 import type { ApiError, DataError } from '@ull-tfg/ull-tfg-typescript';

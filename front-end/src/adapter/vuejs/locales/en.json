@@ -606,7 +606,7 @@
             "litersChartTitle": "Cumulative liters",
             "distanceTitle": "Cumulative meters",
             "stopAxisLabel": "Stop",
-            "collectionYAxisLabel": "Quantity",
+            "collectionYaxisLabel": "Quantity",
             "kilogramsSeries": "Kilograms",
             "litersSeries": "Liters",
             "distanceSeries": "Meters"

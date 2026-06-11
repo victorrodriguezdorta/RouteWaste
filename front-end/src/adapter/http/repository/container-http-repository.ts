@@ -1,13 +1,13 @@
-import { postBulkImportFile } from '@/adapter/http/bulk-import-http';
-import type { BulkImportJsonResponse } from '@/adapter/http/dto/common/bulk-import-json-response';
+import { postBulkImportFile } from '@/adapter/http/repository/bulk-import-http';
+import type { BulkImportJsonResponse } from '@/adapter/http/response/common/bulk-import-json-response';
 import {
   type BulkImportResult,
   toBulkImportResult,
-} from '@/adapter/http/dto/common/bulk-import-result';
-import { ContainerJsonResponse } from '@/adapter/http/dto/container/container-json-response';
-import type { ContainerPageJsonResponse } from '@/adapter/http/dto/container/container-page-json-response';
-import { ContainerPostJsonRequest } from '@/adapter/http/dto/container/container-post-json-request';
-import { ContainerPutJsonRequest } from '@/adapter/http/dto/container/container-put-json-request';
+} from '@/adapter/http/response/common/bulk-import-result';
+import { ContainerJsonResponse } from '@/adapter/http/response/container/container-json-response';
+import type { ContainerPageJsonResponse } from '@/adapter/http/response/container/container-page-json-response';
+import { ContainerPostJsonRequest } from '@/adapter/http/request/container/container-post-json-request';
+import { ContainerPutJsonRequest } from '@/adapter/http/request/container/container-put-json-request';
 import { toEntityTypeStatistics } from '@/adapter/http/mapper/entity-statistics-json-mapper';
 import type { ContainerRepository } from '@/application/repository/container-repository';
 import type { CreateContainerCommand, CreateContainerResult } from '@/application/usecase/container-management/create-container/create-container-use-case';

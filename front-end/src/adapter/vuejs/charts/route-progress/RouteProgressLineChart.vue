@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
-import type {
-  RouteProgressChartDatum,
-  RouteProgressChartSeries,
-  RouteProgressLegendPosition,
-} from './types';
+import type { RouteProgressChartDatum } from '@/adapter/vuejs/charts/route-progress/route-progress-chart-datum';
+import type { RouteProgressChartSeries } from '@/adapter/vuejs/charts/route-progress/route-progress-chart-series';
+import type { RouteProgressLegendPosition } from '@/adapter/vuejs/charts/route-progress/route-progress-legend-position';
 
 const SIDE_LEGEND_WIDTH = 200;
 

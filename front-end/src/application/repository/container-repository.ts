@@ -1,4 +1,4 @@
-import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
+import type { BulkImportResult } from '@/adapter/http/response/common/bulk-import-result';
 import type { CreateContainerCommand, CreateContainerResult } from '@/application/usecase/container-management/create-container/create-container-use-case';
 import type { DeleteContainerCommand, DeleteContainerResult } from '@/application/usecase/container-management/delete-container/delete-container-use-case';
 import type { FilterContainersCommand, FilterContainersResult } from '@/application/usecase/container-management/filter-containers/filter-containers-use-case';

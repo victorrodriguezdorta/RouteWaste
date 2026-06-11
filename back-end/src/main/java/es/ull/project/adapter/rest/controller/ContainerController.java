@@ -140,6 +140,7 @@ public class ContainerController {
      * @param minDemand optional minimum daily demand filter
      * @param maxDemand optional maximum daily demand filter
      * @param location optional filter by location (postal address)
+     * @param name optional filter by container name
      * @return ResponseEntity containing a page of containers with HTTP 200 (OK) status
      */
     @Operation(summary = "Get all containers", description = "Retrieves a paginated list of containers with optional sorting and advanced filtering")

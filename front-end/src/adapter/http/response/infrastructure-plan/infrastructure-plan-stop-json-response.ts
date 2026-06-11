@@ -1,5 +1,5 @@
 import type { StopAlertJsonResponse } from './stop-alert-json-response';
-import type { ContainerJsonResponse } from '@/adapter/http/dto/container/container-json-response';
+import type { ContainerJsonResponse } from '@/adapter/http/response/container/container-json-response';
 
 /**
  * Stop included in a daily plan.

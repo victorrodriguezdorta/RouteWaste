@@ -1,5 +1,5 @@
-import type { InfrastructurePlanSummaryJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-summary-json-response';
-import { InfrastructurePlanHttpRepository } from '@/adapter/http/infrastructure-plan-http-repository';
+import type { InfrastructurePlanSummaryJsonResponse } from '@/adapter/http/response/infrastructure-plan/infrastructure-plan-summary-json-response';
+import { InfrastructurePlanHttpRepository } from '@/adapter/http/repository/infrastructure-plan-http-repository';
 import { resolveStoreSuccessNotification } from '@/adapter/vuejs/utils/store-notification-messages';
 import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { DeleteInfrastructurePlanService } from '@/application/service/infrastructure-plan/delete-infrastructure-plan-service';

@@ -294,7 +294,6 @@ public class SampleDataSeeder implements ApplicationRunner {
             double dailyDemandLiters,
             ServiceZone serviceZone) {
         return new Container(
-                sampleId(CONTAINER_ENTITY_TYPE, index),
                 new Name(name),
                 new Location(latitude, longitude, postalAddress, CONTAINER_REFERENCE_PREFIX + index),
                 wasteType,

@@ -606,7 +606,7 @@
             "litersChartTitle": "Litros acumulados",
             "distanceTitle": "Metros acumulados",
             "stopAxisLabel": "Parada",
-            "collectionYAxisLabel": "Cantidad",
+            "collectionYaxisLabel": "Cantidad",
             "kilogramsSeries": "Kilogramos",
             "litersSeries": "Litros",
             "distanceSeries": "Metros"

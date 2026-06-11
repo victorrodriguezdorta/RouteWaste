@@ -1,6 +1,6 @@
 import type { InfrastructurePlanStopJsonResponse } from './infrastructure-plan-stop-json-response';
-import type { FacilityJsonResponse } from '@/adapter/http/dto/facility/facility-json-response';
-import type { VehicleJsonResponse } from '@/adapter/http/dto/vehicle/vehicle-json-response';
+import type { FacilityJsonResponse } from '@/adapter/http/response/facility/facility-json-response';
+import type { VehicleJsonResponse } from '@/adapter/http/response/vehicle/vehicle-json-response';
 
 /**
  * Daily plan returned in the infrastructure plan detail endpoint.

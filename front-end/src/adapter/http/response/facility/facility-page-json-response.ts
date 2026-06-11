@@ -1,5 +1,5 @@
 import type { FacilityJsonResponse } from './facility-json-response';
-import type { EntityStatisticsJsonResponse } from '@/adapter/http/dto/common/entity-statistics-json-response';
+import type { EntityStatisticsJsonResponse } from '@/adapter/http/response/common/entity-statistics-json-response';
 
 /**
  * Paginated response DTO for facilities endpoint.

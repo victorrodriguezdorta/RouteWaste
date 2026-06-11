@@ -133,6 +133,13 @@ public class VehicleMongoRepository implements VehicleRepository {
         return new PageImpl<>(vehicles, pageable, total);
     }
 
+    /**
+     * Builds a list of MongoDB Criteria from search criteria.
+     * Each non-null filter is converted to a corresponding Criteria object.
+     *
+     * @param criteria search criteria
+     * @return list of Criteria objects
+     */
     private List<Criteria> buildSearchCriterias(@NonNull VehicleSearchCriteria criteria) {
         List<Criteria> criterias = new ArrayList<>();
         if (criteria.getVehicleType() != null) {

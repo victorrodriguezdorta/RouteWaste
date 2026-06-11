@@ -1,5 +1,5 @@
 import type { InfrastructurePlanDailyPlanJsonResponse } from './infrastructure-plan-daily-plan-json-response';
-import type { ContainerJsonResponse } from '@/adapter/http/dto/container/container-json-response';
+import type { ContainerJsonResponse } from '@/adapter/http/response/container/container-json-response';
 
 /**
  * Facility returned by the newer infrastructure plan detail endpoint.

@@ -44,6 +44,7 @@ public class Algorithm {
   private static final double DISTANCE_WEIGHT = 0.40;
   private static final double FILL_WEIGHT = 0.60;
   private static final double OVERFLOW_SCORE_BONUS = 1.5;
+  private static final double FULL_FILL_PERCENTAGE = 100.0;
 
   private final DeliveryPlanningProblem problem;
   /**
@@ -441,6 +442,7 @@ public class Algorithm {
    * @param solution solution receiving the monitoring snapshots
    * @param containers containers to monitor
    * @param day simulated planning day
+   * @param fillingBeforeCollection pending liters per container before the day collection starts
    */
   private void recordContainerStates(
       DeliveryPlanningSolution solution,
@@ -508,7 +510,6 @@ public class Algorithm {
     double bestDistance = Double.MAX_VALUE;
     double maxDistance = 0.0;
     double maxFillPercentage = 0.0;
-
     for (Container container : containers) {
       if (container == null || container.getLocation() == null) {
         continue;
@@ -525,7 +526,6 @@ public class Algorithm {
         continue;
       }
     }
-
     for (Container container : containers) {
       if (container == null || container.getLocation() == null) {
         continue;
@@ -577,7 +577,7 @@ public class Algorithm {
     double normalizedDistance = maxDistance > EPSILON ? distance / maxDistance : 0.0;
     double normalizedFill = maxFillPercentage > EPSILON ? fillPercentage / maxFillPercentage : 0.0;
     double score = DISTANCE_WEIGHT * normalizedDistance - FILL_WEIGHT * normalizedFill;
-    if (fillPercentage > 100.0) {
+    if (fillPercentage > FULL_FILL_PERCENTAGE) {
       score -= OVERFLOW_SCORE_BONUS;
     }
     return score;

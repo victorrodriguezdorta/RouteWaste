@@ -197,7 +197,7 @@ import type {
   InfrastructurePlanDailyPlanDetail,
   InfrastructurePlanFacilityDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
-import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-detail-mapper';
+import { infrastructurePlanDetailFallbackDisplayNames } from '@/adapter/http/mapper/infrastructure-plan-detail-mapper';
 import { ButtonTooltip } from '@ull-tfg/ull-tfg-vue';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';

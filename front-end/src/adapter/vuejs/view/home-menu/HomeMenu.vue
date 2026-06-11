@@ -253,7 +253,7 @@
 </template>
 
 <script setup lang="ts">
-import type { InfrastructurePlanSummaryJsonResponse } from '@/adapter/http/dto/infrastructure-plan/infrastructure-plan-summary-json-response';
+import type { InfrastructurePlanSummaryJsonResponse } from '@/adapter/http/response/infrastructure-plan/infrastructure-plan-summary-json-response';
 import {
   InfrastructurePlanExecutionState,
   infrastructurePlanExecutionStateFromString,

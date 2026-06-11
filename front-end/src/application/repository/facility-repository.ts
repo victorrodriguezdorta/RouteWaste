@@ -1,4 +1,4 @@
-import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
+import type { BulkImportResult } from '@/adapter/http/response/common/bulk-import-result';
 import type { CreateFacilityCommand, CreateFacilityResult } from '@/application/usecase/facility-management/create-facility/create-facility-use-case';
 import type { DeleteFacilityCommand, DeleteFacilityResult } from '@/application/usecase/facility-management/delete-facility/delete-facility-use-case';
 import type { FilterFacilitiesCommand, FilterFacilitiesResult } from '@/application/usecase/facility-management/filter-facilities/filter-facilities-use-case';

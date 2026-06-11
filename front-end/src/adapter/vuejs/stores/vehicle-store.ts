@@ -1,5 +1,5 @@
-import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
-import { VehicleHttpRepository } from '@/adapter/http/vehicle-http-repository';
+import type { BulkImportResult } from '@/adapter/http/response/common/bulk-import-result';
+import { VehicleHttpRepository } from '@/adapter/http/repository/vehicle-http-repository';
 import { resolveStoreSuccessNotification } from '@/adapter/vuejs/utils/store-notification-messages';
 import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { CreateVehicleService } from '@/application/service/vehicle/create-vehicle-service';

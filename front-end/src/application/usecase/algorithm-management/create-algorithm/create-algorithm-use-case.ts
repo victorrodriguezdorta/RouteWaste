@@ -14,5 +14,5 @@ export interface CreateAlgorithmUseCase {
 }
 
 export type { CreateAlgorithmCommand } from '@/application/model/algorithm-management/create-algorithm/create-algorithm-command';
-export type { FacilityVehicleCommand } from '@/adapter/http/dto/algorithm/facility-vehicle-command';
+export type { FacilityVehicleCommand } from '@/adapter/http/request/algorithm/facility-vehicle-command';
 export type { CreateAlgorithmResult } from '@/application/model/algorithm-management/create-algorithm/create-algorithm-result';

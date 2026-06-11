@@ -1,4 +1,4 @@
-import type { BulkImportResult } from '@/adapter/http/dto/common/bulk-import-result';
+import type { BulkImportResult } from '@/adapter/http/response/common/bulk-import-result';
 import type { CreateVehicleCommand, CreateVehicleResult } from '@/application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
 import type { DeleteVehicleCommand, DeleteVehicleResult } from '@/application/usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';
 import type { GetVehicleCommand, GetVehicleResult } from '@/application/usecase/vehicle-management/get-vehicle/get-vehicle-use-case';

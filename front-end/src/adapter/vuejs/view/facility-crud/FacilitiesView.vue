@@ -194,6 +194,7 @@
             <v-text-field
               v-model="selectedNameFilter"
               :placeholder="t('facility.list.filterByName')"
+              prepend-inner-icon="mdi-magnify"
               clearable
               density="compact"
               hide-details
@@ -207,6 +208,7 @@
             <v-text-field
               v-model="selectedLocationFilter"
               :placeholder="t('facility.list.filterByLocation')"
+              prepend-inner-icon="mdi-magnify"
               clearable
               density="compact"
               hide-details

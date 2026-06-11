@@ -1,5 +1,5 @@
 import type { FacilityVehicleJson } from './facility-vehicle-json';
-import type { FacilityVehicleCommand } from '@/adapter/http/dto/algorithm/facility-vehicle-command';
+import type { FacilityVehicleCommand } from '@/adapter/http/request/algorithm/facility-vehicle-command';
 import type { CreateAlgorithmCommand } from '@/application/model/algorithm-management/create-algorithm/create-algorithm-command';
 
 /**
