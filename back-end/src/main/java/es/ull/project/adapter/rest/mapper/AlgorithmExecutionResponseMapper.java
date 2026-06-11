@@ -35,6 +35,9 @@ public class AlgorithmExecutionResponseMapper {
                 .toList();
         responseBody.numberOfDays = result.getNumberOfDays();
         responseBody.averagePickupTimeMinutes = result.getAveragePickupTimeMinutes();
+        responseBody.collectionStartTime = result.getCollectionStartTime();
+        responseBody.averageTransferTimeMinutes = result.getAverageTransferTimeMinutes();
+        responseBody.greedyWeights = result.getGreedyWeights();
         return responseBody;
     }
 

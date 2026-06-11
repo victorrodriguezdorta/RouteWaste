@@ -8,6 +8,9 @@ import es.ull.project.domain.enumerate.InfrastructurePlanStatus;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
@@ -96,6 +99,21 @@ public class InfrastructurePlanResponseBody {
      * Average pickup time in minutes
      */
     public AveragePickupTimeMinutes averagePickupTimeMinutes;
+
+    /**
+     * Time of day when the collection journey starts
+     */
+    public CollectionStartTime collectionStartTime;
+
+    /**
+     * Average travelling time, in minutes, between two points
+     */
+    public AverageTransferTimeMinutes averageTransferTimeMinutes;
+
+    /**
+     * Weights applied to the greedy container selection score (distance vs. fill)
+     */
+    public GreedyWeights greedyWeights;
 
     /**
      * Timestamp when the algorithm execution was performed (ISO 8601)

@@ -50,6 +50,9 @@ import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;
 import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;
@@ -158,6 +161,9 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
         InfrastructurePlan pending = pendingService.createPending(
                 new NumberOfDays(7),
                 new AveragePickupTimeMinutes(15),
+                CollectionStartTime.fromString("08:00"),
+                new AverageTransferTimeMinutes(10),
+                GreedyWeights.defaultWeights(),
                 new MaximumBudget(1_000_000.0),
                 new AlgorithmJsonPayload(requestSnap));
         UUID pendingId = pending.getId();
@@ -194,6 +200,9 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
         InfrastructurePlan pending = pendingService.createPending(
                 new NumberOfDays(2),
                 new AveragePickupTimeMinutes(10),
+                CollectionStartTime.fromString("08:00"),
+                new AverageTransferTimeMinutes(10),
+                GreedyWeights.defaultWeights(),
                 new MaximumBudget(1000.0),
                 null);
 

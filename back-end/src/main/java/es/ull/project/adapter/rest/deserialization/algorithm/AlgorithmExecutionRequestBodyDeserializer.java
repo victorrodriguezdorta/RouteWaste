@@ -10,6 +10,9 @@ import es.ull.project.adapter.rest.exception.ValidationException;
 import es.ull.project.adapter.rest.request.algorithm.AlgorithmExecutionRequestBody;
 import es.ull.project.adapter.rest.request.algorithm.FacilityVehiclesSelectionRequestBody;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.Currency;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
@@ -28,6 +31,10 @@ public class AlgorithmExecutionRequestBodyDeserializer extends JsonDeserializer<
     private static final String FIELD_SELECTED_CONTAINER_IDS = "selectedContainerIds";
     private static final String FIELD_NUMBER_OF_DAYS = "numberOfDays";
     private static final String FIELD_AVERAGE_PICKUP_TIME_MINUTES = "averagePickupTimeMinutes";
+    private static final String FIELD_COLLECTION_START_TIME = "collectionStartTime";
+    private static final String FIELD_AVERAGE_TRANSFER_TIME_MINUTES = "averageTransferTimeMinutes";
+    private static final String FIELD_DISTANCE_WEIGHT = "distanceWeight";
+    private static final String FIELD_FILL_WEIGHT = "fillWeight";
 
     /**
      * Deserializes JSON content into an AlgorithmExecutionRequestBody.
@@ -47,6 +54,9 @@ public class AlgorithmExecutionRequestBodyDeserializer extends JsonDeserializer<
         List<UUID> selectedContainerIds = parseSelectedContainerIds(rootNode, errors);
         NumberOfDays numberOfDays = parseNumberOfDays(rootNode, errors);
         AveragePickupTimeMinutes averagePickupTimeMinutes = parseAveragePickupTimeMinutes(rootNode, errors);
+        CollectionStartTime collectionStartTime = parseCollectionStartTime(rootNode, errors);
+        AverageTransferTimeMinutes averageTransferTimeMinutes = parseAverageTransferTimeMinutes(rootNode, errors);
+        GreedyWeights greedyWeights = parseGreedyWeights(rootNode, errors);
         MaximumBudget maxBudget = parseMaximumBudget(rootNode, errors);
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
@@ -56,6 +66,9 @@ public class AlgorithmExecutionRequestBodyDeserializer extends JsonDeserializer<
         requestBody.selectedContainerIds = selectedContainerIds;
         requestBody.numberOfDays = numberOfDays;
         requestBody.averagePickupTimeMinutes = averagePickupTimeMinutes;
+        requestBody.collectionStartTime = collectionStartTime;
+        requestBody.averageTransferTimeMinutes = averageTransferTimeMinutes;
+        requestBody.greedyWeights = greedyWeights;
         requestBody.maxBudget = maxBudget;
         return requestBody;
     }
@@ -150,6 +163,77 @@ public class AlgorithmExecutionRequestBodyDeserializer extends JsonDeserializer<
             return new AveragePickupTimeMinutes(rootNode.get(FIELD_AVERAGE_PICKUP_TIME_MINUTES).asInt());
         } catch (IllegalArgumentException e) {
             errors.add(new FieldError(FIELD_AVERAGE_PICKUP_TIME_MINUTES, e.getMessage()));
+            return null;
+        }
+    }
+
+    /**
+     * Parses the optional collection start time ("HH:mm").
+     *
+     * @param rootNode the root JSON node
+     * @param errors validation errors collected during parsing
+     * @return parsed collection start time, or null when absent or invalid
+     */
+    private CollectionStartTime parseCollectionStartTime(JsonNode rootNode, List<FieldError> errors) {
+        if (!rootNode.has(FIELD_COLLECTION_START_TIME) || rootNode.get(FIELD_COLLECTION_START_TIME).isNull()) {
+            return null;
+        }
+        try {
+            return CollectionStartTime.fromString(rootNode.get(FIELD_COLLECTION_START_TIME).asText());
+        } catch (IllegalArgumentException e) {
+            errors.add(new FieldError(FIELD_COLLECTION_START_TIME, e.getMessage()));
+            return null;
+        }
+    }
+
+    /**
+     * Parses the optional average transfer time in minutes.
+     *
+     * @param rootNode the root JSON node
+     * @param errors validation errors collected during parsing
+     * @return parsed average transfer time, or null when absent or invalid
+     */
+    private AverageTransferTimeMinutes parseAverageTransferTimeMinutes(JsonNode rootNode, List<FieldError> errors) {
+        if (!rootNode.has(FIELD_AVERAGE_TRANSFER_TIME_MINUTES)
+                || rootNode.get(FIELD_AVERAGE_TRANSFER_TIME_MINUTES).isNull()) {
+            return null;
+        }
+        try {
+            return new AverageTransferTimeMinutes(rootNode.get(FIELD_AVERAGE_TRANSFER_TIME_MINUTES).asInt());
+        } catch (IllegalArgumentException e) {
+            errors.add(new FieldError(FIELD_AVERAGE_TRANSFER_TIME_MINUTES, e.getMessage()));
+            return null;
+        }
+    }
+
+    /**
+     * Parses the optional greedy weights (distance and fill).
+     * Both weights are required together; when neither is present the value is left null.
+     *
+     * @param rootNode the root JSON node
+     * @param errors validation errors collected during parsing
+     * @return parsed greedy weights, or null when absent or invalid
+     */
+    private GreedyWeights parseGreedyWeights(JsonNode rootNode, List<FieldError> errors) {
+        boolean hasDistance = rootNode.has(FIELD_DISTANCE_WEIGHT) && !rootNode.get(FIELD_DISTANCE_WEIGHT).isNull();
+        boolean hasFill = rootNode.has(FIELD_FILL_WEIGHT) && !rootNode.get(FIELD_FILL_WEIGHT).isNull();
+        if (!hasDistance && !hasFill) {
+            return null;
+        }
+        if (!hasDistance) {
+            errors.add(new FieldError(FIELD_DISTANCE_WEIGHT, "Field is required when fillWeight is provided"));
+            return null;
+        }
+        if (!hasFill) {
+            errors.add(new FieldError(FIELD_FILL_WEIGHT, "Field is required when distanceWeight is provided"));
+            return null;
+        }
+        try {
+            return new GreedyWeights(
+                    rootNode.get(FIELD_DISTANCE_WEIGHT).asDouble(),
+                    rootNode.get(FIELD_FILL_WEIGHT).asDouble());
+        } catch (IllegalArgumentException e) {
+            errors.add(new FieldError(FIELD_DISTANCE_WEIGHT, e.getMessage()));
             return null;
         }
     }

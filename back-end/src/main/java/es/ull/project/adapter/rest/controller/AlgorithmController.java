@@ -16,6 +16,9 @@ import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 
@@ -67,6 +70,9 @@ public class AlgorithmController {
     private static final String FIELD_FACILITY_ID = "facilityId";
     private static final String DEFAULT_BUDGET = "1.7976931348623157E308";
     private static final String EMPTY_STRING = "";
+    private static final int DEFAULT_COLLECTION_START_HOUR = 8;
+    private static final int DEFAULT_COLLECTION_START_MINUTE = 0;
+    private static final int DEFAULT_AVERAGE_TRANSFER_TIME_MINUTES = 0;
 
     @Autowired
     private ExecuteAlgorithmUseCase executeAlgorithmUseCase;
@@ -115,6 +121,16 @@ public class AlgorithmController {
         NumberOfDays numberOfDaysVo = this.requireNonNull(requestBody.numberOfDays, FIELD_NUMBER_OF_DAYS);
         AveragePickupTimeMinutes averagePickupTimeMinutesVo =
                 this.requireNonNull(requestBody.averagePickupTimeMinutes, FIELD_AVERAGE_PICKUP);
+        CollectionStartTime collectionStartTimeVo = requestBody.collectionStartTime != null
+                ? requestBody.collectionStartTime
+                : new CollectionStartTime(
+                        java.time.LocalTime.of(DEFAULT_COLLECTION_START_HOUR, DEFAULT_COLLECTION_START_MINUTE));
+        AverageTransferTimeMinutes averageTransferTimeMinutesVo = requestBody.averageTransferTimeMinutes != null
+                ? requestBody.averageTransferTimeMinutes
+                : new AverageTransferTimeMinutes(DEFAULT_AVERAGE_TRANSFER_TIME_MINUTES);
+        GreedyWeights greedyWeightsVo = requestBody.greedyWeights != null
+                ? requestBody.greedyWeights
+                : GreedyWeights.defaultWeights();
         MaximumBudget effectiveMaxBudget = requestBody.maxBudget != null
                 ? requestBody.maxBudget
                 : new MaximumBudget(Double.parseDouble(DEFAULT_BUDGET));
@@ -122,7 +138,10 @@ public class AlgorithmController {
                 facilitiesWithVehicles,
                 selectedContainerIds,
                 numberOfDaysVo,
-                averagePickupTimeMinutesVo);
+                averagePickupTimeMinutesVo,
+                collectionStartTimeVo,
+                averageTransferTimeMinutesVo,
+                greedyWeightsVo);
         AlgorithmJsonPayload executionRequestJson;
         try {
             executionRequestJson = new AlgorithmJsonPayload(this.objectMapper.writeValueAsString(requestBody));
@@ -136,6 +155,9 @@ public class AlgorithmController {
         InfrastructurePlan pendingPlan = this.createPendingInfrastructurePlanUseCase.createPending(
                 numberOfDaysVo,
                 averagePickupTimeMinutesVo,
+                collectionStartTimeVo,
+                averageTransferTimeMinutesVo,
+                greedyWeightsVo,
                 effectiveMaxBudget,
                 executionRequestJson);
         AlgorithmExecutionJobCommand jobCommand = new AlgorithmExecutionJobCommand(
@@ -144,6 +166,9 @@ public class AlgorithmController {
                 selectedContainerIds,
                 numberOfDaysVo,
                 averagePickupTimeMinutesVo,
+                collectionStartTimeVo,
+                averageTransferTimeMinutesVo,
+                greedyWeightsVo,
                 effectiveMaxBudget,
                 executionRequestJson);
         this.runAlgorithmExecutionJobAsyncUseCase.runAsync(jobCommand);

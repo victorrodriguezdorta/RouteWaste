@@ -28,6 +28,27 @@ export class AlgorithmExecutionRequestJson {
    * Average pickup time in minutes for collecting a container
    */
   averagePickupTimeMinutes: number;
+
+  /**
+   * Time when the collection workday starts, expressed as "HH:mm"
+   */
+  collectionStartTime: string;
+
+  /**
+   * Average time in minutes a vehicle takes to move between two points
+   */
+  averageTransferTimeMinutes: number;
+
+  /**
+   * Greedy scoring weight for the distance component
+   */
+  distanceWeight: number;
+
+  /**
+   * Greedy scoring weight for the fill component
+   */
+  fillWeight: number;
+
   /**
    * Optional maximum budget to send to backend
    */
@@ -40,13 +61,21 @@ export class AlgorithmExecutionRequestJson {
     facilitiesWithVehicles: FacilityVehicleJson[],
     selectedContainerIds: string[],
     numberOfDays: number,
-    averagePickupTimeMinutes: number
-    , maxBudget?: { amount: number; currency: string }
+    averagePickupTimeMinutes: number,
+    collectionStartTime: string,
+    averageTransferTimeMinutes: number,
+    distanceWeight: number,
+    fillWeight: number,
+    maxBudget?: { amount: number; currency: string }
   ) {
     this.facilitiesWithVehicles = facilitiesWithVehicles;
     this.selectedContainerIds = selectedContainerIds;
     this.numberOfDays = numberOfDays;
     this.averagePickupTimeMinutes = averagePickupTimeMinutes;
+    this.collectionStartTime = collectionStartTime;
+    this.averageTransferTimeMinutes = averageTransferTimeMinutes;
+    this.distanceWeight = distanceWeight;
+    this.fillWeight = fillWeight;
     this.maxBudget = maxBudget;
   }
 
@@ -73,6 +102,10 @@ export class AlgorithmExecutionRequestJson {
       selectedContainerIds,
       data.numberOfDays,
       data.averagePickupTimeMinutes,
+      data.collectionStartTime,
+      data.averageTransferTimeMinutes,
+      data.greedyWeights.distanceWeight,
+      data.greedyWeights.fillWeight,
       maxBudget
     );
   }

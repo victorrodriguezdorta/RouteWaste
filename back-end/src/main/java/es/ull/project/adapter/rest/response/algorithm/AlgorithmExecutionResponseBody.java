@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
 import es.ull.project.adapter.rest.serialization.algorithm.AlgorithmExecutionResponseBodySerializer;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import java.util.List;
@@ -36,6 +39,21 @@ public class AlgorithmExecutionResponseBody {
      * Average pickup time received in the request.
      */
     public AveragePickupTimeMinutes averagePickupTimeMinutes;
+
+    /**
+     * Time of day when the collection journey starts.
+     */
+    public CollectionStartTime collectionStartTime;
+
+    /**
+     * Average travelling time between points received in the request.
+     */
+    public AverageTransferTimeMinutes averageTransferTimeMinutes;
+
+    /**
+     * Weights applied to the greedy selection score received in the request.
+     */
+    public GreedyWeights greedyWeights;
 
     /**
      * Optional maximum budget included in the processed payload.

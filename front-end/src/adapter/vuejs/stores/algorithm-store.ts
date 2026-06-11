@@ -57,10 +57,21 @@ export const useAlgorithmStore = defineStore('Algorithm', {
       numberOfDays: 7,
       averagePickupTimeMinutes: 15,
       maxBudgetAmount: 100,
+      // Time when the collection workday starts, expressed as "HH:mm".
+      collectionStartTime: '08:00',
+      // Average time (in minutes) a vehicle takes to move between two points.
+      averageTransferTimeMinutes: 10,
+      // Greedy scoring weights used by the algorithm; both must add up to 1.
+      distanceWeight: 0.40,
+      fillWeight: 0.60,
     } as {
       numberOfDays: number;
       averagePickupTimeMinutes: number;
       maxBudgetAmount: number;
+      collectionStartTime: string;
+      averageTransferTimeMinutes: number;
+      distanceWeight: number;
+      fillWeight: number;
     },
 
     /**
@@ -116,12 +127,23 @@ export const useAlgorithmStore = defineStore('Algorithm', {
      * @returns Boolean indicating if the form is ready to submit
      */
     isFormValid: (state) => {
+      const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+      const weightsSum = state.extraData.distanceWeight + state.extraData.fillWeight;
+      const weightsAreValid =
+        state.extraData.distanceWeight >= 0 &&
+        state.extraData.distanceWeight <= 1 &&
+        state.extraData.fillWeight >= 0 &&
+        state.extraData.fillWeight <= 1 &&
+        Math.abs(weightsSum - 1) < 0.000001;
       return (
         state.facilitiesWithVehicles.length > 0 &&
         state.facilitiesWithVehicles.every(f => f.selectedVehicleIds.length > 0) &&
         state.selectedContainerIds.length > 0 &&
         state.extraData.numberOfDays > 0 &&
-        state.extraData.averagePickupTimeMinutes > 0
+        state.extraData.averagePickupTimeMinutes > 0 &&
+        timePattern.test(state.extraData.collectionStartTime) &&
+        state.extraData.averageTransferTimeMinutes >= 0 &&
+        weightsAreValid
       );
     },
 
@@ -218,19 +240,44 @@ export const useAlgorithmStore = defineStore('Algorithm', {
      * @param averagePickupTimeMinutes Average pickup time in minutes
      */
     setExtraData(numberOfDays: number, averagePickupTimeMinutes: number) {
+      // Preserve the remaining extra data fields when updating only these two
       this.extraData = {
+        ...this.extraData,
         numberOfDays,
         averagePickupTimeMinutes,
-        maxBudgetAmount: this.extraData?.maxBudgetAmount ?? 100,
       };
     },
 
     setMaxBudgetAmount(amount: number) {
       // Preserve other extraData fields when updating only the budget
       this.extraData = {
-        numberOfDays: this.extraData.numberOfDays,
-        averagePickupTimeMinutes: this.extraData.averagePickupTimeMinutes,
+        ...this.extraData,
         maxBudgetAmount: amount,
+      };
+    },
+
+    setCollectionStartTime(collectionStartTime: string) {
+      // Preserve other extraData fields when updating only the start time
+      this.extraData = {
+        ...this.extraData,
+        collectionStartTime,
+      };
+    },
+
+    setAverageTransferTimeMinutes(averageTransferTimeMinutes: number) {
+      // Preserve other extraData fields when updating only the transfer time
+      this.extraData = {
+        ...this.extraData,
+        averageTransferTimeMinutes,
+      };
+    },
+
+    setGreedyWeights(distanceWeight: number, fillWeight: number) {
+      // Preserve other extraData fields when updating only the greedy weights
+      this.extraData = {
+        ...this.extraData,
+        distanceWeight,
+        fillWeight,
       };
     },
 
@@ -268,6 +315,12 @@ export const useAlgorithmStore = defineStore('Algorithm', {
         selectedContainerIds: this.selectedContainerIds.map(c => new UllUUID(c)),
         numberOfDays: this.extraData.numberOfDays,
         averagePickupTimeMinutes: this.extraData.averagePickupTimeMinutes,
+        collectionStartTime: this.extraData.collectionStartTime,
+        averageTransferTimeMinutes: this.extraData.averageTransferTimeMinutes,
+        greedyWeights: {
+          distanceWeight: this.extraData.distanceWeight,
+          fillWeight: this.extraData.fillWeight,
+        },
         maxBudget: {
           amount: this.extraData.maxBudgetAmount,
           currency: 'EUR',
@@ -329,6 +382,10 @@ export const useAlgorithmStore = defineStore('Algorithm', {
         numberOfDays: 7,
         averagePickupTimeMinutes: 15,
         maxBudgetAmount: 100,
+        collectionStartTime: '08:00',
+        averageTransferTimeMinutes: 10,
+        distanceWeight: 0.40,
+        fillWeight: 0.60,
       };
       this.executionResult = undefined;
     },
@@ -405,6 +462,30 @@ export const useAlgorithmStore = defineStore('Algorithm', {
       this.setFacilitiesWithVehicles(facilities);
       this.setSelectedContainers(selectedContainerIds);
       this.setExtraData(numberOfDays, averagePickupTimeMinutes);
+
+      const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+      if (typeof root.collectionStartTime === 'string' && timePattern.test(root.collectionStartTime)) {
+        this.setCollectionStartTime(root.collectionStartTime);
+      }
+
+      if (
+        typeof root.averageTransferTimeMinutes === 'number' &&
+        Number.isFinite(root.averageTransferTimeMinutes) &&
+        root.averageTransferTimeMinutes >= 0
+      ) {
+        this.setAverageTransferTimeMinutes(Math.floor(root.averageTransferTimeMinutes));
+      }
+
+      const distanceWeight = root.distanceWeight;
+      const fillWeight = root.fillWeight;
+      if (
+        typeof distanceWeight === 'number' &&
+        Number.isFinite(distanceWeight) &&
+        typeof fillWeight === 'number' &&
+        Number.isFinite(fillWeight)
+      ) {
+        this.setGreedyWeights(distanceWeight, fillWeight);
+      }
 
       const maxBudget = root.maxBudget;
       if (maxBudget && typeof maxBudget === 'object') {

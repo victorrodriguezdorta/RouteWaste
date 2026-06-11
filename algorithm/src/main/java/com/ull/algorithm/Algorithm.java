@@ -13,6 +13,7 @@ import com.ull.domain.entity.FacilityWithVehicles;
 import com.ull.domain.entity.Vehicle;
 import com.ull.domain.enumerate.ContainerStatus;
 import com.ull.domain.enumerate.WasteType;
+import com.ull.domain.valueobject.algorithm.GreedyWeights;
 import com.ull.domain.valueobject.converter.WasteVolumeToMassConverter;
 
 import java.time.LocalDate;
@@ -41,12 +42,12 @@ public class Algorithm {
   private static final double EPSILON = 0.000001;
   private static final int MAX_FACILITY_VISITS = 3;
   private static final int MIN_NUMBER_OF_DAYS = 1;
-  private static final double DISTANCE_WEIGHT = 0.40;
-  private static final double FILL_WEIGHT = 0.60;
   private static final double OVERFLOW_SCORE_BONUS = 1.5;
   private static final double FULL_FILL_PERCENTAGE = 100.0;
 
   private final DeliveryPlanningProblem problem;
+  /** Weights applied to the greedy selection score, taken from the problem request. */
+  private final GreedyWeights greedyWeights;
   /**
    * Mixed-purpose state map used during the simulation:
    * - key = "containerId" stores the pending liters that still need collection
@@ -64,6 +65,9 @@ public class Algorithm {
       throw new IllegalArgumentException(PROBLEM_NOT_DEFINED);
     }
     this.problem = problem;
+    this.greedyWeights = problem.getGreedyWeights() != null
+        ? problem.getGreedyWeights()
+        : GreedyWeights.defaultWeights();
     this.containerDailyState = new HashMap<>();
   }
 
@@ -576,7 +580,8 @@ public class Algorithm {
       double maxFillPercentage) {
     double normalizedDistance = maxDistance > EPSILON ? distance / maxDistance : 0.0;
     double normalizedFill = maxFillPercentage > EPSILON ? fillPercentage / maxFillPercentage : 0.0;
-    double score = DISTANCE_WEIGHT * normalizedDistance - FILL_WEIGHT * normalizedFill;
+    double score = this.greedyWeights.getDistanceWeight() * normalizedDistance
+        - this.greedyWeights.getFillWeight() * normalizedFill;
     if (fillPercentage > FULL_FILL_PERCENTAGE) {
       score -= OVERFLOW_SCORE_BONUS;
     }

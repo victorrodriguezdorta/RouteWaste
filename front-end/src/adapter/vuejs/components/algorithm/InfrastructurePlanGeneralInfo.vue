@@ -263,6 +263,9 @@ const generalInfo = computed(() => {
     estimatedTotalCostCurrency: plan?.metrics.estimatedTotalCost.getCurrency().getCode(),
     maxBudgetAmount: plan?.metrics.maxBudget.getAmount(),
     maxBudgetCurrency: plan?.metrics.maxBudget.getCurrency().getCode(),
+    collectionStartTime: plan?.collectionStartTime ?? undefined,
+    averageTransferTimeMinutes: plan?.averageTransferTimeMinutes ?? undefined,
+    greedyWeights: plan?.greedyWeights ?? undefined,
   };
 });
 
@@ -349,6 +352,21 @@ const compactStats = computed<CompactStat[]>(() => {
       key: 'pickup',
       label: t('infrastructurePlan.show.generalInfo.fields.averagePickupTimeMinutes'),
       value: formatNumber(info.averagePickupTimeMinutes, 'min'),
+    },
+    {
+      key: 'collectionStartTime',
+      label: t('infrastructurePlan.show.generalInfo.fields.collectionStartTime'),
+      value: info.collectionStartTime ?? '-',
+    },
+    {
+      key: 'averageTransferTime',
+      label: t('infrastructurePlan.show.generalInfo.fields.averageTransferTimeMinutes'),
+      value: formatNumber(info.averageTransferTimeMinutes, 'min'),
+    },
+    {
+      key: 'greedyWeights',
+      label: t('infrastructurePlan.show.generalInfo.fields.greedyWeights'),
+      value: formatGreedyWeights(info.greedyWeights),
     },
     {
       key: 'cost',
@@ -675,6 +693,17 @@ function formatDateTime(value: string | undefined): string {
 function formatNumber(value: number | undefined, unit: string): string {
   if (typeof value !== 'number') return '-';
   return `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })} ${unit}`;
+}
+
+function formatGreedyWeights(
+  weights: { distanceWeight: number; fillWeight: number } | undefined,
+): string {
+  if (!weights) return '-';
+  const distanceLabel = t('infrastructurePlan.show.generalInfo.fields.distanceWeight');
+  const fillLabel = t('infrastructurePlan.show.generalInfo.fields.fillWeight');
+  const distance = weights.distanceWeight.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  const fill = weights.fillWeight.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  return `${distanceLabel} ${distance} / ${fillLabel} ${fill}`;
 }
 
 function formatMoney(amount: number | undefined, currency: string | undefined): string {

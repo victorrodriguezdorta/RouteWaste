@@ -8,6 +8,14 @@ import type { InfrastructurePlanValidityState } from '@/domain/enumerate/infrast
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
 
 /**
+ * Greedy scoring weights for distance and fill used by the algorithm execution.
+ */
+export interface InfrastructurePlanGreedyWeights {
+  distanceWeight: number;
+  fillWeight: number;
+}
+
+/**
  * Read-only infrastructure plan detail consumed by the views.
  */
 export class InfrastructurePlanDetail {
@@ -24,6 +32,9 @@ export class InfrastructurePlanDetail {
     public readonly executionState: InfrastructurePlanExecutionState,
     public readonly failureReason: string | null,
     public readonly executionRequestJson: string | null,
+    public readonly collectionStartTime: string | null = null,
+    public readonly averageTransferTimeMinutes: number | null = null,
+    public readonly greedyWeights: InfrastructurePlanGreedyWeights | null = null,
   ) {}
 
   /**

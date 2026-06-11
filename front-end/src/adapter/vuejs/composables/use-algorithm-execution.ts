@@ -689,12 +689,66 @@ export function useAlgorithmExecution() {
     }
   });
 
+  const collectionStartTimeRef = computed({
+    get: () => algorithmStore.extraData.collectionStartTime,
+    set: (value: string) => {
+      algorithmStore.setCollectionStartTime(value);
+    }
+  });
+
+  const averageTransferTimeMinutesRef = computed({
+    get: () => algorithmStore.extraData.averageTransferTimeMinutes,
+    set: (value: number) => {
+      algorithmStore.setAverageTransferTimeMinutes(value);
+    }
+  });
+
+  const distanceWeightRef = computed({
+    get: () => algorithmStore.extraData.distanceWeight,
+    set: (value: number) => {
+      algorithmStore.setGreedyWeights(value, algorithmStore.extraData.fillWeight);
+    }
+  });
+
+  const fillWeightRef = computed({
+    get: () => algorithmStore.extraData.fillWeight,
+    set: (value: number) => {
+      algorithmStore.setGreedyWeights(algorithmStore.extraData.distanceWeight, value);
+    }
+  });
+
+  /**
+   * Time format validation for the collection start time ("HH:mm")
+   */
+  const isCollectionStartTimeValid = computed(() => {
+    const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+    return timePattern.test(algorithmStore.extraData.collectionStartTime);
+  });
+
+  /**
+   * Greedy weights are valid when both are within [0, 1] and add up to 1
+   */
+  const areGreedyWeightsValid = computed(() => {
+    const distanceWeight = algorithmStore.extraData.distanceWeight;
+    const fillWeight = algorithmStore.extraData.fillWeight;
+    return (
+      distanceWeight >= 0 &&
+      distanceWeight <= 1 &&
+      fillWeight >= 0 &&
+      fillWeight <= 1 &&
+      Math.abs(distanceWeight + fillWeight - 1) < 0.000001
+    );
+  });
+
   /**
    * Validate that step 3 has valid extra data
    */
   const isStep3Valid = computed(() => {
-    return algorithmStore.extraData.numberOfDays > 0 && 
-           algorithmStore.extraData.averagePickupTimeMinutes > 0;
+    return algorithmStore.extraData.numberOfDays > 0 &&
+           algorithmStore.extraData.averagePickupTimeMinutes > 0 &&
+           isCollectionStartTimeValid.value &&
+           algorithmStore.extraData.averageTransferTimeMinutes >= 0 &&
+           areGreedyWeightsValid.value;
   });
 
   /**
@@ -911,6 +965,12 @@ export function useAlgorithmExecution() {
     numberOfDaysRef,
     averagePickupTimeMinutesRef,
     maxBudgetAmountRef,
+    collectionStartTimeRef,
+    averageTransferTimeMinutesRef,
+    distanceWeightRef,
+    fillWeightRef,
+    isCollectionStartTimeValid,
+    areGreedyWeightsValid,
     isStep3Valid,
     
     // Methods - Step 2

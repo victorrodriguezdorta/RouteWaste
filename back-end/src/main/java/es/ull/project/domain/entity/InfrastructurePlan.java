@@ -4,6 +4,9 @@ import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
@@ -118,6 +121,24 @@ public class InfrastructurePlan {
     private AveragePickupTimeMinutes averagePickupTimeMinutes;
 
     /**
+     * Time of day when the collection journey starts.
+     * It is an optional attribute.
+     */
+    private CollectionStartTime collectionStartTime;
+
+    /**
+     * Average travelling time, in minutes, between two points.
+     * It is an optional attribute.
+     */
+    private AverageTransferTimeMinutes averageTransferTimeMinutes;
+
+    /**
+     * Weights applied to the greedy container selection score (distance vs. fill).
+     * It is an optional attribute.
+     */
+    private GreedyWeights greedyWeights;
+
+    /**
      * Timestamp when the algorithm execution was performed (ISO 8601 format).
      * It is an optional attribute.
      */
@@ -197,6 +218,9 @@ public class InfrastructurePlan {
         this.executionState = executionState;
         this.failureReason = null;
         this.executionRequestJson = null;
+        this.collectionStartTime = null;
+        this.averageTransferTimeMinutes = null;
+        this.greedyWeights = null;
     }
 
     /**
@@ -225,6 +249,9 @@ public class InfrastructurePlan {
         this.executionState = otherObject.executionState;
         this.failureReason = otherObject.failureReason;
         this.executionRequestJson = otherObject.executionRequestJson;
+        this.collectionStartTime = otherObject.collectionStartTime;
+        this.averageTransferTimeMinutes = otherObject.averageTransferTimeMinutes;
+        this.greedyWeights = otherObject.greedyWeights;
     }
 
     /**
@@ -723,6 +750,33 @@ public class InfrastructurePlan {
     }
 
     /**
+     * Returns the time of day when the collection journey starts.
+     *
+     * @return optional collection start time
+     */
+    public Optional<CollectionStartTime> getCollectionStartTime() {
+        return Optional.ofNullable(collectionStartTime);
+    }
+
+    /**
+     * Returns the average travelling time, in minutes, between two points.
+     *
+     * @return optional average transfer time in minutes
+     */
+    public Optional<AverageTransferTimeMinutes> getAverageTransferTimeMinutes() {
+        return Optional.ofNullable(averageTransferTimeMinutes);
+    }
+
+    /**
+     * Returns the weights applied to the greedy container selection score.
+     *
+     * @return optional greedy scoring weights
+     */
+    public Optional<GreedyWeights> getGreedyWeights() {
+        return Optional.ofNullable(greedyWeights);
+    }
+
+    /**
      * Returns the timestamp when the algorithm was executed.
      *
      * @return the execution timestamp in ISO 8601 format
@@ -817,6 +871,23 @@ public class InfrastructurePlan {
      */
     public void assignExecutionRequestSnapshot(String json) {
         this.executionRequestJson = json != null && !json.isBlank() ? new AlgorithmJsonPayload(json) : null;
+    }
+
+    /**
+     * Assigns the extra execution parameters provided by the client request: the collection
+     * start time, the average transfer time and the greedy scoring weights.
+     *
+     * @param collectionStartTime        time of day when the collection journey starts
+     * @param averageTransferTimeMinutes average travelling time between points in minutes
+     * @param greedyWeights              weights applied to the greedy selection score
+     */
+    public void assignExecutionParameters(
+            CollectionStartTime collectionStartTime,
+            AverageTransferTimeMinutes averageTransferTimeMinutes,
+            GreedyWeights greedyWeights) {
+        this.collectionStartTime = collectionStartTime;
+        this.averageTransferTimeMinutes = averageTransferTimeMinutes;
+        this.greedyWeights = greedyWeights;
     }
 
     /**

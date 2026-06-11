@@ -1,6 +1,9 @@
 package es.ull.project.adapter.rest.request.algorithm;
 
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import java.util.List;
@@ -33,6 +36,21 @@ public class AlgorithmExecutionRequestBody {
      * Average pickup time in minutes.
      */
     public AveragePickupTimeMinutes averagePickupTimeMinutes;
+
+    /**
+     * Time of day when the collection journey starts.
+     */
+    public CollectionStartTime collectionStartTime;
+
+    /**
+     * Average travelling time in minutes between two points.
+     */
+    public AverageTransferTimeMinutes averageTransferTimeMinutes;
+
+    /**
+     * Weights applied to the greedy container selection score (distance vs. fill).
+     */
+    public GreedyWeights greedyWeights;
 
     /**
      * Optional maximum budget to be provided to the algorithm.

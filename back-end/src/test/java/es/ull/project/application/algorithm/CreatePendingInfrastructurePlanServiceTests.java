@@ -15,8 +15,12 @@ import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
+import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -39,6 +43,9 @@ class CreatePendingInfrastructurePlanServiceTests {
         InfrastructurePlan plan = service.createPending(
                 new NumberOfDays(3),
                 new AveragePickupTimeMinutes(20),
+                new CollectionStartTime(LocalTime.of(8, 0)),
+                new AverageTransferTimeMinutes(10),
+                GreedyWeights.defaultWeights(),
                 new MaximumBudget(50_000.0),
                 new AlgorithmJsonPayload(requestJson));
 
@@ -48,6 +55,9 @@ class CreatePendingInfrastructurePlanServiceTests {
         assertEquals(InfrastructurePlanValidityState.RUNNING, plan.getValidityState());
         assertEquals(new NumberOfDays(3), plan.getNumberOfDays().orElseThrow());
         assertEquals(new AveragePickupTimeMinutes(20), plan.getAveragePickupTimeMinutes().orElseThrow());
+        assertEquals(new CollectionStartTime(LocalTime.of(8, 0)), plan.getCollectionStartTime().orElseThrow());
+        assertEquals(new AverageTransferTimeMinutes(10), plan.getAverageTransferTimeMinutes().orElseThrow());
+        assertEquals(GreedyWeights.defaultWeights(), plan.getGreedyWeights().orElseThrow());
         assertEquals(requestJson, plan.getExecutionRequestJson().orElseThrow());
         assertTrue(plan.getExecutedAt().isPresent());
         assertEquals(0, plan.getSelectedFacilities().size());
@@ -68,6 +78,9 @@ class CreatePendingInfrastructurePlanServiceTests {
                 () -> service.createPending(
                         new NumberOfDays(1),
                         new AveragePickupTimeMinutes(10),
+                        new CollectionStartTime(LocalTime.of(8, 0)),
+                        new AverageTransferTimeMinutes(10),
+                        GreedyWeights.defaultWeights(),
                         null,
                         null));
     }

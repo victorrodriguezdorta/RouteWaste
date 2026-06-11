@@ -11,6 +11,9 @@ import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -56,6 +59,9 @@ public class ExecuteAlgorithmService implements ExecuteAlgorithmUseCase {
      * @param selectedContainerIds selected container identifiers
      * @param numberOfDays number of planning days
      * @param averagePickupTimeMinutes average pickup time in minutes
+     * @param collectionStartTime time of day when the collection journey starts
+     * @param averageTransferTimeMinutes average travelling time between points in minutes
+     * @param greedyWeights weights applied to the greedy selection score
      * @return processed result with resolved entities
      */
     @Override
@@ -63,7 +69,10 @@ public class ExecuteAlgorithmService implements ExecuteAlgorithmUseCase {
             List<AlgorithmExecutionSelection> facilitiesWithVehicles,
             List<UUID> selectedContainerIds,
             NumberOfDays numberOfDays,
-            AveragePickupTimeMinutes averagePickupTimeMinutes) {
+            AveragePickupTimeMinutes averagePickupTimeMinutes,
+            CollectionStartTime collectionStartTime,
+            AverageTransferTimeMinutes averageTransferTimeMinutes,
+            GreedyWeights greedyWeights) {
         this.validateRequest(facilitiesWithVehicles, selectedContainerIds);
         List<ResolvedFacilityVehiclesSelection> resolvedFacilitiesWithVehicles =
                 facilitiesWithVehicles.stream()
@@ -76,7 +85,10 @@ public class ExecuteAlgorithmService implements ExecuteAlgorithmUseCase {
                 resolvedFacilitiesWithVehicles,
                 resolvedContainers,
                 numberOfDays,
-                averagePickupTimeMinutes);
+                averagePickupTimeMinutes,
+                collectionStartTime,
+                averageTransferTimeMinutes,
+                greedyWeights);
     }
 
     /**

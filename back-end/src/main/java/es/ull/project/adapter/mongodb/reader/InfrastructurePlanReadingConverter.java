@@ -8,6 +8,9 @@ import es.ull.project.domain.entity.ServiceAssignment;
 import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.capacity.CollectedVolumeLiters;
 import es.ull.project.domain.valueobject.capacity.CollectedWeightKilograms;
 import es.ull.project.domain.valueobject.cost.Currency;
@@ -197,6 +200,62 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
             executionRequestJson != null && !executionRequestJson.isBlank() ? new AlgorithmJsonPayload(executionRequestJson) : null,
             containerDailyStates
         );
+        CollectionStartTime collectionStartTime = readCollectionStartTime(document);
+        AverageTransferTimeMinutes averageTransferTimeMinutes = readAverageTransferTimeMinutes(document);
+        GreedyWeights greedyWeights = readGreedyWeights(document);
+        plan.assignExecutionParameters(collectionStartTime, averageTransferTimeMinutes, greedyWeights);
         return plan;
+    }
+
+    /**
+     * Reads the optional collection start time from the document.
+     *
+     * @param document MongoDB document being converted
+     * @return parsed collection start time, or null when absent or malformed
+     */
+    private CollectionStartTime readCollectionStartTime(Document document) {
+        String raw = document.getString(MongoFields.COLLECTION_START_TIME);
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        try {
+            return CollectionStartTime.fromString(raw);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
+    }
+
+    /**
+     * Reads the optional average transfer time from the document.
+     *
+     * @param document MongoDB document being converted
+     * @return parsed average transfer time, or null when absent
+     */
+    private AverageTransferTimeMinutes readAverageTransferTimeMinutes(Document document) {
+        Integer raw = document.getInteger(MongoFields.AVERAGE_TRANSFER_TIME_MINUTES);
+        return raw != null ? new AverageTransferTimeMinutes(raw) : null;
+    }
+
+    /**
+     * Reads the optional greedy weights subdocument from the document.
+     *
+     * @param document MongoDB document being converted
+     * @return parsed greedy weights, or null when absent or invalid
+     */
+    private GreedyWeights readGreedyWeights(Document document) {
+        Document greedyWeightsDocument = document.get(MongoFields.GREEDY_WEIGHTS, Document.class);
+        if (greedyWeightsDocument == null) {
+            return null;
+        }
+        Double distanceWeight = greedyWeightsDocument.getDouble(MongoFields.GREEDY_WEIGHTS_DISTANCE);
+        Double fillWeight = greedyWeightsDocument.getDouble(MongoFields.GREEDY_WEIGHTS_FILL);
+        if (distanceWeight == null || fillWeight == null) {
+            return null;
+        }
+        try {
+            return new GreedyWeights(distanceWeight, fillWeight);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 }

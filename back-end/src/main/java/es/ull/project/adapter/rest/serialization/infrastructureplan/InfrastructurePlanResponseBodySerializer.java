@@ -21,6 +21,11 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
     private static final String FIELD_EXECUTED_AT = "executedAt";
     private static final String FIELD_PERIOD = "period";
     private static final String FIELD_NUMBER_OF_DAYS = "numberOfDays";
+    private static final String FIELD_COLLECTION_START_TIME = "collectionStartTime";
+    private static final String FIELD_AVERAGE_TRANSFER_TIME_MINUTES = "averageTransferTimeMinutes";
+    private static final String FIELD_GREEDY_WEIGHTS = "greedyWeights";
+    private static final String FIELD_DISTANCE_WEIGHT = "distanceWeight";
+    private static final String FIELD_FILL_WEIGHT = "fillWeight";
     private static final String FIELD_METRICS = "metrics";
     private static final String FIELD_TOTAL_COLLECTED_KILOGRAMS = "totalCollectedKilograms";
     private static final String FIELD_TOTAL_COLLECTED_LITERS = "totalCollectedLiters";
@@ -98,6 +103,18 @@ public class InfrastructurePlanResponseBodySerializer extends StdSerializer<Infr
         }
         if (value.numberOfDays != null) {
             gen.writeNumberField(FIELD_NUMBER_OF_DAYS, value.numberOfDays.getValue());
+        }
+        if (value.collectionStartTime != null) {
+            gen.writeStringField(FIELD_COLLECTION_START_TIME, value.collectionStartTime.getFormatted());
+        }
+        if (value.averageTransferTimeMinutes != null) {
+            gen.writeNumberField(FIELD_AVERAGE_TRANSFER_TIME_MINUTES, value.averageTransferTimeMinutes.getValue());
+        }
+        if (value.greedyWeights != null) {
+            gen.writeObjectFieldStart(FIELD_GREEDY_WEIGHTS);
+            gen.writeNumberField(FIELD_DISTANCE_WEIGHT, value.greedyWeights.getDistanceWeight());
+            gen.writeNumberField(FIELD_FILL_WEIGHT, value.greedyWeights.getFillWeight());
+            gen.writeEndObject();
         }
         gen.writeObjectFieldStart(FIELD_METRICS);
         gen.writeNumberField(FIELD_TOTAL_COLLECTED_KILOGRAMS, value.totalCollectedKilograms.getValue());

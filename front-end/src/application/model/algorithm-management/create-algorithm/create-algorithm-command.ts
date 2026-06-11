@@ -27,8 +27,35 @@ export interface CreateAlgorithmCommand {
    * Average pickup time in minutes for collecting a container
    */
   averagePickupTimeMinutes: number;
+
+  /**
+   * Time when the collection workday starts, expressed as "HH:mm"
+   */
+  collectionStartTime: string;
+
+  /**
+   * Average time in minutes a vehicle takes to move between two points
+   */
+  averageTransferTimeMinutes: number;
+
+  /**
+   * Greedy scoring weights for distance and fill used by the algorithm
+   */
+  greedyWeights: AlgorithmGreedyWeightsCommand;
+
   /**
    * Optional maximum budget for the algorithm execution. Currency code expected (e.g., 'EUR').
    */
   maxBudget?: AlgorithmMaxBudgetCommand;
+}
+
+/**
+ * AlgorithmGreedyWeightsCommand
+ *
+ * Distance and fill weights used by the greedy scoring of the algorithm.
+ * Both weights must add up to 1.
+ */
+export interface AlgorithmGreedyWeightsCommand {
+  distanceWeight: number;
+  fillWeight: number;
 }

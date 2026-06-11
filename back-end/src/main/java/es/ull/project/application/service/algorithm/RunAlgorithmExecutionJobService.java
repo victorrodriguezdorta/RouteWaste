@@ -63,7 +63,10 @@ public class RunAlgorithmExecutionJobService implements RunAlgorithmExecutionJob
                     command.facilitiesWithVehicles(),
                     command.selectedContainerIds(),
                     command.numberOfDays(),
-                    command.averagePickupTimeMinutes());
+                    command.averagePickupTimeMinutes(),
+                    command.collectionStartTime(),
+                    command.averageTransferTimeMinutes(),
+                    command.greedyWeights());
             AlgorithmJsonPayload processedJson = this.payloadSerializer.serialize(result, command.maxBudget());
             AlgorithmJsonPayload algorithmJsonPayload = this.runAlgorithmUseCase.execute(processedJson);
             InfrastructurePlan completedPlan = this.persistAlgorithmExecutionResultUseCase.complete(

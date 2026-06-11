@@ -106,6 +106,11 @@ public class MongoFields {
     public static final String TOTAL_DISTANCE_METERS = "totalDistanceMeters";
     public static final String NUMBER_OF_DAYS = "numberOfDays";
     public static final String AVERAGE_PICKUP_TIME_MINUTES = "averagePickupTimeMinutes";
+    public static final String COLLECTION_START_TIME = "collectionStartTime";
+    public static final String AVERAGE_TRANSFER_TIME_MINUTES = "averageTransferTimeMinutes";
+    public static final String GREEDY_WEIGHTS = "greedyWeights";
+    public static final String GREEDY_WEIGHTS_DISTANCE = "distanceWeight";
+    public static final String GREEDY_WEIGHTS_FILL = "fillWeight";
     public static final String EXECUTED_AT = "executedAt";
     public static final String EXECUTION_REQUEST_JSON = "executionRequestJson";
     public static final String VALIDITY_STATE = "validityState";

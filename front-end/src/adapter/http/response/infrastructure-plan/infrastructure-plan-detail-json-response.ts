@@ -13,6 +13,12 @@ export interface InfrastructurePlanDetailJsonResponse {
   executedAt: string;
   period?: number;
   numberOfDays?: number;
+  /** Time when the collection workday starts, formatted as "HH:mm" */
+  collectionStartTime?: string;
+  /** Average time in minutes a vehicle takes to move between two points */
+  averageTransferTimeMinutes?: number;
+  /** Greedy scoring weights used by the algorithm */
+  greedyWeights?: InfrastructurePlanGreedyWeightsJsonResponse;
   totalCollectedKilograms?: number;
   totalCollectedLiters?: number;
   maxBudget?: InfrastructurePlanMoneyJsonResponse;
@@ -33,4 +39,12 @@ export interface InfrastructurePlanDetailJsonResponse {
   failureReason?: string | null;
   /** JSON snapshot of the client execution request */
   executionRequestJson?: string;
+}
+
+/**
+ * Greedy scoring weights block returned within the infrastructure plan detail.
+ */
+export interface InfrastructurePlanGreedyWeightsJsonResponse {
+  distanceWeight?: number;
+  fillWeight?: number;
 }

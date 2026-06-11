@@ -16,6 +16,10 @@ public class AlgorithmExecutionResponseBodySerializer extends StdSerializer<Algo
     private static final String FIELD_SELECTED_CONTAINERS = "selectedContainers";
     private static final String FIELD_NUMBER_OF_DAYS = "numberOfDays";
     private static final String FIELD_AVERAGE_PICKUP_TIME_MINUTES = "averagePickupTimeMinutes";
+    private static final String FIELD_COLLECTION_START_TIME = "collectionStartTime";
+    private static final String FIELD_AVERAGE_TRANSFER_TIME_MINUTES = "averageTransferTimeMinutes";
+    private static final String FIELD_DISTANCE_WEIGHT = "distanceWeight";
+    private static final String FIELD_FILL_WEIGHT = "fillWeight";
     private static final String FIELD_MAX_BUDGET = "maxBudget";
     private static final String FIELD_AMOUNT = "amount";
     private static final String FIELD_CURRENCY = "currency";
@@ -46,6 +50,16 @@ public class AlgorithmExecutionResponseBodySerializer extends StdSerializer<Algo
         }
         if (value.averagePickupTimeMinutes != null) {
             gen.writeNumberField(FIELD_AVERAGE_PICKUP_TIME_MINUTES, value.averagePickupTimeMinutes.getValue());
+        }
+        if (value.collectionStartTime != null) {
+            gen.writeStringField(FIELD_COLLECTION_START_TIME, value.collectionStartTime.getFormatted());
+        }
+        if (value.averageTransferTimeMinutes != null) {
+            gen.writeNumberField(FIELD_AVERAGE_TRANSFER_TIME_MINUTES, value.averageTransferTimeMinutes.getValue());
+        }
+        if (value.greedyWeights != null) {
+            gen.writeNumberField(FIELD_DISTANCE_WEIGHT, value.greedyWeights.getDistanceWeight());
+            gen.writeNumberField(FIELD_FILL_WEIGHT, value.greedyWeights.getFillWeight());
         }
         if (value.maxBudget != null) {
             gen.writeObjectFieldStart(FIELD_MAX_BUDGET);

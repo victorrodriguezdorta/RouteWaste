@@ -1,6 +1,9 @@
 package es.ull.project.application.usecase.algorithm;
 
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import java.util.List;
 import java.util.UUID;
@@ -18,11 +21,17 @@ public interface ExecuteAlgorithmUseCase {
      * @param selectedContainerIds selected container identifiers
      * @param numberOfDays number of planning days
      * @param averagePickupTimeMinutes average pickup time in minutes
+     * @param collectionStartTime time of day when the collection journey starts
+     * @param averageTransferTimeMinutes average travelling time between points in minutes
+     * @param greedyWeights weights applied to the greedy selection score
      * @return processed result with full resolved data
      */
     AlgorithmExecutionResult execute(
             List<AlgorithmExecutionSelection> facilitiesWithVehicles,
             List<UUID> selectedContainerIds,
             NumberOfDays numberOfDays,
-            AveragePickupTimeMinutes averagePickupTimeMinutes);
+            AveragePickupTimeMinutes averagePickupTimeMinutes,
+            CollectionStartTime collectionStartTime,
+            AverageTransferTimeMinutes averageTransferTimeMinutes,
+            GreedyWeights greedyWeights);
 }

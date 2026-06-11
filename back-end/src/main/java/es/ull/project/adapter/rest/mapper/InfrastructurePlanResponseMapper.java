@@ -85,6 +85,9 @@ public class InfrastructurePlanResponseMapper {
         }
         responseBody.numberOfDays = plan.getNumberOfDays().orElse(null);
         responseBody.averagePickupTimeMinutes = plan.getAveragePickupTimeMinutes().orElse(null);
+        responseBody.collectionStartTime = plan.getCollectionStartTime().orElse(null);
+        responseBody.averageTransferTimeMinutes = plan.getAverageTransferTimeMinutes().orElse(null);
+        responseBody.greedyWeights = plan.getGreedyWeights().orElse(null);
         responseBody.executedAt = plan.getExecutedAt().orElse(null);
         responseBody.validityState = plan.getValidityState();
         responseBody.executionState = plan.getExecutionState();

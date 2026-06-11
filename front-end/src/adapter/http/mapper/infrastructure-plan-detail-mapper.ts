@@ -26,6 +26,7 @@ import {
   InfrastructurePlanStopDetail,
   InfrastructurePlanVehicleDetail,
 } from '@/domain/read-model/infrastructure-plan-detail';
+import type { InfrastructurePlanGreedyWeights } from '@/domain/read-model/infrastructure-plan-detail';
 import { CollectedVolumeLiters } from '@/domain/valueobject/capacity/collected-volume-liters';
 import { CollectedWeightKilograms } from '@/domain/valueobject/capacity/collected-weight-kilograms';
 import { ProcessingCapacityKilogramsPerDay } from '@/domain/valueobject/capacity/processing-capacity-kilograms-per-day';
@@ -93,7 +94,45 @@ export class InfrastructurePlanDetailMapper {
       executionState,
       failureReason,
       executionRequestJson,
+      this.mapCollectionStartTime(data),
+      this.extractOptionalNumber(data.averageTransferTimeMinutes),
+      this.mapGreedyWeights(data),
     );
+  }
+
+  /**
+   * Extracts the collection workday start time ("HH:mm") from the API response.
+   *
+   * @param data Infrastructure plan detail JSON from the API
+   * @returns Collection start time string, or null when absent
+   */
+  private static mapCollectionStartTime(
+    data: InfrastructurePlanDetailJsonResponse,
+  ): string | null {
+    return typeof data.collectionStartTime === 'string' && data.collectionStartTime.length > 0
+      ? data.collectionStartTime
+      : null;
+  }
+
+  /**
+   * Maps the greedy scoring weights from the API response.
+   *
+   * @param data Infrastructure plan detail JSON from the API
+   * @returns Greedy weights read model, or null when absent or incomplete
+   */
+  private static mapGreedyWeights(
+    data: InfrastructurePlanDetailJsonResponse,
+  ): InfrastructurePlanGreedyWeights | null {
+    const weights = data.greedyWeights;
+    if (!weights) {
+      return null;
+    }
+    const distanceWeight = this.extractOptionalNumber(weights.distanceWeight);
+    const fillWeight = this.extractOptionalNumber(weights.fillWeight);
+    if (distanceWeight == null || fillWeight == null) {
+      return null;
+    }
+    return { distanceWeight, fillWeight };
   }
 
   /**

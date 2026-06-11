@@ -20,10 +20,14 @@ import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.algorithm.AveragePickupTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.AverageTransferTimeMinutes;
+import es.ull.project.domain.valueobject.algorithm.CollectionStartTime;
+import es.ull.project.domain.valueobject.algorithm.GreedyWeights;
 import es.ull.project.domain.valueobject.algorithm.NumberOfDays;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,11 +76,15 @@ class RunAlgorithmExecutionJobServiceTests {
                 List.of(UUID.randomUUID()),
                 new NumberOfDays(3),
                 new AveragePickupTimeMinutes(10),
+                new CollectionStartTime(LocalTime.of(8, 0)),
+                new AverageTransferTimeMinutes(10),
+                GreedyWeights.defaultWeights(),
                 new MaximumBudget(1000.0),
                 new AlgorithmJsonPayload("{\"numberOfDays\":3}"));
 
-        when(this.executeAlgorithmUseCase.execute(any(), any(), any(), any()))
-                .thenReturn(new AlgorithmExecutionResult(List.of(), List.of(), new NumberOfDays(3), new AveragePickupTimeMinutes(10)));
+        when(this.executeAlgorithmUseCase.execute(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(new AlgorithmExecutionResult(List.of(), List.of(), new NumberOfDays(3), new AveragePickupTimeMinutes(10),
+                        new CollectionStartTime(LocalTime.of(8, 0)), new AverageTransferTimeMinutes(10), GreedyWeights.defaultWeights()));
         when(this.payloadSerializer.serialize(any(), any())).thenReturn(new AlgorithmJsonPayload("{\"processed\":true}"));
         when(this.runAlgorithmUseCase.execute(any())).thenReturn(new AlgorithmJsonPayload("{\"clusters\":[],\"dailyPlans\":[]}"));
         InfrastructurePlan completedPlan = new InfrastructurePlan(
@@ -113,11 +121,15 @@ class RunAlgorithmExecutionJobServiceTests {
                 List.of(UUID.randomUUID()),
                 new NumberOfDays(1),
                 new AveragePickupTimeMinutes(5),
+                new CollectionStartTime(LocalTime.of(8, 0)),
+                new AverageTransferTimeMinutes(10),
+                GreedyWeights.defaultWeights(),
                 new MaximumBudget(500.0),
                 null);
 
-        when(this.executeAlgorithmUseCase.execute(any(), any(), any(), any()))
-                .thenReturn(new AlgorithmExecutionResult(List.of(), List.of(), new NumberOfDays(1), new AveragePickupTimeMinutes(5)));
+        when(this.executeAlgorithmUseCase.execute(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(new AlgorithmExecutionResult(List.of(), List.of(), new NumberOfDays(1), new AveragePickupTimeMinutes(5),
+                        new CollectionStartTime(LocalTime.of(8, 0)), new AverageTransferTimeMinutes(10), GreedyWeights.defaultWeights()));
         when(this.payloadSerializer.serialize(any(), any())).thenReturn(new AlgorithmJsonPayload("{\"processed\":true}"));
         when(this.runAlgorithmUseCase.execute(any())).thenThrow(new RuntimeException("Docker failed"));
         InfrastructurePlan failedPlan = new InfrastructurePlan(

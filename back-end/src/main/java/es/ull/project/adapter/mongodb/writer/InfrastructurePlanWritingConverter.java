@@ -110,6 +110,18 @@ public class InfrastructurePlanWritingConverter implements Converter<Infrastruct
         plan.getAveragePickupTimeMinutes().ifPresent(averagePickupTimeMinutes -> 
             document.put(MongoFields.AVERAGE_PICKUP_TIME_MINUTES, averagePickupTimeMinutes.getValue())
         );
+        plan.getCollectionStartTime().ifPresent(collectionStartTime ->
+            document.put(MongoFields.COLLECTION_START_TIME, collectionStartTime.getFormatted())
+        );
+        plan.getAverageTransferTimeMinutes().ifPresent(averageTransferTimeMinutes ->
+            document.put(MongoFields.AVERAGE_TRANSFER_TIME_MINUTES, averageTransferTimeMinutes.getValue())
+        );
+        plan.getGreedyWeights().ifPresent(greedyWeights -> {
+            Document greedyWeightsDocument = new Document();
+            greedyWeightsDocument.put(MongoFields.GREEDY_WEIGHTS_DISTANCE, greedyWeights.getDistanceWeight());
+            greedyWeightsDocument.put(MongoFields.GREEDY_WEIGHTS_FILL, greedyWeights.getFillWeight());
+            document.put(MongoFields.GREEDY_WEIGHTS, greedyWeightsDocument);
+        });
         plan.getExecutedAt().ifPresent(executedAt -> 
             document.put(MongoFields.EXECUTED_AT, executedAt.getTimestamp())
         );

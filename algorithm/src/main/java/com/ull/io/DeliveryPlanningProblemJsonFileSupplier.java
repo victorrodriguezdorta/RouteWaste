@@ -6,8 +6,11 @@ import com.ull.domain.entity.Facility;
 import com.ull.domain.entity.FacilityWithVehicles;
 import com.ull.domain.entity.Vehicle;
 import com.ull.domain.enumerate.WasteType;
+import com.ull.domain.valueobject.algorithm.GreedyWeights;
 import com.ull.domain.valueobject.cost.MaximumBudget;
 import com.ull.domain.valueobject.location.Location;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,6 +24,10 @@ import org.json.JSONObject;
  * <ul>
  *   <li>{@code averagePickupTimeMinutes} – int</li>
  *   <li>{@code numberOfDays} – int</li>
+ *   <li>{@code collectionStartTime} – optional string ("HH:mm") with the journey start time</li>
+ *   <li>{@code averageTransferTimeMinutes} – optional int with the average travel time</li>
+ *   <li>{@code distanceWeight} – optional double with the greedy distance weight</li>
+ *   <li>{@code fillWeight} – optional double with the greedy fill weight</li>
  *   <li>{@code maxBudget} – optional object with {@code amount} and {@code currency}</li>
  *   <li>{@code facilitiesWithVehicles} – array of facility+vehicle groups</li>
  *   <li>{@code selectedContainers} – array of container objects</li>
@@ -29,6 +36,8 @@ import org.json.JSONObject;
 public class DeliveryPlanningProblemJsonFileSupplier {
 
   private static final String DEFAULT_CURRENCY = "EUR";
+  private static final LocalTime DEFAULT_COLLECTION_START_TIME = LocalTime.of(8, 0);
+  private static final int DEFAULT_AVERAGE_TRANSFER_TIME_MINUTES = 0;
   private static final String ERROR_ID_ONLY_SHORTHAND =
       "Input JSON uses ID-only shorthand (selectedContainerIds or facilityId). "
           + "The algorithm requires fully expanded objects: 'selectedContainers' and "
@@ -37,6 +46,10 @@ public class DeliveryPlanningProblemJsonFileSupplier {
   private static final String ERROR_INVALID_NUMERIC_FIELD = "Invalid numeric field: ";
   private static final String FIELD_AMOUNT = "amount";
   private static final String FIELD_AVERAGE_PICKUP_TIME_MINUTES = "averagePickupTimeMinutes";
+  private static final String FIELD_AVERAGE_TRANSFER_TIME_MINUTES = "averageTransferTimeMinutes";
+  private static final String FIELD_COLLECTION_START_TIME = "collectionStartTime";
+  private static final String FIELD_DISTANCE_WEIGHT = "distanceWeight";
+  private static final String FIELD_FILL_WEIGHT = "fillWeight";
   private static final String FIELD_CAPACITY_KILOGRAMS = "capacityKilograms";
   private static final String FIELD_CAPACITY_LITERS = "capacityLiters";
   private static final String FIELD_COST_PER_KILOMETER = "costPerKilometer";
@@ -88,6 +101,10 @@ public class DeliveryPlanningProblemJsonFileSupplier {
     int averagePickupTimeMinutes = json.getInt(FIELD_AVERAGE_PICKUP_TIME_MINUTES);
     int numberOfDays = json.getInt(FIELD_NUMBER_OF_DAYS);
     MaximumBudget maxBudget = parseMaximumBudget(json.optJSONObject(FIELD_MAX_BUDGET));
+    LocalTime collectionStartTime = parseCollectionStartTime(json);
+    int averageTransferTimeMinutes =
+        json.optInt(FIELD_AVERAGE_TRANSFER_TIME_MINUTES, DEFAULT_AVERAGE_TRANSFER_TIME_MINUTES);
+    GreedyWeights greedyWeights = parseGreedyWeights(json);
     if (json.has(FIELD_SELECTED_CONTAINER_IDS) || containsFacilityIdOnly(json)) {
       throw new IllegalArgumentException(ERROR_ID_ONLY_SHORTHAND);
     }
@@ -100,8 +117,48 @@ public class DeliveryPlanningProblemJsonFileSupplier {
         numberOfDays,
         facilitiesWithVehicles,
       containers,
-      maxBudget);
+      maxBudget,
+      collectionStartTime,
+      averageTransferTimeMinutes,
+      greedyWeights);
     return Stream.of(problem);
+  }
+
+  /**
+   * Parses the optional collection start time ("HH:mm"), falling back to the default value.
+   *
+   * @param json the raw JSON received by the algorithm
+   * @return the parsed start time, or the default when absent or malformed
+   */
+  private LocalTime parseCollectionStartTime(JSONObject json) {
+    if (!json.has(FIELD_COLLECTION_START_TIME) || json.isNull(FIELD_COLLECTION_START_TIME)) {
+      return DEFAULT_COLLECTION_START_TIME;
+    }
+    String rawValue = json.optString(FIELD_COLLECTION_START_TIME, null);
+    if (rawValue == null || rawValue.isBlank()) {
+      return DEFAULT_COLLECTION_START_TIME;
+    }
+    try {
+      return LocalTime.parse(rawValue.trim());
+    } catch (DateTimeParseException exception) {
+      return DEFAULT_COLLECTION_START_TIME;
+    }
+  }
+
+  /**
+   * Parses the optional greedy weights, falling back to the default distribution when absent.
+   *
+   * @param json the raw JSON received by the algorithm
+   * @return the parsed greedy weights, or the default weights when not provided
+   */
+  private GreedyWeights parseGreedyWeights(JSONObject json) {
+    if (!json.has(FIELD_DISTANCE_WEIGHT) && !json.has(FIELD_FILL_WEIGHT)) {
+      return GreedyWeights.defaultWeights();
+    }
+    GreedyWeights defaultWeights = GreedyWeights.defaultWeights();
+    double distanceWeight = json.optDouble(FIELD_DISTANCE_WEIGHT, defaultWeights.getDistanceWeight());
+    double fillWeight = json.optDouble(FIELD_FILL_WEIGHT, defaultWeights.getFillWeight());
+    return new GreedyWeights(distanceWeight, fillWeight);
   }
 
   /**
