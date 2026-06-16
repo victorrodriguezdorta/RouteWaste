@@ -21,6 +21,7 @@ public final class GreedyWeights {
     private static final double SUM_TOLERANCE = 0.000001;
     private static final double DEFAULT_DISTANCE_WEIGHT = 0.40;
     private static final double DEFAULT_FILL_WEIGHT = 0.60;
+    private static final int DOUBLE_COMPARE_EQUAL = 0;
 
     /**
      * Weight applied to the normalized distance term.
@@ -114,8 +115,8 @@ public final class GreedyWeights {
             return false;
         }
         GreedyWeights other = (GreedyWeights) otherObject;
-        return Double.compare(distanceWeight, other.distanceWeight) == 0
-                && Double.compare(fillWeight, other.fillWeight) == 0;
+        return Double.compare(distanceWeight, other.distanceWeight) == DOUBLE_COMPARE_EQUAL
+                && Double.compare(fillWeight, other.fillWeight) == DOUBLE_COMPARE_EQUAL;
     }
 
     /**

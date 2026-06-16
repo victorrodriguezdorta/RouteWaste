@@ -47,7 +47,11 @@ public class Algorithm {
   private static final double FULL_FILL_PERCENTAGE = 100.0;
 
   private final DeliveryPlanningProblem problem;
-  /** Weights applied to the greedy selection score, taken from the problem request. */
+  /**
+   * Weights applied to the greedy selection score.
+   *
+   * <p>The values are taken from the problem request or fall back to defaults.
+   */
   private final GreedyWeights greedyWeights;
   /**
    * Mixed-purpose state map used during the simulation:
@@ -227,7 +231,6 @@ public class Algorithm {
     double vehicleCurrentLoadKilograms = 0.0;
     Object currentLocation = facility;
     int facilityVisits = MIN_NUMBER_OF_DAYS;
-    // The vehicle clock starts at the configured collection start time for the day.
     LocalTime currentTime = problem.getCollectionStartTime();
     int transferMinutes = problem.getAverageTransferTimeMinutes();
     int pickupMinutes = problem.getAveragePickupTimeMinutes();
@@ -278,7 +281,6 @@ public class Algorithm {
           collectedLiters,
           nextContainer.getWasteType());
       double distanceFromCurrentLocation = calculateDistanceToContainer(currentLocation, nextContainer);
-      // Travel to the container, then this is the time the container is collected.
       LocalTime collectedAt = advanceTime(currentTime, transferMinutes);
       dailyPlan.addStop(
           nextContainer,
@@ -297,7 +299,6 @@ public class Algorithm {
           getPendingLiters(nextContainer),
           pendingLiters,
           collectedAt);
-      // The collection itself consumes the average pickup time.
       currentTime = advanceTime(collectedAt, pickupMinutes);
       vehicleCurrentLoadLiters += collectedLiters;
       vehicleCurrentLoadKilograms += collectedKilograms;
@@ -805,7 +806,6 @@ public class Algorithm {
       return currentTime;
     }
     double distanceToFacility = calculateDistanceToFacility(currentLocation, facility);
-    // Travel back to the facility, then unload during the facility unloading time.
     LocalTime arrivalAtFacility = advanceTime(currentTime, problem.getAverageTransferTimeMinutes());
     dailyPlan.addFacilityStop(distanceToFacility, new ArrayList<>(), arrivalAtFacility);
     vehicle.emptyLoad();

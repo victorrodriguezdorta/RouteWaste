@@ -83,7 +83,7 @@ public class ContainerDailyState {
 
     /**
      * Time of day represented by this snapshot.
-     * It is an optional attribute (null for plain daily snapshots).
+     * It is an optional attribute.
      */
     private final LocalTime time;
 
@@ -107,7 +107,6 @@ public class ContainerDailyState {
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
             ContainerStatus status) {
         this(
-                UUID.randomUUID(),
                 infrastructurePlan,
                 container,
                 planDay,
@@ -115,6 +114,7 @@ public class ContainerDailyState {
                 containerCapacityLiters,
                 dailyDemandLitersPerDay,
                 status,
+                null,
                 null);
     }
 
@@ -140,7 +140,6 @@ public class ContainerDailyState {
             ContainerStatus status,
             CollectedVolumeLiters dailyFillingLitersBeforeCollection) {
         this(
-                UUID.randomUUID(),
                 infrastructurePlan,
                 container,
                 planDay,
@@ -148,7 +147,8 @@ public class ContainerDailyState {
                 containerCapacityLiters,
                 dailyDemandLitersPerDay,
                 status,
-                dailyFillingLitersBeforeCollection);
+                dailyFillingLitersBeforeCollection,
+                null);
     }
 
     /**
@@ -170,53 +170,19 @@ public class ContainerDailyState {
     }
 
     /**
-     * Restore constructor.
+     * Creates a container state snapshot tied to a specific moment of the day.
      *
-     * @param id                        the daily state identifier
-     * @param infrastructurePlan        the parent infrastructure plan
-     * @param container                 the referenced container
-     * @param planDay                   the planning day represented by the snapshot
-     * @param dailyFillingLiters        the container filling level in liters
-     * @param containerCapacityLiters   the container capacity in liters
-     * @param dailyDemandLitersPerDay   the estimated daily demand in liters per day
-     * @param status                    the computed container status
+     * @param infrastructurePlan                   the parent infrastructure plan
+     * @param container                            the referenced container
+     * @param planDay                              the planning day represented by the snapshot
+     * @param dailyFillingLiters                   the container filling level in liters
+     * @param containerCapacityLiters              the container capacity in liters
+     * @param dailyDemandLitersPerDay              the estimated daily demand in liters per day
+     * @param status                               the computed container status
+     * @param dailyFillingLitersBeforeCollection   the filling level before collection
+     * @param time                                 the time of day represented by this snapshot
      */
     public ContainerDailyState(
-            UUID id,
-            InfrastructurePlan infrastructurePlan,
-            Container container,
-            PlanDay planDay,
-            CollectedVolumeLiters dailyFillingLiters,
-            ContainerCapacityLiters containerCapacityLiters,
-            DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
-            ContainerStatus status) {
-        this(
-                id,
-                infrastructurePlan,
-                container,
-                planDay,
-                dailyFillingLiters,
-                containerCapacityLiters,
-                dailyDemandLitersPerDay,
-                status,
-                null);
-    }
-
-    /**
-     * Restore constructor including the before-collection level.
-     *
-     * @param id                                     the daily state identifier
-     * @param infrastructurePlan                     the parent infrastructure plan
-     * @param container                              the referenced container
-     * @param planDay                                the planning day represented by the snapshot
-     * @param dailyFillingLiters                     the container filling level in liters
-     * @param containerCapacityLiters                the container capacity in liters
-     * @param dailyDemandLitersPerDay                the estimated daily demand in liters per day
-     * @param status                                 the computed container status
-     * @param dailyFillingLitersBeforeCollection     the filling level before collection
-     */
-    public ContainerDailyState(
-            UUID id,
             InfrastructurePlan infrastructurePlan,
             Container container,
             PlanDay planDay,
@@ -224,22 +190,24 @@ public class ContainerDailyState {
             ContainerCapacityLiters containerCapacityLiters,
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
             ContainerStatus status,
-            CollectedVolumeLiters dailyFillingLitersBeforeCollection) {
-        this(
-                id,
-                infrastructurePlan,
-                container,
-                planDay,
-                dailyFillingLiters,
-                containerCapacityLiters,
-                dailyDemandLitersPerDay,
-                status,
-                dailyFillingLitersBeforeCollection,
-                null);
+            CollectedVolumeLiters dailyFillingLitersBeforeCollection,
+            LocalTime time) {
+        validate(container, planDay, dailyFillingLiters, containerCapacityLiters, dailyDemandLitersPerDay);
+        this.id = UUID.randomUUID();
+        this.infrastructurePlan = infrastructurePlan;
+        this.container = container;
+        this.planDay = planDay;
+        this.dailyFillingLiters = dailyFillingLiters;
+        this.dailyFillingLitersBeforeCollection = dailyFillingLitersBeforeCollection;
+        this.containerCapacityLiters = containerCapacityLiters;
+        this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
+        this.status = status != null ? status : ContainerStatus.CORRECT;
+        this.time = time;
     }
 
     /**
-     * Restore constructor including the before-collection level and the snapshot time.
+     * Restore constructor.
+     * Restores a ContainerDailyState from persistence with all its attributes.
      *
      * @param id                                     the daily state identifier
      * @param infrastructurePlan                     the parent infrastructure plan
@@ -274,42 +242,6 @@ public class ContainerDailyState {
         this.dailyDemandLitersPerDay = dailyDemandLitersPerDay;
         this.status = status != null ? status : ContainerStatus.CORRECT;
         this.time = time;
-    }
-
-    /**
-     * Creates a container state snapshot tied to a specific moment of the day.
-     *
-     * @param infrastructurePlan                   the parent infrastructure plan
-     * @param container                            the referenced container
-     * @param planDay                              the planning day represented by the snapshot
-     * @param dailyFillingLiters                   the container filling level in liters
-     * @param containerCapacityLiters              the container capacity in liters
-     * @param dailyDemandLitersPerDay              the estimated daily demand in liters per day
-     * @param status                               the computed container status
-     * @param dailyFillingLitersBeforeCollection   the filling level before collection
-     * @param time                                 the time of day represented by this snapshot
-     */
-    public ContainerDailyState(
-            InfrastructurePlan infrastructurePlan,
-            Container container,
-            PlanDay planDay,
-            CollectedVolumeLiters dailyFillingLiters,
-            ContainerCapacityLiters containerCapacityLiters,
-            DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
-            ContainerStatus status,
-            CollectedVolumeLiters dailyFillingLitersBeforeCollection,
-            LocalTime time) {
-        this(
-                UUID.randomUUID(),
-                infrastructurePlan,
-                container,
-                planDay,
-                dailyFillingLiters,
-                containerCapacityLiters,
-                dailyDemandLitersPerDay,
-                status,
-                dailyFillingLitersBeforeCollection,
-                time);
     }
 
     /**

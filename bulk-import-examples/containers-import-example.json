@@ -1,7 +1,7 @@
 {
   "containers": [
     {
-      "name": "Contenedor Calle San Agustín 32",
+      "name": "Cont A Calle San Agustín",
       "location": {
         "latitude": 28.469346,
         "longitude": -16.28105,
@@ -14,7 +14,7 @@
       "serviceZone": "GEOGRAPHICAL_AREA"
     },
     {
-      "name": "Contenedor Calle La Marina 55",
+      "name": "Cont B Calle La Marina",
       "location": {
         "latitude": 28.471776,
         "longitude": -16.261276,
@@ -27,7 +27,7 @@
       "serviceZone": "NEIGHBORHOOD"
     },
     {
-      "name": "Contenedor Calle San Juan Bosco 26",
+      "name": "Cont C Calle San Juan Bosco",
       "location": {
         "latitude": 28.459584,
         "longitude": -16.259123,
@@ -40,7 +40,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle del Castillo 98",
+      "name": "Cont D Calle del Castillo",
       "location": {
         "latitude": 28.468142,
         "longitude": -16.251242,
@@ -53,7 +53,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle Bravo Murillo 14",
+      "name": "Cont E Calle Bravo Murillo",
       "location": {
         "latitude": 28.457732,
         "longitude": -16.245626,
@@ -66,7 +66,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle del Pilar 94",
+      "name": "Cont F Calle del Pilar",
       "location": {
         "latitude": 28.47434,
         "longitude": -16.259058,
@@ -79,7 +79,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle Juan Pablo II 80",
+      "name": "Cont G Calle Juan Pablo II",
       "location": {
         "latitude": 28.455891,
         "longitude": -16.270859,
@@ -92,7 +92,7 @@
       "serviceZone": "GEOGRAPHICAL_AREA"
     },
     {
-      "name": "Contenedor Calle San Pedro 38",
+      "name": "Cont H Calle San Pedro",
       "location": {
         "latitude": 28.455669,
         "longitude": -16.256872,
@@ -105,7 +105,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle Juan de Vera 21",
+      "name": "Cont I Calle Juan de Vera",
       "location": {
         "latitude": 28.460671,
         "longitude": -16.257844,
@@ -118,7 +118,7 @@
       "serviceZone": "GEOGRAPHICAL_AREA"
     },
     {
-      "name": "Contenedor Calle Juan Pablo II 10",
+      "name": "Cont J Calle Juan Pablo II",
       "location": {
         "latitude": 28.460407,
         "longitude": -16.246407,
@@ -131,7 +131,7 @@
       "serviceZone": "GEOGRAPHICAL_AREA"
     },
     {
-      "name": "Contenedor Calle San Agustín 119",
+      "name": "Cont K Calle San Agustín",
       "location": {
         "latitude": 28.459875,
         "longitude": -16.264434,
@@ -144,7 +144,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle Méndez Núñez 106",
+      "name": "Cont L Calle Méndez Núñez",
       "location": {
         "latitude": 28.474228,
         "longitude": -16.252512,
@@ -157,7 +157,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle La Marina 113",
+      "name": "Cont M Calle La Marina",
       "location": {
         "latitude": 28.455589,
         "longitude": -16.247301,
@@ -170,7 +170,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle San Isidro 19",
+      "name": "Cont N Calle San Isidro",
       "location": {
         "latitude": 28.463495,
         "longitude": -16.247247,
@@ -183,7 +183,7 @@
       "serviceZone": "GEOGRAPHICAL_AREA"
     },
     {
-      "name": "Contenedor Calle La Marina 55",
+      "name": "Cont O Calle La Marina",
       "location": {
         "latitude": 28.467473,
         "longitude": -16.272016,
@@ -196,7 +196,7 @@
       "serviceZone": "NEIGHBORHOOD"
     },
     {
-      "name": "Contenedor Calle Bethencourt Alfonso 12",
+      "name": "Cont P Calle Bethencourt Alfonso",
       "location": {
         "latitude": 28.477936,
         "longitude": -16.276743,
@@ -209,7 +209,7 @@
       "serviceZone": "GEOGRAPHICAL_AREA"
     },
     {
-      "name": "Contenedor Calle José Murphy 9",
+      "name": "Cont Q Calle José Murphy",
       "location": {
         "latitude": 28.45784,
         "longitude": -16.256142,
@@ -222,7 +222,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle del Castillo 88",
+      "name": "Cont R Calle del Castillo",
       "location": {
         "latitude": 28.466699,
         "longitude": -16.245099,
@@ -235,7 +235,7 @@
       "serviceZone": "GEOGRAPHICAL_AREA"
     },
     {
-      "name": "Contenedor Calle San Sebastián 59",
+      "name": "Cont S Calle San Sebastián",
       "location": {
         "latitude": 28.462164,
         "longitude": -16.270847,
@@ -248,7 +248,7 @@
       "serviceZone": "NEIGHBORHOOD"
     },
     {
-      "name": "Contenedor Calle Juan Pablo II 39",
+      "name": "Cont T Calle Juan Pablo II",
       "location": {
         "latitude": 28.466184,
         "longitude": -16.277956,
@@ -261,7 +261,7 @@
       "serviceZone": "NEIGHBORHOOD"
     },
     {
-      "name": "Contenedor Calle San Pedro 119",
+      "name": "Cont U Calle San Pedro",
       "location": {
         "latitude": 28.462974,
         "longitude": -16.275861,
@@ -274,7 +274,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle Juan de Vera 113",
+      "name": "Cont V Calle Juan de Vera",
       "location": {
         "latitude": 28.465727,
         "longitude": -16.277749,
@@ -287,7 +287,7 @@
       "serviceZone": "NEIGHBORHOOD"
     },
     {
-      "name": "Contenedor Rambla de Pulido 94",
+      "name": "Cont W Rambla de Pulido",
       "location": {
         "latitude": 28.475072,
         "longitude": -16.246016,
@@ -300,7 +300,7 @@
       "serviceZone": "NEIGHBORHOOD"
     },
     {
-      "name": "Contenedor Calle San Juan Bosco 22",
+      "name": "Cont X Calle San Juan Bosco",
       "location": {
         "latitude": 28.457081,
         "longitude": -16.263939,
@@ -313,7 +313,7 @@
       "serviceZone": "DISTRICT"
     },
     {
-      "name": "Contenedor Calle San Pedro 94",
+      "name": "Cont Y Calle San Pedro",
       "location": {
         "latitude": 28.477145,
         "longitude": -16.246701,

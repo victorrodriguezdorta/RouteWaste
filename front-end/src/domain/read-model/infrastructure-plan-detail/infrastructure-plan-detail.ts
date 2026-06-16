@@ -1,19 +1,12 @@
-import type { InfrastructurePlanContainerDailyStateDetail } from './details/infrastructure-plan-container-daily-state-detail';
-import type { InfrastructurePlanDailyPlanDetail } from './details/infrastructure-plan-daily-plan-detail';
-import type { InfrastructurePlanFacilityDetail } from './details/infrastructure-plan-facility-detail';
-import type { InfrastructurePlanMetricsDetail } from './details/infrastructure-plan-metrics-detail';
 import { FacilityStatus } from '@/domain/enumerate/facility-status';
 import type { InfrastructurePlanExecutionState } from '@/domain/enumerate/infrastructure-plan-execution-state';
 import type { InfrastructurePlanValidityState } from '@/domain/enumerate/infrastructure-plan-validity-state';
+import type { InfrastructurePlanContainerDailyStateDetail } from '@/domain/read-model/infrastructure-plan-detail/details/infrastructure-plan-container-daily-state-detail';
+import type { InfrastructurePlanDailyPlanDetail } from '@/domain/read-model/infrastructure-plan-detail/details/infrastructure-plan-daily-plan-detail';
+import type { InfrastructurePlanFacilityDetail } from '@/domain/read-model/infrastructure-plan-detail/details/infrastructure-plan-facility-detail';
+import type { InfrastructurePlanMetricsDetail } from '@/domain/read-model/infrastructure-plan-detail/details/infrastructure-plan-metrics-detail';
+import type { InfrastructurePlanGreedyWeights } from '@/domain/read-model/infrastructure-plan-detail/infrastructure-plan-greedy-weights';
 import { UllUUID } from '@ull-tfg/ull-tfg-typescript';
-
-/**
- * Greedy scoring weights for distance and fill used by the algorithm execution.
- */
-export interface InfrastructurePlanGreedyWeights {
-  distanceWeight: number;
-  fillWeight: number;
-}
 
 /**
  * Read-only infrastructure plan detail consumed by the views.

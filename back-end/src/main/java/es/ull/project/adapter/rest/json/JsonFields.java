@@ -1,12 +1,12 @@
-package es.ull.project.adapter.rest.deserialization;
+package es.ull.project.adapter.rest.json;
 
 /**
  * JsonFields
- * 
- * Centralized constants for JSON field names used in deserialization.
- * This class defines all field names that appear in JSON request bodies
- * to ensure consistency across deserializers and avoid typos.
- * 
+ *
+ * Centralized constants for JSON field names used by REST adapters.
+ * This class defines all field names that appear in JSON request and response bodies
+ * to ensure consistency across serializers, deserializers and avoid typos.
+ *
  * Using constants allows easy refactoring and provides a single source
  * of truth for field naming conventions.
  */
@@ -131,7 +131,7 @@ public final class JsonFields {
      * ServiceAssignment fields
      */
     public static final String CONTAINER_ID = "containerId";
-    public static final String FACILITY_ID = "facilityId";;
+    public static final String FACILITY_ID = "facilityId";
 
     /**
      * Distance fields

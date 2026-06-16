@@ -3,7 +3,7 @@ package es.ull.project.adapter.rest.serialization.infrastructureplan;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import es.ull.project.adapter.rest.deserialization.JsonFields;
+import es.ull.project.adapter.rest.json.JsonFields;
 import es.ull.project.adapter.rest.response.infrastructureplan.InfrastructurePlanListResponseBody;
 import java.io.IOException;
 

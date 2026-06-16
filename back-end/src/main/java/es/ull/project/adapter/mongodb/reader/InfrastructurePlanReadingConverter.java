@@ -182,24 +182,18 @@ public class InfrastructurePlanReadingConverter implements Converter<Document, I
         InfrastructurePlan plan = new InfrastructurePlan(
             id,
             period,
-            selectedFacilities,
-            serviceAssignments,
-            dailyPlans,
             servicePolicies,
             maxBudget,
-            estimatedTotalCost,
-            kg,
-            liters,
-            distance,
             numberOfDays,
             averagePickupTimeMinutes,
             executedAt,
             validityState,
             executionState,
             InfrastructurePlanFailureReason.fromNullable(failureReasonRaw),
-            executionRequestJson != null && !executionRequestJson.isBlank() ? new AlgorithmJsonPayload(executionRequestJson) : null,
-            containerDailyStates
+            executionRequestJson != null && !executionRequestJson.isBlank() ? new AlgorithmJsonPayload(executionRequestJson) : null
         );
+        plan.restoreComputedAssociations(selectedFacilities, serviceAssignments, dailyPlans, containerDailyStates);
+        plan.restoreComputedMetrics(estimatedTotalCost, kg, liters, distance);
         CollectionStartTime collectionStartTime = readCollectionStartTime(document);
         AverageTransferTimeMinutes averageTransferTimeMinutes = readAverageTransferTimeMinutes(document);
         GreedyWeights greedyWeights = readGreedyWeights(document);

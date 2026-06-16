@@ -1,9 +1,9 @@
-package es.ull.project.adapter.rest.deserialization.vehicle;
+package es.ull.project.adapter.rest.json.vehicle;
 
-import es.ull.project.adapter.rest.deserialization.JsonFields;
-import es.ull.project.adapter.rest.deserialization.bulk.AbstractBulkPostRequestBodyDeserializer;
+import es.ull.project.adapter.rest.json.JsonFields;
 import es.ull.project.adapter.rest.request.vehicle.VehicleBulkPostRequestBody;
 import es.ull.project.adapter.rest.request.vehicle.VehiclePostRequestBody;
+import es.ull.project.adapter.rest.support.AbstractBulkPostRequestBodyDeserializer;
 
 /**
  * Deserializes bulk vehicle creation payloads.

@@ -1,4 +1,7 @@
+import { toEntityTypeStatistics } from '@/adapter/http/mapper/entity-statistics-json-mapper';
 import { postBulkImportFile } from '@/adapter/http/repository/bulk-import-http';
+import { VehiclePostJsonRequest } from '@/adapter/http/request/vehicle/vehicle-post-json-request';
+import { VehiclePutJsonRequest } from '@/adapter/http/request/vehicle/vehicle-put-json-request';
 import type { BulkImportJsonResponse } from '@/adapter/http/response/common/bulk-import-json-response';
 import {
   type BulkImportResult,
@@ -6,9 +9,6 @@ import {
 } from '@/adapter/http/response/common/bulk-import-result';
 import { VehicleJsonResponse } from '@/adapter/http/response/vehicle/vehicle-json-response';
 import type { VehiclePageJsonResponse } from '@/adapter/http/response/vehicle/vehicle-page-json-response';
-import { VehiclePostJsonRequest } from '@/adapter/http/request/vehicle/vehicle-post-json-request';
-import { VehiclePutJsonRequest } from '@/adapter/http/request/vehicle/vehicle-put-json-request';
-import { toEntityTypeStatistics } from '@/adapter/http/mapper/entity-statistics-json-mapper';
 import type { VehicleRepository } from '@/application/repository/vehicle-repository';
 import type { CreateVehicleCommand, CreateVehicleResult } from '@/application/usecase/vehicle-management/create-vehicle/create-vehicle-use-case';
 import type { DeleteVehicleCommand, DeleteVehicleResult } from '@/application/usecase/vehicle-management/delete-vehicle/delete-vehicle-use-case';

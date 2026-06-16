@@ -145,40 +145,12 @@ public class Stop {
             CollectedVolumeLiters containerActualLiters,
             List<StopAlert> alerts) {
         this(UUID.randomUUID(), sequence, type, container, collectedKilograms, collectedLiters,
-                distanceFromPreviousMeters, cumulativeDistanceMeters, containerActualLiters, alerts);
-    }
-
-    /**
-     * Restore constructor.
-     * Restores a stop with its persisted identifier.
-     *
-     * @param id                          The persisted stop identifier.
-     * @param sequence                    The sequence number in the route.
-     * @param type                        The kind of stop.
-     * @param container                   The container visited.
-     * @param collectedKilograms          The weight of waste collected.
-     * @param collectedLiters             The volume of waste collected.
-     * @param distanceFromPreviousMeters  The distance traveled from the previous stop.
-     * @param cumulativeDistanceMeters    The total distance traveled so far.
-     * @param containerActualLiters       The actual liters before collection.
-     * @param alerts                      List of alerts.
-     */
-    public Stop(UUID id,
-            RouteSequence sequence,
-            StopType type,
-            Container container,
-            CollectedWeightKilograms collectedKilograms,
-            CollectedVolumeLiters collectedLiters,
-            Distance distanceFromPreviousMeters,
-            Distance cumulativeDistanceMeters,
-            CollectedVolumeLiters containerActualLiters,
-            List<StopAlert> alerts) {
-        this(id, sequence, type, container, collectedKilograms, collectedLiters,
                 distanceFromPreviousMeters, cumulativeDistanceMeters, containerActualLiters, alerts, null);
     }
 
     /**
-     * Restore constructor including the time of the visit.
+     * Restore constructor.
+     * Restores a Stop from persistence with all its attributes.
      *
      * @param id                          The persisted stop identifier.
      * @param sequence                    The sequence number in the route.

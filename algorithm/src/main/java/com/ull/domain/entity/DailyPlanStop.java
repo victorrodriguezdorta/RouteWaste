@@ -29,7 +29,11 @@ public class DailyPlanStop {
   private final double collectedKilograms;
   private final double collectedLiters;
   private final double containerActualLiters;
-  /** Time of day at which the vehicle performs this stop (null when not computed). */
+  /**
+   * Time of day at which the vehicle performs this stop.
+   *
+   * <p>This value is {@code null} when the route schedule was not computed.
+   */
   private final LocalTime collectedAt;
   private final List<Alert> alerts;
 

@@ -27,7 +27,11 @@ public class ContainerDailyState {
   private final double containerCapacityLiters;
   private final double dailyDemandLitersPerDay;
   private final ContainerStatus status;
-  /** Time of day this snapshot represents (null for plain daily snapshots). */
+  /**
+   * Time of day this snapshot represents.
+   *
+   * <p>This value is {@code null} for plain daily snapshots without an exact moment.
+   */
   private final LocalTime time;
 
   /**

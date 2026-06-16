@@ -16,9 +16,10 @@ import java.util.Objects;
  */
 public final class CollectionStartTime {
 
+    private static final String TIME_PATTERN = "HH:mm";
     private static final String ERROR_TIME_NOT_DEFINED = "Collection start time is not defined";
-    private static final String ERROR_TIME_NOT_VALID = "Collection start time must follow the HH:mm format";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private static final String ERROR_TIME_NOT_VALID = "Collection start time must follow the " + TIME_PATTERN + " format";
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(TIME_PATTERN);
 
     /**
      * The collection start time.

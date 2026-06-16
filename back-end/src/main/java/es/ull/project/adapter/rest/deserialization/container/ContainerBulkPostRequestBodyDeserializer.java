@@ -1,7 +1,7 @@
 package es.ull.project.adapter.rest.deserialization.container;
 
-import es.ull.project.adapter.rest.deserialization.JsonFields;
-import es.ull.project.adapter.rest.deserialization.bulk.AbstractBulkPostRequestBodyDeserializer;
+import es.ull.project.adapter.rest.json.JsonFields;
+import es.ull.project.adapter.rest.support.AbstractBulkPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.request.container.ContainerBulkPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;
 

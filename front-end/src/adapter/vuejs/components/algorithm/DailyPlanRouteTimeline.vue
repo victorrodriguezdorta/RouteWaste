@@ -634,11 +634,21 @@ function openFacility(facilityId: string): void {
 
 .route-stop__time {
   align-items: center;
-  color: rgba(var(--v-theme-neutral-base), 0.7);
+  background: rgba(var(--v-theme-primary), 0.12);
+  border: 1px solid rgba(var(--v-theme-primary), 0.24);
+  border-radius: 999px;
+  color: rgb(var(--v-theme-primary));
   display: inline-flex;
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
   gap: 4px;
+  padding: 2px 10px;
+}
+
+.route-stop--facility .route-stop__time {
+  background: rgba(var(--v-theme-danger-dark), 0.12);
+  border-color: rgba(var(--v-theme-danger-dark), 0.24);
+  color: rgb(var(--v-theme-danger-dark));
 }
 
 .route-stop__facility-indicator {

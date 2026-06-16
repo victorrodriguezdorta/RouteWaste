@@ -1,5 +1,7 @@
 import type { ContainerFillChartInput } from '@/adapter/vuejs/charts/container-fill/container-fill-chart-input';
 import type { ContainerFillChartResult } from '@/adapter/vuejs/charts/container-fill/container-fill-chart-result';
+import type { MonitoringState } from '@/adapter/vuejs/charts/container-fill/monitoring-state';
+import type { TimelineColumn } from '@/adapter/vuejs/charts/container-fill/timeline-column';
 import type { RouteProgressChartDatum } from '@/adapter/vuejs/charts/route-progress/route-progress-chart-datum';
 import {
   computeContainerFillPercentFromLiters,
@@ -31,15 +33,6 @@ const CONTAINER_FILL_CHART_COLORS = [
 
 const MINUTES_PER_DAY = 24 * 60;
 const DEFAULT_TIME_MINUTES = 0;
-
-type MonitoringState = ContainerFillChartInput['monitoringStates'][number];
-
-interface TimelineColumn {
-  /** Unique sortable value combining day and time of day. */
-  key: number;
-  day: number;
-  minutes: number;
-}
 
 function normalizeIdentifier(value: string | null | undefined): string {
   return String(value ?? '').trim().toLowerCase();

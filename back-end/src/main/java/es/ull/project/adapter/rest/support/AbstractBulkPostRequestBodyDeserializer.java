@@ -1,4 +1,4 @@
-package es.ull.project.adapter.rest.deserialization.bulk;
+package es.ull.project.adapter.rest.support;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

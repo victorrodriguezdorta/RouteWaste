@@ -26,19 +26,39 @@ public class DeliveryPlanningProblem {
   private static final int MIN_AVERAGE_PICKUP_TIME_MINUTES = 0;
   private static final int MIN_NUMBER_OF_DAYS = 1;
   private static final int MIN_AVERAGE_TRANSFER_TIME_MINUTES = 0;
-  /** Default collection day start time applied when the request does not provide one. */
+  /**
+   * Default collection day start time.
+   *
+   * <p>Applied when the request does not provide an explicit workday start.
+   */
   private static final LocalTime DEFAULT_COLLECTION_START_TIME = LocalTime.of(8, 0);
-  /** Default average transfer time between points applied when the request does not provide one. */
+  /**
+   * Default average transfer time between route points.
+   *
+   * <p>Applied when the request does not provide a custom transfer duration.
+   */
   private static final int DEFAULT_AVERAGE_TRANSFER_TIME_MINUTES = 0;
 
   private final int averagePickupTimeMinutes;
   private final int numberOfDays;
   private final MaximumBudget maxBudget;
-  /** Time of day when the collection journey starts (used to schedule each vehicle's stops). */
+  /**
+   * Time of day when the collection journey starts.
+   *
+   * <p>Used as the initial clock value to schedule each vehicle's stops.
+   */
   private final LocalTime collectionStartTime;
-  /** Average travelling time, in minutes, a vehicle needs to move from one point to another. */
+  /**
+   * Average travelling time between route points.
+   *
+   * <p>Measured in minutes and applied to every simulated movement.
+   */
   private final int averageTransferTimeMinutes;
-  /** Weights applied to the greedy container selection score (distance vs. fill). */
+  /**
+   * Weights applied to the greedy container selection score.
+   *
+   * <p>Balances the distance penalty against the container fill reward.
+   */
   private final GreedyWeights greedyWeights;
   private final List<FacilityWithVehicles> facilitiesWithVehicles;
   private final List<Container> containers;

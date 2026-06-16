@@ -1,5 +1,5 @@
-import type { BulkImportResult } from '@/adapter/http/response/common/bulk-import-result';
 import { FacilityHttpRepository } from '@/adapter/http/repository/facility-http-repository';
+import type { BulkImportResult } from '@/adapter/http/response/common/bulk-import-result';
 import { resolveStoreSuccessNotification } from '@/adapter/vuejs/utils/store-notification-messages';
 import { resolveBackendError } from '@/adapter/vuejs/utils/translate-backend-error';
 import { CreateFacilityService } from '@/application/service/facility/create-facility-service';

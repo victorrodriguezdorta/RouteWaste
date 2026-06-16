@@ -71,7 +71,9 @@ class ContainerDailyStateTests {
                 CollectedVolumeLiters.fromLiters(dailyFillingLiters),
                 new ContainerCapacityLiters(containerCapacityLiters),
                 new DailyWasteDemandLitersPerDay(dailyDemandLitersPerDay),
-                status);
+                status,
+                null,
+                null);
 
         assertEquals(id, state.getId());
         assertEquals(plan.getId(), state.getInfrastructurePlanId().orElse(null));
@@ -186,7 +188,9 @@ class ContainerDailyStateTests {
                 CollectedVolumeLiters.fromLiters(12.0),
                 new ContainerCapacityLiters(100.0),
                 new DailyWasteDemandLitersPerDay(5.0),
-                ContainerStatus.CORRECT);
+                ContainerStatus.CORRECT,
+                null,
+                null);
         ContainerDailyState state2 = new ContainerDailyState(
                 id,
                 plan,
@@ -195,7 +199,9 @@ class ContainerDailyStateTests {
                 CollectedVolumeLiters.fromLiters(20.0),
                 new ContainerCapacityLiters(150.0),
                 new DailyWasteDemandLitersPerDay(7.0),
-                ContainerStatus.OVERFLOWED);
+                ContainerStatus.OVERFLOWED,
+                null,
+                null);
         ContainerDailyState state3 = randomState();
 
         assertTrue(state1.equals(state1));

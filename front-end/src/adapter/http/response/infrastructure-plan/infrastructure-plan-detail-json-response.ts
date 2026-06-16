@@ -2,6 +2,7 @@ import type { ContainerDailyStateJsonResponse } from './container-daily-state-js
 import type { InfrastructurePlanClusterJsonResponse } from './infrastructure-plan-cluster-json-response';
 import type { InfrastructurePlanDailyPlanJsonResponse } from './infrastructure-plan-daily-plan-json-response';
 import type { InfrastructurePlanFacilityJsonResponse } from './infrastructure-plan-facility-json-response';
+import type { InfrastructurePlanGreedyWeightsJsonResponse } from './infrastructure-plan-greedy-weights-json-response';
 import type { InfrastructurePlanMetricsJsonResponse } from './infrastructure-plan-metrics-json-response';
 import type { InfrastructurePlanMoneyJsonResponse } from './infrastructure-plan-money-json-response';
 
@@ -39,12 +40,4 @@ export interface InfrastructurePlanDetailJsonResponse {
   failureReason?: string | null;
   /** JSON snapshot of the client execution request */
   executionRequestJson?: string;
-}
-
-/**
- * Greedy scoring weights block returned within the infrastructure plan detail.
- */
-export interface InfrastructurePlanGreedyWeightsJsonResponse {
-  distanceWeight?: number;
-  fillWeight?: number;
 }

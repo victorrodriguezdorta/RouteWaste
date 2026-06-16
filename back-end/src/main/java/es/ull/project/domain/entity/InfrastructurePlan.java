@@ -256,19 +256,12 @@ public class InfrastructurePlan {
 
     /**
      * Restore constructor.
-     * Restores an InfrastructurePlan from persistence with all its attributes.
+     * Restores an InfrastructurePlan from persistence with its required and optional scalar attributes.
      *
      * @param id                       the plan identifier
      * @param period                   the planning period
-     * @param selectedFacilities       selected facilities restored for the plan
-     * @param serviceAssignments       service assignments restored for the plan
-     * @param dailyPlans               daily plans restored for the plan
      * @param servicePolicies          the service policies
      * @param maxBudget                the maximum budget allowed
-     * @param estimatedTotalCost       estimated total cost restored for the plan
-     * @param totalCollectedKilograms  total collected kilograms restored for the plan
-     * @param totalCollectedLiters     total collected liters restored for the plan
-     * @param totalDistanceMeters      total route distance restored for the plan
      * @param numberOfDays             the number of days for planning
      * @param averagePickupTimeMinutes the average pickup time in minutes
      * @param executedAt               the timestamp of algorithm execution
@@ -276,73 +269,8 @@ public class InfrastructurePlan {
      * @param executionState           persisted algorithm execution lifecycle state
      * @param failureReason            optional failure description when execution failed
      * @param executionRequestJson     persisted client request JSON snapshot
-     * @param containerDailyStates     container daily states restored for the plan
      */
     public InfrastructurePlan(UUID id,
-            PlanningPeriod period,
-            List<Facility> selectedFacilities,
-            List<ServiceAssignment> serviceAssignments,
-            List<DailyPlan> dailyPlans,
-            ServicePolicies servicePolicies,
-            MaximumBudget maxBudget,
-            TotalCost estimatedTotalCost,
-            CollectedWeightKilograms totalCollectedKilograms,
-            CollectedVolumeLiters totalCollectedLiters,
-            Distance totalDistanceMeters,
-            NumberOfDays numberOfDays,
-            AveragePickupTimeMinutes averagePickupTimeMinutes,
-            ExecutedAt executedAt,
-            InfrastructurePlanValidityState validityState,
-            InfrastructurePlanExecutionState executionState,
-            InfrastructurePlanFailureReason failureReason,
-            AlgorithmJsonPayload executionRequestJson,
-            List<ContainerDailyState> containerDailyStates) {
-        validatePeriod(period);
-        validateMaxBudget(maxBudget);
-        validateValidityState(validityState);
-        validateExecutionState(executionState);
-        this.id = id;
-        this.period = period;
-        this.selectedFacilities = selectedFacilities != null ? new ArrayList<>(selectedFacilities) : new ArrayList<>();
-        this.serviceAssignments = serviceAssignments != null ? new ArrayList<>(serviceAssignments) : new ArrayList<>();
-        this.dailyPlans = dailyPlans != null ? new ArrayList<>(dailyPlans) : new ArrayList<>();
-        this.containerDailyStates = containerDailyStates != null ? new ArrayList<>(containerDailyStates) : new ArrayList<>();
-        this.servicePolicies = servicePolicies;
-        this.maxBudget = maxBudget;
-        this.estimatedTotalCost = estimatedTotalCost != null ? estimatedTotalCost : new TotalCost(0.0);
-        this.totalCollectedKilograms = totalCollectedKilograms != null
-                ? totalCollectedKilograms
-                : CollectedWeightKilograms.fromKilograms(0.0);
-        this.totalCollectedLiters = totalCollectedLiters != null
-                ? totalCollectedLiters
-                : CollectedVolumeLiters.fromLiters(0.0);
-        this.totalDistanceMeters = totalDistanceMeters != null ? totalDistanceMeters : Distance.fromMeters(0.0);
-        this.numberOfDays = numberOfDays;
-        this.averagePickupTimeMinutes = averagePickupTimeMinutes;
-        this.executedAt = executedAt;
-        this.validityState = validityState;
-        this.executionState = executionState;
-        this.failureReason = failureReason;
-        this.executionRequestJson = executionRequestJson;
-    }
-
-    /**
-     * Restore constructor.
-     * Restores an InfrastructurePlan reference with only required scalar values.
-     *
-     * @param id                       the plan identifier
-     * @param period                   the planning period
-     * @param servicePolicies          the service policies
-     * @param maxBudget                the maximum budget allowed
-     * @param numberOfDays             the number of days for planning
-     * @param averagePickupTimeMinutes the average pickup time in minutes
-     * @param executedAt               the timestamp of algorithm execution
-     * @param validityState            persisted validity state
-     * @param executionState           persisted algorithm execution lifecycle state
-     * @param failureReason            optional failure description
-     * @param executionRequestJson     persisted client request JSON snapshot
-     */
-    private InfrastructurePlan(UUID id,
             PlanningPeriod period,
             ServicePolicies servicePolicies,
             MaximumBudget maxBudget,
@@ -353,9 +281,32 @@ public class InfrastructurePlan {
             InfrastructurePlanExecutionState executionState,
             InfrastructurePlanFailureReason failureReason,
             AlgorithmJsonPayload executionRequestJson) {
-        this(id, period, null, null, null, servicePolicies, maxBudget, null, null, null, null,
-                numberOfDays, averagePickupTimeMinutes, executedAt, validityState, executionState, failureReason,
-                executionRequestJson, null);
+        validatePeriod(period);
+        validateMaxBudget(maxBudget);
+        validateValidityState(validityState);
+        validateExecutionState(executionState);
+        this.id = id;
+        this.period = period;
+        this.selectedFacilities = new ArrayList<>();
+        this.serviceAssignments = new ArrayList<>();
+        this.dailyPlans = new ArrayList<>();
+        this.containerDailyStates = new ArrayList<>();
+        this.servicePolicies = servicePolicies;
+        this.maxBudget = maxBudget;
+        this.estimatedTotalCost = new TotalCost(0.0);
+        this.totalCollectedKilograms = CollectedWeightKilograms.fromKilograms(0.0);
+        this.totalCollectedLiters = CollectedVolumeLiters.fromLiters(0.0);
+        this.totalDistanceMeters = Distance.fromMeters(0.0);
+        this.numberOfDays = numberOfDays;
+        this.averagePickupTimeMinutes = averagePickupTimeMinutes;
+        this.executedAt = executedAt;
+        this.validityState = validityState;
+        this.executionState = executionState;
+        this.failureReason = failureReason;
+        this.executionRequestJson = executionRequestJson;
+        this.collectionStartTime = null;
+        this.averageTransferTimeMinutes = null;
+        this.greedyWeights = null;
     }
 
     /**
@@ -404,26 +355,20 @@ public class InfrastructurePlan {
             String failureReason) {
         PlanningPeriod placeholderPeriod = new PlanningPeriod(String.valueOf(LocalDate.now().getYear()));
         MaximumBudget placeholderBudget = new MaximumBudget(0.0);
-        return new InfrastructurePlan(
+        InfrastructurePlan plan = new InfrastructurePlan(
                 id,
                 placeholderPeriod,
                 null,
-                null,
-                null,
-                null,
                 placeholderBudget,
-                estimatedTotalCost,
-                null,
-                null,
-                null,
                 numberOfDays,
                 averagePickupTimeMinutes,
                 executedAt,
                 validityState,
                 executionState,
                 InfrastructurePlanFailureReason.fromNullable(failureReason),
-                null,
                 null);
+        plan.restoreComputedMetrics(estimatedTotalCost, null, null, null);
+        return plan;
     }
 
     /**

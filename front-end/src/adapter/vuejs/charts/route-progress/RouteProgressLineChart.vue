@@ -417,6 +417,7 @@ function clearSeriesTooltip(): void {
         :d="item.areaPath"
         :fill="`url(#${item.gradientId})`"
         class="route-progress-chart__area"
+        :class="{ 'route-progress-chart__area--active': hoveredSeriesKey === item.key }"
       />
 
       <path
@@ -438,7 +439,12 @@ function clearSeriesTooltip(): void {
         @mouseleave="clearSeriesTooltip"
       />
 
-      <g v-for="item in renderedSeries" :key="`${item.key}-points`">
+      <g
+        v-for="item in renderedSeries"
+        :key="`${item.key}-points`"
+        class="route-progress-chart__points"
+        :class="{ 'route-progress-chart__points--active': hoveredSeriesKey === item.key }"
+      >
         <circle
           v-for="point in item.points"
           :key="`${item.key}-${point.stop}`"
@@ -560,7 +566,16 @@ function clearSeriesTooltip(): void {
 }
 
 .route-progress-chart-host:has(.route-progress-chart__line--active) .route-progress-chart__line:not(.route-progress-chart__line--active) {
-  opacity: 0.28;
+  opacity: 0.55;
+  stroke: rgba(255, 255, 255, 0.85) !important;
+}
+
+.route-progress-chart-host:has(.route-progress-chart__line--active) .route-progress-chart__area:not(.route-progress-chart__area--active) {
+  opacity: 0.1;
+}
+
+.route-progress-chart-host:has(.route-progress-chart__line--active) .route-progress-chart__points:not(.route-progress-chart__points--active) {
+  opacity: 0.15;
 }
 
 .route-progress-chart__line {
@@ -569,10 +584,11 @@ function clearSeriesTooltip(): void {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2.75;
-  transition: stroke-width 0.15s ease, opacity 0.15s ease;
+  transition: stroke 0.15s ease, stroke-width 0.15s ease, opacity 0.15s ease;
 }
 
 .route-progress-chart__line--active {
+  stroke: #000000 !important;
   stroke-width: 4;
 }
 

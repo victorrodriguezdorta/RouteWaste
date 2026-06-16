@@ -10,9 +10,9 @@ import es.ull.project.adapter.rest.deserialization.container.ContainerPutRequest
 import es.ull.project.adapter.rest.deserialization.facility.FacilityBulkPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.facility.FacilityPostRequestBodyDeserializer;
 import es.ull.project.adapter.rest.deserialization.facility.FacilityPutRequestBodyDeserializer;
-import es.ull.project.adapter.rest.deserialization.vehicle.VehicleBulkPostRequestBodyDeserializer;
-import es.ull.project.adapter.rest.deserialization.vehicle.VehiclePostRequestBodyDeserializer;
-import es.ull.project.adapter.rest.deserialization.vehicle.VehiclePutRequestBodyDeserializer;
+import es.ull.project.adapter.rest.json.vehicle.VehicleBulkPostRequestBodyDeserializer;
+import es.ull.project.adapter.rest.json.vehicle.VehiclePostRequestBodyDeserializer;
+import es.ull.project.adapter.rest.json.vehicle.VehiclePutRequestBodyDeserializer;
 import es.ull.project.adapter.rest.request.algorithm.AlgorithmExecutionRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerBulkPostRequestBody;
 import es.ull.project.adapter.rest.request.container.ContainerPostRequestBody;

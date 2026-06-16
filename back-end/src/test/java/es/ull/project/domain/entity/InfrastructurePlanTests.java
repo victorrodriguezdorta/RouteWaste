@@ -323,23 +323,25 @@ class InfrastructurePlanTests {
         InfrastructurePlan restored = new InfrastructurePlan(
                 id,
                 period,
-                List.of(facility),
-                List.of(assignment),
-                List.of(dailyPlan),
                 randomServicePolicies(),
                 randomMaxBudget(),
-                new TotalCost(5000.0),
-                CollectedWeightKilograms.fromKilograms(100.0),
-                CollectedVolumeLiters.fromLiters(200.0),
-                Distance.fromMeters(1500.0),
                 new NumberOfDays(10),
                 new AveragePickupTimeMinutes(12),
                 new ExecutedAt("2026-04-01T08:00:00Z"),
                 InfrastructurePlanValidityState.VALID,
                 InfrastructurePlanExecutionState.COMPLETED,
                 null,
-                null,
+                null);
+        restored.restoreComputedAssociations(
+                List.of(facility),
+                List.of(assignment),
+                List.of(dailyPlan),
                 List.of(dailyState));
+        restored.restoreComputedMetrics(
+                new TotalCost(5000.0),
+                CollectedWeightKilograms.fromKilograms(100.0),
+                CollectedVolumeLiters.fromLiters(200.0),
+                Distance.fromMeters(1500.0));
 
         assertEquals(id, restored.getId());
         assertEquals(1, restored.getSelectedFacilities().size());

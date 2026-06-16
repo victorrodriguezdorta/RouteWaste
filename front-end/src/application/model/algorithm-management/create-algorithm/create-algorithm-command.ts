@@ -1,6 +1,8 @@
 import type { FacilityVehicleCommand } from '@/adapter/http/request/algorithm/facility-vehicle-command';
+import type { AlgorithmGreedyWeightsCommand } from '@/application/model/algorithm-management/create-algorithm/algorithm-greedy-weights-command';
 import type { AlgorithmMaxBudgetCommand } from '@/application/model/algorithm-management/create-algorithm/algorithm-max-budget-command';
 import type { UllUUID } from '@ull-tfg/ull-tfg-typescript';
+
 /**
  * CreateAlgorithmCommand
  *
@@ -47,15 +49,4 @@ export interface CreateAlgorithmCommand {
    * Optional maximum budget for the algorithm execution. Currency code expected (e.g., 'EUR').
    */
   maxBudget?: AlgorithmMaxBudgetCommand;
-}
-
-/**
- * AlgorithmGreedyWeightsCommand
- *
- * Distance and fill weights used by the greedy scoring of the algorithm.
- * Both weights must add up to 1.
- */
-export interface AlgorithmGreedyWeightsCommand {
-  distanceWeight: number;
-  fillWeight: number;
 }
