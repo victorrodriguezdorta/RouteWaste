@@ -1,6 +1,6 @@
 package es.ull.project.application.usecase.facility;
 
-import es.ull.project.application.model.BulkCreateOutcome;
+import es.ull.project.application.message.BulkCreateOutcome;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.valueobject.capacity.ProcessingCapacityKilogramsPerDay;

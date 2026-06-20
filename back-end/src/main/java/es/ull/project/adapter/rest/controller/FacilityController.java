@@ -11,8 +11,7 @@ import es.ull.project.adapter.rest.response.bulk.BulkImportResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityPageResponseBody;
 import es.ull.project.adapter.rest.response.facility.FacilityResponseBody;
 import es.ull.project.adapter.rest.support.BulkImportMultipartSupport;
-import es.ull.project.application.model.BulkCreateOutcome;
-import es.ull.project.application.query.FacilitySearchCriteria;
+import es.ull.project.application.message.BulkCreateOutcome;
 import es.ull.project.application.usecase.facility.BulkCreateFacilitiesUseCase;
 import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
 import es.ull.project.application.usecase.facility.DeleteFacilityUseCase;
@@ -169,7 +168,7 @@ public class FacilityController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-        FacilitySearchCriteria criteria = new FacilitySearchCriteriaBuilder()
+        var criteria = new FacilitySearchCriteriaBuilder()
                 .withFacilityType(facilityTypeFilter)
                 .withStatus(statusFilter)
                 .withLocationPostalAddress(location)

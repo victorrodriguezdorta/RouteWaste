@@ -1,7 +1,7 @@
 package es.ull.project.application.service.algorithm;
 
-import es.ull.project.application.port.algorithm.AlgorithmExecutionPayloadSerializer;
-import es.ull.project.application.port.infrastructureplan.InfrastructurePlanExecutionNotifier;
+import es.ull.project.application.repository.algorithm.AlgorithmExecutionPayloadSerializer;
+import es.ull.project.application.repository.infrastructureplan.InfrastructurePlanExecutionNotifier;
 import es.ull.project.application.usecase.algorithm.AlgorithmExecutionJobCommand;
 import es.ull.project.application.usecase.algorithm.AlgorithmExecutionResult;
 import es.ull.project.application.usecase.algorithm.ExecuteAlgorithmUseCase;

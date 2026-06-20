@@ -18,7 +18,6 @@ import es.ull.project.domain.valueobject.location.Distance;
 import es.ull.project.domain.valueobject.policy.ServicePolicies;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanningPeriod;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -178,8 +177,8 @@ public class InfrastructurePlan {
      * Creates a new InfrastructurePlan.
      *
      * @param period                   Planning period
-     * @param maxBudget                Maximum budget allowed
      * @param servicePolicies          Service policies to comply with
+     * @param maxBudget                Maximum budget allowed
      * @param numberOfDays             Number of days in the planning horizon
      * @param averagePickupTimeMinutes Average pickup time in minutes
      * @param executedAt               Timestamp of algorithm execution (ISO 8601)
@@ -188,8 +187,8 @@ public class InfrastructurePlan {
      */
     public InfrastructurePlan(
             PlanningPeriod period,
-            MaximumBudget maxBudget,
             ServicePolicies servicePolicies,
+            MaximumBudget maxBudget,
             NumberOfDays numberOfDays,
             AveragePickupTimeMinutes averagePickupTimeMinutes,
             ExecutedAt executedAt,
@@ -201,8 +200,8 @@ public class InfrastructurePlan {
         validateExecutionState(executionState);
         this.id = UUID.randomUUID();
         this.period = period;
-        this.maxBudget = maxBudget;
         this.servicePolicies = servicePolicies;
+        this.maxBudget = maxBudget;
         this.numberOfDays = numberOfDays;
         this.averagePickupTimeMinutes = averagePickupTimeMinutes;
         this.executedAt = executedAt;
@@ -307,68 +306,6 @@ public class InfrastructurePlan {
         this.collectionStartTime = null;
         this.averageTransferTimeMinutes = null;
         this.greedyWeights = null;
-    }
-
-    /**
-     * Minimal aggregate reference used when loading nested documents (for example a {@link DailyPlan})
-     * where only the infrastructure plan identifier is required.
-     *
-     * @param infrastructurePlanId parent plan id
-     * @return placeholder plan carrying only the id and default scalar placeholders
-     */
-    public static InfrastructurePlan forIdReferenceOnly(UUID infrastructurePlanId) {
-        return new InfrastructurePlan(
-                infrastructurePlanId,
-                new PlanningPeriod(String.valueOf(LocalDate.now().getYear())),
-                null,
-                new MaximumBudget(1.0),
-                null,
-                null,
-                null,
-                InfrastructurePlanValidityState.VALID,
-                InfrastructurePlanExecutionState.COMPLETED,
-                null,
-                null);
-    }
-
-    /**
-     * Lightweight aggregate for paginated list reads without hydrating related entities.
-     *
-     * @param id                       plan identifier
-     * @param estimatedTotalCost       persisted estimated total cost, may be null while running
-     * @param numberOfDays             planning horizon length in days
-     * @param averagePickupTimeMinutes average pickup time in minutes
-     * @param executedAt               algorithm execution timestamp
-     * @param validityState            persisted validity state
-     * @param executionState           persisted execution lifecycle state
-     * @param failureReason            optional failure description
-     * @return infrastructure plan carrying only list-summary fields
-     */
-    public static InfrastructurePlan forListSummary(
-            UUID id,
-            TotalCost estimatedTotalCost,
-            NumberOfDays numberOfDays,
-            AveragePickupTimeMinutes averagePickupTimeMinutes,
-            ExecutedAt executedAt,
-            InfrastructurePlanValidityState validityState,
-            InfrastructurePlanExecutionState executionState,
-            String failureReason) {
-        PlanningPeriod placeholderPeriod = new PlanningPeriod(String.valueOf(LocalDate.now().getYear()));
-        MaximumBudget placeholderBudget = new MaximumBudget(0.0);
-        InfrastructurePlan plan = new InfrastructurePlan(
-                id,
-                placeholderPeriod,
-                null,
-                placeholderBudget,
-                numberOfDays,
-                averagePickupTimeMinutes,
-                executedAt,
-                validityState,
-                executionState,
-                InfrastructurePlanFailureReason.fromNullable(failureReason),
-                null);
-        plan.restoreComputedMetrics(estimatedTotalCost, null, null, null);
-        return plan;
     }
 
     /**

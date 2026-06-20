@@ -83,7 +83,7 @@ public interface ContainerRepository {
      * @param criteria search criteria with optional filters
      * @return page of matching containers
      */
-    public abstract Page<Container> findAll(@NonNull Pageable pageable, @NonNull es.ull.project.application.query.ContainerSearchCriteria criteria);
+    public abstract Page<Container> findAll(@NonNull Pageable pageable, @NonNull es.ull.project.application.repository.query.ContainerSearchCriteria criteria);
 
     /**
      * Counts all containers in the repository.

@@ -1,6 +1,11 @@
 package es.ull.project.adapter.mongodb.mapper;
 
+/**
+ * Maps MongoDB infrastructure plan documents to lightweight domain aggregates for list queries.
+ * Avoids loading daily plans, service assignments, facilities, and other nested collections.
+ */
 import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.domain.InfrastructurePlanReferences;
 import es.ull.project.domain.entity.InfrastructurePlan;
 import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.enumerate.InfrastructurePlanValidityState;
@@ -12,10 +17,6 @@ import es.ull.project.domain.valueobject.time.ExecutedAt;
 import java.util.UUID;
 import org.bson.Document;
 
-/**
- * Maps MongoDB infrastructure plan documents to lightweight domain aggregates for list queries.
- * Avoids loading daily plans, service assignments, facilities, and other nested collections.
- */
 public final class InfrastructurePlanListDocumentMapper {
 
     private static final String UTILITY_CLASS_EXCEPTION_MESSAGE = "Utility class cannot be instantiated";
@@ -53,7 +54,7 @@ public final class InfrastructurePlanListDocumentMapper {
             validityState = InfrastructurePlanValidityState.RUNNING;
         }
         String failureReason = document.getString(MongoFields.FAILURE_REASON);
-        return InfrastructurePlan.forListSummary(
+        return InfrastructurePlanReferences.forListSummary(
                 id,
                 estimatedTotalCost,
                 numberOfDays,

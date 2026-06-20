@@ -1,22 +1,5 @@
 package es.ull.project.adapter.mongodb.reader;
 
-import es.ull.project.adapter.mongodb.MongoFields;
-import es.ull.project.configuration.MongoConfiguration;
-import es.ull.project.domain.entity.Container;
-import es.ull.project.domain.entity.Facility;
-import es.ull.project.domain.entity.InfrastructurePlan;
-import es.ull.project.domain.entity.ServiceAssignment;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.ReadingConverter;
-import org.springframework.lang.NonNull;
-
 /**
  * ServiceAssignmentReadingConverter
  *
@@ -27,6 +10,23 @@ import org.springframework.lang.NonNull;
  * (WasteDemand, Distance, ServiceTime, TransportationVariableCost) into a properly
  * constructed ServiceAssignment domain entity.
  */
+import es.ull.project.adapter.mongodb.MongoFields;
+import es.ull.project.configuration.MongoConfiguration;
+import es.ull.project.domain.InfrastructurePlanReferences;
+import es.ull.project.domain.entity.Container;
+import es.ull.project.domain.entity.Facility;
+import es.ull.project.domain.entity.InfrastructurePlan;
+import es.ull.project.domain.entity.ServiceAssignment;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
+
 @ReadingConverter
 public class ServiceAssignmentReadingConverter implements Converter<Document, ServiceAssignment> {
 
@@ -57,7 +57,7 @@ public class ServiceAssignmentReadingConverter implements Converter<Document, Se
         logger.info("ServiceAssignment to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         UUID planId = (UUID) document.get(MongoFields.INFRASTRUCTURE_PLAN_ID);
-        InfrastructurePlan infrastructurePlan = InfrastructurePlan.forIdReferenceOnly(planId);
+        InfrastructurePlan infrastructurePlan = InfrastructurePlanReferences.forIdReferenceOnly(planId);
         UUID facilityId = (UUID) document.get(MongoFields.FACILITY_ID);
         Facility facility = mongoConfiguration.facilityRepository().findById(facilityId)
                 .orElseThrow(() -> new IllegalStateException(String.format(ERR_FACILITY_SNAPSHOT, facilityId)));

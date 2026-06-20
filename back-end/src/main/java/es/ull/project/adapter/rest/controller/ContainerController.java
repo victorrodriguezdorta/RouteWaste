@@ -11,8 +11,7 @@ import es.ull.project.adapter.rest.response.bulk.BulkImportResponseBody;
 import es.ull.project.adapter.rest.response.container.ContainerPageResponseBody;
 import es.ull.project.adapter.rest.response.container.ContainerResponseBody;
 import es.ull.project.adapter.rest.support.BulkImportMultipartSupport;
-import es.ull.project.application.model.BulkCreateOutcome;
-import es.ull.project.application.query.ContainerSearchCriteria;
+import es.ull.project.application.message.BulkCreateOutcome;
 import es.ull.project.application.usecase.container.BulkCreateContainersUseCase;
 import es.ull.project.application.usecase.container.CreateContainerUseCase;
 import es.ull.project.application.usecase.container.DeleteContainerUseCase;
@@ -179,7 +178,7 @@ public class ContainerController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-        ContainerSearchCriteria criteria = new ContainerSearchCriteriaBuilder()
+        var criteria = new ContainerSearchCriteriaBuilder()
                 .withWasteType(wasteTypeFilter)
                 .withServiceZone(serviceZone)
                 .withMinCapacityLiters(minCapacity)

@@ -1,7 +1,7 @@
 package es.ull.project.application.service.facility;
 
-import es.ull.project.application.model.BulkCreateItemFailure;
-import es.ull.project.application.model.BulkCreateOutcome;
+import es.ull.project.application.message.BulkCreateItemFailure;
+import es.ull.project.application.message.BulkCreateOutcome;
 import es.ull.project.application.usecase.facility.BulkCreateFacilitiesUseCase;
 import es.ull.project.application.usecase.facility.CreateFacilityUseCase;
 import es.ull.project.domain.enumerate.FacilityStatus;

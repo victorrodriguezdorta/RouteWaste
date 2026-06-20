@@ -1,6 +1,6 @@
 package es.ull.project.application.repository;
 
-import es.ull.project.application.query.FacilitySearchCriteria;
+import es.ull.project.application.repository.query.FacilitySearchCriteria;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;

@@ -1,6 +1,6 @@
 package es.ull.project.application.usecase.facility;
 
-import es.ull.project.application.query.FacilitySearchCriteria;
+import es.ull.project.application.repository.query.FacilitySearchCriteria;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityType;
 import es.ull.project.domain.readmodel.EntityTypeBreakdown;

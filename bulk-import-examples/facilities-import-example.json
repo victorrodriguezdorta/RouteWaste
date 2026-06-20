@@ -1,13 +1,13 @@
 {
   "facilities": [
     {
-      "name": "Instalación importación Base Operativa Norte",
+      "name": "Muelle",
       "facilityType": "OPERATIONAL_BASE",
       "location": {
-        "latitude": 28.4629,
-        "longitude": -16.2519,
-        "postalAddress": "Avenida Tres de Mayo 10, Santa Cruz de Tenerife",
-        "gisReference": "IMPORT-FACILITY-1"
+        "latitude": 28.4686,
+        "longitude": -16.2451,
+        "postalAddress": "Muelle de Santa Cruz de Tenerife",
+        "gisReference": "MUELLE"
       },
       "storageCapacity": {
         "value": 25000
@@ -25,13 +25,13 @@
       "status": "OPEN"
     },
     {
-      "name": "Instalación importación Estación Transferencia Anaga",
+      "name": "La Cuesta",
       "facilityType": "TRANSFER_STATION",
       "location": {
-        "latitude": 28.5262,
-        "longitude": -16.2464,
-        "postalAddress": "Carretera de Anaga 15, Santa Cruz de Tenerife",
-        "gisReference": "IMPORT-FACILITY-2"
+        "latitude": 28.4668,
+        "longitude": -16.2996,
+        "postalAddress": "La Cuesta, San Cristóbal de La Laguna",
+        "gisReference": "LA-CUESTA"
       },
       "storageCapacity": {
         "value": 38000
@@ -49,13 +49,13 @@
       "status": "PLANNED"
     },
     {
-      "name": "Instalación importación Planta Tratamiento Santa Cruz",
+      "name": "El Mayorazgo",
       "facilityType": "TREATMENT_PLANT",
       "location": {
-        "latitude": 28.4548,
-        "longitude": -16.2685,
-        "postalAddress": "Polígono Industrial de Añaza, Santa Cruz de Tenerife",
-        "gisReference": "IMPORT-FACILITY-3"
+        "latitude": 28.441241,
+        "longitude": -16.283345,
+        "postalAddress": "El Mayorazgo, Santa Cruz de Tenerife",
+        "gisReference": "EL-MAYORAZGO"
       },
       "storageCapacity": {
         "value": 80000

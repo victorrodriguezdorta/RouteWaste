@@ -1,6 +1,6 @@
 package es.ull.project.adapter.mongodb.query;
 
-import es.ull.project.application.query.FacilitySearchCriteria;
+import es.ull.project.application.repository.query.FacilitySearchCriteria;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;
 

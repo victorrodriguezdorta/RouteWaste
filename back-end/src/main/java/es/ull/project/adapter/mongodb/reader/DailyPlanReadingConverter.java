@@ -1,7 +1,15 @@
 package es.ull.project.adapter.mongodb.reader;
 
+/**
+ * DailyPlanReadingConverter
+ *
+ * Implements custom conversion logic for transforming MongoDB documents
+ * into DailyPlan entities, including their nested facility, vehicle,
+ * stop, and container snapshots.
+ */
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
+import es.ull.project.domain.InfrastructurePlanReferences;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.DailyPlan;
 import es.ull.project.domain.entity.Facility;
@@ -20,7 +28,6 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,13 +35,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.lang.NonNull;
 
-/**
- * DailyPlanReadingConverter
- *
- * Implements custom conversion logic for transforming MongoDB documents
- * into DailyPlan entities, including their nested facility, vehicle,
- * stop, and container snapshots.
- */
 @ReadingConverter
 public class DailyPlanReadingConverter implements Converter<Document, DailyPlan> {
 
@@ -69,7 +69,7 @@ public class DailyPlanReadingConverter implements Converter<Document, DailyPlan>
         logger.info("DailyPlan to read from document '{}'", document);
         UUID id = (UUID) document.get(MongoFields.ID);
         UUID planId = (UUID) document.get(MongoFields.INFRASTRUCTURE_PLAN_ID);
-        InfrastructurePlan infrastructurePlan = InfrastructurePlan.forIdReferenceOnly(planId);
+        InfrastructurePlan infrastructurePlan = InfrastructurePlanReferences.forIdReferenceOnly(planId);
         UUID facilityId = (UUID) document.get(MongoFields.FACILITY_ID);
         Facility facility = mongoConfiguration.facilityRepository().findById(facilityId)
                 .orElseThrow(() -> new IllegalStateException(String.format(ERR_FACILITY_SNAPSHOT, facilityId)));

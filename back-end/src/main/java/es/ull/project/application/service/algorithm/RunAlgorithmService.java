@@ -1,6 +1,6 @@
 package es.ull.project.application.service.algorithm;
 
-import es.ull.project.application.port.algorithm.AlgorithmRunner;
+import es.ull.project.application.repository.algorithm.AlgorithmRunner;
 import es.ull.project.application.usecase.algorithm.RunAlgorithmUseCase;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 

@@ -71,8 +71,8 @@ public class CreatePendingInfrastructurePlanService implements CreatePendingInfr
         ExecutedAt startedAt = new ExecutedAt(ZonedDateTime.now(ZoneOffset.UTC).toString());
         InfrastructurePlan plan = new InfrastructurePlan(
                 period,
-                maxBudget,
                 null,
+                maxBudget,
                 numberOfDays,
                 averagePickupTimeMinutes,
                 startedAt,

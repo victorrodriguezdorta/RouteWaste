@@ -152,24 +152,6 @@ public class ContainerDailyState {
     }
 
     /**
-     * Copy constructor.
-     *
-     * @param otherObject container daily state to copy
-     */
-    public ContainerDailyState(ContainerDailyState otherObject) {
-        this.id = otherObject.id;
-        this.infrastructurePlan = otherObject.infrastructurePlan;
-        this.container = otherObject.container;
-        this.planDay = otherObject.planDay;
-        this.dailyFillingLiters = otherObject.dailyFillingLiters;
-        this.dailyFillingLitersBeforeCollection = otherObject.dailyFillingLitersBeforeCollection;
-        this.containerCapacityLiters = otherObject.containerCapacityLiters;
-        this.dailyDemandLitersPerDay = otherObject.dailyDemandLitersPerDay;
-        this.status = otherObject.status;
-        this.time = otherObject.time;
-    }
-
-    /**
      * Creates a container state snapshot tied to a specific moment of the day.
      *
      * @param infrastructurePlan                   the parent infrastructure plan
@@ -206,6 +188,24 @@ public class ContainerDailyState {
     }
 
     /**
+     * Copy constructor.
+     *
+     * @param otherObject container daily state to copy
+     */
+    public ContainerDailyState(ContainerDailyState otherObject) {
+        this.id = otherObject.id;
+        this.infrastructurePlan = otherObject.infrastructurePlan;
+        this.container = otherObject.container;
+        this.planDay = otherObject.planDay;
+        this.dailyFillingLiters = otherObject.dailyFillingLiters;
+        this.dailyFillingLitersBeforeCollection = otherObject.dailyFillingLitersBeforeCollection;
+        this.containerCapacityLiters = otherObject.containerCapacityLiters;
+        this.dailyDemandLitersPerDay = otherObject.dailyDemandLitersPerDay;
+        this.status = otherObject.status;
+        this.time = otherObject.time;
+    }
+
+    /**
      * Restore constructor.
      * Restores a ContainerDailyState from persistence with all its attributes.
      *
@@ -214,10 +214,10 @@ public class ContainerDailyState {
      * @param container                              the referenced container
      * @param planDay                                the planning day represented by the snapshot
      * @param dailyFillingLiters                     the container filling level in liters
+     * @param dailyFillingLitersBeforeCollection     the filling level before collection
      * @param containerCapacityLiters                the container capacity in liters
      * @param dailyDemandLitersPerDay                the estimated daily demand in liters per day
      * @param status                                 the computed container status
-     * @param dailyFillingLitersBeforeCollection     the filling level before collection
      * @param time                                   the time of day represented by this snapshot
      */
     public ContainerDailyState(
@@ -226,10 +226,10 @@ public class ContainerDailyState {
             Container container,
             PlanDay planDay,
             CollectedVolumeLiters dailyFillingLiters,
+            CollectedVolumeLiters dailyFillingLitersBeforeCollection,
             ContainerCapacityLiters containerCapacityLiters,
             DailyWasteDemandLitersPerDay dailyDemandLitersPerDay,
             ContainerStatus status,
-            CollectedVolumeLiters dailyFillingLitersBeforeCollection,
             LocalTime time) {
         validate(container, planDay, dailyFillingLiters, containerCapacityLiters, dailyDemandLitersPerDay);
         this.id = id;

@@ -1,6 +1,6 @@
 package es.ull.project.application.usecase.container;
 
-import es.ull.project.application.query.ContainerSearchCriteria;
+import es.ull.project.application.repository.query.ContainerSearchCriteria;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.readmodel.EntityTypeBreakdown;

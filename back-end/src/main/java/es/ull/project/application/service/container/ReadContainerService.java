@@ -1,12 +1,12 @@
 package es.ull.project.application.service.container;
 
-import es.ull.project.application.common.EntityTypeBreakdownBuilder;
-import es.ull.project.application.query.ContainerSearchCriteria;
 import es.ull.project.application.repository.ContainerRepository;
+import es.ull.project.application.repository.query.ContainerSearchCriteria;
 import es.ull.project.application.usecase.container.ReadContainerUseCase;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.readmodel.EntityTypeBreakdown;
+import es.ull.project.domain.readmodel.EntityTypeBreakdownBuilder;
 
 import java.util.List;
 import java.util.NoSuchElementException;

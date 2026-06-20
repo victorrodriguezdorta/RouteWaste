@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.ull.project.adapter.rest.mapper.AlgorithmExecutionResponseMapper;
 import es.ull.project.adapter.rest.response.algorithm.AlgorithmExecutionResponseBody;
 import es.ull.project.application.exception.AlgorithmExecutionException;
-import es.ull.project.application.port.algorithm.AlgorithmExecutionPayloadSerializer;
+import es.ull.project.application.repository.algorithm.AlgorithmExecutionPayloadSerializer;
 import es.ull.project.application.usecase.algorithm.AlgorithmExecutionResult;
 import es.ull.project.domain.valueobject.algorithm.AlgorithmJsonPayload;
 import es.ull.project.domain.valueobject.cost.MaximumBudget;

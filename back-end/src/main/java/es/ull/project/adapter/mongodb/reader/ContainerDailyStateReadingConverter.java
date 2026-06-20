@@ -1,7 +1,11 @@
 package es.ull.project.adapter.mongodb.reader;
 
+/**
+ * Converts MongoDB documents into ContainerDailyState entities.
+ */
 import es.ull.project.adapter.mongodb.MongoFields;
 import es.ull.project.configuration.MongoConfiguration;
+import es.ull.project.domain.InfrastructurePlanReferences;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.ContainerDailyState;
 import es.ull.project.domain.entity.InfrastructurePlan;
@@ -20,9 +24,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.lang.NonNull;
 
-/**
- * Converts MongoDB documents into ContainerDailyState entities.
- */
 @ReadingConverter
 public class ContainerDailyStateReadingConverter implements Converter<Document, ContainerDailyState> {
 
@@ -52,7 +53,7 @@ public class ContainerDailyStateReadingConverter implements Converter<Document, 
         UUID id = (UUID) document.get(MongoFields.ID);
         UUID infrastructurePlanId = document.get(MongoFields.INFRASTRUCTURE_PLAN_ID, UUID.class);
         InfrastructurePlan infrastructurePlan = infrastructurePlanId != null
-                ? InfrastructurePlan.forIdReferenceOnly(infrastructurePlanId)
+                ? InfrastructurePlanReferences.forIdReferenceOnly(infrastructurePlanId)
                 : null;
         UUID containerId = document.get(MongoFields.CONTAINER_ID, UUID.class);
         Container container = this.mongoConfiguration.containerRepository().findById(containerId)
@@ -71,12 +72,12 @@ public class ContainerDailyStateReadingConverter implements Converter<Document, 
                 container,
                 new PlanDay(planDay != null ? planDay : 1),
                 CollectedVolumeLiters.fromLiters(dailyFilling != null ? dailyFilling : 0.0),
-                new ContainerCapacityLiters(capacity != null ? capacity : 0.0),
-                new DailyWasteDemandLitersPerDay(dailyDemand != null ? dailyDemand : 0.0),
-                status,
                 dailyFillingBeforeCollection != null
                         ? CollectedVolumeLiters.fromLiters(dailyFillingBeforeCollection)
                         : null,
+                new ContainerCapacityLiters(capacity != null ? capacity : 0.0),
+                new DailyWasteDemandLitersPerDay(dailyDemand != null ? dailyDemand : 0.0),
+                status,
                 time);
     }
 

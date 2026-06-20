@@ -1,7 +1,7 @@
 package es.ull.project.adapter.memory;
 
-import es.ull.project.application.query.VehicleSearchCriteria;
 import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.application.repository.query.VehicleSearchCriteria;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
 import java.util.ArrayList;

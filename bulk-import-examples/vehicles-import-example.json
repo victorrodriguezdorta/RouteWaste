@@ -3,8 +3,8 @@
     {
       "name": "Vehículo A",
       "vehicleType": "COLLECTION_TRUCK",
-      "capacityKilograms": 850,
-      "CapacityLiters": 1500,
+      "capacityKilograms": 625,
+      "CapacityLiters": 950,
       "costPerKilometer": {
         "amount": 0.82,
         "currency": "EUR"
@@ -13,8 +13,8 @@
     {
       "name": "Vehículo B",
       "vehicleType": "COLLECTION_TRUCK",
-      "capacityKilograms": 720,
-      "CapacityLiters": 1300,
+      "capacityKilograms": 560,
+      "CapacityLiters": 850,
       "costPerKilometer": {
         "amount": 0.79,
         "currency": "EUR"
@@ -23,8 +23,8 @@
     {
       "name": "Vehículo C",
       "vehicleType": "COLLECTION_TRUCK",
-      "capacityKilograms": 340,
-      "CapacityLiters": 620,
+      "capacityKilograms": 370,
+      "CapacityLiters": 510,
       "costPerKilometer": {
         "amount": 0.76,
         "currency": "EUR"
@@ -33,8 +33,8 @@
     {
       "name": "Vehículo D",
       "vehicleType": "TRANSFER_TRUCK",
-      "capacityKilograms": 7500,
-      "CapacityLiters": 10000,
+      "capacityKilograms": 3950,
+      "CapacityLiters": 5200,
       "costPerKilometer": {
         "amount": 1.45,
         "currency": "EUR"
@@ -43,8 +43,8 @@
     {
       "name": "Vehículo E",
       "vehicleType": "COLLECTION_TRUCK",
-      "capacityKilograms": 900,
-      "CapacityLiters": 1650,
+      "capacityKilograms": 650,
+      "CapacityLiters": 1025,
       "costPerKilometer": {
         "amount": 0.85,
         "currency": "EUR"
@@ -53,8 +53,8 @@
     {
       "name": "Vehículo F",
       "vehicleType": "SUPPORT_VEHICLE",
-      "capacityKilograms": 280,
-      "CapacityLiters": 450,
+      "capacityKilograms": 340,
+      "CapacityLiters": 425,
       "costPerKilometer": {
         "amount": 0.55,
         "currency": "EUR"
@@ -63,8 +63,8 @@
     {
       "name": "Vehículo G",
       "vehicleType": "COLLECTION_TRUCK",
-      "capacityKilograms": 680,
-      "CapacityLiters": 1200,
+      "capacityKilograms": 540,
+      "CapacityLiters": 800,
       "costPerKilometer": {
         "amount": 0.81,
         "currency": "EUR"
@@ -73,8 +73,8 @@
     {
       "name": "Vehículo H",
       "vehicleType": "COLLECTION_TRUCK",
-      "capacityKilograms": 310,
-      "CapacityLiters": 580,
+      "capacityKilograms": 355,
+      "CapacityLiters": 490,
       "costPerKilometer": {
         "amount": 0.74,
         "currency": "EUR"
@@ -83,8 +83,8 @@
     {
       "name": "Vehículo I",
       "vehicleType": "TRANSFER_TRUCK",
-      "capacityKilograms": 9000,
-      "CapacityLiters": 12000,
+      "capacityKilograms": 4700,
+      "CapacityLiters": 6200,
       "costPerKilometer": {
         "amount": 1.6,
         "currency": "EUR"
@@ -93,8 +93,8 @@
     {
       "name": "Vehículo J",
       "vehicleType": "SUPPORT_VEHICLE",
-      "capacityKilograms": 320,
-      "CapacityLiters": 500,
+      "capacityKilograms": 360,
+      "CapacityLiters": 450,
       "costPerKilometer": {
         "amount": 0.58,
         "currency": "EUR"
@@ -103,8 +103,8 @@
     {
       "name": "Vehículo K",
       "vehicleType": "COLLECTION_TRUCK",
-      "capacityKilograms": 360,
-      "CapacityLiters": 650,
+      "capacityKilograms": 380,
+      "CapacityLiters": 525,
       "costPerKilometer": {
         "amount": 0.77,
         "currency": "EUR"

@@ -1,12 +1,12 @@
 package es.ull.project.application.service.vehicle;
 
-import es.ull.project.application.common.EntityTypeBreakdownBuilder;
-import es.ull.project.application.query.VehicleSearchCriteria;
 import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.application.repository.query.VehicleSearchCriteria;
 import es.ull.project.application.usecase.vehicle.ReadVehicleUseCase;
 import es.ull.project.domain.entity.Vehicle;
 import es.ull.project.domain.enumerate.VehicleType;
 import es.ull.project.domain.readmodel.EntityTypeBreakdown;
+import es.ull.project.domain.readmodel.EntityTypeBreakdownBuilder;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;

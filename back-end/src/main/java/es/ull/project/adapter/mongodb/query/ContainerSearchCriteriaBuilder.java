@@ -1,6 +1,6 @@
 package es.ull.project.adapter.mongodb.query;
 
-import es.ull.project.application.query.ContainerSearchCriteria;
+import es.ull.project.application.repository.query.ContainerSearchCriteria;
 import es.ull.project.domain.enumerate.WasteType;
 
 /**

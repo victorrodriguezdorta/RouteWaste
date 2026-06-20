@@ -1,7 +1,7 @@
 package es.ull.project.application.service.container;
 
-import es.ull.project.application.model.BulkCreateItemFailure;
-import es.ull.project.application.model.BulkCreateOutcome;
+import es.ull.project.application.message.BulkCreateItemFailure;
+import es.ull.project.application.message.BulkCreateOutcome;
 import es.ull.project.application.usecase.container.BulkCreateContainersUseCase;
 import es.ull.project.application.usecase.container.CreateContainerUseCase;
 import es.ull.project.domain.enumerate.ServiceZone;

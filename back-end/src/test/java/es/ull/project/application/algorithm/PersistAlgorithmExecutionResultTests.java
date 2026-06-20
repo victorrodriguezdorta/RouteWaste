@@ -1,38 +1,13 @@
 package es.ull.project.application.algorithm;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-
-import es.ull.project.application.query.ContainerSearchCriteria;
-import es.ull.project.application.query.FacilitySearchCriteria;
-import es.ull.project.application.repository.ContainerDailyStateRepository;
-import es.ull.project.application.repository.ContainerRepository;
-import es.ull.project.application.repository.DailyPlanRepository;
-import es.ull.project.application.repository.FacilityRepository;
-import es.ull.project.application.repository.InfrastructurePlanRepository;
-import es.ull.project.application.repository.ServiceAssignmentRepository;
-import es.ull.project.application.repository.VehicleRepository;
+import es.ull.project.adapter.memory.InMemoryContainerDailyStateRepository;
+import es.ull.project.adapter.memory.InMemoryContainerRepository;
+import es.ull.project.adapter.memory.InMemoryFacilityRepository;
+import es.ull.project.adapter.memory.InMemoryInfrastructurePlanRepository;
+import es.ull.project.adapter.memory.InMemoryServiceAssignmentRepository;
+import es.ull.project.adapter.memory.InMemoryVehicleRepository;
 import es.ull.project.application.service.algorithm.CreatePendingInfrastructurePlanService;
 import es.ull.project.application.service.algorithm.PersistAlgorithmExecutionResultService;
-import es.ull.project.application.usecase.algorithm.PersistAlgorithmExecutionResultUseCase;
-import es.ull.project.domain.InfrastructurePlanAggregateReferences;
 import es.ull.project.domain.entity.Container;
 import es.ull.project.domain.entity.ContainerDailyState;
 import es.ull.project.domain.entity.DailyPlan;
@@ -64,91 +39,65 @@ import es.ull.project.domain.valueobject.cost.MaximumBudget;
 import es.ull.project.domain.valueobject.cost.OpeningFixedCost;
 import es.ull.project.domain.valueobject.cost.TransportationVariableCost;
 import es.ull.project.domain.valueobject.demand.DailyWasteDemandLitersPerDay;
+import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import es.ull.project.domain.valueobject.location.Location;
 import es.ull.project.domain.valueobject.name.Name;
 import es.ull.project.domain.valueobject.time.ExecutedAt;
 import es.ull.project.domain.valueobject.time.PlanDay;
+import java.lang.reflect.Field;
+import java.util.UUID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.Test;
 
-class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionResultUseCase {
+class PersistAlgorithmExecutionResultTests {
 
+    private static final String COLLECTION_START_TIME_VALUE = "08:00";
+    private static final String CONTAINER_ONE_ADDRESS = "Calle random";
+    private static final String CONTAINER_ONE_GIS_REFERENCE = "123414";
+    private static final String CONTAINER_ONE_ID_VALUE = "2dd7627e-f357-42e1-b257-2cf1160440d3";
+    private static final String CONTAINER_ONE_NAME = "container-seed-1";
+    private static final String CONTAINER_TWO_ADDRESS = "adf";
+    private static final String CONTAINER_TWO_GIS_REFERENCE = "afdsa";
+    private static final String CONTAINER_TWO_ID_VALUE = "374ae62c-1e31-4210-88d3-dbefa4320a72";
+    private static final String CONTAINER_TWO_NAME = "container-seed-2";
+    private static final String ENTITY_ID_FIELD = "id";
+    private static final String EXECUTED_AT_VALUE = "2026-04-29T10:30:32.420542549Z";
+    private static final String FACILITY_ADDRESS = "Calle Principal 123, Las Palmas";
+    private static final String FACILITY_GIS_REFERENCE = "GIS-REF-001";
+    private static final String FACILITY_ID_VALUE = "ce3d2863-eabe-4c6c-a31b-1c3b3ea72038";
+    private static final String FACILITY_NAME = "facility-seed";
+    private static final String FAILURE_REASON_VALUE = "Docker timeout";
+    private static final String PERIOD_VALUE = "2026";
+    private static final String REQUEST_SNAPSHOT = "{\"facilityId\":\"ce3d2863-eabe-4c6c-a31b-1c3b3ea72038\"}";
+    private static final String VEHICLE_ONE_ID_VALUE = "21703654-95aa-4620-9668-a429fa4b2cf8";
+    private static final String VEHICLE_ONE_NAME = "vehicle-seed-1";
+    private static final String VEHICLE_TWO_ID_VALUE = "882d413c-18c7-4a66-90ad-fa62f7600b02";
+    private static final String VEHICLE_TWO_NAME = "vehicle-seed-2";
+    private static final UUID CONTAINER_ONE_ID = UUID.fromString(CONTAINER_ONE_ID_VALUE);
+    private static final UUID CONTAINER_TWO_ID = UUID.fromString(CONTAINER_TWO_ID_VALUE);
+    private static final UUID FACILITY_ID = UUID.fromString(FACILITY_ID_VALUE);
+    private static final UUID VEHICLE_ONE_ID = UUID.fromString(VEHICLE_ONE_ID_VALUE);
+    private static final UUID VEHICLE_TWO_ID = UUID.fromString(VEHICLE_TWO_ID_VALUE);
+
+    /**
+     * Verifies that an algorithm response creates plan assignments and daily plans.
+     *
+     * @throws Exception when reflection-based fixture setup fails.
+     */
     @Test
-    void persistAlgorithmResponse_createsPlanAssignmentsAndDailyPlans() throws Exception {
+    void persistAlgorithmResponseCreatesPlanAssignmentsAndDailyPlans() throws Exception {
         InMemoryInfrastructurePlanRepository infrastructurePlanRepository = new InMemoryInfrastructurePlanRepository();
         InMemoryServiceAssignmentRepository serviceAssignmentRepository = new InMemoryServiceAssignmentRepository();
-        InMemoryDailyPlanRepository dailyPlanRepository = new InMemoryDailyPlanRepository();
+        TestInMemoryDailyPlanRepository dailyPlanRepository = new TestInMemoryDailyPlanRepository();
         InMemoryContainerDailyStateRepository containerDailyStateRepository = new InMemoryContainerDailyStateRepository();
         InMemoryFacilityRepository facilityRepository = new InMemoryFacilityRepository();
         InMemoryContainerRepository containerRepository = new InMemoryContainerRepository();
         InMemoryVehicleRepository vehicleRepository = new InMemoryVehicleRepository();
-
         seedInfrastructureEntities(facilityRepository, containerRepository, vehicleRepository);
-
-        PersistAlgorithmExecutionResultService service = new PersistAlgorithmExecutionResultService(
-                infrastructurePlanRepository,
-                serviceAssignmentRepository,
-          dailyPlanRepository,
-        containerDailyStateRepository,
-          facilityRepository,
-          containerRepository,
-          vehicleRepository);
-
-        AlgorithmJsonPayload payload = new AlgorithmJsonPayload(sampleAlgorithmJson());
-        String requestSnap = "{\"facilityId\":\"ce3d2863-eabe-4c6c-a31b-1c3b3ea72038\"}";
-        InfrastructurePlan plan = service.persist(
-                payload,
-                new NumberOfDays(7),
-                new AveragePickupTimeMinutes(15),
-                null,
-                new AlgorithmJsonPayload(requestSnap));
-
-        assertNotNull(plan);
-        assertEquals(requestSnap, plan.getExecutionRequestJson().orElse(null));
-        assertEquals(InfrastructurePlanValidityState.VALID, plan.getValidityState());
-        assertEquals(1, plan.getSelectedFacilities().size());
-        assertEquals(1, plan.getServiceAssignments().size());
-        assertEquals(2, plan.getDailyPlanIds().size());
-        assertEquals("2026", plan.getPeriod().getValue());
-        assertEquals(new NumberOfDays(7), plan.getNumberOfDays().get());
-        assertEquals(new AveragePickupTimeMinutes(15), plan.getAveragePickupTimeMinutes().get());
-        assertEquals(new ExecutedAt("2026-04-29T10:30:32.420542549Z"), plan.getExecutedAt().get());
-        assertEquals(2, plan.getContainerDailyStates().size());
-        for (ContainerDailyState cds : plan.getContainerDailyStates()) {
-            assertEquals(plan.getId(), cds.getInfrastructurePlanId().orElse(null));
-        }
-        assertEquals(1, infrastructurePlanRepository.saved.size());
-        assertEquals(1, serviceAssignmentRepository.saved.size());
-        assertEquals(2, dailyPlanRepository.saved.size());
-        assertEquals(2, containerDailyStateRepository.saved.size());
-
-        ServiceAssignment assignment = serviceAssignmentRepository.saved.values().iterator().next();
-        assertEquals(2, assignment.getAssignedContainers().size());
-        assertEquals(UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"), assignment.getFacility().getId());
-
-        DailyPlan firstDailyPlan = dailyPlanRepository.saved.values().iterator().next();
-        assertEquals(3, firstDailyPlan.getStops().size());
-        assertEquals(new PlanDay(1), firstDailyPlan.getPlanDay().orElse(null));
-        assertEquals(UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"), firstDailyPlan.getFacility().getId());
-        assertEquals(UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"), firstDailyPlan.getStops().get(0).getContainer().getId());
-        assertEquals(StopType.FACILITY, firstDailyPlan.getStops().get(2).getType());
-        assertNull(firstDailyPlan.getStops().get(2).getContainer());
-        assertEquals(InfrastructurePlanExecutionState.COMPLETED, plan.getExecutionState());
-    }
-
-    @Test
-    void complete_updatesExistingRunningPlanWithSameId() throws Exception {
-        InMemoryInfrastructurePlanRepository infrastructurePlanRepository = new InMemoryInfrastructurePlanRepository();
-        InMemoryServiceAssignmentRepository serviceAssignmentRepository = new InMemoryServiceAssignmentRepository();
-        InMemoryDailyPlanRepository dailyPlanRepository = new InMemoryDailyPlanRepository();
-        InMemoryContainerDailyStateRepository containerDailyStateRepository = new InMemoryContainerDailyStateRepository();
-        InMemoryFacilityRepository facilityRepository = new InMemoryFacilityRepository();
-        InMemoryContainerRepository containerRepository = new InMemoryContainerRepository();
-        InMemoryVehicleRepository vehicleRepository = new InMemoryVehicleRepository();
-
-        seedInfrastructureEntities(facilityRepository, containerRepository, vehicleRepository);
-
-        CreatePendingInfrastructurePlanService pendingService =
-                new CreatePendingInfrastructurePlanService(infrastructurePlanRepository);
-        PersistAlgorithmExecutionResultService persistService = new PersistAlgorithmExecutionResultService(
+        PersistAlgorithmExecutionResultService service = createPersistService(
                 infrastructurePlanRepository,
                 serviceAssignmentRepository,
                 dailyPlanRepository,
@@ -156,158 +105,231 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
                 facilityRepository,
                 containerRepository,
                 vehicleRepository);
+        InfrastructurePlan plan = service.persist(
+                new AlgorithmJsonPayload(sampleAlgorithmJson()),
+                new NumberOfDays(7),
+                new AveragePickupTimeMinutes(15),
+                null,
+                new AlgorithmJsonPayload(REQUEST_SNAPSHOT));
+        assertNotNull(plan);
+        assertEquals(REQUEST_SNAPSHOT, plan.getExecutionRequestJson().orElse(null));
+        assertEquals(InfrastructurePlanValidityState.VALID, plan.getValidityState());
+        assertEquals(1, plan.getSelectedFacilities().size());
+        assertEquals(1, plan.getServiceAssignments().size());
+        assertEquals(2, plan.getDailyPlanIds().size());
+        assertEquals(PERIOD_VALUE, plan.getPeriod().getValue());
+        assertEquals(new NumberOfDays(7), plan.getNumberOfDays().get());
+        assertEquals(new AveragePickupTimeMinutes(15), plan.getAveragePickupTimeMinutes().get());
+        assertEquals(new ExecutedAt(EXECUTED_AT_VALUE), plan.getExecutedAt().get());
+        assertEquals(2, plan.getContainerDailyStates().size());
+        for (ContainerDailyState state : plan.getContainerDailyStates()) {
+            assertEquals(plan.getId(), state.getInfrastructurePlanId().orElse(null));
+        }
+        assertEquals(1, infrastructurePlanRepository.fetchAll().size());
+        assertEquals(1, serviceAssignmentRepository.findAll().size());
+        assertEquals(2, dailyPlanRepository.findAll().size());
+        assertEquals(2, containerDailyStateRepository.findAll().size());
+        ServiceAssignment assignment = serviceAssignmentRepository.findAll().iterator().next();
+        assertEquals(2, assignment.getAssignedContainers().size());
+        assertEquals(FACILITY_ID, assignment.getFacility().getId());
+        DailyPlan firstDailyPlan = dailyPlanRepository.findAll().iterator().next();
+        assertEquals(3, firstDailyPlan.getStops().size());
+        assertEquals(new PlanDay(1), firstDailyPlan.getPlanDay().orElse(null));
+        assertEquals(FACILITY_ID, firstDailyPlan.getFacility().getId());
+        assertEquals(CONTAINER_ONE_ID, firstDailyPlan.getStops().get(0).getContainer().getId());
+        assertEquals(StopType.FACILITY, firstDailyPlan.getStops().get(2).getType());
+        assertNull(firstDailyPlan.getStops().get(2).getContainer());
+        assertEquals(InfrastructurePlanExecutionState.COMPLETED, plan.getExecutionState());
+    }
 
-        String requestSnap = "{\"facilityId\":\"ce3d2863-eabe-4c6c-a31b-1c3b3ea72038\"}";
+    /**
+     * Verifies that completion updates an existing running plan with the same identifier.
+     *
+     * @throws Exception when reflection-based fixture setup fails.
+     */
+    @Test
+    void completeUpdatesExistingRunningPlanWithSameId() throws Exception {
+        InMemoryInfrastructurePlanRepository infrastructurePlanRepository = new InMemoryInfrastructurePlanRepository();
+        InMemoryServiceAssignmentRepository serviceAssignmentRepository = new InMemoryServiceAssignmentRepository();
+        TestInMemoryDailyPlanRepository dailyPlanRepository = new TestInMemoryDailyPlanRepository();
+        InMemoryContainerDailyStateRepository containerDailyStateRepository = new InMemoryContainerDailyStateRepository();
+        InMemoryFacilityRepository facilityRepository = new InMemoryFacilityRepository();
+        InMemoryContainerRepository containerRepository = new InMemoryContainerRepository();
+        InMemoryVehicleRepository vehicleRepository = new InMemoryVehicleRepository();
+        seedInfrastructureEntities(facilityRepository, containerRepository, vehicleRepository);
+        CreatePendingInfrastructurePlanService pendingService =
+                new CreatePendingInfrastructurePlanService(infrastructurePlanRepository);
+        PersistAlgorithmExecutionResultService persistService = createPersistService(
+                infrastructurePlanRepository,
+                serviceAssignmentRepository,
+                dailyPlanRepository,
+                containerDailyStateRepository,
+                facilityRepository,
+                containerRepository,
+                vehicleRepository);
         InfrastructurePlan pending = pendingService.createPending(
                 new NumberOfDays(7),
                 new AveragePickupTimeMinutes(15),
-                CollectionStartTime.fromString("08:00"),
+                CollectionStartTime.fromString(COLLECTION_START_TIME_VALUE),
                 new AverageTransferTimeMinutes(10),
                 GreedyWeights.defaultWeights(),
                 new MaximumBudget(1_000_000.0),
-                new AlgorithmJsonPayload(requestSnap));
+                new AlgorithmJsonPayload(REQUEST_SNAPSHOT));
         UUID pendingId = pending.getId();
-
         InfrastructurePlan completed = persistService.complete(
                 pendingId,
                 new AlgorithmJsonPayload(sampleAlgorithmJson()),
                 new NumberOfDays(7),
                 new AveragePickupTimeMinutes(15),
                 null,
-                new AlgorithmJsonPayload(requestSnap));
-
+                new AlgorithmJsonPayload(REQUEST_SNAPSHOT));
         assertEquals(pendingId, completed.getId());
         assertEquals(InfrastructurePlanExecutionState.COMPLETED, completed.getExecutionState());
         assertEquals(1, completed.getSelectedFacilities().size());
         assertEquals(2, completed.getDailyPlanIds().size());
-        assertEquals(1, infrastructurePlanRepository.saved.size());
+        assertEquals(1, infrastructurePlanRepository.fetchAll().size());
     }
 
+    /**
+     * Verifies that execution failure updates the running plan state.
+     */
     @Test
-    void markExecutionFailed_updatesRunningPlan() {
+    void markExecutionFailedUpdatesRunningPlan() {
         InMemoryInfrastructurePlanRepository infrastructurePlanRepository = new InMemoryInfrastructurePlanRepository();
         CreatePendingInfrastructurePlanService pendingService =
                 new CreatePendingInfrastructurePlanService(infrastructurePlanRepository);
-        PersistAlgorithmExecutionResultService persistService = new PersistAlgorithmExecutionResultService(
+        PersistAlgorithmExecutionResultService persistService = createPersistService(
                 infrastructurePlanRepository,
                 new InMemoryServiceAssignmentRepository(),
-                new InMemoryDailyPlanRepository(),
+                new TestInMemoryDailyPlanRepository(),
                 new InMemoryContainerDailyStateRepository(),
                 new InMemoryFacilityRepository(),
                 new InMemoryContainerRepository(),
                 new InMemoryVehicleRepository());
-
         InfrastructurePlan pending = pendingService.createPending(
                 new NumberOfDays(2),
                 new AveragePickupTimeMinutes(10),
-                CollectionStartTime.fromString("08:00"),
+                CollectionStartTime.fromString(COLLECTION_START_TIME_VALUE),
                 new AverageTransferTimeMinutes(10),
                 GreedyWeights.defaultWeights(),
                 new MaximumBudget(1000.0),
                 null);
-
         InfrastructurePlan failed = persistService.markExecutionFailed(
-                pending.getId(), new es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason("Docker timeout"));
-
+                pending.getId(),
+                new InfrastructurePlanFailureReason(FAILURE_REASON_VALUE));
         assertEquals(InfrastructurePlanExecutionState.FAILED, failed.getExecutionState());
         assertEquals(InfrastructurePlanValidityState.VALID, failed.getValidityState());
         assertFalse(failed.isExecutionRunning());
-        assertEquals("Docker timeout", failed.getFailureReason().orElseThrow());
+        assertEquals(FAILURE_REASON_VALUE, failed.getFailureReason().orElseThrow());
     }
 
-    @Override
-    public InfrastructurePlan persist(
-            AlgorithmJsonPayload algorithmResponse,
-            NumberOfDays numberOfDays,
-            AveragePickupTimeMinutes averagePickupTimeMinutes,
-            es.ull.project.domain.valueobject.cost.MaximumBudget providedMaxBudget,
-            AlgorithmJsonPayload executionRequestJson) {
-        throw new UnsupportedOperationException("Test class does not implement production persistence.");
+    /**
+     * Creates the service under test with in-memory repositories.
+     *
+     * @param infrastructurePlanRepository infrastructure plan repository.
+     * @param serviceAssignmentRepository service assignment repository.
+     * @param dailyPlanRepository daily plan repository.
+     * @param containerDailyStateRepository container daily state repository.
+     * @param facilityRepository facility repository.
+     * @param containerRepository container repository.
+     * @param vehicleRepository vehicle repository.
+     * @return configured persistence service.
+     */
+    private PersistAlgorithmExecutionResultService createPersistService(
+            InMemoryInfrastructurePlanRepository infrastructurePlanRepository,
+            InMemoryServiceAssignmentRepository serviceAssignmentRepository,
+            TestInMemoryDailyPlanRepository dailyPlanRepository,
+            InMemoryContainerDailyStateRepository containerDailyStateRepository,
+            InMemoryFacilityRepository facilityRepository,
+            InMemoryContainerRepository containerRepository,
+            InMemoryVehicleRepository vehicleRepository) {
+        return new PersistAlgorithmExecutionResultService(
+                infrastructurePlanRepository,
+                serviceAssignmentRepository,
+                dailyPlanRepository,
+                containerDailyStateRepository,
+                facilityRepository,
+                containerRepository,
+                vehicleRepository);
     }
 
-    @Override
-    public InfrastructurePlan complete(
-            UUID planId,
-            AlgorithmJsonPayload algorithmResponse,
-            NumberOfDays numberOfDays,
-            AveragePickupTimeMinutes averagePickupTimeMinutes,
-            es.ull.project.domain.valueobject.cost.MaximumBudget providedMaxBudget,
-            AlgorithmJsonPayload executionRequestJson) {
-        throw new UnsupportedOperationException("Test class does not implement production persistence.");
+    /**
+     * Seeds infrastructure repositories with deterministic entities.
+     *
+     * @param facilityRepository facility repository.
+     * @param containerRepository container repository.
+     * @param vehicleRepository vehicle repository.
+     * @throws Exception when deterministic identifier injection fails.
+     */
+    private void seedInfrastructureEntities(
+            InMemoryFacilityRepository facilityRepository,
+            InMemoryContainerRepository containerRepository,
+            InMemoryVehicleRepository vehicleRepository) throws Exception {
+        Facility facility = new Facility(
+                new Name(FACILITY_NAME),
+                FacilityType.TRANSFER_STATION,
+                new Location(28.47, -16.25, FACILITY_ADDRESS, FACILITY_GIS_REFERENCE),
+                new StorageCapacityKilograms(1000.0),
+                new ProcessingCapacityKilogramsPerDay(1000.0),
+                new UnloadingTime(10),
+                new OpeningFixedCost(100.0),
+                FacilityStatus.OPEN);
+        setEntityId(facility, FACILITY_ID);
+        facilityRepository.save(facility);
+        Container container1 = new Container(
+                new Name(CONTAINER_ONE_NAME),
+                new Location(28.465837, -16.263835, CONTAINER_ONE_ADDRESS, CONTAINER_ONE_GIS_REFERENCE),
+                WasteType.ORGANIC,
+                new ContainerCapacityLiters(1000.0),
+                new DailyWasteDemandLitersPerDay(100.0),
+                ServiceZone.DISTRICT);
+        setEntityId(container1, CONTAINER_ONE_ID);
+        containerRepository.save(container1);
+        Container container2 = new Container(
+                new Name(CONTAINER_TWO_NAME),
+                new Location(28.462808, -16.264503, CONTAINER_TWO_ADDRESS, CONTAINER_TWO_GIS_REFERENCE),
+                WasteType.ORGANIC,
+                new ContainerCapacityLiters(1000.0),
+                new DailyWasteDemandLitersPerDay(100.0),
+                ServiceZone.DISTRICT);
+        setEntityId(container2, CONTAINER_TWO_ID);
+        containerRepository.save(container2);
+        Vehicle vehicle1 = new Vehicle(
+                new Name(VEHICLE_ONE_NAME),
+                VehicleType.SUPPORT_VEHICLE,
+                new VehicleCapacityKilograms(88),
+                new VehicleCapacityLiters(88),
+                new TransportationVariableCost(0.03));
+        setEntityId(vehicle1, VEHICLE_ONE_ID);
+        vehicleRepository.save(vehicle1);
+        Vehicle vehicle2 = new Vehicle(
+                new Name(VEHICLE_TWO_NAME),
+                VehicleType.COLLECTION_TRUCK,
+                new VehicleCapacityKilograms(88),
+                new VehicleCapacityLiters(88),
+                new TransportationVariableCost(0.03));
+        setEntityId(vehicle2, VEHICLE_TWO_ID);
+        vehicleRepository.save(vehicle2);
     }
 
-    @Override
-    public InfrastructurePlan markExecutionFailed(
-            UUID planId,
-            es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason failureReason) {
-        throw new UnsupportedOperationException("Test class does not implement production persistence.");
+    /**
+     * Injects a deterministic entity identifier into domain fixtures.
+     *
+     * @param entity entity whose identifier is replaced.
+     * @param id deterministic identifier.
+     * @throws Exception when reflection fails.
+     */
+    private void setEntityId(Object entity, UUID id) throws Exception {
+        Field idField = entity.getClass().getDeclaredField(ENTITY_ID_FIELD);
+        idField.setAccessible(true);
+        idField.set(entity, id);
     }
 
-        private void seedInfrastructureEntities(
-          InMemoryFacilityRepository facilityRepository,
-          InMemoryContainerRepository containerRepository,
-          InMemoryVehicleRepository vehicleRepository) {
-      Facility facility = new Facility(
-        new Name("facility-seed"),
-        FacilityType.TRANSFER_STATION,
-        new Location(28.47, -16.25, "Calle Principal 123, Las Palmas", "GIS-REF-001"),
-        new StorageCapacityKilograms(1000.0),
-        new ProcessingCapacityKilogramsPerDay(1000.0),
-        new UnloadingTime(10),
-        new OpeningFixedCost(100.0),
-        FacilityStatus.OPEN);
-      setEntityId(facility, UUID.fromString("ce3d2863-eabe-4c6c-a31b-1c3b3ea72038"));
-      facilityRepository.save(facility);
-
-      Container container1 = new Container(
-        new Name("container-seed-1"),
-        new Location(28.465837, -16.263835, "Calle random", "123414"),
-        WasteType.ORGANIC,
-        new ContainerCapacityLiters(1000.0),
-        new DailyWasteDemandLitersPerDay(100.0),
-        ServiceZone.DISTRICT);
-      setEntityId(container1, UUID.fromString("2dd7627e-f357-42e1-b257-2cf1160440d3"));
-      containerRepository.save(container1);
-
-      Container container2 = new Container(
-        new Name("container-seed-2"),
-        new Location(28.462808, -16.264503, "adf", "afdsa"),
-        WasteType.ORGANIC,
-        new ContainerCapacityLiters(1000.0),
-        new DailyWasteDemandLitersPerDay(100.0),
-        ServiceZone.DISTRICT);
-      setEntityId(container2, UUID.fromString("374ae62c-1e31-4210-88d3-dbefa4320a72"));
-      containerRepository.save(container2);
-
-      Vehicle vehicle1 = new Vehicle(
-        new Name("vehicle-seed-1"),
-        VehicleType.SUPPORT_VEHICLE,
-        new VehicleCapacityKilograms(88),
-        new VehicleCapacityLiters(88),
-        new TransportationVariableCost(0.03));
-      setEntityId(vehicle1, UUID.fromString("21703654-95aa-4620-9668-a429fa4b2cf8"));
-      vehicleRepository.save(vehicle1);
-
-      Vehicle vehicle2 = new Vehicle(
-        new Name("vehicle-seed-2"),
-        VehicleType.COLLECTION_TRUCK,
-        new VehicleCapacityKilograms(88),
-        new VehicleCapacityLiters(88),
-        new TransportationVariableCost(0.03));
-      setEntityId(vehicle2, UUID.fromString("882d413c-18c7-4a66-90ad-fa62f7600b02"));
-      vehicleRepository.save(vehicle2);
-        }
-
-        private void setEntityId(Object entity, UUID id) {
-            try {
-                java.lang.reflect.Field idField = entity.getClass().getDeclaredField("id");
-                idField.setAccessible(true);
-                idField.set(entity, id);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
+    /**
+     * Builds a representative algorithm response JSON.
+     *
+     * @return sample algorithm response.
+     */
     private String sampleAlgorithmJson() {
         return """
                 {
@@ -467,398 +489,5 @@ class PersistAlgorithmExecutionResultTests implements PersistAlgorithmExecutionR
                   ]
                 }
                 """;
-    }
-
-    private static final class InMemoryInfrastructurePlanRepository implements InfrastructurePlanRepository {
-        private final Map<UUID, InfrastructurePlan> saved = new LinkedHashMap<>();
-
-        @Override
-        public void delete(InfrastructurePlan entity) {
-            if (entity != null) {
-                saved.remove(entity.getId());
-            }
-        }
-
-        @Override
-        public List<InfrastructurePlan> fetchAll() {
-            return new ArrayList<>(saved.values());
-        }
-
-        @Override
-        public List<InfrastructurePlan> findAll() {
-            return fetchAll();
-        }
-
-        @Override
-        public Page<InfrastructurePlan> findAll(Pageable pageable) {
-          List<InfrastructurePlan> plans = new ArrayList<>(saved.values());
-          int start = (int) pageable.getOffset();
-          int end = Math.min(start + pageable.getPageSize(), plans.size());
-          List<InfrastructurePlan> pageContent = start >= plans.size() ? List.of() : plans.subList(start, end);
-          return new PageImpl<>(pageContent, pageable, plans.size());
-        }
-
-        @Override
-        public InfrastructurePlan save(InfrastructurePlan entity) {
-            saved.put(entity.getId(), entity);
-            return entity;
-        }
-
-        @Override
-        public Optional<InfrastructurePlan> findById(UUID id) {
-            return Optional.ofNullable(saved.get(id));
-        }
-
-        @Override
-        public List<InfrastructurePlan> findValidPlansReferencingEntityInExecutionRequest(UUID entityId) {
-            if (entityId == null) {
-                return List.of();
-            }
-            List<InfrastructurePlan> matches = new ArrayList<>();
-            for (InfrastructurePlan p : saved.values()) {
-                if (p.getValidityState() != InfrastructurePlanValidityState.VALID) {
-                    continue;
-                }
-                if (InfrastructurePlanAggregateReferences.referencesEntity(p, entityId)) {
-                    matches.add(p);
-                }
-            }
-            return matches;
-        }
-
-        @Override
-        public boolean existsAnyPlanReferencingEntityInExecutionRequest(UUID entityId) {
-            if (entityId == null) {
-                return false;
-            }
-            for (InfrastructurePlan p : saved.values()) {
-                if (InfrastructurePlanAggregateReferences.referencesEntity(p, entityId)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public List<InfrastructurePlan> findPlansReferencingEntityInExecutionRequest(UUID entityId) {
-            if (entityId == null) {
-                return List.of();
-            }
-            List<InfrastructurePlan> matches = new ArrayList<>();
-            for (InfrastructurePlan p : saved.values()) {
-                if (InfrastructurePlanAggregateReferences.referencesEntity(p, entityId)) {
-                    matches.add(p);
-                }
-            }
-            return matches;
-        }
-    }
-
-    private static final class InMemoryServiceAssignmentRepository implements ServiceAssignmentRepository {
-        private final Map<UUID, ServiceAssignment> saved = new LinkedHashMap<>();
-
-        @Override
-        public void delete(ServiceAssignment entity) {
-            if (entity != null) {
-                saved.remove(entity.getId());
-            }
-        }
-
-        @Override
-        public List<ServiceAssignment> fetchAll() {
-            return new ArrayList<>(saved.values());
-        }
-
-        @Override
-        public List<ServiceAssignment> findAll() {
-            return fetchAll();
-        }
-
-        @Override
-        public ServiceAssignment save(ServiceAssignment entity) {
-            saved.put(entity.getId(), entity);
-            return entity;
-        }
-
-        @Override
-        public Optional<ServiceAssignment> findById(UUID id) {
-            return Optional.ofNullable(saved.get(id));
-        }
-
-        @Override
-        public List<ServiceAssignment> findByInfrastructurePlanId(UUID infrastructurePlanId) {
-            if (infrastructurePlanId == null) {
-                return List.of();
-            }
-            List<ServiceAssignment> matches = new ArrayList<>();
-            for (ServiceAssignment a : saved.values()) {
-                if (infrastructurePlanId.equals(a.getInfrastructurePlan().getId())) {
-                    matches.add(a);
-                }
-            }
-            return matches;
-        }
-    }
-
-    private static final class InMemoryDailyPlanRepository implements DailyPlanRepository {
-        private final Map<UUID, DailyPlan> saved = new LinkedHashMap<>();
-
-        @Override
-        public DailyPlan save(DailyPlan entity) {
-            saved.put(entity.getId(), entity);
-            return entity;
-        }
-
-        @Override
-        public void delete(DailyPlan entity) {
-            if (entity != null) {
-                saved.remove(entity.getId());
-            }
-        }
-
-        @Override
-        public Optional<DailyPlan> findById(UUID id) {
-            return Optional.ofNullable(saved.get(id));
-        }
-
-        @Override
-        public List<DailyPlan> findByInfrastructurePlanId(UUID infrastructurePlanId) {
-            List<DailyPlan> plans = new ArrayList<>();
-            for (DailyPlan plan : saved.values()) {
-                if (plan.getInfrastructurePlan().getId().equals(infrastructurePlanId)) {
-                    plans.add(plan);
-                }
-            }
-            return plans;
-        }
-    }
-
-    private static final class InMemoryContainerDailyStateRepository implements ContainerDailyStateRepository {
-      private final Map<UUID, ContainerDailyState> saved = new LinkedHashMap<>();
-
-      @Override
-      public ContainerDailyState save(ContainerDailyState entity) {
-        saved.put(entity.getId(), entity);
-        return entity;
-      }
-
-      @Override
-      public Optional<ContainerDailyState> findById(UUID id) {
-        return Optional.ofNullable(saved.get(id));
-      }
-
-      @Override
-      public List<ContainerDailyState> findAll() {
-        return new ArrayList<>(saved.values());
-      }
-
-      @Override
-      public List<ContainerDailyState> findByInfrastructurePlanId(UUID infrastructurePlanId) {
-        if (infrastructurePlanId == null) {
-          return List.of();
-        }
-        List<ContainerDailyState> matches = new ArrayList<>();
-        for (ContainerDailyState s : saved.values()) {
-          if (s.getInfrastructurePlanId().filter(infrastructurePlanId::equals).isPresent()) {
-            matches.add(s);
-          }
-        }
-        return matches;
-      }
-
-      @Override
-      public void delete(ContainerDailyState entity) {
-        if (entity != null) {
-          saved.remove(entity.getId());
-        }
-      }
-    }
-
-      private static final class InMemoryFacilityRepository implements FacilityRepository {
-        private final Map<UUID, Facility> saved = new LinkedHashMap<>();
-
-        @Override
-        public void delete(Facility entity) {
-          if (entity != null) {
-            saved.remove(entity.getId());
-          }
-        }
-
-        @Override
-        public List<Facility> fetchAll() {
-          return new ArrayList<>(saved.values());
-        }
-
-        @Override
-        public List<Facility> findAll() {
-          return fetchAll();
-        }
-
-        @Override
-        public Facility save(Facility entity) {
-          saved.put(entity.getId(), entity);
-          return entity;
-        }
-
-        @Override
-        public Optional<Facility> findById(UUID id) {
-          return Optional.ofNullable(saved.get(id));
-        }
-
-        @Override
-        public Page<Facility> findAll(Pageable pageable) {
-          return new PageImpl<>(fetchAll(), pageable, saved.size());
-        }
-
-        @Override
-        public Page<Facility> findAll(Pageable pageable, FacilityType type, FacilityStatus status) {
-          return new PageImpl<>(fetchAll(), pageable, saved.size());
-        }
-
-        @Override
-        public Page<Facility> findAll(Pageable pageable, FacilitySearchCriteria criteria) {
-          return new PageImpl<>(fetchAll(), pageable, saved.size());
-        }
-
-        @Override
-        public long count() {
-          return saved.size();
-        }
-
-        @Override
-        public Map<FacilityType, Long> countByFacilityType() {
-          return countByEnum(saved.values().stream(), FacilityType.class, Facility::getFacilityType);
-        }
-      }
-
-      private static final class InMemoryContainerRepository implements ContainerRepository {
-        private final Map<UUID, Container> saved = new LinkedHashMap<>();
-
-        @Override
-        public void delete(Container entity) {
-          if (entity != null) {
-            saved.remove(entity.getId());
-          }
-        }
-
-        @Override
-        public List<Container> fetchAll() {
-          return new ArrayList<>(saved.values());
-        }
-
-        @Override
-        public List<Container> findAll() {
-          return fetchAll();
-        }
-
-        @Override
-        public Page<Container> findAll(Pageable pageable) {
-          return new PageImpl<>(fetchAll(), pageable, saved.size());
-        }
-
-        @Override
-        public Page<Container> findAll(Pageable pageable, WasteType wasteType) {
-          return new PageImpl<>(fetchAll(), pageable, saved.size());
-        }
-
-        @Override
-        public Container save(Container entity) {
-          saved.put(entity.getId(), entity);
-          return entity;
-        }
-
-        @Override
-        public Optional<Container> findById(UUID id) {
-          return Optional.ofNullable(saved.get(id));
-        }
-
-        @Override
-        public Page<Container> findAll(Pageable pageable, ContainerSearchCriteria criteria) {
-          return new PageImpl<>(fetchAll(), pageable, saved.size());
-        }
-
-        @Override
-        public long count() {
-          return saved.size();
-        }
-
-        @Override
-        public Map<WasteType, Long> countByWasteType() {
-          return countByEnum(saved.values().stream(), WasteType.class, Container::getWasteType);
-        }
-      }
-
-      private static final class InMemoryVehicleRepository implements VehicleRepository {
-        private final Map<UUID, Vehicle> saved = new LinkedHashMap<>();
-
-        @Override
-        public void delete(Vehicle entity) {
-          if (entity != null) {
-            saved.remove(entity.getId());
-          }
-        }
-
-        @Override
-        public List<Vehicle> fetchAll() {
-          return new ArrayList<>(saved.values());
-        }
-
-        @Override
-        public List<Vehicle> findAll() {
-          return fetchAll();
-        }
-
-        @Override
-        public Page<Vehicle> findAll(Pageable pageable) {
-          return new PageImpl<>(fetchAll(), pageable, saved.size());
-        }
-
-        @Override
-        public Page<Vehicle> findAll(Pageable pageable, VehicleType vehicleType) {
-          return new PageImpl<>(fetchAll(), pageable, saved.size());
-        }
-
-        @Override
-        public Page<Vehicle> findAll(Pageable pageable, es.ull.project.application.query.VehicleSearchCriteria criteria) {
-          return new PageImpl<>(fetchAll(), pageable, saved.size());
-        }
-
-        @Override
-        public Vehicle save(Vehicle entity) {
-          saved.put(entity.getId(), entity);
-          return entity;
-        }
-
-        @Override
-        public Optional<Vehicle> findById(UUID id) {
-          return Optional.ofNullable(saved.get(id));
-        }
-
-        @Override
-        public long count() {
-          return saved.size();
-        }
-
-        @Override
-        public Map<VehicleType, Long> countByVehicleType() {
-          return countByEnum(saved.values().stream(), VehicleType.class, Vehicle::getVehicleType);
-        }
-      }
-
-    private static <T, E extends Enum<E>> Map<E, Long> countByEnum(
-            Stream<T> entities,
-            Class<E> enumClass,
-            Function<T, E> classifier) {
-        Map<E, Long> counts = new EnumMap<>(enumClass);
-        for (E enumValue : enumClass.getEnumConstants()) {
-            counts.put(enumValue, 0L);
-        }
-        entities.forEach(entity -> {
-            E key = classifier.apply(entity);
-            if (key != null) {
-                counts.merge(key, 1L, Long::sum);
-            }
-        });
-        return counts;
     }
 }

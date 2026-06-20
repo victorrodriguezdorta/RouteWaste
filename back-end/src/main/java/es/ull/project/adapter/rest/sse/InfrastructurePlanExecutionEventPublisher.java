@@ -2,7 +2,7 @@ package es.ull.project.adapter.rest.sse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.ull.project.application.port.infrastructureplan.InfrastructurePlanExecutionNotifier;
+import es.ull.project.application.repository.infrastructureplan.InfrastructurePlanExecutionNotifier;
 import es.ull.project.domain.enumerate.InfrastructurePlanExecutionState;
 import es.ull.project.domain.valueobject.infrastructureplan.InfrastructurePlanFailureReason;
 import java.io.IOException;

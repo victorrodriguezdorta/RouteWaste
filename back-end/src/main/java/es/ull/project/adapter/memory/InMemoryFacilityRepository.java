@@ -1,7 +1,7 @@
 package es.ull.project.adapter.memory;
 
-import es.ull.project.application.query.FacilitySearchCriteria;
 import es.ull.project.application.repository.FacilityRepository;
+import es.ull.project.application.repository.query.FacilitySearchCriteria;
 import es.ull.project.domain.entity.Facility;
 import es.ull.project.domain.enumerate.FacilityStatus;
 import es.ull.project.domain.enumerate.FacilityType;

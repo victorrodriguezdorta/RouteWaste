@@ -1,6 +1,6 @@
 package es.ull.project.application.usecase.container;
 
-import es.ull.project.application.model.BulkCreateOutcome;
+import es.ull.project.application.message.BulkCreateOutcome;
 import es.ull.project.domain.enumerate.ServiceZone;
 import es.ull.project.domain.enumerate.WasteType;
 import es.ull.project.domain.valueobject.capacity.ContainerCapacityLiters;

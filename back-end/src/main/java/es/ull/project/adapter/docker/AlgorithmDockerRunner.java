@@ -2,7 +2,7 @@ package es.ull.project.adapter.docker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.ull.project.application.exception.AlgorithmExecutionException;
-import es.ull.project.application.port.algorithm.AlgorithmRunner;
+import es.ull.project.application.repository.algorithm.AlgorithmRunner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

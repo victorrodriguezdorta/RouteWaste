@@ -11,8 +11,7 @@ import es.ull.project.adapter.rest.response.bulk.BulkImportResponseBody;
 import es.ull.project.adapter.rest.response.vehicle.VehiclePageResponseBody;
 import es.ull.project.adapter.rest.response.vehicle.VehicleResponseBody;
 import es.ull.project.adapter.rest.support.BulkImportMultipartSupport;
-import es.ull.project.application.model.BulkCreateOutcome;
-import es.ull.project.application.query.VehicleSearchCriteria;
+import es.ull.project.application.message.BulkCreateOutcome;
 import es.ull.project.application.usecase.vehicle.BulkCreateVehiclesUseCase;
 import es.ull.project.application.usecase.vehicle.CreateVehicleUseCase;
 import es.ull.project.application.usecase.vehicle.DeleteVehicleUseCase;
@@ -153,7 +152,7 @@ public class VehicleController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-        VehicleSearchCriteria criteria = new VehicleSearchCriteriaBuilder()
+        var criteria = new VehicleSearchCriteriaBuilder()
                 .withVehicleType(vehicleTypeFilter)
                 .withName(name)
                 .build();

@@ -144,78 +144,7 @@ public class Stop {
             Distance cumulativeDistanceMeters,
             CollectedVolumeLiters containerActualLiters,
             List<StopAlert> alerts) {
-        this(UUID.randomUUID(), sequence, type, container, collectedKilograms, collectedLiters,
-                distanceFromPreviousMeters, cumulativeDistanceMeters, containerActualLiters, alerts, null);
-    }
-
-    /**
-     * Restore constructor.
-     * Restores a Stop from persistence with all its attributes.
-     *
-     * @param id                          The persisted stop identifier.
-     * @param sequence                    The sequence number in the route.
-     * @param type                        The kind of stop.
-     * @param container                   The container visited.
-     * @param collectedKilograms          The weight of waste collected.
-     * @param collectedLiters             The volume of waste collected.
-     * @param distanceFromPreviousMeters  The distance traveled from the previous stop.
-     * @param cumulativeDistanceMeters    The total distance traveled so far.
-     * @param containerActualLiters       The actual liters before collection.
-     * @param alerts                      List of alerts.
-     * @param collectedAt                 Time of day at which the stop is performed.
-     */
-    public Stop(UUID id,
-            RouteSequence sequence,
-            StopType type,
-            Container container,
-            CollectedWeightKilograms collectedKilograms,
-            CollectedVolumeLiters collectedLiters,
-            Distance distanceFromPreviousMeters,
-            Distance cumulativeDistanceMeters,
-            CollectedVolumeLiters containerActualLiters,
-            List<StopAlert> alerts,
-            LocalTime collectedAt) {
-        validateId(id);
-        validate(sequence, type, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
-        this.id = id;
-        this.sequence = sequence;
-        this.type = type;
-        this.container = container;
-        this.collectedKilograms = collectedKilograms;
-        this.collectedLiters = collectedLiters;
-        this.distanceFromPreviousMeters = distanceFromPreviousMeters;
-        this.cumulativeDistanceMeters = cumulativeDistanceMeters;
-        this.containerActualLiters = containerActualLiters != null ? containerActualLiters : CollectedVolumeLiters.fromLiters(0.0);
-        this.collectedAt = collectedAt;
-        this.alerts = alerts != null ? new ArrayList<>(alerts) : new ArrayList<>();
-    }
-
-    /**
-     * Creates a new Stop including collection metadata and the time of the visit.
-     *
-     * @param sequence                   The sequence number in the route.
-     * @param type                       The kind of stop.
-     * @param container                  The container visited.
-     * @param collectedKilograms         The weight of waste collected.
-     * @param collectedLiters            The volume of waste collected.
-     * @param distanceFromPreviousMeters The distance traveled from the previous stop.
-     * @param cumulativeDistanceMeters   The total distance traveled so far.
-     * @param containerActualLiters      The actual liters before collection.
-     * @param alerts                     List of alerts.
-     * @param collectedAt                Time of day at which the stop is performed.
-     */
-    public Stop(RouteSequence sequence,
-            StopType type,
-            Container container,
-            CollectedWeightKilograms collectedKilograms,
-            CollectedVolumeLiters collectedLiters,
-            Distance distanceFromPreviousMeters,
-            Distance cumulativeDistanceMeters,
-            CollectedVolumeLiters containerActualLiters,
-            List<StopAlert> alerts,
-            LocalTime collectedAt) {
-        this(UUID.randomUUID(), sequence, type, container, collectedKilograms, collectedLiters,
-                distanceFromPreviousMeters, cumulativeDistanceMeters, containerActualLiters, alerts, collectedAt);
+        this(sequence, type, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters, containerActualLiters, alerts, null);
     }
 
     /**
@@ -259,6 +188,44 @@ public class Stop {
     }
 
     /**
+     * Creates a new Stop including collection metadata and the time of the visit.
+     *
+     * @param sequence                   The sequence number in the route.
+     * @param type                       The kind of stop.
+     * @param container                  The container visited.
+     * @param collectedKilograms         The weight of waste collected.
+     * @param collectedLiters            The volume of waste collected.
+     * @param distanceFromPreviousMeters The distance traveled from the previous stop.
+     * @param cumulativeDistanceMeters   The total distance traveled so far.
+     * @param containerActualLiters      The actual liters before collection.
+     * @param alerts                     List of alerts.
+     * @param collectedAt                Time of day at which the stop is performed.
+     */
+    public Stop(RouteSequence sequence,
+            StopType type,
+            Container container,
+            CollectedWeightKilograms collectedKilograms,
+            CollectedVolumeLiters collectedLiters,
+            Distance distanceFromPreviousMeters,
+            Distance cumulativeDistanceMeters,
+            CollectedVolumeLiters containerActualLiters,
+            List<StopAlert> alerts,
+            LocalTime collectedAt) {
+        validate(sequence, type, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
+        this.id = UUID.randomUUID();
+        this.sequence = sequence;
+        this.type = type;
+        this.container = container;
+        this.collectedKilograms = collectedKilograms;
+        this.collectedLiters = collectedLiters;
+        this.distanceFromPreviousMeters = distanceFromPreviousMeters;
+        this.cumulativeDistanceMeters = cumulativeDistanceMeters;
+        this.containerActualLiters = containerActualLiters != null ? containerActualLiters : CollectedVolumeLiters.fromLiters(0.0);
+        this.collectedAt = collectedAt;
+        this.alerts = alerts != null ? new ArrayList<>(alerts) : new ArrayList<>();
+    }
+
+    /**
      * Copy constructor.
      *
      * @param otherObject the Stop instance to copy; must not be null
@@ -278,6 +245,48 @@ public class Stop {
         this.containerActualLiters = otherObject.containerActualLiters;
         this.collectedAt = otherObject.collectedAt;
         this.alerts = new ArrayList<>(otherObject.alerts);
+    }
+
+    /**
+     * Restore constructor.
+     * Restores a Stop from persistence with all its attributes.
+     *
+     * @param id                          The persisted stop identifier.
+     * @param sequence                    The sequence number in the route.
+     * @param type                        The kind of stop.
+     * @param container                   The container visited.
+     * @param collectedKilograms          The weight of waste collected.
+     * @param collectedLiters             The volume of waste collected.
+     * @param distanceFromPreviousMeters  The distance traveled from the previous stop.
+     * @param cumulativeDistanceMeters    The total distance traveled so far.
+     * @param containerActualLiters       The actual liters before collection.
+     * @param collectedAt                 Time of day at which the stop is performed.
+     * @param alerts                      List of alerts.
+     */
+    public Stop(UUID id,
+            RouteSequence sequence,
+            StopType type,
+            Container container,
+            CollectedWeightKilograms collectedKilograms,
+            CollectedVolumeLiters collectedLiters,
+            Distance distanceFromPreviousMeters,
+            Distance cumulativeDistanceMeters,
+            CollectedVolumeLiters containerActualLiters,
+            LocalTime collectedAt,
+            List<StopAlert> alerts) {
+        validateId(id);
+        validate(sequence, type, container, collectedKilograms, collectedLiters, distanceFromPreviousMeters, cumulativeDistanceMeters);
+        this.id = id;
+        this.sequence = sequence;
+        this.type = type;
+        this.container = container;
+        this.collectedKilograms = collectedKilograms;
+        this.collectedLiters = collectedLiters;
+        this.distanceFromPreviousMeters = distanceFromPreviousMeters;
+        this.cumulativeDistanceMeters = cumulativeDistanceMeters;
+        this.containerActualLiters = containerActualLiters != null ? containerActualLiters : CollectedVolumeLiters.fromLiters(0.0);
+        this.collectedAt = collectedAt;
+        this.alerts = alerts != null ? new ArrayList<>(alerts) : new ArrayList<>();
     }
 
     /**

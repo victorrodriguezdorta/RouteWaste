@@ -285,8 +285,8 @@ public class PersistAlgorithmExecutionResultService implements PersistAlgorithmE
 		} else {
 			plan = new InfrastructurePlan(
 					resolvePlanningPeriod(algorithmResponse),
-					effectiveMaxBudget,
 					null,
+					effectiveMaxBudget,
 					numberOfDays,
 					averagePickupTimeMinutes,
 					executedAt != null ? new ExecutedAt(executedAt) : null,
