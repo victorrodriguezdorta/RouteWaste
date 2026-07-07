@@ -5,6 +5,7 @@
 # RouteWaste TFG
 
 **Waste collection infrastructure and daily route planning platform**
+Video DEMO: https://www.youtube.com/watch?v=jKH_b8NVqXg 
 
 ### Tech Stack
 
