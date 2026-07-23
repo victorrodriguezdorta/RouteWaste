@@ -8,6 +8,9 @@
 
 Video DEMO: https://www.youtube.com/watch?v=jKH_b8NVqXg 
 
+The complete project documentation is available here:  (Spanish)
+📄 [Project Report (PDF)](enlace-al-pdf)
+
 ### Tech Stack
 
 ![Vue 3](https://img.shields.io/badge/Vue.js-3-4FC08D?style=for-the-badge&logo=vuedotjs&logoColor=white)
