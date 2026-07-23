@@ -8,8 +8,8 @@
 
 Video DEMO: https://www.youtube.com/watch?v=jKH_b8NVqXg 
 
-The complete project documentation is available here:  (Spanish)
-##📄 [Project Report (PDF)](enlace-al-pdf)
+## The complete project documentation is available here:  (Spanish)
+📄 [Project Report (PDF)](enlace-al-pdf)
 
 ### Tech Stack
 
